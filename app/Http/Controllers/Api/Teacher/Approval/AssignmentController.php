@@ -40,33 +40,64 @@ class AssignmentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function assignment()
+    public function assignment(Request $request)
     {
         //
         $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
-        /*$assignment = Assignment::where([
-                ['school_id',Auth::user()->school_id],
-                ['academic_year_id',$academic_year->id],
-                ['teacher_id',Auth::id()],
-                ['submission_date','>=',date('Y-m-d')],
-               // ['status','ongoing']
-            ])->orWhere([['status','pending'],['teacher_id',Auth::id()]])->whereHas('assignmentApproval' , function($query) use($status) {
-                $query->where('status','approved');
-            })->get();*/
+        
+        //  $assignment = Assignment::where([
+        //         ['school_id',Auth::user()->school_id],
+        //         ['academic_year_id',$academic_year->id],
+        //         ['teacher_id',Auth::id()],
+        //         ['submission_date','>=',date('Y-m-d')],
+        //     ])->latest()->get();   
+        // $assignmentlist = AssignmentResource::collection($assignment);
 
-         $assignment = Assignment::where([
-                ['school_id',Auth::user()->school_id],
-                ['academic_year_id',$academic_year->id],
-                ['teacher_id',Auth::id()],
-                ['submission_date','>=',date('Y-m-d')],
-            ])->latest()->get();   
+        // return response()->json([
+        //     'success'   =>  true,
+        //     'message'   =>  'Assignment List',
+        //     'data'      =>  $assignmentlist
+        // ],200);
+
+        $query = Assignment::where([
+            ['school_id', Auth::user()->school_id],
+            ['academic_year_id', $academic_year->id],
+            ['teacher_id', Auth::id()],
+            // ['submission_date', '>=', date('Y-m-d')],
+        ]);
+
+        //  Filter by standardLink_id (dynamic)
+        if (isset($request->standardLink_id)) {
+            $query->where('standardLink_id', $request->standardLink_id);
+        }
+
+        // Optional: status filter (if needed)
+        if (isset($request->status)) {
+            $query->where('status', $request->status);
+        }
+        
+        //date filter  
+        if (isset($request->date)) {
+            $query->whereDate('submission_date', $request->date);
+        }
+
+
+        $assignment = $query->orderBy('id','desc')->paginate(10);
+
+        //  Resource collection
         $assignmentlist = AssignmentResource::collection($assignment);
 
         return response()->json([
-            'success'   =>  true,
-            'message'   =>  'Assignment List',
-            'data'      =>  $assignmentlist
-        ],200);
+            'success' => true,
+            'message' => 'Assignment List',
+            'data'    => $assignmentlist,
+            'meta'    => [
+                'current_page' => $assignment->currentPage(),
+                'last_page'    => $assignment->lastPage(),
+                'per_page'     => $assignment->perPage(),
+                'total'        => $assignment->total(),
+            ]
+        ], 200);
     }
 
     /**
@@ -82,7 +113,7 @@ class AssignmentController extends Controller
                 ['school_id',Auth::user()->school_id],
                 ['academic_year_id',$academic_year->id],
                 ['teacher_id',Auth::id()],
-                ['submission_date','<=',date('Y-m-d')],
+                // ['submission_date','<=',date('Y-m-d')],
                 ['status','completed']
             ])->whereHas('assignmentApproval' , function($query) use($status) {
                 $query->where('status','approved');
@@ -123,11 +154,15 @@ class AssignmentController extends Controller
                 ['class_teacher_id',Auth::id()]
             ])->pluck('id')->toArray();
 
+
+
         $teacherlinks = Teacherlink::where([
             ['school_id',$school_id],
             ['academic_year_id',$academic_year->id],
             ['teacher_id',Auth::id()]
         ])->pluck('standardLink_id')->toArray();
+
+        dd($teacherlinks);
 
         $standards = array_merge($standardLinks,$teacherlinks);
 
@@ -201,21 +236,35 @@ class AssignmentController extends Controller
             $assigned_date = date('Y-m-d',strtotime($request->assigned_date));
             $assignment->assigned_date      =   $assigned_date;
             $assignment->submission_date    =   date('Y-m-d',strtotime($request->submission_date));
-            if($assigned_date == date('Y-m-d'))
+            
+            $assignment->status             =   $request->status;
+
+            if ($request->status == 'completed')
             {
                 $assignment->status             =   'ongoing';
+
             }
-            else
-            {
-                $assignment->status             =   'pending';
-            }
+            // if($assigned_date == date('Y-m-d'))
+            // {
+            //     $assignment->status             =   'ongoing';
+            // }
+            // else
+            // {
+            //     $assignment->status             =   'pending';
+            // }
 
             $assignment->save();
 
             $assignmentapproval = new AssignmentApproval;
 
             $assignmentapproval->assignment_id  = $assignment->id;
-            $assignmentapproval->status         = 'pending';
+            // $assignmentapproval->status         = 'pending';
+            // $assignmentapproval->status         = $request->status;
+
+            // if ($request->status == 'completed')
+            // {
+                $assignmentapproval->status         = 'approved';
+            // }
 
             $assignmentapproval->save();
 
@@ -280,6 +329,8 @@ class AssignmentController extends Controller
         $array['submissionDate']    =   date('d-m-Y',strtotime($assignment->submission_date));
         $array['attachment']        =   $assignment->attachment==null ? '':$assignment->AttachmentPath;
 
+        $array['status']        =   $assignment->status;
+
         return response()->json([
             'success'   =>  true,
             'message'   =>  'Show Assignment',
@@ -300,8 +351,8 @@ class AssignmentController extends Controller
         try
         {
             $assignment     =   Assignment::where('id',$id)->first();
-            if( $assignment->assignmentApproval->status == 'pending' )
-            {
+            // if( $assignment->assignmentApproval->status == 'pending' )
+            // {
                 if($assignment->status != 'completed')
                 {
 
@@ -324,13 +375,18 @@ class AssignmentController extends Controller
                     $assigned_date      =   date('Y-m-d',strtotime($request->assigned_date));
                     $assignment->assigned_date      =   $assigned_date;
                     $assignment->submission_date    =   date('Y-m-d',strtotime($request->submission_date));
-                    if($assigned_date == date('Y-m-d'))
+                    // if($assigned_date == date('Y-m-d'))
+                    // {
+                    //     $assignment->status             =   'ongoing';
+                    // }
+                    // else
+                    // {
+                    //     $assignment->status             =   'pending';
+                    // }
+                    if ($request->status == 'completed')
                     {
                         $assignment->status             =   'ongoing';
-                    }
-                    else
-                    {
-                        $assignment->status             =   'pending';
+
                     }
 
                     $assignment->save();
@@ -368,11 +424,11 @@ class AssignmentController extends Controller
                 {
                     $message = "Can't Update.Assignment is completed";
                 }
-            }
-            else
-            {
-                $message = trans('messages.approval_done_msg',['module' => 'Assignment']);
-            }
+            // }
+            // else
+            // {
+            //     $message = trans('messages.approval_done_msg',['module' => 'Assignment']);
+            // }
 
             return response()->json([
                 'success'   =>  true,

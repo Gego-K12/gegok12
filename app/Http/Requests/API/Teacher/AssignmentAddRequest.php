@@ -141,8 +141,8 @@ class AssignmentAddRequest extends FormRequest
         $rules = [
             'status' => 'required|in:pending,ongoing,cancel,completed',
 
-            'standardLink_id' => 'required_if:status,completed',
-            'subject_id'      => 'required_if:status,completed',
+            'standardLink_id' => 'required',
+            'subject_id'      => 'required',
 
             'title' => 'required_if:status,completed|max:50|check_title',
 

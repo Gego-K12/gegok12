@@ -92,7 +92,7 @@ Route::group([ 'prefix' => 'teacher' , 'middleware'=>['auth:sanctum'] , 'namespa
             Route::post('/assignment/edit/{id}', 'AssignmentController@update');
 
             //delete
-            Route::get('/assignment/delete/{id}', 'AssignmentController@destroy');
+            Route::delete('/assignment/delete/{id}', 'AssignmentController@destroy');
 
         //homework
             //index

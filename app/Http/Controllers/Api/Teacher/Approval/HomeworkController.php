@@ -50,7 +50,13 @@ class HomeworkController extends Controller
         /*->whereHas('standardLink' , function ($query){
             $query->where('class_teacher_id',Auth::id());
         })*/ // code for class teacher
-        $homework = Homework::where([['school_id',Auth::user()->school_id],['academic_year_id',$academic_year->id],['teacher_id',Auth::id()],['date','>=',date('Y-m-d')]])->orderBy('date','DESC')->get();
+        $homework = Homework::where([
+            ['school_id',Auth::user()->school_id],
+            ['academic_year_id',$academic_year->id],
+            ['teacher_id',Auth::id()],
+            ['date','>=',date('Y-m-d')]
+        ])->orderBy('date','DESC')
+        ->paginate(10);
 
         $homeworklist = HomeworkResource::collection($homework);
         
@@ -111,9 +117,14 @@ class HomeworkController extends Controller
         //
         $school_id      =   Auth::user()->school_id;
         $academic_year  =   SiteHelper::getAcademicYear($school_id);
-        $homework = Homework::where([['school_id',Auth::user()->school_id],['academic_year_id',$academic_year->id],['teacher_id',Auth::id()],['date','<',date('Y-m-d')]])->orderBy('date','DESC')->whereHas('homeworkApproval' ,function ($query) {
+        $homework = Homework::where([
+            ['school_id',Auth::user()->school_id],
+            ['academic_year_id',$academic_year->id],
+            ['teacher_id',Auth::id()],['date','<',date('Y-m-d')]
+        ])->orderBy('date','DESC')
+        ->whereHas('homeworkApproval' ,function ($query) {
             $query->where('status','approved');
-        })->get();
+        })->paginate(10);
         /*->whereHas('standardLink' , function ($query){
             $query->where('class_teacher_id',Auth::id());
         })*/ // code for class teacher
@@ -220,7 +231,8 @@ class HomeworkController extends Controller
             $homeworkapproval = new HomeworkApproval;
 
             $homeworkapproval->homework_id    = $work->id;
-            $homeworkapproval->status         = 'pending';
+            // $homeworkapproval->status         = 'pending';
+            $homeworkapproval->status         = 'approved';
 
             $homeworkapproval->save();
 
@@ -318,8 +330,8 @@ class HomeworkController extends Controller
         try
         {
             $work = Homework::where('id',$id)->first();
-            if( $work->homeworkApproval->status == 'pending' )
-            {
+            // if( $work->homeworkApproval->status == 'pending' )
+            // {
                 $work->standardLink_id      =   $request->standardLink_id;
                 $work->subject_id           =   $request->subject_id;
                 $work->teacher_id           =   Auth::id();
@@ -359,11 +371,11 @@ class HomeworkController extends Controller
                     LOGNAME_EDIT_HOMEWORK,
                     $message
                 );
-            }
-            else
-            {
-                $message = trans('messages.approval_done_msg',['module' => 'Homework']);
-            }
+            // }
+            // else
+            // {
+            //     $message = trans('messages.approval_done_msg',['module' => 'Homework']);
+            // }
             
             return response()->json([
                 'success'   =>  true,

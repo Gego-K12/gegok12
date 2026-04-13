@@ -81,6 +81,11 @@ class AssignmentController extends Controller
             $query->whereDate('submission_date', $request->date);
         }
 
+        //date filter  
+        if (isset($request->subject_id)) {
+            $query->where('subject_id', $request->subject_id);
+        }
+
 
         $assignment = $query->orderBy('id','desc')->paginate(10);
 
@@ -162,7 +167,7 @@ class AssignmentController extends Controller
             ['teacher_id',Auth::id()]
         ])->pluck('standardLink_id')->toArray();
 
-        dd($teacherlinks);
+        // dd($teacherlinks);
 
         $standards = array_merge($standardLinks,$teacherlinks);
 
@@ -383,6 +388,8 @@ class AssignmentController extends Controller
                     // {
                     //     $assignment->status             =   'pending';
                     // }
+                    $assignment->status             =   $request->status;
+                    
                     if ($request->status == 'completed')
                     {
                         $assignment->status             =   'ongoing';
@@ -454,8 +461,8 @@ class AssignmentController extends Controller
         try
         {
             $assignment = Assignment::where('id',$id)->first();
-            if( $assignment->assignmentApproval->status == 'pending' )
-            {
+            // if( $assignment->assignmentApproval->status == 'pending' )
+            // {
                 $assignment->status     =   'cancel';
                 $assignment->save();
 
@@ -489,11 +496,11 @@ class AssignmentController extends Controller
                     LOGNAME_DELETE_ASSIGNMENT,
                     $message
                 );
-            }
-            else
-            {
-                $message = trans('messages.delete_fail_approval_done_msg',['module' => 'Assignment']);
-            }
+            // }
+            // else
+            // {
+            //     $message = trans('messages.delete_fail_approval_done_msg',['module' => 'Assignment']);
+            // }
 
             return response()->json([
                 'success'   =>  true,

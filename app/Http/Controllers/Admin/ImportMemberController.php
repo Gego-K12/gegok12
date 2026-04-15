@@ -53,6 +53,7 @@ class ImportMemberController extends Controller
      * Import users from an uploaded Excel or CSV file.
      *
      * Handles:
+     * - CSV validation before import
      * - Import execution
      * - Import limit validation
      * - Success and failure messaging
@@ -63,10 +64,45 @@ class ImportMemberController extends Controller
      */
     public function importUsers(ImportMemberRequest $request)
     {
-        // 
         try
         {
-            Excel::import(new UsersImport, $request->file('import_file'));
+            // ==========================================
+            // STEP 1: VALIDATE CSV BEFORE IMPORTING
+            // ==========================================
+            
+            $importer = new UsersImport;
+            
+            // Read the file into a collection for validation
+            $rows = Excel::toCollection($importer, $request->file('import_file'))->first();
+            
+            // Skip the first row if it contains format hints (check if first row firstname = 'firstname')
+            if ($rows->count() > 0 && strtolower(trim($rows->first()['firstname'] ?? '')) === 'firstname') {
+                $rows = $rows->slice(1);
+            }
+            
+            // Run validation
+            $validationErrors = $importer->validateImport($rows);
+            $validationWarnings = $importer->getImportWarnings();
+            
+            // If there are validation errors, return them to the user
+            if (!empty($validationErrors)) {
+                $errorMessages = $this->formatValidationErrors($validationErrors);
+                return back()->with('validation_errors', $validationErrors)
+                             ->with('validation_warnings', $validationWarnings)
+                             ->with('failmessage', 'Import validation failed. Please fix the following errors in your CSV file:')
+                             ->with('error_details', $errorMessages);
+            }
+
+            // ==========================================
+            // STEP 2: PROCEED WITH IMPORT
+            // ==========================================
+            
+            // Create a fresh importer instance for actual import
+            $importerForExecution = new UsersImport;
+            Excel::import($importerForExecution, $request->file('import_file'));
+            
+            // Get import summary statistics
+            $importSummary = $importerForExecution->getImportSummary();
 
             $count = \Session::get('count');
             if ($count != 0)
@@ -74,9 +110,12 @@ class ImportMemberController extends Controller
                 return back()->with('failmessage', 'You can add only ' . $count . ' Members');
             }
 
-            \Session::forget('count'); 
-             
+            \Session::forget('count');
+
             $insertedcount = \Session::get('insertedcount');
+            $parentsCreated = \Session::get('parents_created', 0);
+            $siblingsLinked = \Session::get('siblings_linked', 0);
+            
             if ($insertedcount > 0)
             {
                 $message = trans('messages.import_success_msg', ['module' => 'Student']);
@@ -90,22 +129,54 @@ class ImportMemberController extends Controller
                     $message
                 );
 
-                return back()->with(
+                // Build success response with import summary
+                $successResponse = back()->with(
                     'successmessage',
                     $insertedcount . ' ' . trans('messages.insert_success_msg')
-                );
+                )->with('import_summary', [
+                    'students_imported' => $insertedcount,
+                    'parents_created' => $parentsCreated,
+                    'siblings_linked' => $siblingsLinked
+                ]);
+                
+                \Session::forget('insertedcount');
+                \Session::forget('parents_created');
+                \Session::forget('siblings_linked');
+                
+                return $successResponse;
             }
             else
             {
                 return back()->with('failmessage', trans('messages.insert_failure_msg'));
             }
-
-            \Session::forget('insertedcount'); 
         }
         catch (Exception $e)
         {
-            //dd($e->getMessage());
+            \Log::error('Import Error: ' . $e->getMessage() . ' at line ' . $e->getLine());
+            return back()->with('failmessage', 'Import failed: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Format validation errors into a readable string/array for display.
+     *
+     * @param array $validationErrors
+     * @return string
+     */
+    protected function formatValidationErrors(array $validationErrors)
+    {
+        $formatted = [];
+        
+        foreach ($validationErrors as $error) {
+            $rowInfo = "Row {$error['row']}";
+            if (!empty($error['student'])) {
+                $rowInfo .= " ({$error['student']})";
+            }
+            $rowInfo .= ": " . implode('; ', $error['errors']);
+            $formatted[] = $rowInfo;
+        }
+        
+        return implode("\n", $formatted);
     }
 
     /**
@@ -121,7 +192,7 @@ class ImportMemberController extends Controller
      * @return void
      */
     public function downloadFormat(Request $request)
-    {      
+    {
         $csv = Writer::createFromFileObject(new \SplTempFileObject());
 
         $csv->insertOne([

@@ -80,8 +80,8 @@ class Assignment extends JsonResource
             'assigned_date'             =>  date('d M Y', strtotime($this->assigned_date)),
             'submission_date'           =>  date('d M Y', strtotime($this->submission_date)),
             'attachment'                =>  $attachment,
-            'status_display'            =>  ucwords($this->assignmentApproval->status),
-            'status'                    =>  $this->assignmentApproval->status,
+            'status_display'            =>  ucwords($this->status), //$this->assignmentApproval->status
+            'status'                    =>  $this->status, //$this->assignmentApproval->status
             'comments'                  =>  $this->assignmentApproval->comments,
             //'studentAssignmentStatus'   =>  $studentAssignmentStatus,
             //'studentStatus'             =>  ucwords($this->studentAssignment->status),

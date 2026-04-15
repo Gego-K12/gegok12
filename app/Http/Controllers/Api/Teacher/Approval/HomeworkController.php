@@ -39,7 +39,7 @@ class HomeworkController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function pendingList()
+    public function pendingList(Request $request)
     {
         //
         $school_id      =   Auth::user()->school_id;
@@ -50,13 +50,35 @@ class HomeworkController extends Controller
         /*->whereHas('standardLink' , function ($query){
             $query->where('class_teacher_id',Auth::id());
         })*/ // code for class teacher
-        $homework = Homework::where([
+        $query = Homework::where([
             ['school_id',Auth::user()->school_id],
             ['academic_year_id',$academic_year->id],
             ['teacher_id',Auth::id()],
-            ['date','>=',date('Y-m-d')]
-        ])->orderBy('date','DESC')
-        ->paginate(10);
+            // ['date','>=',date('Y-m-d')]
+        ]);
+
+        //  Filter by standardLink_id (dynamic)
+        if (isset($request->standardLink_id)) {
+            $query->where('standardLink_id', $request->standardLink_id);
+        }
+
+        // Optional: status filter (if needed)
+        if (isset($request->status)) {
+            $query->where('status', $request->status);
+        }
+        
+        //date filter  
+        if (isset($request->date)) {
+            $query->whereDate('date', $request->date);
+        }
+
+        //date filter  
+        if (isset($request->subject_id)) {
+            $query->where('subject_id', $request->subject_id);
+        }
+
+
+        $homework = $query->orderBy('id','desc')->paginate(10);
 
         $homeworklist = HomeworkResource::collection($homework);
         
@@ -215,6 +237,7 @@ class HomeworkController extends Controller
             $work->description          =   $request->description;
             $work->date                 =   date('Y-m-d',strtotime($request->date));
             $work->submission_date      =   date('Y-m-d',strtotime($request->submission_date));
+            $work->status               =   $request->status;
 
             $file = $request->file('attachment');
             if($file)
@@ -294,7 +317,7 @@ class HomeworkController extends Controller
     {
         //
         $homework = Homework::where('id',$id)->first();
-        if(count($homework)>0)
+        if($homework)
         {
             $array=[];
 
@@ -305,6 +328,7 @@ class HomeworkController extends Controller
             $array['attachment']        =   $homework->attachment == null ? '':$homework->AttachmentPath;
             $array['pending_count']     =   $homework->PendingCount;
             $array['submission_date']   =   date('d-m-Y',strtotime($homework->submission_date));
+            $array['status']            =   $homework->status;
 
             return $array;
         }
@@ -401,12 +425,12 @@ class HomeworkController extends Controller
         try
         {
             $homework = Homework::where('id',$id)->first();
-            if(count($homework)>0)
+            if($homework)
             {
                 if(\Gate::allows('homework',$homework))
                 {                    
-                    if( $homework->homeworkApproval->status == 'pending' )
-                    {
+                    // if( $homework->homeworkApproval->status == 'pending' )
+                    // {
                         $homework->delete();
 
                         $admin = User::BySchool(Auth::user()->school_id)->ByRole(3)->first();
@@ -442,11 +466,11 @@ class HomeworkController extends Controller
                             LOGNAME_DELETE_HOMEWORK,
                             $message
                         );
-                    }
-                    else
-                    {
-                        $message = trans('messages.delete_fail_approval_done_msg',['module' => 'Homework']);
-                    }
+                    // }
+                    // else
+                    // {
+                    //     $message = trans('messages.delete_fail_approval_done_msg',['module' => 'Homework']);
+                    // }
                     $success = true;
                     $error_code = 200;
                 }

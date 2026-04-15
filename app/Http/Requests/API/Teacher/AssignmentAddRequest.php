@@ -138,24 +138,33 @@ class AssignmentAddRequest extends FormRequest
             return preg_match('/^[0-9]+$/', request('marks'));
         });
 
+        $status = request('status');
+
         $rules = [
             'status' => 'required|in:pending,ongoing,cancel,completed',
 
             'standardLink_id' => 'required',
             'subject_id'      => 'required',
 
-            'title' => 'required_if:status,completed|max:50|check_title',
+            'title'        => 'nullable|max:50|check_title',
+            'description'  => 'nullable|max:255',
 
-            'description' => 'required_if:status,completed|max:255',
+            'attachment'   => 'nullable',
 
-            'attachment' => 'nullable',
+            'marks'        => 'nullable|numeric|check_marks|check_valid_marks',
 
-            'marks' => 'nullable|numeric|check_marks|check_valid_marks',
-
-            'assigned_date' => 'required_if:status,completed|check_assigned_date|check_exists|before:submission_date',
-
-            'submission_date' => 'required_if:status,completed|after:assigned_date',
+            'assigned_date'   => 'nullable|check_assigned_date|check_exists',
+            'submission_date' => 'nullable',
         ];
+
+        if ($status === 'completed') {
+
+            $rules['title']           .= '|required';
+            $rules['description']     .= '|required';
+
+            $rules['assigned_date']   .= '|required|before:submission_date';
+            $rules['submission_date'] .= '|required|after:assigned_date';
+        }
 
         return $rules;
     }

@@ -78,7 +78,7 @@ class AssignmentController extends Controller
         
         //date filter  
         if (isset($request->date)) {
-            $query->whereDate('submission_date', $request->date);
+            $query->whereDate('assigned_date', $request->date);
         }
 
         //date filter  

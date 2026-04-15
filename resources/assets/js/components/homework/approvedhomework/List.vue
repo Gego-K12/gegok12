@@ -36,19 +36,18 @@
             </div>
         </Teleport>
         <div class="">
-          <div class="flex" v-show="this.status=='pending' && this.approvallist.length>0">
-             <a @click="updateAll('approve')" class="no-underline text-white px-4 my-3 mx-1 flex items-center custom-green py-1 justify-center cursor-pointer">
-                            <span class="mx-1 text-sm font-semibold">Approve</span>
+          <div class="flex" v-show="this.status=='draft' && this.approvallist.length>0">
+             <a @click="updateAll('publish')" class="no-underline text-white px-4 my-3 mx-1 flex items-center custom-green py-1 justify-center cursor-pointer">
+                            <span class="mx-1 text-sm font-semibold">Publish</span>
                         </a> 
-                        <a  @click="updateAll('reject')" class="no-underline text-white px-4 my-3 mx-1 flex items-center bg-red-500 py-1 justify-center cursor-pointer">
-                            <span class="mx-1 text-sm font-semibold">Reject</span>
+                        <a  @click="updateAll('draft')" class="no-underline text-white px-4 my-3 mx-1 flex items-center bg-red-500 py-1 justify-center cursor-pointer">
+                            <span class="mx-1 text-sm font-semibold">Draft</span>
                         </a> 
              </div>           
             <div class="flex flex-wrap custom-table  my-3 overflow-auto">
                 <table class="w-full">
                     <thead class="bg-grey-light">
                         <tr class="border-b">
-                            <th class="text-left text-sm px-2 py-2 text-grey-darker" v-if="this.status == 'pending' && mode=='admin'"> Check </th>
                             <th class="text-left text-sm px-2 py-2 text-grey-darker" v-if="hidecolumns == 'false'"> Class </th>
                             <th class="text-left text-sm px-2 py-2 text-grey-darker"> Subject </th>
                             <th class="text-left text-sm px-2 py-2 text-grey-darker" width="40%"> Descripiton </th>
@@ -63,9 +62,6 @@
                     </thead>   
                     <tbody v-if="this.homeworks != ''">
                         <tr class="border-b" v-for="homework in homeworks">
-                            <td class="py-3 px-2" v-if="homework.status == 'pending' && mode=='admin'">
-                                <input type="checkbox" name=""  v-model="approvallist" :value="homework.id">
-                            </td>
                             <td class="py-3 px-2" v-if="hidecolumns == 'false'">
                                 <p class="font-semibold text-xs">{{ homework.class_name }}</p>
                             </td>
@@ -74,7 +70,6 @@
                                 <p class="font-semibold text-xs" v-else>--</p>
                             </td>
                             <td class="py-3 px-2">
-                                <!-- <p class="font-semibold text-xs">{{ trim(homework.description) }}</p> -->
                                 <div class="font-semibold text-xs" v-html="trim(homework.description)"></div>
                             </td>
                             <td class="py-3 px-2">
@@ -104,42 +99,48 @@
                             </td>
                             <td class="py-3 px-2">
                                 <div class="flex items-center">
-                                    <a :href="url+'/'+mode+'/homework/edit/'+homework.id" title="Edit" v-if="hidecolumns == 'false' && (role == 'admin' && ( homework.status == 'pending' || homework.status == 'approved') ) && homework.finished_count == 0">
+                                    <!-- Edit: admin can edit draft or publish if no finished submissions -->
+                                    <a :href="url+'/'+mode+'/homework/edit/'+homework.id" title="Edit" v-if="hidecolumns == 'false' && (role == 'admin' && ( homework.status == 'draft' || homework.status == 'publish') ) && homework.finished_count == 0">
                                         <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 477.873 477.873" xml:space="preserve" class="w-4 h-4 fill-current text-black-500 mx-1"><g><g><path d="M392.533,238.937c-9.426,0-17.067,7.641-17.067,17.067V426.67c0,9.426-7.641,17.067-17.067,17.067H51.2 c-9.426,0-17.067-7.641-17.067-17.067V85.337c0-9.426,7.641-17.067,17.067-17.067H256c9.426,0,17.067-7.641,17.067-17.067 S265.426,34.137,256,34.137H51.2C22.923,34.137,0,57.06,0,85.337V426.67c0,28.277,22.923,51.2,51.2,51.2h307.2 c28.277,0,51.2-22.923,51.2-51.2V256.003C409.6,246.578,401.959,238.937,392.533,238.937z"></path></g></g> <g><g><path d="M458.742,19.142c-12.254-12.256-28.875-19.14-46.206-19.138c-17.341-0.05-33.979,6.846-46.199,19.149L141.534,243.937 c-1.865,1.879-3.272,4.163-4.113,6.673l-34.133,102.4c-2.979,8.943,1.856,18.607,10.799,21.585 c1.735,0.578,3.552,0.873,5.38,0.875c1.832-0.003,3.653-0.297,5.393-0.87l102.4-34.133c2.515-0.84,4.8-2.254,6.673-4.13 l224.802-224.802C484.25,86.023,484.253,44.657,458.742,19.142z M434.603,87.419L212.736,309.286l-66.287,22.135l22.067-66.202 L390.468,43.353c12.202-12.178,31.967-12.158,44.145,0.044c5.817,5.829,9.095,13.72,9.12,21.955 C443.754,73.631,440.467,81.575,434.603,87.419z"></path></g></g></svg>
                                     </a>
 
-                                    <a :href="url+'/'+mode+'/homework/edit/'+homework.id" title="Edit" v-if="hidecolumns == 'false' && (mode == 'teacher' &&  homework.status == 'pending' && homework.created_by == homework.auth_id)">
+                                    <!-- Edit: teacher can edit their own draft homework -->
+                                    <a :href="url+'/'+mode+'/homework/edit/'+homework.id" title="Edit" v-if="hidecolumns == 'false' && (mode == 'teacher' && homework.status == 'draft' && homework.created_by == homework.auth_id)">
                                         <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 477.873 477.873" xml:space="preserve" class="w-4 h-4 fill-current text-black-500 mx-1"><g><g><path d="M392.533,238.937c-9.426,0-17.067,7.641-17.067,17.067V426.67c0,9.426-7.641,17.067-17.067,17.067H51.2 c-9.426,0-17.067-7.641-17.067-17.067V85.337c0-9.426,7.641-17.067,17.067-17.067H256c9.426,0,17.067-7.641,17.067-17.067 S265.426,34.137,256,34.137H51.2C22.923,34.137,0,57.06,0,85.337V426.67c0,28.277,22.923,51.2,51.2,51.2h307.2 c28.277,0,51.2-22.923,51.2-51.2V256.003C409.6,246.578,401.959,238.937,392.533,238.937z"></path></g></g> <g><g><path d="M458.742,19.142c-12.254-12.256-28.875-19.14-46.206-19.138c-17.341-0.05-33.979,6.846-46.199,19.149L141.534,243.937 c-1.865,1.879-3.272,4.163-4.113,6.673l-34.133,102.4c-2.979,8.943,1.856,18.607,10.799,21.585 c1.735,0.578,3.552,0.873,5.38,0.875c1.832-0.003,3.653-0.297,5.393-0.87l102.4-34.133c2.515-0.84,4.8-2.254,6.673-4.13 l224.802-224.802C484.25,86.023,484.253,44.657,458.742,19.142z M434.603,87.419L212.736,309.286l-66.287,22.135l22.067-66.202 L390.468,43.353c12.202-12.178,31.967-12.158,44.145,0.044c5.817,5.829,9.095,13.72,9.12,21.955 C443.754,73.631,440.467,81.575,434.603,87.419z"></path></g></g></svg>
                                     </a>
 
-                                    <a :href="url+'/'+mode+'/homework/show/'+homework.id" title="View" v-if="hidecolumns == 'false' && homework.status == 'approved'">
+                                    <!-- View: show for published homework -->
+                                    <a :href="url+'/'+mode+'/homework/show/'+homework.id" title="View" v-if="hidecolumns == 'false' && homework.status == 'publish'">
                                         <svg class="w-4 h-4 fill-current text-black-500 mx-1" height="512pt" viewBox="-27 0 512 512" width="512pt" xmlns="http://www.w3.org/2000/svg"><path d="m188 492c0 11.046875-8.953125 20-20 20h-88c-44.113281 0-80-35.886719-80-80v-352c0-44.113281 35.886719-80 80-80h245.890625c44.109375 0 80 35.886719 80 80v191c0 11.046875-8.957031 20-20 20-11.046875 0-20-8.953125-20-20v-191c0-22.054688-17.945313-40-40-40h-245.890625c-22.054688 0-40 17.945312-40 40v352c0 22.054688 17.945312 40 40 40h88c11.046875 0 20 8.953125 20 20zm117.890625-372h-206c-11.046875 0-20 8.953125-20 20s8.953125 20 20 20h206c11.042969 0 20-8.953125 20-20s-8.957031-20-20-20zm20 100c0-11.046875-8.957031-20-20-20h-206c-11.046875 0-20 8.953125-20 20s8.953125 20 20 20h206c11.042969 0 20-8.953125 20-20zm-226 60c-11.046875 0-20 8.953125-20 20s8.953125 20 20 20h105.109375c11.046875 0 20-8.953125 20-20s-8.953125-20-20-20zm355.472656 146.496094c-.703125 1.003906-3.113281 4.414062-4.609375 6.300781-6.699218 8.425781-22.378906 28.148437-44.195312 45.558594-27.972656 22.324219-56.757813 33.644531-85.558594 33.644531s-57.585938-11.320312-85.558594-33.644531c-21.816406-17.410157-37.496094-37.136719-44.191406-45.558594-1.5-1.886719-3.910156-5.300781-4.613281-6.300781-4.847657-6.898438-4.847657-16.097656 0-22.996094.703125-1 3.113281-4.414062 4.613281-6.300781 6.695312-8.421875 22.375-28.144531 44.191406-45.554688 27.972656-22.324219 56.757813-33.644531 85.558594-33.644531s57.585938 11.320312 85.558594 33.644531c21.816406 17.410157 37.496094 37.136719 44.191406 45.558594 1.5 1.886719 3.910156 5.300781 4.613281 6.300781 4.847657 6.898438 4.847657 16.09375 0 22.992188zm-41.71875-11.496094c-31.800781-37.832031-62.9375-57-92.644531-57-29.703125 0-60.84375 19.164062-92.644531 57 31.800781 37.832031 62.9375 57 92.644531 57s60.84375-19.164062 92.644531-57zm-91.644531-38c-20.988281 0-38 17.011719-38 38s17.011719 38 38 38 38-17.011719 38-38-17.011719-38-38-38zm0 0"/></svg>
                                     </a>
 
-                                    <a href="#" @click="deleteHomework(homework.id)" title="Delete" v-if="homework.status == 'pending' ">
-
-                                   <!--  <a href="#" @click="deleteHomework(homework.id)" title="Delete" v-if="hidecolumns == 'false' && (role == 'admin' && homework.created_by == homework.auth_id)"> -->
+                                    <!-- Delete: only for draft status -->
+                                    <a href="#" @click="deleteHomework(homework.id)" title="Delete" v-if="homework.status == 'draft'">
                                         <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 512 512" xml:space="preserve" class="w-4 h-4 fill-current text-black-500 mx-1"><g><g><g><polygon points="353.574,176.526 313.496,175.056 304.807,412.34 344.885,413.804"></polygon><rect x="235.948" y="175.791" width="40.104" height="237.285"></rect><polygon points="207.186,412.334 198.497,175.049 158.419,176.52 167.109,413.804"></polygon><path d="M17.379,76.867v40.104h41.789L92.32,493.706C93.229,504.059,101.899,512,112.292,512h286.74 c10.394,0,19.07-7.947,19.972-18.301l33.153-376.728h42.464V76.867H17.379z M380.665,471.896H130.654L99.426,116.971h312.474 L380.665,471.896z"></path></g></g></g> <g><g><path d="M321.504,0H190.496c-18.428,0-33.42,14.992-33.42,33.42v63.499h40.104V40.104h117.64v56.815h40.104V33.42 C354.924,14.992,339.932,0,321.504,0z"></path></g></g></svg>
                                     </a>
 
-                                    <a href="#" @click="showModal(homework.id)" title="Show" >
-
-                                   <!--  <a href="#" @click="deleteHomework(homework.id)" title="Delete" v-if="hidecolumns == 'false' && (role == 'admin' && homework.created_by == homework.auth_id)"> -->
-                                    <svg data-v-251df964="" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 511.999 511.999" xml:space="preserve" width="512px" height="512px" class="w-4 h-4 fill-current text-black-500 mx-1" style="filter: brightness(0);"><g data-v-251df964=""><g data-v-251df964=""><g data-v-251df964=""><path data-v-251df964="" d="M508.745,246.041c-4.574-6.257-113.557-153.206-252.748-153.206S7.818,239.784,3.249,246.035c-4.332,5.936-4.332,13.987,0,19.923c4.569,6.257,113.557,153.206,252.748,153.206s248.174-146.95,252.748-153.201 C513.083,260.028,513.083,251.971,508.745,246.041z M255.997,385.406c-102.529,0-191.33-97.533-217.617-129.418c26.253-31.913,114.868-129.395,217.617-129.395c102.524,0,191.319,97.516,217.617,129.418 C447.361,287.923,358.746,385.406,255.997,385.406z" data-original="#000000" fill="#fba33a" class="active-path"></path></g></g><g data-v-251df964=""><g data-v-251df964=""><path data-v-251df964="" d="M255.997,154.725c-55.842,0-101.275,45.433-101.275,101.275s45.433,101.275,101.275,101.275    s101.275-45.433,101.275-101.275S311.839,154.725,255.997,154.725z M255.997,323.516c-37.23,0-67.516-30.287-67.516-67.516 s30.287-67.516,67.516-67.516s67.516,30.287,67.516,67.516S293.227,323.516,255.997,323.516z" data-original="#000000" fill="#fba33a" class="active-path"></path></g></g></g></svg>
+                                    <!-- Show modal: always visible -->
+                                    <a href="#" @click="showModal(homework.id)" title="Show">
+                                        <svg data-v-251df964="" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 511.999 511.999" xml:space="preserve" width="512px" height="512px" class="w-4 h-4 fill-current text-black-500 mx-1" style="filter: brightness(0);"><g data-v-251df964=""><g data-v-251df964=""><g data-v-251df964=""><path data-v-251df964="" d="M508.745,246.041c-4.574-6.257-113.557-153.206-252.748-153.206S7.818,239.784,3.249,246.035c-4.332,5.936-4.332,13.987,0,19.923c4.569,6.257,113.557,153.206,252.748,153.206s248.174-146.95,252.748-153.201 C513.083,260.028,513.083,251.971,508.745,246.041z M255.997,385.406c-102.529,0-191.33-97.533-217.617-129.418c26.253-31.913,114.868-129.395,217.617-129.395c102.524,0,191.319,97.516,217.617,129.418 C447.361,287.923,358.746,385.406,255.997,385.406z" data-original="#000000" fill="#fba33a" class="active-path"></path></g></g><g data-v-251df964=""><g data-v-251df964=""><path data-v-251df964="" d="M255.997,154.725c-55.842,0-101.275,45.433-101.275,101.275s45.433,101.275,101.275,101.275    s101.275-45.433,101.275-101.275S311.839,154.725,255.997,154.725z M255.997,323.516c-37.23,0-67.516-30.287-67.516-67.516 s30.287-67.516,67.516-67.516s67.516,30.287,67.516,67.516S293.227,323.516,255.997,323.516z" data-original="#000000" fill="#fba33a" class="active-path"></path></g></g></g></svg>
                                     </a>
 
-                                    <a href="#" class="capitalize text-white rounded px-1 py-1 font-medium activate" @click="approveHomework(homework.id)" v-if="role == 'admin' && homework.status == 'pending'">
+                                    <!-- Publish action button: shown for admin on draft homework -->
+                                    <a href="#" class="capitalize text-white rounded px-1 py-1 font-medium activate" @click="publishHomework(homework.id)" v-if="role == 'admin' && homework.status == 'draft'">
                                         <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 512 512" xml:space="preserve" class="w-5 h-5 fill-current text-green-600 mx-auto"><g><g><path d="M383.841,171.838c-7.881-8.31-21.02-8.676-29.343-0.775L221.987,296.732l-63.204-64.893 c-8.005-8.213-21.13-8.393-29.35-0.387c-8.213,7.998-8.386,21.137-0.388,29.35l77.492,79.561 c4.061,4.172,9.458,6.275,14.869,6.275c5.134,0,10.268-1.896,14.288-5.694l147.373-139.762 C391.383,193.294,391.735,180.155,383.841,171.838z"></path></g></g><g><g><path d="M256,0C114.84,0,0,114.84,0,256s114.84,256,256,256s256-114.84,256-256S397.16,0,256,0z M256,470.487c-118.265,0-214.487-96.214-214.487-214.487c0-118.265,96.221-214.487,214.487-214.487c118.272,0,214.487,96.221,214.487,214.487C470.487,374.272,374.272,470.487,256,470.487z"></path></g></g></svg>
                                     </a>
 
-                                    <a href="#" class="capitalize text-white  rounded px-1 py-1 font-medium activate" @click="rejectHomework(homework.id)" v-if="role == 'admin' && homework.status == 'pending'">
+                                    <!-- Draft action button: shown for admin on published homework (move back to draft) -->
+                                    <a href="#" class="capitalize text-white  rounded px-1 py-1 font-medium activate" @click="draftHomework(homework.id)" v-if="role == 'admin' && homework.status == 'publish'">
                                         <svg height="512pt" viewBox="0 0 512 512" width="512pt" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mx-auto text-red-600 fill-current"><path d="m256 512c-141.160156 0-256-114.839844-256-256s114.839844-256 256-256 256 114.839844 256 256-114.839844 256-256 256zm0-475.429688c-120.992188 0-219.429688 98.4375-219.429688 219.429688s98.4375 219.429688 219.429688 219.429688 219.429688-98.4375 219.429688-219.429688-98.4375-219.429688-219.429688-219.429688zm0 0"></path><path d="m347.429688 365.714844c-4.679688 0-9.359376-1.785156-12.929688-5.359375l-182.855469-182.855469c-7.144531-7.144531-7.144531-18.714844 0-25.855469 7.140625-7.140625 18.714844-7.144531 25.855469 0l182.855469 182.855469c7.144531 7.144531 7.144531 18.714844 0 25.855469-3.570313 3.574219-8.246094 5.359375-12.925781 5.359375zm0 0"></path><path d="m164.570312 365.714844c-4.679687 0-9.355468-1.785156-12.925781-5.359375-7.144531-7.140625-7.144531-18.714844 0-25.855469l182.855469-182.855469c7.144531-7.144531 18.714844-7.144531 25.855469 0 7.140625 7.140625 7.144531 18.714844 0 25.855469l-182.855469 182.855469c-3.570312 3.574219-8.25 5.359375-12.929688 5.359375zm0 0"></path></svg>
                                     </a>
-                                    <p v-if="homework.status == 'approved'">
+
+                                    <!-- Published status indicator -->
+                                    <p v-if="homework.status == 'publish'">
                                         <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 512 512" xml:space="preserve" class="w-4 h-4 fill-current text-green-600 mx-auto"><g><g><path d="M383.841,171.838c-7.881-8.31-21.02-8.676-29.343-0.775L221.987,296.732l-63.204-64.893 c-8.005-8.213-21.13-8.393-29.35-0.387c-8.213,7.998-8.386,21.137-0.388,29.35l77.492,79.561 c4.061,4.172,9.458,6.275,14.869,6.275c5.134,0,10.268-1.896,14.288-5.694l147.373-139.762 C391.383,193.294,391.735,180.155,383.841,171.838z"></path></g></g> <g><g><path d="M256,0C114.84,0,0,114.84,0,256s114.84,256,256,256s256-114.84,256-256S397.16,0,256,0z M256,470.487 c-118.265,0-214.487-96.214-214.487-214.487c0-118.265,96.221-214.487,214.487-214.487c118.272,0,214.487,96.221,214.487,214.487 C470.487,374.272,374.272,470.487,256,470.487z"></path></g></g></svg>
                                     </p>
 
-                                    <p v-if="homework.status == 'rejected'">
+                                    <!-- Draft status indicator -->
+                                    <p v-if="homework.status == 'draft'">
                                         <svg height="512pt" viewBox="0 0 512 512" width="512pt" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mx-auto text-red-600 fill-current"><path d="m256 512c-141.160156 0-256-114.839844-256-256s114.839844-256 256-256 256 114.839844 256 256-114.839844 256-256 256zm0-475.429688c-120.992188 0-219.429688 98.4375-219.429688 219.429688s98.4375 219.429688 219.429688 219.429688 219.429688-98.4375 219.429688-219.429688-98.4375-219.429688-219.429688-219.429688zm0 0"></path><path d="m347.429688 365.714844c-4.679688 0-9.359376-1.785156-12.929688-5.359375l-182.855469-182.855469c-7.144531-7.144531-7.144531-18.714844 0-25.855469 7.140625-7.140625 18.714844-7.144531 25.855469 0l182.855469 182.855469c7.144531 7.144531 7.144531 18.714844 0 25.855469-3.570313 3.574219-8.246094 5.359375-12.925781 5.359375zm0 0"></path><path d="m164.570312 365.714844c-4.679687 0-9.355468-1.785156-12.925781-5.359375-7.144531-7.140625-7.144531-18.714844 0-25.855469l182.855469-182.855469c7.144531-7.144531 18.714844-7.144531 25.855469 0 7.140625 7.140625 7.144531 18.714844 0 25.855469l-182.855469 182.855469c-3.570312 3.574219-8.25 5.359375-12.929688 5.359375zm0 0"></path></svg>
                                     </p>
                                 </div>
@@ -148,7 +149,7 @@
                     </tbody>
                     <tbody v-else>
                         <tr class="border-b">
-                            <td colspan="10">
+                            <td colspan="11">
                                 <p class="font-semibold text-s" style="text-align: center">No Records Found</p>
                             </td>
                         </tr>
@@ -205,12 +206,13 @@
                     </div>
                 </div>
             </div>
+            <!-- Publish / Draft status modal -->
             <div v-if="show == 'status_'+list.id" class="modal modal-mask">
                 <div class="modal-wrapper px-4">
                     <div class="modal-container w-full  max-w-md px-8 mx-auto">
                         <div class="modal-header flex justify-between items-center">
-                            <h2 v-if="status_type == 'approve'">Approve Homework</h2>
-                            <h2 v-if="status_type == 'reject'">Reject Homework</h2>
+                            <h2 v-if="status_type == 'publish'">Publish Homework</h2>
+                            <h2 v-if="status_type == 'draft'">Move to Draft</h2>
                             <button id="close-button" class="modal-default-button text-2xl py-1" @click="closeModal()">&times;</button>
                         </div>
                         <div class="modal-body">
@@ -224,7 +226,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="my-6">
                             <a href="#" class="btn btn-submit blue-bg text-white rounded px-3 py-1 mr-3 text-sm font-medium" @click="submitStatus(list.id)">Submit</a>
                         </div>
@@ -232,34 +233,32 @@
                 </div>
             </div>
         </div>
-        <!-- all approval -->
-             <div v-show="approval_all == true" class="modal modal-mask">
-                <div class="modal-wrapper px-4">
-                    <div class="modal-container w-full  max-w-md px-8 mx-auto">
-                        <div class="modal-header flex justify-between items-center">
-                            <h2 v-if="all_status == 'approve'">Approve Homework</h2>
-                            <h2 v-if="all_status == 'reject'">Reject Homework</h2>
-                            <button id="close-button" class="modal-default-button text-2xl py-1" @click="closeAllModal()">&times;</button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="flex items-center">
-                                <div class="w-full lg:w-1/4"> 
-                                    <label for="approval_comment" class="tw-form-label">Comments</label>
-                                </div>
-                                <div class="my-2 w-full lg:w-3/4">
-                                    <textarea type="text" name="approval_comment"  v-model="approval_comment" id="approval_comment" class="tw-form-control w-full"></textarea>
-                                    <span v-if="errors.principal_comments" class="text-red-500 text-xs font-semibold">{{errors.principal_comments[0]}}</span>
-                                </div>
+        <!-- Bulk publish/draft modal -->
+        <div v-show="approval_all == true" class="modal modal-mask">
+            <div class="modal-wrapper px-4">
+                <div class="modal-container w-full  max-w-md px-8 mx-auto">
+                    <div class="modal-header flex justify-between items-center">
+                        <h2 v-if="all_status == 'publish'">Publish Homework</h2>
+                        <h2 v-if="all_status == 'draft'">Move to Draft</h2>
+                        <button id="close-button" class="modal-default-button text-2xl py-1" @click="closeAllModal()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="flex items-center">
+                            <div class="w-full lg:w-1/4"> 
+                                <label for="approval_comment" class="tw-form-label">Comments</label>
+                            </div>
+                            <div class="my-2 w-full lg:w-3/4">
+                                <textarea type="text" name="approval_comment"  v-model="approval_comment" id="approval_comment" class="tw-form-control w-full"></textarea>
+                                <span v-if="errors.principal_comments" class="text-red-500 text-xs font-semibold">{{errors.principal_comments[0]}}</span>
                             </div>
                         </div>
-
-                        <div class="my-6">
-                            <a href="#" class="btn btn-submit blue-bg text-white rounded px-3 py-1 mr-3 text-sm font-medium" @click="submitAllStatus()">Submit</a>
-                        </div>
+                    </div>
+                    <div class="my-6">
+                        <a href="#" class="btn btn-submit blue-bg text-white rounded px-3 py-1 mr-3 text-sm font-medium" @click="submitAllStatus()">Submit</a>
                     </div>
                 </div>
             </div>
-<!-- all approval -->
+        </div>
     </div>
 </template>
 
@@ -275,7 +274,7 @@
                 standardLink_id:'',
                 show:'',
                 principal_comments:'',
-                status:'pending',
+                status:'publish',
                 status_type:'',
                 search:'',
                 params:{},
@@ -293,21 +292,26 @@
         },
 
         methods:{
-            getData(status,page=1)
+            getData(status, page=1)
             {
                 axios.get('/'+this.mode+'/homework/show/'+this.status+'/list?standardLink_id='+this.standardLink_id+'&search='+this.search+'&page='+this.page).then(response => {
                     this.homeworks      = response.data.data;
                     this.page_count     = response.data.meta.last_page;
                     this.total          = response.data.meta.total;
-                    //console.log(this.homeworks);    
-                    //console.log(this.hidecolumns);    
                 });
-                
             },
 
             trim(string) 
             {
-              return string.substring(0,50) + '...';
+                if (string === null || string === undefined) {
+                    return '--';
+                }
+
+                string = String(string); // ensure it's string
+
+                return string.length > 50 
+                    ? string.substring(0, 50) + '...' 
+                    : string;
             },
 
             showModal(id)
@@ -337,68 +341,64 @@
 
             selectClass()
             {
-                //this.scope = this.standardLink_id;
                 this.getData(this.status);
             },
 
-            approveHomework(id) 
+            // Trigger publish modal for a single homework
+            publishHomework(id) 
             {
                 this.show = 'status_'+id;
-                this.status_type = 'approve';
+                this.status_type = 'publish';
             },
 
-            rejectHomework(id) 
+            // Trigger draft modal for a single homework
+            draftHomework(id) 
             {
                 this.show = 'status_'+id;
-                this.status_type = 'reject';
+                this.status_type = 'draft';
             },
 
             updateAll(status)
             {
-               this.all_status=status;
-               this.approval_all=true;
+                this.all_status = status;
+                this.approval_all = true;
             },
 
             closeAllModal()
             {
-              this.approval_all = false;
-              this.approval_comment='';
+                this.approval_all = false;
+                this.approval_comment = '';
             },
 
             updateAllStatus()
             {
-                this.errors=[];
-                this.success=null; 
-
-                //console.log(this.approvallist);
+                this.errors = [];
+                this.success = null; 
 
                 axios.post('/'+this.mode+'/homework/status/update',{
-                    approvallist:this.approvallist,
-                    principal_comments:this.approval_comment,
-                    all_status:this.all_status,
+                    approvallist: this.approvallist,
+                    principal_comments: this.approval_comment,
+                    all_status: this.all_status,
                 }).then(response => {     
-                        this.success = response.data.success;
-                        this.closeAllModal();
-                        window.location.reload();
-                    }).catch(error => {
-                        this.errors = error.response.data.errors;
-                    });
-
+                    this.success = response.data.success;
+                    this.closeAllModal();
+                    window.location.reload();
+                }).catch(error => {
+                    this.errors = error.response.data.errors;
+                });
             },
-
 
             submitStatus(id)
             {
-                this.errors=[];
-                this.success=null; 
+                this.errors = [];
+                this.success = null; 
 
                 let formData = new FormData();
-                
-                formData.append('principal_comments',this.principal_comments); 
+                formData.append('principal_comments', this.principal_comments); 
 
-                if(this.status_type == 'approve')
+                if(this.status_type == 'publish')
                 {     
-                    axios.post('/'+this.mode+'/homework/approve/'+id,formData,{headers: {'Content-Type': 'multipart/form-data'}}).then(response => {     
+                    axios.post('/'+this.mode+'/homework/approve/'+id, formData, {headers: {'Content-Type': 'multipart/form-data'}}).then(response => {     
                         this.success = response.data.success;
                         this.closeModal();
                         window.location.reload();
@@ -406,9 +406,9 @@
                         this.errors = error.response.data.errors;
                     });
                 }
-                else if(this.status_type == 'reject')
+                else if(this.status_type == 'draft')
                 {
-                    axios.post('/'+this.mode+'/homework/reject/'+id,formData,{headers: {'Content-Type': 'multipart/form-data'}}).then(response => {     
+                    axios.post('/'+this.mode+'/homework/reject/'+id, formData, {headers: {'Content-Type': 'multipart/form-data'}}).then(response => {     
                         this.success = response.data.success;
                         this.closeModal();
                         window.location.reload();
@@ -473,18 +473,17 @@
   
         created()
         {  
-
-        axios.get('/'+this.mode+'/homework/list').then(response => {
-                    this.standardLinklist = response.data.standardlist;
-                });
+            axios.get('/'+this.mode+'/homework/list').then(response => {
+                this.standardLinklist = response.data.standardlist;
+            });
 
             this.getData(this.status);
             bus.on("statusTab", data => {
-                if(data!='')
+                if(data != '')
                 {
-                    this.status=data;
-                    this.page=1;      
-                    this.getData(this.status)           
+                    this.status = data;
+                    this.page = 1;      
+                    this.getData(this.status);           
                 }
             });
         }
@@ -512,7 +511,6 @@
 
     .modal-container-new {
         margin: 0px auto;
-        /*padding: 20px 30px;*/
         background-color: #fff;
         border-radius: 2px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
@@ -523,12 +521,10 @@
 
     .modal-container {
         margin: 0px auto;
-        /*padding: 20px 30px;*/
         background-color: #fff;
         border-radius: 2px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
         transition: all .3s ease;
-        /*height: 500px;*/
         overflow:auto;
     }
 
@@ -545,14 +541,6 @@
         float: right;
     }
 
-    /*
-     * The following styles are auto-applied to elements with
-     * transition="modal" when their visibility is toggled
-     * by Vue.js.
-     *
-     * You can easily play with the modal transition by editing
-     * these styles.
-     */
     .modal-enter {
         opacity: 0;
     }

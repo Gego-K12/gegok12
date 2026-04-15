@@ -64,8 +64,8 @@ class Homework extends JsonResource
             'description'       =>  $this->description,
             'attachment'        =>  $attachment,
             'pending_count'     =>  $this->PendingCount,
-            'status_display'    =>  ucwords($this->homeworkApproval->status),
-            'status'            =>  $this->homeworkApproval->status,
+            'status_display'    =>  ucwords($this->status),//$this->homeworkApproval->status
+            'status'            =>  $this->status,//$this->homeworkApproval->status
             'comments'          =>  $this->homeworkApproval->comments,
             'type'              =>  $type,
             'submission_date'   =>  $this->submission_date==null?'':date('d-m-Y', strtotime($this->submission_date)),

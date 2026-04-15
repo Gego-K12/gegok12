@@ -25,7 +25,7 @@ class CreateHomeworksTable extends Migration
             $table->foreign('subject_id')->references('id')->on('subjects');
             $table->integer('teacher_id')->unsigned()->nullable();
             $table->foreign('teacher_id')->references('id')->on('users');
-            $table->longText('description');
+            $table->longText('description')->nullable();
             $table->string('attachment')->nullable();
             $table->dateTime('date')->nullable();
             $table->integer('created_by')->unsigned()->nullable();
@@ -33,6 +33,7 @@ class CreateHomeworksTable extends Migration
             $table->integer('updated_by')->unsigned()->nullable();
             $table->foreign('updated_by')->references('id')->on('users');
             $table->dateTime('submission_date')->nullable();
+            $table->enum('status', ['draft', 'publish'])->default('draft');
             $table->timestamps();
             $table->softDeletes();
         });

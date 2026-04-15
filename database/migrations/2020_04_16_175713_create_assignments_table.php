@@ -25,12 +25,12 @@ class CreateAssignmentsTable extends Migration
             $table->foreign('subject_id')->references('id')->on('subjects');
             $table->integer('teacher_id')->unsigned()->nullable();
             $table->foreign('teacher_id')->references('id')->on('users');
-            $table->string('title');
-            $table->longText('description');
+            $table->string('title')->nullable();
+            $table->longText('description')->nullable();
             $table->string('attachment')->nullable();
             $table->integer('marks')->nullable();
-            $table->dateTime('assigned_date');
-            $table->dateTime('submission_date');
+            $table->dateTime('assigned_date')->nullable();
+            $table->dateTime('submission_date')->nullable();
             $table->enum('status',['pending','ongoing','cancel','completed']);
             $table->timestamps();
             $table->softDeletes();

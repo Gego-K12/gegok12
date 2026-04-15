@@ -50,9 +50,12 @@ class HomeWorkController extends Controller
         //
         $school_id      =   Auth::user()->school_id;
         $academic_year  =   SiteHelper::getAcademicYear($school_id);
-        $homeworks = Homework::where([['school_id', $school_id], ['academic_year_id', $academic_year->id]])->orderBy('date', 'DESC')->whereHas('homeworkApproval', function ($query) use ($status) {
-            $query->where('status', $status);
-        });
+        $homeworks = Homework::where([
+            ['school_id', $school_id], 
+            ['academic_year_id', $academic_year->id]
+        ])
+        ->where('status', $status);
+        
         if (count((array)\Request::getQueryString()) > 0) {
             if ($request->standardLink_id != '') {
                 $homeworks = $homeworks->where('standardLink_id', $request->standardLink_id);

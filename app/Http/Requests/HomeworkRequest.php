@@ -23,16 +23,27 @@ class HomeworkRequest extends FormRequest
      */
     public function rules()
     {
+        $status = request('status');
+
         $rules = [
             //
+            'status' => 'required|in:draft,publish',
             'standardLink_id' => 'required',
             'subject_id'      => 'required',
-            'description'     => 'required',
+            'description'     => 'nullable',
             'attachment'      => 'nullable|mimes:jpeg,png,jpg,pdf|max:20480',
             //mimes:'jpg','jpeg','png','mp3','mp4','pdf'
-            'date'            => 'required|after_or_equal:today',
-            'submission_date' => 'required|after_or_equal:date',    
+            'date'            => 'nullable|after_or_equal:today',
+            'submission_date' => 'nullable|after_or_equal:date',    
         ];
+
+        if ($status === 'publish') {
+
+            $rules['description']     .= '|required';
+
+            $rules['date']   .= '|required|before:submission_date';
+            $rules['submission_date'] .= '|required|after:date';
+        }
 
         if(request('mode') == 'admin')
         {

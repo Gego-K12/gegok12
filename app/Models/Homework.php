@@ -60,7 +60,7 @@ class Homework extends Model
      * @var array
      */
 	protected $fillable = [
-	    'school_id' , 'academic_year_id' , 'standardLink_id' , 'section_id' , 'subject_id' , 'description' , 'attachment' , 'date' , 'created_by' , 'updated_by','teacher_id'
+	    'school_id' , 'academic_year_id' , 'standardLink_id' , 'section_id' , 'subject_id' , 'description' , 'attachment' , 'date' , 'created_by' , 'updated_by','teacher_id','status'
 	];
 
     /**

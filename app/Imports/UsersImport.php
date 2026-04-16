@@ -174,18 +174,17 @@ class UsersImport implements ToCollection, WithHeadingRow
             // PARENT VALIDATION
             // ==========================================
 
-            // Check parent email (MANDATORY - used for login and parent identification)
+            // Check parent email and mobile - at least one is required
             $parentEmail = strtolower(trim($row['parent_email'] ?? ''));
-            if (empty($parentEmail)) {
-                $rowErrors[] = "Parent email is required (used for parent login)";
-            } elseif (!filter_var($parentEmail, FILTER_VALIDATE_EMAIL)) {
-                $rowErrors[] = "Parent email '{$row['parent_email']}' is not a valid email format";
-            }
-
-            // Check parent mobile (mandatory)
             $parentMobile = trim($row['parent_mobile_no'] ?? '');
-            if (empty($parentMobile)) {
-                $rowErrors[] = "Parent mobile number is required";
+            
+            if (empty($parentEmail) && empty($parentMobile)) {
+                $rowErrors[] = "Parent email OR mobile number is required (used for parent identification)";
+            }
+            
+            // Validate email format if provided
+            if (!empty($parentEmail) && !filter_var($parentEmail, FILTER_VALIDATE_EMAIL)) {
+                $rowErrors[] = "Parent email '{$row['parent_email']}' is not a valid email format";
             }
 
             // Check parent firstname (mandatory)
@@ -464,18 +463,63 @@ class UsersImport implements ToCollection, WithHeadingRow
                 $student->notes                 = $row['notes'];
 
                 // ==========================================
-                // PARENT HANDLING - lookup by email (parent's login identifier)
+                // PARENT HANDLING - lookup by mobile (primary) OR email (secondary)
                 // ==========================================
                 
                 $parent_email = strtolower(trim($row['parent_email'] ?? ''));
                 $parent_mobile = trim($row['parent_mobile_no'] ?? '');
+                $parent_status = null;
+                $matched_by = null;
                 
-                // Search for existing parent by email (email is the unique identifier for parents)
-                $parent_status = User::where([
-                    ['school_id', $school_id],
-                    ['email', $parent_email],
-                    ['usergroup_id', 7]
-                ])->first();
+                // Step 1: Try to find existing parent by mobile number (primary - used for app login)
+                if (!empty($parent_mobile)) {
+                    $parent_status = User::where([
+                        ['school_id', $school_id],
+                        ['mobile_no', $parent_mobile],
+                        ['usergroup_id', 7]
+                    ])->first();
+                    
+                    if ($parent_status) {
+                        $matched_by = 'mobile';
+                        // Check if email needs updating
+                        if (!empty($parent_email) && $parent_status->email !== $parent_email) {
+                            $this->importWarnings[] = [
+                                'type' => 'parent_email_updated',
+                                'parent_name' => $parent_status->name,
+                                'old_email' => $parent_status->email,
+                                'new_email' => $parent_email,
+                                'matched_by' => 'mobile'
+                            ];
+                            $parent_status->email = $parent_email;
+                            $parent_status->save();
+                        }
+                    }
+                }
+                
+                // Step 2: If not found by mobile, try email
+                if ($parent_status === null && !empty($parent_email)) {
+                    $parent_status = User::where([
+                        ['school_id', $school_id],
+                        ['email', $parent_email],
+                        ['usergroup_id', 7]
+                    ])->first();
+                    
+                    if ($parent_status) {
+                        $matched_by = 'email';
+                        // Check if mobile needs updating
+                        if (!empty($parent_mobile) && $parent_status->mobile_no !== $parent_mobile) {
+                            $this->importWarnings[] = [
+                                'type' => 'parent_mobile_updated',
+                                'parent_name' => $parent_status->name,
+                                'old_mobile' => $parent_status->mobile_no,
+                                'new_mobile' => $parent_mobile,
+                                'matched_by' => 'email'
+                            ];
+                            $parent_status->mobile_no = $parent_mobile;
+                            $parent_status->save();
+                        }
+                    }
+                }
 
                 if ($parent_status === null)
                 {

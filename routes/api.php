@@ -156,7 +156,7 @@ Route::group([
 
     Route::post('/homework/submit/{homework_id}/{student_id}','HomeworkController@store');
 
-    Route::get('/homework/delete/{id}/{student_id}','HomeworkController@destroy');
+    Route::delete('/homework/delete/{id}/{student_id}','HomeworkController@destroy');
 
     Route::post('/homework/reply/{homework_id}/{student_id}','HomeworkController@replycomment');
 
@@ -226,7 +226,7 @@ Route::group([
 
     Route::post('/assignment/submit/{assignment_id}/{student_id}','AssignmentController@store');
 
-    Route::get('/assignment/delete/{id}/{student_id}','AssignmentController@destroy');  
+    Route::delete('/assignment/delete/{id}/{student_id}','AssignmentController@destroy');  
 
 
 

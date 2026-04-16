@@ -54,7 +54,7 @@ class HomeworkController extends Controller
             ['school_id',Auth::user()->school_id],
             ['academic_year_id',$academic_year->id],
             ['teacher_id',Auth::id()],
-            // ['date','>=',date('Y-m-d')]
+            ['date','>=',date('Y-m-d')]
         ]);
 
         //  Filter by standardLink_id (dynamic)
@@ -72,7 +72,7 @@ class HomeworkController extends Controller
             $query->whereDate('date', $request->date);
         }
 
-        //date filter  
+        //subject filter  
         if (isset($request->subject_id)) {
             $query->where('subject_id', $request->subject_id);
         }
@@ -95,7 +95,13 @@ class HomeworkController extends Controller
         //
         $school_id      =   Auth::user()->school_id;
         $academic_year  =   SiteHelper::getAcademicYear($school_id);
-        $homework = Homework::where([['school_id',Auth::user()->school_id],['academic_year_id',$academic_year->id],['teacher_id',Auth::id()]])->orderBy('date','DESC')->whereHas('homeworkApproval' ,function ($query) {
+        $homework = Homework::where([
+            ['school_id',Auth::user()->school_id],
+            ['academic_year_id',$academic_year->id],
+            ['teacher_id',Auth::id()]
+        ])
+        ->orderBy('date','DESC')
+        ->whereHas('homeworkApproval' ,function ($query) {
             $query->where('status','pending');
         })->get();
         /*->whereHas('standardLink' , function ($query){
@@ -134,22 +140,44 @@ class HomeworkController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function completedList()
+    public function completedList(Request $request)
     {
-        //
         $school_id      =   Auth::user()->school_id;
         $academic_year  =   SiteHelper::getAcademicYear($school_id);
-        $homework = Homework::where([
+
+        $query = Homework::where([
             ['school_id',Auth::user()->school_id],
             ['academic_year_id',$academic_year->id],
-            ['teacher_id',Auth::id()],['date','<',date('Y-m-d')]
-        ])->orderBy('date','DESC')
-        ->whereHas('homeworkApproval' ,function ($query) {
-            $query->where('status','approved');
-        })->paginate(10);
-        /*->whereHas('standardLink' , function ($query){
-            $query->where('class_teacher_id',Auth::id());
-        })*/ // code for class teacher
+            ['teacher_id',Auth::id()],
+            ['date','<',date('Y-m-d')],
+        ]);
+        // ->orderBy('date','DESC')
+        // ->whereHas('homeworkApproval' ,function ($query) {
+        //     $query->where('status','approved');
+        // })->paginate(10);
+
+       //  Filter by standardLink_id (dynamic)
+        if (isset($request->standardLink_id)) {
+            $query->where('standardLink_id', $request->standardLink_id);
+        }
+
+        // Optional: status filter (if needed)
+        if (isset($request->status)) {
+            $query->where('status', $request->status);
+        }
+        
+        //date filter  
+        if (isset($request->date)) {
+            $query->whereDate('date', $request->date);
+        }
+
+        //subject filter  
+        if (isset($request->subject_id)) {
+            $query->where('subject_id', $request->subject_id);
+        }
+
+
+        $homework = $query->orderBy('id','desc')->paginate(10);
 
         $homeworklist = HomeworkResource::collection($homework);
         

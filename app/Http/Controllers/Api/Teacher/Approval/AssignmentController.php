@@ -330,11 +330,15 @@ class AssignmentController extends Controller
         $array['title']             =   $assignment->title;
         $array['description']       =   $assignment->description;
         $array['marks']             =   $assignment->marks;
-        $array['assignedDate']      =   date('d-m-Y',strtotime($assignment->assigned_date));
-        $array['submissionDate']    =   date('d-m-Y',strtotime($assignment->submission_date));
+        $array['assigned_date']      =   date('d-m-Y',strtotime($assignment->assigned_date));
+        $array['submission_date']    =   date('d-m-Y',strtotime($assignment->submission_date));
         $array['attachment']        =   $assignment->attachment==null ? '':$assignment->AttachmentPath;
 
         $array['status']        =   $assignment->status;
+        $array['standard']        =   $assignment->standardLink->StandardSection;
+        $array['standardLink_id']        =   $assignment->standardLink_id;
+        $array['subject_id']        =   $assignment->subject_id;
+        $array['subject']        =   $assignment->subject->name;
 
         return response()->json([
             'success'   =>  true,

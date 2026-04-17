@@ -113,6 +113,28 @@
                     </div>
                 </div>
             </div>
+            <div class="my-5">
+            <div class="tw-form-group w-full lg:w-3/5 md:w-3/4">
+                <div class="lg:mr-8 md:mr-8 flex flex-col lg:flex-row md:flex-row lg:items-center md:items-center w-full">
+                    <div class="w-full lg:w-1/4 md:w-1/4">
+                        <label class="tw-form-label">
+                            Status <span class="text-red-500">*</span>
+                        </label>
+                    </div>
+                    <div class="mb-2 w-full lg:w-3/4 md:w-2/3">
+                        <select class="tw-form-control w-full" v-model="status">
+                            <option value="" disabled>Select Status</option>
+                            <option value="draft">Draft</option>
+                            <option value="publish">Publish</option>
+                        </select>
+
+                        <span v-if="errors.status" class="text-red-500 text-xs font-semibold">
+                            {{ errors.status[0] }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
 
             <div class="my-6">
                 <a href="#" id="submit-btn" class="btn btn-submit blue-bg text-white rounded px-3 py-1 mr-3 text-sm font-medium" @click="submitForm()">Submit</a>
@@ -143,6 +165,7 @@
                 attachment_file:'',
                 date:'',
                 submission_date:'',
+                status: '',
                 editorOption:{
                     theme: 'snow',
                     modules: {
@@ -178,7 +201,8 @@
                 formData.append('description',this.description);          
                 formData.append('attachment',this.attachment);          
                 formData.append('date',this.date); 
-                formData.append('submission_date',this.submission_date);          
+                formData.append('submission_date',this.submission_date);  
+                formData.append('status', this.status);        
               
                 axios.post('/'+this.mode+'/homework/edit/'+this.id,formData,{headers: {'Content-Type': 'multipart/form-data'}}).then(response => {     
                     this.success = response.data.success;
@@ -215,6 +239,7 @@
                     this.attachment_file  = this.list.attachment;  
                     this.date             = this.list.date; 
                     this.submission_date  = this.list.submission_date; 
+                    this.status = this.list.status;
                 }
             },
         },

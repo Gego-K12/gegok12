@@ -10,6 +10,7 @@ use App\Http\Resources\Teacher\Teacher as TeacherResource;
 use App\Http\Resources\API\Teacher\Task as TaskResource;
 use App\Http\Resources\User as UserResource;
 use App\Http\Requests\API\Teacher\TaskRequest;
+use App\Http\Requests\API\TaskStatusUpdateRequest;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Traits\TodolistProcess;
@@ -301,7 +302,7 @@ class TaskController extends Controller
         ],200);
     }
 
-    public function changestatus(Request $request)
+    public function changestatus(TaskStatusUpdateRequest $request)
     {
         try
         {

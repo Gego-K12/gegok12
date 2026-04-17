@@ -54,7 +54,7 @@ class StudentAssignmentAddRequest extends FormRequest
 
         return [
             //
-            'assignment_file'   =>  'required|check_date|check_assignment_exists',
+            'assignment_file'   =>  'required|file|mimes:pdf,jpg,png|max:8192|check_date|check_assignment_exists',
         ];
     }
 

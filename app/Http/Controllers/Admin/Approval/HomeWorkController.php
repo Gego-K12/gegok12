@@ -155,6 +155,8 @@ class HomeWorkController extends Controller
             $homework->date                 =   date('Y-m-d', strtotime($request->date));
             $homework->submission_date      =   date('Y-m-d', strtotime($request->submission_date));
 
+            $homework->status      =  $request->status;
+
             $file = $request->file('attachment');
             if ($file) {
                 $folder = Auth::user()->school->slug . '/homework';
@@ -170,7 +172,8 @@ class HomeWorkController extends Controller
 
             if ($admin->id != Auth::id()) {
                 $homeworkapproval->homework_id  = $homework->id;
-                $homeworkapproval->status       = 'pending';
+                // $homeworkapproval->status       = 'pending';
+                $homeworkapproval->status       = 'approved';
 
                 $data = [];
 
@@ -288,6 +291,8 @@ class HomeWorkController extends Controller
         $array['submission_date']   =   date('Y-m-d', strtotime($homework->submission_date));
         $array['viewers']           =   count($homework->viewers);
 
+        $array['status']           =   $homework->status;
+
         return $array;
     }
 
@@ -314,6 +319,7 @@ class HomeWorkController extends Controller
             $homework->description          =   $request->description;
             $homework->date                 =   date('Y-m-d', strtotime($request->date));
             $homework->submission_date      =   date('Y-m-d', strtotime($request->submission_date));
+            $homework->status      =  $request->status;
 
 
             $file = $request->file('attachment');

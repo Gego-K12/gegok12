@@ -64,8 +64,8 @@ class Homework extends JsonResource
             'attachment'        =>  $attachment,
             'pending_count'     =>  $this->PendingCount,
             'finished_count'    =>  $this->FinishedCount,
-            'status_display'    =>  ucwords($this->homeworkApproval->status),
-            'status'            =>  $this->homeworkApproval->status,
+            'status_display'    =>  ucwords($this->status),//$this->homeworkApproval->status
+            'status'            =>  $this->status,
             'comments'          =>  $this->homeworkApproval->comments ==  null ? '--':$this->homeworkApproval->comments,
             'auth_id'           =>  \Auth::id(),
             'created_by'        =>  $this->created_by,

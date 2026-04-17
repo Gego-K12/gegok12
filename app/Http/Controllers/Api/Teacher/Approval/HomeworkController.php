@@ -150,6 +150,7 @@ class HomeworkController extends Controller
             ['academic_year_id',$academic_year->id],
             ['teacher_id',Auth::id()],
             ['date','<',date('Y-m-d')],
+            ['status','publish']
         ]);
         // ->orderBy('date','DESC')
         // ->whereHas('homeworkApproval' ,function ($query) {
@@ -390,6 +391,7 @@ class HomeworkController extends Controller
                 $work->description          =   $request->description;
                 $work->date                 =   date('Y-m-d',strtotime($request->date));
                 $work->submission_date      =   date('Y-m-d',strtotime($request->submission_date));
+                $work->status               =   $request->status;
 
                 $file = $request->file('attachment');
                 if($file)

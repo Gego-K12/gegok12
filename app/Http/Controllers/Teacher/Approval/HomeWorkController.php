@@ -39,13 +39,17 @@ class HomeWorkController extends Controller
         $admin = Auth::id();
         $school_id      =   Auth::user()->school_id;
         $academic_year  =   SiteHelper::getAcademicYear($school_id);
+
         $homework = Homework::where([
             ['school_id',$school_id],
             ['academic_year_id',$academic_year->id],
             ['teacher_id',Auth::id()]
-        ])->orderBy('date','DESC')->whereHas('homeworkApproval' ,function ($query) use ($status) {
-            $query->where('status',$status);
-        });
+        ])
+        ->where('status',$status)
+        ->orderBy('date','DESC');
+        // ->whereHas('homeworkApproval' ,function ($query) use ($status) {
+        //     $query->where('status',$status);
+        // });
         /*->orWhereHas('standardLink' , function ($q) use ($admin){
             $q->where('class_teacher_id',$admin);
         })*/ // code for class teacher
@@ -159,6 +163,7 @@ class HomeWorkController extends Controller
             $work->description          =   $request->description;
             $work->date                 =   date('Y-m-d',strtotime($request->date));
             $work->submission_date      =   date('Y-m-d',strtotime($request->submission_date));
+            $work->status               =   $request->status;
 
             $file = $request->file('attachment');
             if($file)
@@ -294,6 +299,8 @@ class HomeWorkController extends Controller
         $array['viewers']           =   count($homework->viewers);
         $array['submission_date']   =   date('Y-m-d',strtotime($homework->submission_date));
 
+        $array['status']            =   $homework->status;
+
         return $array;
     }
 
@@ -316,6 +323,7 @@ class HomeWorkController extends Controller
             $work->description          =   $request->description;
             $work->date                 =   date('Y-m-d',strtotime($request->date));
             $work->submission_date      =   date('Y-m-d',strtotime($request->submission_date));
+            $work->status               =   $request->status;
 
             $file = $request->file('attachment');
             if($file)

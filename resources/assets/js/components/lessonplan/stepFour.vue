@@ -45,7 +45,6 @@
             <button 
                 type="button"
                 @click="submitForm()" 
-                id="final_submit"
                 class="btn btn-submit blue-bg text-white rounded px-3 py-1 mr-3 text-sm font-medium">
                 Submit
             </button>
@@ -127,7 +126,7 @@
                 if(this.type == 'add')  
                 {            
                     axios.post('/teacher/lessonplan/add/stepFour/'+this.lesson_id,formData,{headers: {'Content-Type': 'multipart/form-data'}}).then(response => { 
-                     
+                        window.location.href = '/teacher/lessonplans';
                     }).catch(error => {
                         this.errors = error.response.data.errors;
                     });
@@ -135,7 +134,7 @@
                 else if(this.type == 'edit') 
                 {
                     axios.post('/teacher/lessonplan/edit/stepFour/'+this.id,formData,{headers: {'Content-Type': 'multipart/form-data'}}).then(response => {  
-                      
+                        window.location.href = '/teacher/lessonplans';  
                     }).catch(error => {
                         this.errors = error.response.data.errors;
                     });

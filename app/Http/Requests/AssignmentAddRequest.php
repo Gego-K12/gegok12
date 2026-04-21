@@ -27,6 +27,8 @@ class AssignmentAddRequest extends FormRequest
      */
     public function rules()
     {
+        $status = request('status');
+
         Validator::extend('check_title', function ($attribute, $value,$parameters,$validator) 
         {
             //return preg_match('/^[\pL\s]+$/u', request('title')); 
@@ -75,18 +77,33 @@ class AssignmentAddRequest extends FormRequest
             return preg_match('/^[0-9]+$/', request('marks')) ;
         });
 
-        $rules= [
-            //
-            'standardLink_id'   =>  'required',
-            'subject_id'        =>  'required',
-            'title'             =>  'required|max:50|check_title',
-            'description'       =>  'required|max:255',
-            'attachment'       =>  'nullable|mimes:jpeg,png,jpg,pdf',
-            //mimes:'jpg','jpeg','png','mp3','mp4','pdf'
-            'marks'             =>  'nullable|numeric|check_marks|check_valid_marks',    
-            'assigned_date'     =>  'required|check_assigned_date|before:submission_date|check_exists',
-            'submission_date'   =>  'required|after:assigned_date',
+        $rules = [
+            'status' => 'required|in:pending,ongoing',
+
+            'standardLink_id' => 'required',
+            'subject_id'      => 'required',
+
+            'title'        => 'nullable|max:50|check_title',
+            'description'  => 'nullable|max:255',
+
+            'attachment'   => 'nullable|mimes:jpeg,png,jpg,pdf',
+
+            'marks'        => 'nullable',
+
+            'assigned_date'   => 'nullable|check_assigned_date|check_exists',
+            'submission_date' => 'nullable',
         ];
+
+        if ($status === 'ongoing') {
+
+            $rules['title'] = 'required|max:50|check_title'; 
+            $rules['description'] = 'required|max:255';      
+
+            $rules['marks'] = 'required|numeric|check_marks|check_valid_marks';
+
+            $rules['assigned_date'] = 'required|check_assigned_date|before:submission_date';
+            $rules['submission_date'] = 'required|after:assigned_date';
+        }
 
         return $rules;
     }

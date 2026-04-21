@@ -140,7 +140,7 @@ class HomeworkController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function completedList(Request $request)
+    public function index(Request $request)
     {
         $school_id      =   Auth::user()->school_id;
         $academic_year  =   SiteHelper::getAcademicYear($school_id);
@@ -149,40 +149,53 @@ class HomeworkController extends Controller
             ['school_id',Auth::user()->school_id],
             ['academic_year_id',$academic_year->id],
             ['teacher_id',Auth::id()],
-            ['date','<',date('Y-m-d')],
-            ['status','publish']
         ]);
-        // ->orderBy('date','DESC')
-        // ->whereHas('homeworkApproval' ,function ($query) {
-        //     $query->where('status','approved');
-        // })->paginate(10);
 
-       //  Filter by standardLink_id (dynamic)
-        if (isset($request->standardLink_id)) {
-            $query->where('standardLink_id', $request->standardLink_id);
-        }
-
-        // Optional: status filter (if needed)
-        if (isset($request->status)) {
+        // // Optional: status filter (if needed)
+        if (isset($request->status)) 
+        {
             $query->where('status', $request->status);
+
+            if($request->status=='publish')
+            {
+                $query->where('date','<',date('Y-m-d'));
+
+            }
+        
         }
         
-        //date filter  
+        // //date filter  
         if (isset($request->date)) {
             $query->whereDate('date', $request->date);
         }
 
-        //subject filter  
-        if (isset($request->subject_id)) {
-            $query->where('subject_id', $request->subject_id);
-        }
+        $homework = $query->orderBy('id','desc')->get(); 
 
+        $grouped = $homework->groupBy('standardLink_id')->map(function ($standardGroup) {
+            
+            return [
+                'standard_id' => $standardGroup->first()->standardLink_id,
+                'standard_name' => $standardGroup->first()->standardLink->StandardSection ?? '--', // relation
+                
+                'subjects' => $standardGroup->groupBy('subject_id')->map(function ($subjectGroup) {
+                    
+                    return [
+                        'subject_id' => $subjectGroup->first()->subject_id,
+                        'subject_name' => optional($subjectGroup->first()->subject)->name, // relation
+                        
+                        'homeworks' => HomeworkResource::collection($subjectGroup->values())
+                    ];
+                })->values()
+            ];
+        })->values();
 
-        $homework = $query->orderBy('id','desc')->paginate(10);
-
-        $homeworklist = HomeworkResource::collection($homework);
-        
-        return $homeworklist;
+        return response()->json([
+            'status'  => true,
+            'message' => 'Completed homework list',
+            'data'    => [
+                'standards' => $grouped
+            ]
+        ]);
     }
 
     /**

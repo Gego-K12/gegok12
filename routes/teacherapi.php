@@ -102,7 +102,7 @@ Route::group([ 'prefix' => 'teacher' , 'middleware'=>['auth:sanctum'] , 'namespa
 
             Route::get('/homeworks/rejectedApproval','HomeworkController@rejectedApprovalList');
 
-            Route::get('/homeworks/completed','HomeworkController@completedList');
+            Route::get('/homeworks','HomeworkController@index');
 
             //add
             Route::get('/homework/add/list','HomeworkController@create');

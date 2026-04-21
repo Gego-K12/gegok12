@@ -81,6 +81,25 @@
           </div>
         </div>
       </div>
+      <div class="tw-form-group w-full lg:w-1/2 md:w-1/2">
+        <div class="lg:mr-8 md:mr-8">
+          <div class="mb-2">
+            <label for="status" class="tw-form-label">
+              Status<span class="text-red-500">*</span>
+            </label>
+          </div>
+          <div class="mb-2">
+            <select name="status" id="status" v-model="status" class="tw-form-control w-full">
+              <option value="" disabled>Select Status</option>
+              <option value="pending">Draft</option>
+              <option value="ongoing">Publish</option>
+            </select>
+          </div>
+          <span v-if="errors.status" class="text-red-500 text-xs font-semibold">
+            {{ errors.status[0] }}
+          </span>
+        </div>
+      </div>
     	
       <div class="my-6">
         <a href="#" id="submit-btn" class="btn btn-submit blue-bg text-white rounded px-3 py-1 mr-3 text-sm font-medium" @click="checkForm()">Submit</a>
@@ -108,6 +127,7 @@ export default {
       submission_date:'',
       errors:[],
       success:null,
+      status: '', 
     }
   },
         
@@ -132,6 +152,7 @@ export default {
         this.marks            = this.list.marks; 
         this.assigned_date    = this.list.assigned_date;
         this.submission_date  = this.list.submission_date;
+        this.status           = this.list.status;
       }  
     }, 
 
@@ -147,7 +168,8 @@ export default {
       formData.append('attachment',this.attachment);                  
       formData.append('marks',this.marks);                  
       formData.append('assigned_date',this.assigned_date);                 
-      formData.append('submission_date',this.submission_date);          
+      formData.append('submission_date',this.submission_date);
+      formData.append('status', this.status);          
                      
       axios.post('/teacher/assignment/edit/'+this.id,formData,{headers: {'Content-Type': 'multipart/form-data'}}).then(response => {     
         this.success = response.data.success;

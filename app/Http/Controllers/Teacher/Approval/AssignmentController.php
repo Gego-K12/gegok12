@@ -46,21 +46,26 @@ class AssignmentController extends Controller
         {
             $assignment = Assignment::where([
                     ['school_id',Auth::user()->school_id],
-                    ['academic_year_id',$academic_year->id]
-                ])->whereHas('assignmentApproval' , function($query) use($status) {
-                    $query->where('status',$status);
-                });
+                    ['academic_year_id',$academic_year->id],
+                    ['status',$status]
+                ]);
+            // ->whereHas('assignmentApproval' , function($query) use($status) {
+            //         $query->where('status',$status);
+            //     });
         }
         else
         {
             $assignment = Assignment::where([
                     ['school_id',Auth::user()->school_id],
                     ['academic_year_id',$academic_year->id],
-                    ['teacher_id',Auth::id()]
-                ])->whereHas('assignmentApproval' , function($query) use($status) {
-                    $query->where('status',$status);
-                });
+                    ['teacher_id',Auth::id()],
+                    ['status',$status]
+                ]);
+            // ->whereHas('assignmentApproval' , function($query) use($status) {
+            //         $query->where('status',$status);
+            //     });
         }
+        // dump($status);
         if(count((array)\Request::getQueryString())>0)
         {
             if($request->standardLink_id != '')
@@ -242,6 +247,7 @@ class AssignmentController extends Controller
         $array['assigned_date']     =   date('Y-m-d',strtotime($assignment->assigned_date));
         $array['submission_date']   =   date('Y-m-d',strtotime($assignment->submission_date));
         $array['attachment']        =   $assignment->attachment==null ? '':$assignment->attachment;
+        $array['status']        =   $assignment->status;
 
         return $array;
     }

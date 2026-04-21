@@ -34,15 +34,30 @@
         </div>
         <!--end-->
 
-        <div id="submit-btn"></div>
-        <Teleport to="#submit-btn">
-            <div class="my-6">
-                <a href="#" id="submit-btn" class="btn btn-reset bg-gray-100 text-gray-700 border rounded px-3 py-1 mr-3 text-sm font-medium" @click="setTab('3')">Back</a>
-                <a href="#" class="btn btn-submit blue-bg text-white rounded px-3 py-1 mr-3 text-sm font-medium" @click="submitForm()">Submit</a>
-                <a href="#" class="btn btn-reset bg-gray-100 text-gray-700 border rounded px-3 py-1 mr-3 text-sm font-medium" @click="resetForm()" v-if="this.type == 'add'">Reset</a>
-                <input type="submit" class="hidden" id="submit_btn" value="Submit"> 
-            </div>
-        </Teleport>
+        <div class="my-6">
+            <button 
+                type="button"
+                @click="setTab('3')" 
+                class="btn btn-reset bg-gray-100 text-gray-700 border rounded px-3 py-1 mr-3 text-sm font-medium">
+                Back
+            </button>
+
+            <button 
+                type="button"
+                @click="submitForm()" 
+                id="final_submit"
+                class="btn btn-submit blue-bg text-white rounded px-3 py-1 mr-3 text-sm font-medium">
+                Submit
+            </button>
+
+            <button 
+                v-if="type == 'add'" 
+                type="button"
+                @click="resetForm()" 
+                class="btn btn-reset bg-gray-100 text-gray-700 border rounded px-3 py-1 mr-3 text-sm font-medium">
+                Reset
+            </button>
+        </div>
     </div>
 </template>
 
@@ -112,7 +127,7 @@
                 if(this.type == 'add')  
                 {            
                     axios.post('/teacher/lessonplan/add/stepFour/'+this.lesson_id,formData,{headers: {'Content-Type': 'multipart/form-data'}}).then(response => { 
-                        $('#submit_btn').click();  
+                     
                     }).catch(error => {
                         this.errors = error.response.data.errors;
                     });
@@ -120,7 +135,7 @@
                 else if(this.type == 'edit') 
                 {
                     axios.post('/teacher/lessonplan/edit/stepFour/'+this.id,formData,{headers: {'Content-Type': 'multipart/form-data'}}).then(response => {  
-                        $('#submit_btn').click();  
+                      
                     }).catch(error => {
                         this.errors = error.response.data.errors;
                     });

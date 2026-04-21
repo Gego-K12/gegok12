@@ -10,7 +10,12 @@
                         <label for="objective" class="tw-form-label">Objective<span class="text-red-500">*</span></label>
                     </div>
                     <div class="mb-2">
-                        <quill-editor ref="myQuillEditor" v-model="objective" name="objective" :options="option"/>
+
+                        <QuillEditor
+                              v-model:content="objective"
+                              contentType="html"
+                              theme="snow"
+                            />
                     </div>
                     <span v-if="errors.objective" class="text-red-500 text-xs font-semibold">{{ errors.objective[0] }}</span>
                 </div>
@@ -27,11 +32,10 @@
                     </div>
                     <div class="mb-2">
                         <QuillEditor
-                          v-model:content="materials_required"
-                          contentType="html"
-                          theme="snow"
-                          :modules="editorModules"
-                        />
+                              v-model:content="materials_required"
+                              contentType="html"
+                              theme="snow"
+                            />
                     </div>
                     <span v-if="errors.materials_required" class="text-red-500 text-xs font-semibold">{{ errors.materials_required[0] }}</span>
                 </div>
@@ -59,10 +63,10 @@
         <!-- end -->
 
         <div class="my-6">
-            <a href="#" id="submit-btn" class="btn btn-reset bg-gray-100 text-gray-700 border rounded px-3 py-1 mr-3 text-sm font-medium" @click="setTab('1')">Back</a>
-            <a href="#" id="submit-btn" class="btn btn-submit blue-bg text-white rounded px-3 py-1 mr-3 text-sm font-medium" @click="submitForm('3')">Save & Continue</a>
+            <a href="#" class="btn btn-reset bg-gray-100 text-gray-700 border rounded px-3 py-1 mr-3 text-sm font-medium" @click="setTab('1')">Back</a>
+            <a href="#"  class="btn btn-submit blue-bg text-white rounded px-3 py-1 mr-3 text-sm font-medium" @click="submitForm('3')">Save & Continue</a>
 
-            <a href="#" id="submit-btn" class="btn btn-submit bg-yellow-500 text-white rounded px-3 py-1 mr-3 text-sm font-medium" @click="setProfileTab('3','')">Next</a>
+            <a href="#"  class="btn btn-submit bg-yellow-500 text-white rounded px-3 py-1 mr-3 text-sm font-medium" @click="setProfileTab('3','')">Next</a>
 
             <a href="#" class="btn btn-reset bg-gray-100 text-gray-700 border rounded px-3 py-1 mr-3 text-sm font-medium" @click="resetForm()" v-if="this.type == 'add'">Reset</a>  
         </div>
@@ -87,14 +91,19 @@
                 objective:'',
                 materials_required:'',
                 assessment:'',
-                editorModules: {
-                  toolbar: [
-                    ['bold', 'italic', 'underline', 'strike'],
-                    [{ color: [] }, { background: [] }],
-                    [{ script: 'sub' }, { script: 'super' }],
-                    [{ align: [] }],
-                    ['image']
-                  ]
+                editorOption:{
+                    theme: 'snow',
+                    modules: {
+                        toolbar: {
+                            container: [
+                                ['bold', 'italic', 'underline', 'strike'],       
+                                [{ 'color': [] }, { 'background': [] }],
+                                [{ 'script': 'sub' }, { 'script': 'super' }],        
+                                [{ 'align': [] }],
+                                ['image'],
+                            ],      
+                        }
+                    } 
                 },
                 errors:[],
                 success:null,

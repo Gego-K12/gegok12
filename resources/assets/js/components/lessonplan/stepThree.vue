@@ -9,7 +9,11 @@
                         <label for="introduction" class="tw-form-label">Introduction<span class="text-red-500">*</span></label>
                     </div>
                     <div class="mb-2">
-                        <quill-editor ref="myQuillEditor" v-model="introduction" name="introduction" :options="option"/>
+                        <QuillEditor
+                              v-model:content="introduction"
+                              contentType="html"
+                              theme="snow"
+                            />
                     </div>
                     <span v-if="errors.introduction" class="text-red-500 text-xs font-semibold">{{ errors.introduction[0] }}</span>
                 </div>
@@ -20,7 +24,13 @@
                         <label for="procedure" class="tw-form-label">Procedure<span class="text-red-500">*</span></label>
                     </div>
                     <div class="mb-2">
-                        <quill-editor ref="myQuillEditor" v-model="procedure" name="procedure" :options="option"/>
+
+                        <QuillEditor
+                              v-model:content="procedure"
+                              contentType="html"
+                              theme="snow"
+                            />
+
                     </div>
                     <span v-if="errors.procedure" class="text-red-500 text-xs font-semibold">{{ errors.procedure[0] }}</span>
                 </div>
@@ -40,10 +50,9 @@
                     </div>
                     <div class="mb-2">
                         <QuillEditor
-                          v-model:content="introduction"
+                          v-model:content="conclusion"
                           contentType="html"
                           theme="snow"
-                          :modules="editorModules"
                         />
                     </div>
                     <span v-if="errors.conclusion" class="text-red-500 text-xs font-semibold">{{errors.conclusion[0]}}</span> 
@@ -52,10 +61,10 @@
         </div>
 
         <div class="my-6">
-            <a href="#" id="submit-btn" class="btn btn-reset bg-gray-100 text-gray-700 border rounded px-3 py-1 mr-3 text-sm font-medium" @click="setTab('2')">Back</a>
+            <a href="#"  class="btn btn-reset bg-gray-100 text-gray-700 border rounded px-3 py-1 mr-3 text-sm font-medium" @click="setTab('2')">Back</a>
             <a href="#" class="btn btn-submit blue-bg text-white rounded px-3 py-1 mr-3 text-sm font-medium" @click="submitForm('4')">Save & Continue</a>
 
-            <a href="#" id="submit-btn" class="btn btn-submit bg-yellow-500 text-white rounded px-3 py-1 mr-3 text-sm font-medium" @click="setProfileTab('4','')">Next</a>
+            <a href="#" class="btn btn-submit bg-yellow-500 text-white rounded px-3 py-1 mr-3 text-sm font-medium" @click="setProfileTab('4','')">Next</a>
             <a href="#" class="btn btn-reset bg-gray-100 text-gray-700 border rounded px-3 py-1 mr-3 text-sm font-medium" @click="resetForm()" v-if="this.type == 'add'">Reset</a>
         </div>
     </div>
@@ -79,14 +88,19 @@
                 introduction:'',
                 procedure:'',
                 conclusion:'',
-                editorModules: {
-                  toolbar: [
-                    ['bold', 'italic', 'underline', 'strike'],
-                    [{ color: [] }, { background: [] }],
-                    [{ script: 'sub' }, { script: 'super' }],
-                    [{ align: [] }],
-                    ['image']
-                  ]
+                editorOption:{
+                    theme: 'snow',
+                    modules: {
+                        toolbar: {
+                            container: [
+                                ['bold', 'italic', 'underline', 'strike'],       
+                                [{ 'color': [] }, { 'background': [] }],
+                                [{ 'script': 'sub' }, { 'script': 'super' }],        
+                                [{ 'align': [] }],
+                                ['image'],
+                            ],      
+                        }
+                    } 
                 },
                 errors:[],
                 success:null,

@@ -222,7 +222,8 @@ class FeedbackController extends Controller
         if($user)
         {
 
-            $notifications=\DB::table('notifications')->where('notifiable_id',$id)->latest()->paginate(10);
+            $notifications=\DB::table('notifications')->where('notifiable_id',$id)->latest()->get();
+            // ->paginate(10);
 
             $notifications = NotificationResource::collection($notifications);
             
@@ -231,14 +232,14 @@ class FeedbackController extends Controller
                 'message'   =>  'Notification List',
                 'type'      =>  'notification',
                 'data'      =>  $notifications,
-                'meta' => [
-                    'current_page' => $notifications->currentPage(),
-                    'last_page' => $notifications->lastPage(),
-                    'per_page' => $notifications->perPage(),
-                    'total' => $notifications->total(),
-                    'next_page_url' => $notifications->nextPageUrl(),
-                    'prev_page_url' => $notifications->previousPageUrl(),
-                ]
+                // 'meta' => [
+                //     'current_page' => $notifications->currentPage(),
+                //     'last_page' => $notifications->lastPage(),
+                //     'per_page' => $notifications->perPage(),
+                //     'total' => $notifications->total(),
+                //     'next_page_url' => $notifications->nextPageUrl(),
+                //     'prev_page_url' => $notifications->previousPageUrl(),
+                // ]
             ],200);
 
         }

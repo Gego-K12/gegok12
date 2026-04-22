@@ -77,8 +77,9 @@ class Assignment extends JsonResource
             'title'                     =>  $this->title,
             'subject'                   =>  $this->subject->name,
             'description'               =>  $this->description,
-            'assigned_date'             =>  date('d M Y', strtotime($this->assigned_date)),
-            'submission_date'           =>  date('d M Y', strtotime($this->submission_date)),
+            'assigned_date' => $this->assigned_date ? date('d M Y', strtotime($this->assigned_date)) : null,
+
+            'submission_date' => $this->submission_date ? date('d M Y', strtotime($this->submission_date)) : null,
             'attachment'                =>  $attachment,
             'status_display'            =>  ucwords($this->status), //$this->assignmentApproval->status
             'status'                    =>  $this->status, //$this->assignmentApproval->status

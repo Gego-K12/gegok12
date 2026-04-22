@@ -40,69 +40,61 @@ class AssignmentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
     public function assignment(Request $request)
     {
-        //
-        $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
-        
-        //  $assignment = Assignment::where([
-        //         ['school_id',Auth::user()->school_id],
-        //         ['academic_year_id',$academic_year->id],
-        //         ['teacher_id',Auth::id()],
-        //         ['submission_date','>=',date('Y-m-d')],
-        //     ])->latest()->get();   
-        // $assignmentlist = AssignmentResource::collection($assignment);
-
-        // return response()->json([
-        //     'success'   =>  true,
-        //     'message'   =>  'Assignment List',
-        //     'data'      =>  $assignmentlist
-        // ],200);
+        $school_id = Auth::user()->school_id;
+        $academic_year = SiteHelper::getAcademicYear($school_id);
 
         $query = Assignment::where([
-            ['school_id', Auth::user()->school_id],
+            ['school_id', $school_id],
             ['academic_year_id', $academic_year->id],
             ['teacher_id', Auth::id()],
-            // ['submission_date', '>=', date('Y-m-d')],
         ]);
 
-        //  Filter by standardLink_id (dynamic)
-        if (isset($request->standardLink_id)) {
-            $query->where('standardLink_id', $request->standardLink_id);
-        }
 
-        // Optional: status filter (if needed)
+        // Filter: status
         if (isset($request->status)) {
             $query->where('status', $request->status);
+
+            if ($request->status == 'ongoing' && empty($request->date)) {
+                $query->where('assigned_date', '<', date('Y-m-d'));
+            }
         }
-        
-        //date filter  
+
+        // Filter: date
         if (isset($request->date)) {
             $query->whereDate('assigned_date', $request->date);
         }
 
-        //date filter  
-        if (isset($request->subject_id)) {
-            $query->where('subject_id', $request->subject_id);
-        }
 
+        $assignment = $query->orderBy('id', 'desc')->get();
 
-        $assignment = $query->orderBy('id','desc')->paginate(10);
+        $grouped = $assignment->groupBy('standardLink_id')->map(function ($standardGroup) {
 
-        //  Resource collection
-        $assignmentlist = AssignmentResource::collection($assignment);
+            return [
+                'standard_id' => $standardGroup->first()->standardLink_id,
+                'standard_name' => $standardGroup->first()->standardLink->StandardSection ?? '--',
+
+                'subjects' => $standardGroup->groupBy('subject_id')->map(function ($subjectGroup) {
+
+                    return [
+                        'subject_id' => $subjectGroup->first()->subject_id,
+                        'subject_name' => optional($subjectGroup->first()->subject)->name,
+
+                        'assignments' => AssignmentResource::collection($subjectGroup->values())
+                    ];
+                })->values()
+            ];
+        })->values();
 
         return response()->json([
-            'success' => true,
+            'status'  => true,
             'message' => 'Assignment List',
-            'data'    => $assignmentlist,
-            'meta'    => [
-                'current_page' => $assignment->currentPage(),
-                'last_page'    => $assignment->lastPage(),
-                'per_page'     => $assignment->perPage(),
-                'total'        => $assignment->total(),
+            'data'    => [
+                'standards' => $grouped
             ]
-        ], 200);
+        ]);
     }
 
     /**
@@ -238,9 +230,10 @@ class AssignmentController extends Controller
             }
 
             $assignment->marks              =   $request->marks;
-            $assigned_date = date('Y-m-d',strtotime($request->assigned_date));
-            $assignment->assigned_date      =   $assigned_date;
-            $assignment->submission_date    =   date('Y-m-d',strtotime($request->submission_date));
+
+            $assignment->assigned_date = $assigned_date ? date('Y-m-d', strtotime($assigned_date)) : null;
+
+            $assignment->submission_date = !empty($request->submission_date) ? date('Y-m-d', strtotime($request->submission_date)) : null;
             
             $assignment->status             =   $request->status;
 
@@ -330,8 +323,11 @@ class AssignmentController extends Controller
         $array['title']             =   $assignment->title;
         $array['description']       =   $assignment->description;
         $array['marks']             =   $assignment->marks;
-        $array['assigned_date']      =   date('d-m-Y',strtotime($assignment->assigned_date));
-        $array['submission_date']    =   date('d-m-Y',strtotime($assignment->submission_date));
+        
+        $array['assigned_date'] = $assignment->assigned_date ? date('d-m-Y', strtotime($assignment->assigned_date)) : null;
+
+        $array['submission_date'] = $assignment->submission_date ? date('d-m-Y', strtotime($assignment->submission_date)) : null;
+
         $array['attachment']        =   $assignment->attachment==null ? '':$assignment->AttachmentPath;
 
         $array['status']        =   $assignment->status;
@@ -381,9 +377,9 @@ class AssignmentController extends Controller
 
 
                     $assignment->marks              =   $request->marks;
-                    $assigned_date      =   date('Y-m-d',strtotime($request->assigned_date));
-                    $assignment->assigned_date      =   $assigned_date;
-                    $assignment->submission_date    =   date('Y-m-d',strtotime($request->submission_date));
+                    $assignment->assigned_date = $assigned_date ? date('Y-m-d', strtotime($assigned_date)) : null;
+
+                    $assignment->submission_date = !empty($request->submission_date) ? date('Y-m-d', strtotime($request->submission_date)) : null;
                     // if($assigned_date == date('Y-m-d'))
                     // {
                     //     $assignment->status             =   'ongoing';

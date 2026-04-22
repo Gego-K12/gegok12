@@ -156,7 +156,7 @@ class HomeworkController extends Controller
         {
             $query->where('status', $request->status);
 
-            if($request->status=='publish')
+            if($request->status=='publish' && empty($request->date))
             {
                 $query->where('date','<',date('Y-m-d'));
 
@@ -277,8 +277,10 @@ class HomeworkController extends Controller
             $work->subject_id           =   $request->subject_id;
             $work->teacher_id           =   Auth::id();
             $work->description          =   $request->description;
-            $work->date                 =   date('Y-m-d',strtotime($request->date));
-            $work->submission_date      =   date('Y-m-d',strtotime($request->submission_date));
+            $work->date                 = $request->date ? date('Y-m-d', strtotime($request->date)) : null;
+
+            $work->submission_date      = $request->submission_date ? date('Y-m-d', strtotime($request->submission_date)) : null;
+
             $work->status               =   $request->status;
 
             $file = $request->file('attachment');
@@ -366,10 +368,14 @@ class HomeworkController extends Controller
             $array['standardLink_id']   =   $homework->standardLink_id;
             $array['subject_id']        =   $homework->subject_id;
             $array['description']       =   $homework->description;
-            $array['date']              =   date('d-m-Y',strtotime($homework->date));
+
+            $array['date']              =   $homework->date ? date('d-m-Y', strtotime($homework->date)) : '';
+
             $array['attachment']        =   $homework->attachment == null ? '':$homework->AttachmentPath;
             $array['pending_count']     =   $homework->PendingCount;
-            $array['submission_date']   =   date('d-m-Y',strtotime($homework->submission_date));
+
+            $array['submission_date']   =   $homework->submission_date ? date('d-m-Y', strtotime($homework->submission_date)) : '';
+            
             $array['status']            =   $homework->status;
 
             return $array;
@@ -402,8 +408,10 @@ class HomeworkController extends Controller
                 $work->subject_id           =   $request->subject_id;
                 $work->teacher_id           =   Auth::id();
                 $work->description          =   $request->description;
-                $work->date                 =   date('Y-m-d',strtotime($request->date));
-                $work->submission_date      =   date('Y-m-d',strtotime($request->submission_date));
+                $work->date                 = $request->date ? date('Y-m-d', strtotime($request->date)) : null;
+
+                $work->submission_date      = $request->submission_date ? date('Y-m-d', strtotime($request->submission_date)) : null;
+
                 $work->status               =   $request->status;
 
                 $file = $request->file('attachment');

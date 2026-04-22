@@ -60,7 +60,7 @@ class Homework extends JsonResource
             'id'                =>  $this->id,
             'class_name'        =>  $class_name,
             'subject_name'      =>  $this->subject->name,
-            'date'              =>  date('d-m-Y', strtotime($this->date)),
+            'date'              => $this->date ? date('d-m-Y', strtotime($this->date)) : '',
             'description'       =>  $this->description,
             'attachment'        =>  $attachment,
             'pending_count'     =>  $this->PendingCount,
@@ -68,7 +68,7 @@ class Homework extends JsonResource
             'status'            =>  $this->status,//$this->homeworkApproval->status
             'comments'          =>  $this->homeworkApproval->comments,
             'type'              =>  $type,
-            'submission_date'   =>  $this->submission_date==null?'':date('d-m-Y', strtotime($this->submission_date)),
+            'submission_date'   => $this->submission_date ? date('d-m-Y', strtotime($this->submission_date)) : '',
         ];
     }
 }

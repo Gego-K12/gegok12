@@ -33,19 +33,20 @@ class StudentAssignmentController extends Controller
     public function submittedAssignmentList(Request $request,$assignment_id)
     {
         //
-        $studentAssignment = StudentAssignment::where([['assignment_id',$assignment_id],['status','submitted']])->paginate(10);
+        $studentAssignment = StudentAssignment::where([['assignment_id',$assignment_id],['status','submitted']])->get();
+        // ->paginate(10);
         $list = StudentAssignmentResource::collection($studentAssignment);
 
         return response()->json([
             'success' => true,
             'message' => 'Submitted Assignment List',
             'data' => $list,
-            'meta' => [
-                'current_page' => $studentAssignment->currentPage(),
-                'last_page' => $studentAssignment->lastPage(),
-                'per_page' => $studentAssignment->perPage(),
-                'total' => $studentAssignment->total(),
-            ]
+            // 'meta' => [
+            //     'current_page' => $studentAssignment->currentPage(),
+            //     'last_page' => $studentAssignment->lastPage(),
+            //     'per_page' => $studentAssignment->perPage(),
+            //     'total' => $studentAssignment->total(),
+            // ]
         ], 200);
     }
 
@@ -57,19 +58,20 @@ class StudentAssignmentController extends Controller
     public function completedAssignmentList(Request $request,$assignment_id)
     {
         //
-        $studentAssignment = StudentAssignment::where([['assignment_id',$assignment_id],['status','completed']])->paginate(10);
+        $studentAssignment = StudentAssignment::where([['assignment_id',$assignment_id],['status','completed']])->get();
+        // ->paginate(10);
         $list = StudentAssignmentResource::collection($studentAssignment);
 
         return response()->json([
             'success'   =>  true,
             'message'   =>  'Completed Assignment List',
             'data'      =>  $list,
-            'meta' => [
-                'current_page' => $studentAssignment->currentPage(),
-                'last_page' => $studentAssignment->lastPage(),
-                'per_page' => $studentAssignment->perPage(),
-                'total' => $studentAssignment->total(),
-            ]
+            // 'meta' => [
+            //     'current_page' => $studentAssignment->currentPage(),
+            //     'last_page' => $studentAssignment->lastPage(),
+            //     'per_page' => $studentAssignment->perPage(),
+            //     'total' => $studentAssignment->total(),
+            // ]
         ],200);
     }
 

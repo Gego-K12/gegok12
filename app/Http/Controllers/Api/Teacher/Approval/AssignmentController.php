@@ -231,7 +231,7 @@ class AssignmentController extends Controller
 
             $assignment->marks              =   $request->marks;
 
-            $assignment->assigned_date = $assigned_date ? date('Y-m-d', strtotime($assigned_date)) : null;
+            $assignment->assigned_date = $request->assigned_date ? date('Y-m-d', strtotime($request->assigned_date)) : null;
 
             $assignment->submission_date = !empty($request->submission_date) ? date('Y-m-d', strtotime($request->submission_date)) : null;
             
@@ -377,7 +377,7 @@ class AssignmentController extends Controller
 
 
                     $assignment->marks              =   $request->marks;
-                    $assignment->assigned_date = $assigned_date ? date('Y-m-d', strtotime($assigned_date)) : null;
+                    $assignment->assigned_date = $request->assigned_date ? date('Y-m-d', strtotime($request->assigned_date)) : null;
 
                     $assignment->submission_date = !empty($request->submission_date) ? date('Y-m-d', strtotime($request->submission_date)) : null;
                     // if($assigned_date == date('Y-m-d'))

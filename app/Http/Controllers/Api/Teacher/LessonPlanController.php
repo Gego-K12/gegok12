@@ -8,10 +8,17 @@ namespace App\Http\Controllers\Api\Teacher;
 use App\Http\Resources\API\Teacher\LessonPlan as LessonPlanResource;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use App\Events\Notification\SingleNotificationEvent;
+use App\Http\Requests\LessonPlanStep1Request;
+use App\Http\Requests\LessonPlanStep2Request;
+use App\Http\Requests\LessonPlanStep3Request;
+use App\Http\Requests\LessonPlanStep4Request;
 use Illuminate\Http\Request;
 use App\Traits\LogActivity;
 use App\Helpers\SiteHelper;
 use App\Models\LessonPlan;
+use App\Models\Teacherlink;
+use App\Models\TeacherProfile;
 use App\Traits\Common;
 use Exception;
 use Log;
@@ -118,6 +125,259 @@ class LessonPlanController extends Controller
         {
             Log::info($e->getMessage());
             //dd($e->getMessage());
+        }
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function stepOne(LessonPlanStep1Request $request)
+    {
+        try {
+            $teacherLink = Teacherlink::where([
+                ['standardLink_id', $request->standardLink_id],
+                ['subject_id', $request->subject_id],
+                ['teacher_id', Auth::id()]
+            ])->first();
+
+            if (!$teacherLink) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Teacher link not found'
+                ], 404);
+            }
+
+            $lessonplan = new LessonPlan();
+            $lessonplan->teacher_link_id = $teacherLink->id;
+            $lessonplan->unit_no = $request->unit_no;
+            $lessonplan->unit_name = $request->unit_name;
+            $lessonplan->title = $request->title;
+            $lessonplan->duration = date('H:i:s', mktime(0, $request->duration, 0));
+            $lessonplan->description = $request->description;
+            $lessonplan->status = 'draft';
+
+            $lessonplan->save();
+
+           
+            $message = trans('messages.save_success_msg', ['module' => 'Step 1']);
+
+            $ip = $this->getRequestIP();
+            $this->doActivityLog(
+                $lessonplan,
+                Auth::user(),
+                ['ip' => $ip, 'details' => request()->userAgent()],
+                LOGNAME_ADD_LESSON_PLAN_1,
+                $message
+            );
+
+        
+            return response()->json([
+                'status' => true,
+                'message' => $message,
+                'data' => [
+                    'lessonplan_id' => $lessonplan->id
+                ]
+            ], 201);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Something went wrong',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+   public function stepTwo(LessonPlanStep2Request $request, $id)
+    {
+        try {
+          
+            $lessonplan = LessonPlan::find($id);
+
+            // If not found
+            if (!$lessonplan) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Lesson plan not found'
+                ], 404);
+            }
+
+            // Update fields
+            $lessonplan->objective = $request->objective;
+            $lessonplan->materials_required = $request->materials_required;
+            $lessonplan->assessment = $request->assessment;
+            $lessonplan->status = 'draft';
+
+            $lessonplan->save();
+
+            // Log (optional)
+            $message = trans('messages.save_success_msg', ['module' => 'Step 2']);
+
+            $ip = $this->getRequestIP();
+            $this->doActivityLog(
+                $lessonplan,
+                Auth::user(),
+                ['ip' => $ip, 'details' => request()->userAgent()],
+                LOGNAME_ADD_LESSON_PLAN_2,
+                $message
+            );
+
+            // API Response
+            return response()->json([
+                'status' => true,
+                'message' => $message,
+                'data' => [
+                    'lessonplan_id' => $lessonplan->id
+                ]
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Something went wrong',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function stepThree(LessonPlanStep3Request $request, $id)
+    {
+        try {
+            // Find lesson plan
+            $lessonplan = LessonPlan::find($id);
+
+            if (!$lessonplan) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Lesson plan not found'
+                ], 404);
+            }
+
+            // Update fields
+            $lessonplan->introduction = $request->introduction;
+            $lessonplan->procedure = $request->procedure;
+            $lessonplan->conclusion = $request->conclusion;
+            $lessonplan->status = 'pending';
+
+            $lessonplan->save();
+
+            // Notification (safe handling)
+            $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
+
+            $principal = TeacherProfile::with('user')->where([
+                ['school_id', Auth::user()->school_id],
+                ['academic_year_id', $academic_year->id],
+                ['designation', 'principal']
+            ])->first();
+
+            if ($principal && $principal->user) {
+                $data = [
+                    'user' => $principal->user,
+                    'details' => trans('notification.lesson_plan_add_success_msg')
+                ];
+
+                event(new SingleNotificationEvent($data));
+            }
+
+            // Log
+            $message = trans('messages.save_success_msg', ['module' => 'Step 3']);
+
+            $ip = $this->getRequestIP();
+            $this->doActivityLog(
+                $lessonplan,
+                Auth::user(),
+                ['ip' => $ip, 'details' => request()->userAgent()],
+                LOGNAME_ADD_LESSON_PLAN_3,
+                $message
+            );
+
+            // API Response
+            return response()->json([
+                'status' => true,
+                'message' => $message,
+                'data' => [
+                    'lessonplan_id' => $lessonplan->id,
+                    'status' => $lessonplan->status
+                ]
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Something went wrong',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function stepFour(LessonPlanStep4Request $request, $id)
+    {
+        try {
+            // Find lesson plan
+            $lessonplan = LessonPlan::find($id);
+
+            if (!$lessonplan) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Lesson plan not found'
+                ], 404);
+            }
+
+            // Update fields
+            $lessonplan->notes = $request->notes;
+            $lessonplan->modification = $request->modification;
+            $lessonplan->status = 'pending';
+
+            $lessonplan->save();
+
+            // Log
+            $message = trans('messages.save_success_msg', ['module' => 'Step 4']);
+
+            $ip = $this->getRequestIP();
+            $this->doActivityLog(
+                $lessonplan,
+                Auth::user(),
+                ['ip' => $ip, 'details' => request()->userAgent()],
+                LOGNAME_ADD_LESSON_PLAN_4,
+                $message
+            );
+
+            // API Response
+            return response()->json([
+                'status' => true,
+                'message' => $message,
+                'data' => [
+                    'lessonplan_id' => $lessonplan->id,
+                    'status' => $lessonplan->status
+                ]
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Something went wrong',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 }

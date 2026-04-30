@@ -32,6 +32,7 @@ trait TodolistProcess
         \DB::beginTransaction();
         try
         {
+            // dd($data);
             $today = date('Y-m-d H:i:s');
 
             $task                       =   new Task;
@@ -44,6 +45,7 @@ trait TodolistProcess
             $task->to_do_list           =   $data->to_do_list;
             $task->task_date            =   date('Y-m-d H:i:s',strtotime($data->task_date));
             $task->reminder             =   $data->reminder;
+            $task->priority           =   $data->priority;
             if($data->reminder == 'others')
             {
                 $task->reminder_date    =   date('Y-m-d H:i:s',strtotime($data->reminder_date));
@@ -75,32 +77,36 @@ trait TodolistProcess
 
             if($data->assignee == 'class')
             {
-                $task_assignee = new TaskAssignee;
+                foreach ($data->class_ids as $class_id) 
+                {
+                    $task_assignee = new TaskAssignee;
 
-                $task_assignee->task_id             = $task->id;
-                $task_assignee->standardLink_id     = $data->standardLink_id;
-                $task_assignee->status              = 1;
+                    $task_assignee->task_id             = $task->id;
+                    $task_assignee->standardLink_id     = $class_id;
+                    $task_assignee->assigned_type       = 'class';
 
-                $task_assignee->save();
+                    $task_assignee->save();
 
-                $this->addClassReminder($school_id,$reminder_date,$task->title,$task->id,$data->standardLink_id);
 
-                $data=[];
+                    $this->addClassReminder($school_id,$reminder_date,$task->title,$task->id,$data->standardLink_id);
 
-                $data['school_id']      =   $school_id;
-                $data['standard_id']    =   $data->standardLink_id;
-                $data['message']        =   'New Task Assigned';
-                $data['type']           =   'task';
+                    $data=[];
 
-                event(new StandardPushEvent($data));
+                    $data['school_id']      =   $school_id;
+                    $data['standard_id']    =   $data->standardLink_id;
+                    $data['message']        =   'New Task Assigned';
+                    $data['type']           =   'task';
 
-                $array = [];
+                    event(new StandardPushEvent($data));
 
-                $array['school_id']         = $school_id;
-                $array['standardLink_id']   = $data->standardLink_id;
-                $array['details']           = trans('notification.task_assign_msg');  
+                    $array = [];
 
-                event(new ClassNotificationEvent($array));
+                    $array['school_id']         = $school_id;
+                    $array['standardLink_id']   = $data->standardLink_id;
+                    $array['details']           = trans('notification.task_assign_msg');  
+
+                    event(new ClassNotificationEvent($array));
+                    }
             }
             elseif($data->assignee == 'student')
             {
@@ -112,7 +118,6 @@ trait TodolistProcess
                     $task_assignee->task_id         = $task->id;
                     $task_assignee->user_id         = $student_id;
                     $task_assignee->standardLink_id = $standard_id;
-                    $task_assignee->status          = 1;
 
                     $task_assignee->save();
 
@@ -148,7 +153,6 @@ trait TodolistProcess
 
                     $task_assignee->task_id     = $task->id;
                     $task_assignee->user_id     = $teacher_id;
-                    $task_assignee->status      = 1;
 
                     $task_assignee->save();
 
@@ -173,13 +177,48 @@ trait TodolistProcess
                     event(new SingleNotificationEvent($data));
                 }
             }
+            elseif($data->assignee == 'non_teaching')
+            {
+                foreach ($data->non_teachers as $teacher_id) 
+                {
+                    $task_assignee = new TaskAssignee;
+
+                    $task_assignee->task_id     = $task->id;
+                    $task_assignee->user_id     = $teacher_id;
+
+                    $task_assignee->save();
+
+                    $teacher = User::where('id',$teacher_id)->first();
+
+                    $this->sendToTaskReminder($school_id,$reminder_date,$task->title,$task->id,$teacher->email,$teacher->mobile_no);
+
+                    $array=[];
+
+                    $array['school_id']  =   $school_id;
+                    $array['user_id']    =   $teacher->id;
+                    $array['message']    =   'New Task Assigned';
+                    $array['type']       =   'task';
+
+                    event(new SinglePushEvent($array));
+
+                    $data = [];
+
+                    $data['user']       =   $teacher;
+                    $data['details']    =   trans('notification.task_assign_msg');
+
+                    event(new SingleNotificationEvent($data));
+                }
+            }
+            // elseif($data->assignee == 'group')
+            // {
+                
+            // }
             else
             {
                 $task_assignee = new TaskAssignee;
 
                 $task_assignee->task_id     = $task->id;
                 $task_assignee->user_id     = $auth_id;
-                $task_assignee->status      = 1;
 
                 $task_assignee->save();
 

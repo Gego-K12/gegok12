@@ -17,6 +17,13 @@ window.bus = bus;
 import uploader from 'vue-simple-uploader'
 import AudioRecorder from 'vue-audio-recorder'
 
+import PrimeVue from 'primevue/config'
+
+// styles
+import 'primevue/resources/themes/lara-light-blue/theme.css'
+import 'primevue/resources/primevue.min.css'
+import 'primeicons/primeicons.css'
+
 import registerCustomAddon from './custom_addon'
 
 /**
@@ -401,6 +408,10 @@ app.use(Toast)
 registerCustomAddon(app)
 // app.use(uploader)
 // app.use(AudioRecorder)
+import PickList from 'primevue/picklist';
 
+app.component('PickList', PickList);
+
+app.use(PrimeVue)
 
 app.mount('#app');

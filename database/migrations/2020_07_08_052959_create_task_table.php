@@ -22,7 +22,14 @@ class CreateTaskTable extends Migration
             $table->integer('user_id')->unsigned();
             $table->foreign('user_id')->references('id')->on('users');
             $table->text('title');
-            $table->enum('type',['class','self','student','teacher']);
+            $table->enum('type',[
+                'self',
+                'student',
+                'class',
+                'group',
+                'teacher',
+                'non_teaching'
+            ]);
             $table->dateTime('task_date');
             $table->enum('reminder',['one_hour_before_the_task','one_day_before_the_task','others','two_days_before_the_task']);
             $table->dateTime('reminder_date')->nullable();
@@ -30,6 +37,19 @@ class CreateTaskTable extends Migration
             $table->boolean('task_status')->default(false);
             $table->integer('task_flag');//0->over due, 1->today, 2->upcoming
             $table->boolean('snooze')->default(false); 
+
+            $table->enum('priority', [
+                'low',
+                'normal',
+                'high'
+            ])->default('normal');
+
+            $table->enum('task_type', [
+                'individual',
+                'group_task',
+                'open'
+            ])->default('individual');
+
             $table->timestamps();
             $table->softDeletes();
         });

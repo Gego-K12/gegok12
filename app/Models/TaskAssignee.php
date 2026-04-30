@@ -44,7 +44,7 @@ class TaskAssignee extends Model
      * @var array
      */
     protected $fillable = [
-        'task_id' , 'user_id' , 'standardLink_id' , 'status'
+        'task_id' , 'user_id' , 'standardLink_id' , 'status' , 'assigned_type'
     ];
 
     /**

@@ -34,34 +34,98 @@ class LessonPlanController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
-        //
-        $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
-        if(Auth::user()->hasRole('principal'))
-        {
-            $lessonplan = LessonPlan::with('teacherlink')->whereHas('teacherlink' , function ($query) use($academic_year)
-            { 
-                $query->where([
-                    ['school_id',Auth::user()->school_id],
-                    ['academic_year_id',$academic_year->id]
-                ]);
-            })->where('status','approved')->paginate('10');
-        }
-        else
-        {
-            $lessonplan = LessonPlan::with('teacherlink')->whereHas('teacherlink' , function ($query) use($academic_year)
-            { 
-                $query->where([
-                    ['school_id',Auth::user()->school_id],
-                    ['academic_year_id',$academic_year->id],
-                    ['teacher_id',Auth::id()]
-                ]);
-            })->where('status','approved')->paginate('10');
-        }
-        $lessonplan = LessonPlanResource::collection($lessonplan);
+    // public function index()
+    // {
+    //     //
+    //     $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
+    //     if(Auth::user()->hasRole('principal'))
+    //     {
+    //         $lessonplan = LessonPlan::with('teacherlink')->whereHas('teacherlink' , function ($query) use($academic_year)
+    //         { 
+    //             $query->where([
+    //                 ['school_id',Auth::user()->school_id],
+    //                 ['academic_year_id',$academic_year->id]
+    //             ]);
+    //         })->where('status','approved')->paginate('10');
+    //     }
+    //     else
+    //     {
+    //         $lessonplan = LessonPlan::with('teacherlink')->whereHas('teacherlink' , function ($query) use($academic_year)
+    //         { 
+    //             $query->where([
+    //                 ['school_id',Auth::user()->school_id],
+    //                 ['academic_year_id',$academic_year->id],
+    //                 ['teacher_id',Auth::id()]
+    //             ]);
+    //         })->where('status','approved')->paginate('10');
+    //     }
+    //     $lessonplan = LessonPlanResource::collection($lessonplan);
         
-        return $lessonplan;
+    //     return $lessonplan;
+    // }
+   public function index(Request $request)
+    {
+        $school_id = Auth::user()->school_id;
+        $academic_year = SiteHelper::getAcademicYear($school_id);
+
+        $query = LessonPlan::with([
+                'teacherlink.standardLink',
+                'teacherlink.subject',
+                'teacherlink.teacher'
+            ])
+            ->whereHas('teacherlink', function ($q) use ($school_id, $academic_year) {
+                $q->where([
+                    ['school_id', $school_id],
+                    ['academic_year_id', $academic_year->id],
+                ]);
+
+                // If not principal → filter by teacher
+                if (!Auth::user()->hasRole('principal')) {
+                    $q->where('teacher_id', Auth::id());
+                }
+            })
+            ->where('status', 'approved');
+
+        // Optional filter
+        if ($request->has('date')) {
+            $query->whereDate('created_at', $request->date);
+        }
+
+        $lessonplans = $query->orderBy('id', 'desc')->get();
+
+        $grouped = $lessonplans->groupBy(function ($item) {
+            return optional($item->teacherlink)->standard_link_id;
+        })->map(function ($standardGroup) {
+
+            $first = $standardGroup->first();
+
+            return [
+                'standard_id'   => optional($first->teacherlink)->standardLink_id,
+                'standard_name' => optional($first->teacherlink?->standardLink)->StandardSection ?? '--',
+
+                'subjects' => $standardGroup->groupBy(function ($item) {
+                    return optional($item->teacherlink)->subject_id;
+                })->map(function ($subjectGroup) {
+
+                    $firstSubject = $subjectGroup->first();
+
+                    return [
+                        'subject_id'   => optional($firstSubject->teacherlink)->subject_id,
+                        'subject_name' => optional($firstSubject->teacherlink?->subject)->name ?? '--',
+
+                        'lessonplans'  => LessonPlanResource::collection($subjectGroup->values())
+                    ];
+                })->values()
+            ];
+        })->values();
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'Lesson Plan List',
+            'data'    => [
+                'standards' => $grouped
+            ]
+        ]);
     }
 
     /**

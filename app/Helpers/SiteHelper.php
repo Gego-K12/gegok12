@@ -630,6 +630,31 @@ class SiteHelper
             })->get()->sortBy('userprofile.firstname');
         });
     }
+
+    public static function getDoToTeachers($school_id, $academic_year_id)
+    {
+        $key = "do_to_teacher_lists_" . $school_id . '_' . $academic_year_id;
+        return Cache::remember($key, env('CACHE_TIME'), function () use ($school_id, $academic_year_id) {
+            return TeacherUser::where('usergroup_id', 5)->where('status', 'active')->whereHas('teacherprofile', function ($query) use ($school_id, $academic_year_id) {
+                $query->where([
+                    ['school_id', $school_id],
+                    ['academic_year_id', $academic_year_id]
+                ]);
+            })->get()->sortBy('userprofile.firstname');
+        });
+    }
+     public static function getNonTeachers($school_id, $academic_year_id)
+    {
+        $key = "non_teacher_lists_" . $school_id . '_' . $academic_year_id;
+        return Cache::remember($key, env('CACHE_TIME'), function () use ($school_id, $academic_year_id) {
+            return TeacherUser::whereIn('usergroup_id', [8, 10, 11, 12])->where('status', 'active')->whereHas('teacherprofile', function ($query) use ($school_id, $academic_year_id) {
+                $query->where([
+                    ['school_id', $school_id],
+                    ['academic_year_id', $academic_year_id]
+                ]);
+            })->get()->sortBy('userprofile.firstname');
+        });
+    }
     /**
      * Get the count of pending leave applications under a teacher.
      *

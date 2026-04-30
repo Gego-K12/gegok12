@@ -57,7 +57,7 @@ class Task extends Model
      * @var array
      */
     protected $fillable = [
-        'school_id' , 'academic_year_id' , 'user_id' , 'title' , 'type', 'task_date' , 'reminder' , 'reminder_date' , 'to_do_list' , 'task_status' , 'task_flag'
+        'school_id' , 'academic_year_id' , 'user_id' , 'title' , 'type', 'task_date' , 'reminder' , 'reminder_date' , 'to_do_list' , 'task_status' , 'task_flag' , 'priority' , 'task_type'
     ];
 
     /**

@@ -77,7 +77,8 @@ class TaskController extends Controller
     public function list(Request $request)
     {
         $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
-        $teachers = SiteHelper::getTeachers(Auth::user()->school_id,$academic_year->id);
+        $teachers = SiteHelper::getDoToTeachers(Auth::user()->school_id,$academic_year->id);
+        $non_teachers = SiteHelper::getNonTeachers(Auth::user()->school_id,$academic_year->id);
         $array = [];
 
         $standardlink_subject_list = SiteHelper::getStandardSubjectList(Auth::user()->school_id,Auth::id());
@@ -99,6 +100,7 @@ class TaskController extends Controller
         }
 
         $array['teachers']  = TeacherResource::collection($teachers);
+        $array['nonteachers']  = TeacherResource::collection($non_teachers);
         $array['task_date'] = date('Y-m-d');
 
         return response()->json($array);

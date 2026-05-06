@@ -766,6 +766,9 @@ Route::get( '/staffs/id-card-print', 'StaffController@printidcard' );
 Route::get( '/staffs/id-card/{name}', 'StaffController@showidcard' );
 Route::get( '/staffs/show-idcardprint/{name}', 'StaffController@showprintidcard' );
 
+//Group
+Route::post('/group/store', 'GroupController@store');
+
 //Addons
 
 Route::get('/addon', function () {

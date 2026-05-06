@@ -77,7 +77,7 @@ class TaskRequest extends FormRequest
         // {
         //     $rules['standardLink_id'] = 'required';
         // }
-        elseif (request('assignee') == 'student') 
+        if (request('assignee') == 'student') 
         {
             $rules['standardLink_id']       = 'required';
             $rules['selectedUsersCount']    = 'check_student_count';

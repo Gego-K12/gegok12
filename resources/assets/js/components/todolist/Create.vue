@@ -332,7 +332,7 @@
             </div>
         </div>
 
-        <div class="my-6" v-if="this.assignee == 'group'">
+        <div class="my-6" v-if="this.assignee == 'group' && this.standardLink_id != ''">
             <PickList
                 v-model="groupPickList"
                 dataKey="id"
@@ -627,7 +627,7 @@
 
             selectAssignee()
             {
-                if(this.assignee == 'class')
+                if(this.assignee == 'class' || this.assignee == 'student' || this.assignee == 'group')
                 {
                     if($('#student_list').hasClass('hidden'))
                     {
@@ -635,15 +635,6 @@
                         $('#teacher_list').removeClass('block').addClass('hidden');
                     }
                 }
-                else if(this.assignee == 'student')
-                {
-                    if($('#student_list').hasClass('hidden'))
-                    {
-                        $('#student_list').removeClass('hidden').addClass('block');
-                        $('#teacher_list').removeClass('block').addClass('hidden');
-                    }
-                }
-                // FIX: was 'teach' — teacher list never showed
                 else if(this.assignee == 'teacher')
                 {
                     if($('#teacher_list').hasClass('hidden'))

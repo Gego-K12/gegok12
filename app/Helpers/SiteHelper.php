@@ -738,8 +738,8 @@ class SiteHelper
     {
         $array = [];
 
-        $list_id = array('class', 'self', 'student', 'teacher');
-        $list_name = array('Class', 'Self', 'Student', 'Teachers');
+        $list_id = array('class', 'self', 'student', 'teacher','group','non_teaching');
+        $list_name = array('Class', 'Self', 'Student', 'Teachers','Group','Non-Teaching');
 
         return Cache::remember("task_assignee_list", env('CACHE_TIME'), function () use ($list_id, $list_name) {
             for ($i = 0; $i < count($list_name); $i++) {

@@ -183,6 +183,7 @@ Route::group([ 'prefix' => 'teacher' , 'middleware'=>['auth:sanctum'] , 'namespa
         //add
         Route::get('/task/add/list','TaskController@create'); 
         Route::get('/task/add/teacher/list','TaskController@teacherList'); 
+        Route::get('/task/add/nonteacher/list','TaskController@nonTeacherList'); 
         Route::get('/task/add/student/{standardlink_id}','TaskController@studentList'); 
         Route::post('/task/add','TaskController@store'); 
 

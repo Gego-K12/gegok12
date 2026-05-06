@@ -21,6 +21,7 @@ use App\Helpers\SiteHelper;
 use App\Traits\Common;
 use App\Models\Task;
 use App\Models\User;
+use App\Models\Group;
 use Exception;
 use Log;
 
@@ -247,24 +248,34 @@ class TaskController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(Request $request)
-    {
-        $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
-        $standardlink_subject_list = SiteHelper::getStandardSubjectList(Auth::user()->school_id,Auth::id());
+public function create(Request $request)
+{
+    $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
 
-        $array = [];
+    $standardlink_subject_list = SiteHelper::getStandardSubjectList(
+        Auth::user()->school_id,
+        Auth::id()
+    );
 
-        $array['task_assignee_list']    = SiteHelper::getTaskAssigneeList();
-        $array['task_reminder_list']    = SiteHelper::getTaskReminderList();
-        $array['standardlinks']         = $standardlink_subject_list['standardLinklist'];
-        
-        /*return response()->json([
-            'success'   =>  true,
-            'message'   =>  'Add Task List',
-            'data'      =>  $array
-        ],200);*/
-        return response()->json($array,200);
-    }
+    $standardlinks = collect($standardlink_subject_list['standardLinklist']->toArray($request))
+        ->map(function ($item) {
+
+            $item['groups'] = Group::where('standardLink_id', $item['id'])
+                ->select('id', 'group_name')
+                ->get()
+                ->toArray();
+
+            return $item;
+        });
+
+    $array = [];
+
+    $array['task_assignee_list'] = SiteHelper::getTaskAssigneeList();
+    $array['task_reminder_list'] = SiteHelper::getTaskReminderList();
+    $array['standardlinks'] = $standardlinks->values();
+
+    return response()->json($array, 200);
+}
 
     /**
      * Display a listing of the resource.
@@ -274,12 +285,25 @@ class TaskController extends Controller
     public function teacherList()
     {
         $academic_year  = SiteHelper::getAcademicYear(Auth::user()->school_id);
-        $teachers       = SiteHelper::getTeachers(Auth::user()->school_id,$academic_year->id);
+        $teachers       = SiteHelper::getDoToTeachers(Auth::user()->school_id,$academic_year->id);
         $teachers       = TeacherResource::collection($teachers);
         
         return response()->json([
             'success'   =>  true,
             'message'   =>  'Add Task Teacher List',
+            'data'      =>  $teachers
+        ],200);
+    }
+
+    public function nonTeacherList()
+    {
+        $academic_year  = SiteHelper::getAcademicYear(Auth::user()->school_id);
+        $teachers       = SiteHelper::getNonTeachers(Auth::user()->school_id,$academic_year->id);
+        $teachers       = TeacherResource::collection($teachers);
+        
+        return response()->json([
+            'success'   =>  true,
+            'message'   =>  'Add Task Non-Teacher List',
             'data'      =>  $teachers
         ],200);
     }

@@ -768,6 +768,9 @@ Route::get( '/staffs/show-idcardprint/{name}', 'StaffController@showprintidcard'
 
 //Group
 Route::post('/group/store', 'GroupController@store');
+Route::get('groups/{standardLinkId}', 'GroupController@index');
+Route::get('/groups/list', 'GroupController@list');
+Route::post('/groups/add-members', 'GroupController@addMembers');
 
 //Addons
 

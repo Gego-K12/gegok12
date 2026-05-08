@@ -41,6 +41,9 @@
              <li v-if="gvideoroomEnabled && this.mode == 'admin'"  class="px-2 mx-1 lg:mx-2 md:mx-2 py-2 lg:py-3 md:py-2" v-bind:class="[{'active' : profile_tab === '13'}]">
                 <a href="#" class="text-gray-700 font-medium"  @click="setProfileTab('13')">Online Class</a>
             </li>
+            <li v-if="this.mode == 'admin'"  class="px-2 mx-1 lg:mx-2 md:mx-2 py-2 lg:py-3 md:py-2" v-bind:class="[{'active' : profile_tab === '14'}]">
+                <a href="#" class="text-gray-700 font-medium"  @click="setProfileTab('14')">Groups</a>
+            </li>
         </ul>
         <Teleport to="#class">
             <div class="px-3 overflow-x-scroll lg:overflow-x-auto md:overflow-x-auto py-3" v-bind:class="[this.profile_tab==1?'block' :'hidden']">
@@ -58,6 +61,10 @@
             <events :url="this.url" :id="this.id" :mode="this.mode"></events>
             <fees v-if="gfeeEnabled" :url="this.url" :id="this.id" :mode="this.mode"></fees>
             <wallBoard :url="this.url" :id="this.id" :mode="this.mode" :auth_id="this.auth_id"></wallBoard>
+            <groups :url="this.url"
+                    :id="this.id"
+                    :mode="this.mode">
+            </groups>
         </Teleport>
         <Teleport to="#notes">
             <div class="px-3 overflow-x-scroll lg:overflow-x-auto md:overflow-x-auto py-3" v-bind:class="[this.profile_tab==11?'block' :'hidden']">
@@ -85,6 +92,7 @@
     import wallBoard from './wallBoard';
     import notes from '../../notes';
     import conference from './conference';
+    import groups from './groups';
  
     export default {
         props:['url' , 'id' , 'school_id' , 'mode' ,'auth_id'],
@@ -117,7 +125,8 @@
             fees,
             notes,
             wallBoard,
-            conference
+            conference,
+            groups
         },
 
         methods:

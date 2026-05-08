@@ -6,18 +6,16 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Group extends Model
+class GroupMember extends Model
 {
-    protected $table = 'groups';
+    use SoftDeletes;
+    
+    protected $table = 'group_members';
 
     protected $fillable = [
-        'standardLink_id' , 'group_name'
+        'group_id' , 'member_id' ,'member_type'
     ];
-
-    public function members()
-    {
-        return $this->hasMany(GroupMember::class,'id','group_id');
-    }
 
 }

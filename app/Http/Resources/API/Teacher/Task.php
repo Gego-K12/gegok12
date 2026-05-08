@@ -46,6 +46,8 @@ class Task extends JsonResource
             'snooze'            =>  $snooze,
             'reminder_date'     =>  date('d-m-Y H:i:s',strtotime($this->reminder_date)),
             'auth_id'           =>  Auth::id(),
+            'priority'          =>  $this->priority,
+            'task_type'         =>  $this->task_type,
             'created_by'        =>  $this->user_id,
         ];
     }

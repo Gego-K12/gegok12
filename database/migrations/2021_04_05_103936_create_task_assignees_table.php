@@ -21,6 +21,8 @@ class CreateTaskAssigneesTable extends Migration
             $table->foreign('user_id')->references('id')->on('users');
             $table->integer('standardLink_id')->unsigned()->nullable();
             $table->foreign('standardLink_id')->references('id')->on('standards_link');
+            $table->integer('group_id')->unsigned()->nullable();
+            $table->foreign('group_id')->references('id')->on('groups');
             $table->bigInteger('claimed_by')->unsigned()->nullable();
             $table->enum('status', [
                 'pending',

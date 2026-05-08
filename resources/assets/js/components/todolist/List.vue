@@ -1,59 +1,74 @@
 <template>
     <div class="relative task-page">
-        <div v-if="this.success!=null" class="alert alert-success mt-2" id="success-alert">{{this.success}}</div>
+        <div v-if="this.success!=null" class="success-banner" id="success-alert">{{ this.success }}</div>
 
         <Teleport to="#add_todolist">
-            <div class="flex flex-wrap lg:flex-row justify-between items-center">
-                <div class="flex items-center gap-3">
-                    <h1 class="admin-h1 task-title">Tasks</h1>
-                    <select class="tw-form-control task-type-select text-xs" name="type" v-model="type" id="type" v-on:change="selectAssigned">
+            <div class="topbar-wrap">
+                <div class="topbar-left">
+                    <h1 class="page-title">Tasks</h1>
+                    <select class="type-select" name="type" v-model="type" id="type" v-on:change="selectAssigned">
                         <option v-for="assigned in assignedlist" v-bind:value="assigned.id">{{ assigned.name }}</option>
                     </select>
                 </div>
 
-                <div class="flex items-center gap-2">
-                    <!-- Filter chips -->
-                   <!--  <div class="filter-chip-row">
-                        <a href="#" class="filter-chip" :class="{active: status === list.id}" v-for="list in statuslist" @click.prevent="showCompletedTask(list.id)">
-                            {{ list.name }}
-                        </a>
-                    </div>
- -->
-                    <!-- Search -->
+                <div class="topbar-right">
                     <div class="search-wrap">
-                        <svg class="search-icon" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg"><path d="M20.194,3.46c-4.613-4.613-12.121-4.613-16.734,0c-4.612,4.614-4.612,12.121,0,16.735c4.108,4.107,10.506,4.547,15.116,1.34c0.097,0.459,0.319,0.897,0.676,1.254l6.718,6.718c0.979,0.977,2.561,0.977,3.535,0c0.978-0.978,0.978-2.56,0-3.535l-6.718-6.72c-0.355-0.354-0.794-0.577-1.253-0.674C24.743,13.967,24.303,7.57,20.194,3.46z M18.073,18.074c-3.444,3.444-9.049,3.444-12.492,0c-3.442-3.444-3.442-9.048,0-12.492c3.443-3.443,9.048-3.443,12.492,0C21.517,9.026,21.517,14.63,18.073,18.074z"/></svg>
+                        <svg class="search-icon" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M20.194,3.46c-4.613-4.613-12.121-4.613-16.734,0c-4.612,4.614-4.612,12.121,0,16.735c4.108,4.107,10.506,4.547,15.116,1.34c0.097,0.459,0.319,0.897,0.676,1.254l6.718,6.718c0.979,0.977,2.561,0.977,3.535,0c0.978-0.978,0.978-2.56,0-3.535l-6.718-6.72c-0.355-0.354-0.794-0.577-1.253-0.674C24.743,13.967,24.303,7.57,20.194,3.46z M18.073,18.074c-3.444,3.444-9.049,3.444-12.492,0c-3.442-3.444-3.442-9.048,0-12.492c3.443-3.443,9.048-3.443,12.492,0C21.517,9.026,21.517,14.63,18.073,18.074z"/>
+                        </svg>
                         <input type="text" name="search" v-model="search" class="search-input" placeholder="Search tasks..." @keyup.enter="searchList()">
                     </div>
 
-                    <a href="#" @click.prevent="resetForm()" class="btn-ghost text-sm">Reset</a>
+                    <a href="#" @click.prevent="resetForm()" class="btn-ghost">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:13px;height:13px;stroke:#374151;stroke-width:2;stroke-linecap:round;stroke-linejoin:round">
+                            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                            <path d="M3 3v5h5"/>
+                        </svg>
+                        Reset
+                    </a>
 
                     <a href="#" class="btn-complete" @click.prevent="submitForm()" v-if="this.selectedTaskCount > 0">
-                        Mark as completed
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:13px;height:13px;stroke:#fff;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        Mark as completed ({{ selectedTaskCount }})
                     </a>
 
                     <a :href="this.url+'/'+this.mode+'/task/add'" class="btn-new">
-                        <svg viewBox="0 0 409.6 409.6" xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px;fill:#fff;flex-shrink:0"><path d="M392.533,187.733H221.867V17.067C221.867,7.641,214.226,0,204.8,0s-17.067,7.641-17.067,17.067v170.667H17.067C7.641,187.733,0,195.374,0,204.8s7.641,17.067,17.067,17.067h170.667v170.667c0,9.426,7.641,17.067,17.067,17.067s17.067-7.641,17.067-17.067V221.867h170.667c9.426,0,17.067-7.641,17.067-17.067S401.959,187.733,392.533,187.733z"/></svg>
+                        <svg viewBox="0 0 409.6 409.6" xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px;fill:#fff;flex-shrink:0">
+                            <path d="M392.533,187.733H221.867V17.067C221.867,7.641,214.226,0,204.8,0s-17.067,7.641-17.067,17.067v170.667H17.067C7.641,187.733,0,195.374,0,204.8s7.641,17.067,17.067,17.067h170.667v170.667c0,9.426,7.641,17.067,17.067,17.067s17.067-7.641,17.067-17.067V221.867h170.667c9.426,0,17.067-7.641,17.067-17.067S401.959,187.733,392.533,187.733z"/>
+                        </svg>
                         New task
                     </a>
                 </div>
             </div>
         </Teleport>
 
-        <div class="task-list-wrap" v-if="Object.keys(tasks).length > 0">
-            <div class="task-group" v-for="(tasklist, key) in tasks">
+        <!-- Task list -->
+        <div class="task-board" v-if="Object.keys(tasks).length > 0">
+            <div class="task-section" v-for="(tasklist, key) in tasks">
 
                 <!-- Section header -->
-                <div class="group-header" @click="showTasks(key)">
-                    <div class="flex items-center gap-2">
-                        <svg v-if="arrow == '1_'+key" class="chevron" viewBox="0 0 292 292" xmlns="http://www.w3.org/2000/svg"><path d="M222.979,133.331L95.073,5.424C91.456,1.807,87.178,0,82.226,0c-4.952,0-9.233,1.807-12.85,5.424c-3.617,3.617-5.424,7.898-5.424,12.847v255.813c0,4.948,1.807,9.232,5.424,12.847c3.621,3.617,7.902,5.428,12.85,5.428c4.949,0,9.23-1.811,12.847-5.428l127.906-127.907c3.614-3.613,5.428-7.897,5.428-12.847C228.407,141.229,226.594,136.948,222.979,133.331z"/></svg>
-                        <svg v-if="arrow != '1_'+key" class="chevron" viewBox="0 0 292 292" xmlns="http://www.w3.org/2000/svg"><path d="M286.935,69.377c-3.614-3.617-7.898-5.424-12.848-5.424H18.274c-4.952,0-9.233,1.807-12.85,5.424C1.807,72.998,0,77.279,0,82.228c0,4.948,1.807,9.229,5.424,12.847l127.907,127.907c3.621,3.617,7.902,5.428,12.85,5.428s9.233-1.811,12.847-5.428L286.935,95.074c3.613-3.617,5.427-7.898,5.427-12.847C292.362,77.279,290.548,72.998,286.935,69.377z"/></svg>
-                        <span class="group-label">
-                            <span v-if="key == 0">Overdue</span>
-                            <span v-else-if="key == 1">Today</span>
-                            <span v-else-if="key == 2">Upcoming</span>
+                <div class="section-header" @click="showTasks(key)">
+                    <div class="section-header-left">
+                        <span class="section-chevron" :class="{ rotated: arrow === '1_'+key }">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <polyline points="6 9 12 15 18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                        <span class="section-label overdue-label" v-if="key == 0">
+                            <span class="section-dot dot-red"></span>Overdue
+                        </span>
+                        <span class="section-label today-label" v-else-if="key == 1">
+                            <span class="section-dot dot-blue"></span>Today
+                        </span>
+                        <span class="section-label upcoming-label" v-else>
+                            <span class="section-dot dot-green"></span>Upcoming
                         </span>
                     </div>
-                    <span class="group-count">{{ Object.keys(tasklist).length }} task{{ Object.keys(tasklist).length !== 1 ? 's' : '' }}</span>
+                    <span class="section-count">
+                        {{ Object.keys(tasklist).length }} task{{ Object.keys(tasklist).length !== 1 ? 's' : '' }}
+                    </span>
                 </div>
 
                 <!-- Task rows -->
@@ -61,66 +76,113 @@
                     <div
                         class="task-row"
                         :class="{
-                            'overdue-row': key == 0,
-                            'completed-row': task_completed.includes(list.task_id)
+                            'task-row-overdue': key == 0,
+                            'task-row-done': task_completed.includes(list.task_id)
                         }"
                         v-for="list in tasklist"
+                        :key="list.task_id"
                     >
-                        <div class="task-row-main">
-                            <input
-                                class="task-checkbox"
-                                type="checkbox"
-                                v-model="task_completed"
-                                :id="list.task_id"
-                                :value="list.task_id"
-                                @click="selectedCount(list.task_id,$event)"
-                            >
+                        <div class="task-row-inner">
 
-                            <div class="task-content">
-                                <div class="task-title-row">
-                                    <span class="task-name" :class="{'done': task_completed.includes(list.task_id)}">{{ list.title }}</span>
+                            <!-- Checkbox -->
+                            <label class="checkbox-wrap" :for="'chk_'+list.task_id">
+                                <input
+                                    class="task-checkbox"
+                                    type="checkbox"
+                                    v-model="task_completed"
+                                    :id="'chk_'+list.task_id"
+                                    :value="list.task_id"
+                                    @click="selectedCount(list.task_id,$event)"
+                                >
+                                <span class="checkbox-box">
+                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="checkbox-check">
+                                        <polyline points="20 6 9 17 4 12" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </span>
+                            </label>
+
+                            <!-- Content -->
+                            <div class="task-body">
+                                <div class="task-name" :class="{ 'task-name-done': task_completed.includes(list.task_id) }">
+                                    {{ list.title }}
                                 </div>
 
-                                <div class="task-badges">
-                                    <span class="badge badge-gray" v-if="list.assignee_display">{{ list.assignee_display }}</span>
-                                    <span class="badge badge-purple" v-if="list.assignee_type">{{ list.assignee_type }}</span>
-                                    <span class="badge badge-red" v-if="key == 0">
+                                <div class="task-meta">
+                                    <span class="meta-chip chip-gray" v-if="list.assignee_display">
+                                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:10px;height:10px;stroke:#6b7280;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0">
+                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                                        </svg>
+                                        {{ list.assignee_display }}
+                                    </span>
+                                    <span class="meta-chip chip-purple" v-if="list.assignee_type">{{ list.assignee_type }}</span>
+                                    <span class="meta-chip chip-red" v-if="key == 0">
+                                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:10px;height:10px;stroke:#991b1b;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0">
+                                            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                                        </svg>
                                         Overdue &bull; {{ list.task_date }}
                                     </span>
-                                    <span class="badge badge-neutral" v-else-if="key == 1">Today</span>
-                                    <span class="badge badge-neutral" v-else>{{ list.task_date }}</span>
-                                    <span class="badge badge-high" v-if="list.priority == 'high'">High priority</span>
-                                    <span class="badge badge-normal" v-else-if="list.priority == 'normal'">Normal</span>
-                                    <span class="badge badge-low" v-else-if="list.priority == 'low'">Low priority</span>
+                                    <span class="meta-chip chip-blue" v-else-if="key == 1">
+                                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:10px;height:10px;stroke:#075985;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0">
+                                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                                        </svg>
+                                        Today
+                                    </span>
+                                    <span class="meta-chip chip-neutral" v-else>
+                                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:10px;height:10px;stroke:#374151;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0">
+                                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                                        </svg>
+                                        {{ list.task_date }}
+                                    </span>
+                                    <span class="meta-chip chip-amber" v-if="list.priority == 'high'">
+                                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:10px;height:10px;stroke:#92400e;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0">
+                                            <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+                                        </svg>
+                                        High priority
+                                    </span>
+                                    <span class="meta-chip chip-sky" v-else-if="list.priority == 'normal'">Normal</span>
+                                    <span class="meta-chip chip-green" v-else-if="list.priority == 'low'">Low priority</span>
                                 </div>
 
-                                <!-- Progress bar (shown when class/group assignee) -->
-                                <div class="progress-wrap" v-if="list.completion_count && list.total_count">
-                                    <div class="progress-label-row">
-                                        <span class="progress-label">Student completion</span>
-                                        <span class="progress-label">{{ list.completion_count }} / {{ list.total_count }} done</span>
+                                <!-- Progress bar -->
+                                <div class="progress-block" v-if="list.completion_count && list.total_count">
+                                    <div class="progress-info">
+                                        <span>Student completion</span>
+                                        <span class="progress-fraction">{{ list.completion_count }} / {{ list.total_count }}</span>
                                     </div>
-                                    <div class="progress-bar-bg">
-                                        <div class="progress-bar-fill" :style="{width: Math.round((list.completion_count/list.total_count)*100)+'%'}"></div>
+                                    <div class="progress-track">
+                                        <div class="progress-fill" :style="{width: Math.round((list.completion_count/list.total_count)*100)+'%'}"></div>
                                     </div>
                                 </div>
                             </div>
 
+                            <!-- Actions -->
                             <div class="task-actions">
-                                <a href="#" :title="list.reminder" class="action-btn">
-                                    <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M347.216,301.211l-71.387-53.54V138.609c0-10.966-8.864-19.83-19.83-19.83c-10.966,0-19.83,8.864-19.83,19.83v118.978c0,6.246,2.935,12.136,7.932,15.864l79.318,59.489c3.569,2.677,7.734,3.966,11.878,3.966c6.048,0,11.997-2.717,15.884-7.952C357.766,320.208,355.981,307.775,347.216,301.211z"/><path d="M256,0C114.833,0,0,114.833,0,256s114.833,256,256,256s256-114.833,256-256S397.167,0,256,0z M256,472.341c-119.275,0-216.341-97.066-216.341-216.341S136.725,39.659,256,39.659c119.295,0,216.341,97.066,216.341,216.341S375.275,472.341,256,472.341z"/></svg>
+                                <a href="#" :title="list.reminder" class="act-btn act-btn-default">
+                                    <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M347.216,301.211l-71.387-53.54V138.609c0-10.966-8.864-19.83-19.83-19.83c-10.966,0-19.83,8.864-19.83,19.83v118.978c0,6.246,2.935,12.136,7.932,15.864l79.318,59.489c3.569,2.677,7.734,3.966,11.878,3.966c6.048,0,11.997-2.717,15.884-7.952C357.766,320.208,355.981,307.775,347.216,301.211z"/>
+                                        <path d="M256,0C114.833,0,0,114.833,0,256s114.833,256,256,256s256-114.833,256-256S397.167,0,256,0z M256,472.341c-119.275,0-216.341-97.066-216.341-216.341S136.725,39.659,256,39.659c119.295,0,216.341,97.066,216.341,216.341S375.275,472.341,256,472.341z"/>
+                                    </svg>
                                 </a>
-                                <a href="#" @click.prevent="snoozeTask(list.task_id)" title="Snooze" class="action-btn" v-if="list.snooze == 1">
-                                    <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M4509,5091 c-41-42-41-107 0-153l29-33 131-5 131-5-160-240c-144-216-160-244-160-282 0-33 7-50 29-75l29-33 262,0 262,0 29,33c41,46 41,111 0,153l-29,29-131,0c-72,0-131,2-131,5 0,3 72,113 160,245 148,222 160,244 160,286 0,37-6,51-29,75l-29,29-262,0-262,0-29-29z" transform="scale(0.1)"/></svg>
+                                <a href="#" @click.prevent="snoozeTask(list.task_id)" title="Snooze" class="act-btn act-btn-default" v-if="list.snooze == 1">
+                                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                        <text y=".9em" font-size="90">⏰</text>
+                                    </svg>
                                 </a>
-                                <a :href="url+'/'+mode+'/task/edit/'+list.task_id" title="Edit" class="action-btn" v-if="list.auth_id == list.created_by">
-                                    <svg viewBox="0 0 477.873 477.873" xmlns="http://www.w3.org/2000/svg"><path d="M392.533,238.937c-9.426,0-17.067,7.641-17.067,17.067V426.67c0,9.426-7.641,17.067-17.067,17.067H51.2c-9.426,0-17.067-7.641-17.067-17.067V85.337c0-9.426,7.641-17.067,17.067-17.067H256c9.426,0,17.067-7.641,17.067-17.067S265.426,34.137,256,34.137H51.2C22.923,34.137,0,57.06,0,85.337V426.67c0,28.277,22.923,51.2,51.2,51.2h307.2c28.277,0,51.2-22.923,51.2-51.2V256.003C409.6,246.578,401.959,238.937,392.533,238.937z"/><path d="M458.742,19.142c-12.254-12.256-28.875-19.14-46.206-19.138c-17.341-0.05-33.979,6.846-46.199,19.149L141.534,243.937c-1.865,1.879-3.272,4.163-4.113,6.673l-34.133,102.4c-2.979,8.943,1.856,18.607,10.799,21.585c1.735,0.578,3.552,0.873,5.38,0.875c1.832-0.003,3.653-0.297,5.393-0.87l102.4-34.133c2.515-0.84,4.8-2.254,6.673-4.13l224.802-224.802C484.25,86.023,484.253,44.657,458.742,19.142z"/></svg>
+                                <a :href="url+'/'+mode+'/task/edit/'+list.task_id" title="Edit" class="act-btn act-btn-default" v-if="list.auth_id == list.created_by">
+                                    <svg viewBox="0 0 477.873 477.873" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M392.533,238.937c-9.426,0-17.067,7.641-17.067,17.067V426.67c0,9.426-7.641,17.067-17.067,17.067H51.2c-9.426,0-17.067-7.641-17.067-17.067V85.337c0-9.426,7.641-17.067,17.067-17.067H256c9.426,0,17.067-7.641,17.067-17.067S265.426,34.137,256,34.137H51.2C22.923,34.137,0,57.06,0,85.337V426.67c0,28.277,22.923,51.2,51.2,51.2h307.2c28.277,0,51.2-22.923,51.2-51.2V256.003C409.6,246.578,401.959,238.937,392.533,238.937z"/>
+                                        <path d="M458.742,19.142c-12.254-12.256-28.875-19.14-46.206-19.138c-17.341-0.05-33.979,6.846-46.199,19.149L141.534,243.937c-1.865,1.879-3.272,4.163-4.113,6.673l-34.133,102.4c-2.979,8.943,1.856,18.607,10.799,21.585c1.735,0.578,3.552,0.873,5.38,0.875c1.832-0.003,3.653-0.297,5.393-0.87l102.4-34.133c2.515-0.84,4.8-2.254,6.673-4.13l224.802-224.802C484.25,86.023,484.253,44.657,458.742,19.142z"/>
+                                    </svg>
                                 </a>
-                                <a href="#" @click.prevent="showModal(list.task_id)" title="View" class="action-btn">
-                                    <svg viewBox="-27 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="m188 492c0 11.046875-8.953125 20-20 20h-88c-44.113281 0-80-35.886719-80-80v-352c0-44.113281 35.886719-80 80-80h245.890625c44.109375 0 80 35.886719 80 80v191c0 11.046875-8.957031 20-20 20-11.046875 0-20-8.953125-20-20v-191c0-22.054688-17.945313-40-40-40h-245.890625c-22.054688 0-40 17.945312-40 40v352c0 22.054688 17.945312 40 40 40h88c11.046875 0 20 8.953125 20 20zm117.890625-372h-206c-11.046875 0-20 8.953125-20 20s8.953125 20 20 20h206c11.042969 0 20-8.953125 20-20s-8.957031-20-20-20zm20 100c0-11.046875-8.957031-20-20-20h-206c-11.046875 0-20 8.953125-20 20s8.953125 20 20 20h206c11.042969 0 20-8.953125 20-20zm-226 60c-11.046875 0-20 8.953125-20 20s8.953125 20 20 20h105.109375c11.046875 0 20-8.953125 20-20s-8.953125-20-20-20zm355.472656 146.496094c-.703125 1.003906-3.113281 4.414062-4.609375 6.300781-6.699218 8.425781-22.378906 28.148437-44.195312 45.558594-27.972656 22.324219-56.757813 33.644531-85.558594 33.644531s-57.585938-11.320312-85.558594-33.644531c-21.816406-17.410157-37.496094-37.136719-44.191406-45.558594-1.5-1.886719-3.910156-5.300781-4.613281-6.300781-4.847657-6.898438-4.847657-16.097656 0-22.996094.703125-1 3.113281-4.414062 4.613281-6.300781 6.695312-8.421875 22.375-28.144531 44.191406-45.554688 27.972656-22.324219 56.757813-33.644531 85.558594-33.644531s57.585938 11.320312 85.558594 33.644531c21.816406 17.410157 37.496094 37.136719 44.191406 45.558594 1.5 1.886719 3.910156 5.300781 4.613281 6.300781 4.847657 6.898438 4.847657 16.09375 0 22.992188zm-41.71875-11.496094c-31.800781-37.832031-62.9375-57-92.644531-57-29.703125 0-60.84375 19.164062-92.644531 57 31.800781 37.832031 62.9375 57 92.644531 57s60.84375-19.164062 92.644531-57zm-91.644531-38c-20.988281 0-38 17.011719-38 38s17.011719 38 38 38 38-17.011719 38-38-17.011719-38-38-38z"/></svg>
+                                <a href="#" @click.prevent="showModal(list.task_id)" title="View" class="act-btn act-btn-default">
+                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;stroke:#6b7280;stroke-width:2;stroke-linecap:round;stroke-linejoin:round">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                                    </svg>
                                 </a>
-                                <a href="#" @click.prevent="deleteTask(list.task_id)" title="Delete" class="action-btn action-btn-danger" v-if="list.auth_id == list.created_by">
-                                    <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><polygon points="353.574,176.526 313.496,175.056 304.807,412.34 344.885,413.804"/><rect x="235.948" y="175.791" width="40.104" height="237.285"/><polygon points="207.186,412.334 198.497,175.049 158.419,176.52 167.109,413.804"/><path d="M17.379,76.867v40.104h41.789L92.32,493.706C93.229,504.059,101.899,512,112.292,512h286.74c10.394,0,19.07-7.947,19.972-18.301l33.153-376.728h42.464V76.867H17.379z M380.665,471.896H130.654L99.426,116.971h312.474L380.665,471.896z"/><path d="M321.504,0H190.496c-18.428,0-33.42,14.992-33.42,33.42v63.499h40.104V40.104h117.64v56.815h40.104V33.42C354.924,14.992,339.932,0,321.504,0z"/></svg>
+                                <a href="#" @click.prevent="deleteTask(list.task_id)" title="Delete" class="act-btn act-btn-danger" v-if="list.auth_id == list.created_by">
+                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;stroke:#6b7280;stroke-width:2;stroke-linecap:round;stroke-linejoin:round">
+                                        <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                                    </svg>
                                 </a>
                             </div>
                         </div>
@@ -131,204 +193,197 @@
                     </div>
                 </div>
 
-                <!-- Modals for this group -->
-                <div v-for="list in tasklist">
-                    <div v-if="show == list.task_id+'_show'" class="modal modal-mask">
-                        <div class="modal-wrapper px-4">
-                            <div class="modal-container w-full max-w-md px-4 mx-auto">
-                                <div class="modal-header flex justify-between items-center">
-                                    <h2>View Task</h2>
-                                    <button id="close-button" class="modal-default-button text-2xl py-1" @click="closeModal()">&times;</button>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="flex">
-                                        <div class="w-full lg:w-1/4"><label class="tw-form-label">Title</label></div>
-                                        <div class="w-full lg:w-3/4"><p class="tw-form-control w-full">{{ task.title }}</p></div>
-                                    </div>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="flex">
-                                        <div class="w-full lg:w-1/4"><label class="tw-form-label">Description</label></div>
-                                        <div class="w-full lg:w-3/4"><p class="tw-form-control w-full" v-html="task.to_do_list"></p></div>
-                                    </div>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="flex">
-                                        <div class="w-full lg:w-1/4"><label class="tw-form-label">Assignee Type</label></div>
-                                        <div class="w-full lg:w-3/4"><p class="tw-form-control w-full">{{ task.assignee_display }}</p></div>
-                                    </div>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="flex">
-                                        <div class="w-full lg:w-1/4"><label class="tw-form-label">Assigned To</label></div>
-                                        <div class="w-full lg:w-3/4" v-if="task.assignee == 'teacher'">
-                                            <p class="tw-form-control w-full" v-for="teacher in task.teachers">
-                                                <span v-if="mode == 'admin'"><a :href="url+'/'+mode+'/teacher/show/'+teacher.name">{{ teacher.fullname }}</a></span>
-                                                <span v-else>{{ teacher.fullname }}</span>
-                                            </p>
+            </div>
+        </div>
+
+        <!-- Empty state -->
+        <div class="empty-state" v-else>
+            <div class="empty-icon">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" stroke="#d1d5db" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <rect x="9" y="3" width="6" height="4" rx="1" stroke="#d1d5db" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <p class="empty-title">No tasks yet</p>
+            <p class="empty-sub">Create your first task to get started</p>
+        </div>
+
+        <!-- View Modal -->
+        <div v-for="(tasklist, key) in tasks" :key="key">
+            <div v-for="list in tasklist" :key="list.task_id">
+                <div v-if="show == list.task_id+'_show'" class="modal-overlay" @click.self="closeModal()">
+                    <div class="modal-box">
+                        <div class="modal-head">
+                            <h2 class="modal-title">View Task</h2>
+                            <button class="modal-close" @click="closeModal()">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    <line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="modal-body-wrap">
+                            <div class="modal-field">
+                                <span class="modal-field-label">Title</span>
+                                <span class="modal-field-value">{{ task.title }}</span>
+                            </div>
+                            <div class="modal-field">
+                                <span class="modal-field-label">Description</span>
+                                <span class="modal-field-value" v-html="task.to_do_list"></span>
+                            </div>
+                            <div class="modal-field">
+                                <span class="modal-field-label">Assignee Type</span>
+                                <span class="modal-field-value">{{ task.assignee_display }}</span>
+                            </div>
+                            <div class="modal-field">
+                                <span class="modal-field-label">Assigned To</span>
+                                <div class="modal-field-value">
+                                    <template v-if="task.assignee == 'teacher'">
+                                        <div v-for="teacher in task.teachers" :key="teacher.name">
+                                            <a v-if="mode == 'admin'" :href="url+'/'+mode+'/teacher/show/'+teacher.name" class="modal-link">{{ teacher.fullname }}</a>
+                                            <span v-else>{{ teacher.fullname }}</span>
                                         </div>
-                                        <div class="w-full lg:w-3/4" v-else-if="task.assignee == 'class'">
-                                            <p class="tw-form-control w-full">{{ task.class }}</p>
+                                    </template>
+                                    <template v-else-if="task.assignee == 'class'">{{ task.class }}</template>
+                                    <template v-else-if="task.assignee == 'student'">
+                                        <div v-for="student in task.selectedUsers" :key="student.name">
+                                            <a v-if="mode == 'admin'" :href="url+'/'+mode+'/student/show/'+student.name" class="modal-link">{{ student.fullname }}</a>
+                                            <span v-else>{{ student.fullname }}</span>
                                         </div>
-                                        <div class="w-full lg:w-3/4" v-else-if="task.assignee == 'student'">
-                                            <p class="tw-form-control w-full" v-for="student in task.selectedUsers">
-                                                <span v-if="mode == 'admin'"><a :href="url+'/'+mode+'/student/show/'+student.name">{{ student.fullname }}</a></span>
-                                                <span v-else>{{ student.fullname }}</span>
-                                            </p>
-                                        </div>
-                                        <div class="w-full lg:w-3/4" v-else>
-                                            <p class="tw-form-control w-full">{{ task.assignee_display }}</p>
-                                        </div>
-                                    </div>
+                                    </template>
+                                    <template v-else>{{ task.assignee_display }}</template>
                                 </div>
-                                <div class="modal-body">
-                                    <div class="flex">
-                                        <div class="w-full lg:w-1/4"><label class="tw-form-label">Due Date</label></div>
-                                        <div class="w-full lg:w-3/4"><p class="tw-form-control w-full">{{ task.task_date }}</p></div>
-                                    </div>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="flex">
-                                        <div class="w-full lg:w-1/4"><label class="tw-form-label">Reminder On</label></div>
-                                        <div class="w-full lg:w-3/4"><p class="tw-form-control w-full">{{ task.reminder_date }}</p></div>
-                                    </div>
-                                </div>
+                            </div>
+                            <div class="modal-field">
+                                <span class="modal-field-label">Due Date</span>
+                                <span class="modal-field-value">{{ task.task_date }}</span>
+                            </div>
+                            <div class="modal-field" style="border-bottom:none">
+                                <span class="modal-field-label">Reminder On</span>
+                                <span class="modal-field-value">{{ task.reminder_date }}</span>
                             </div>
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
 
-        <div class="task-empty-state" v-else>
-            No tasks found
-        </div>
     </div>
 </template>
 
 <script>
     import { bus } from "../../app";
     export default {
-        props:['url' , 'mode' , 'hidecolumns'],
-        data () {
+        props: ['url', 'mode', 'hidecolumns'],
+        data() {
             return {
-                tasks:[],
-                task:[],
-                task_completed:[],
-                type:'by_me',
-                status:0,
-                showCompleted:'',
-                selectedTaskCount:0,
-                params:{},
-                arrow:0,
-                show:'',
-                search:'',
-                assignedlist:[ { id : 'by_me' , name : 'Assigned By Me' } , { id : 'to_me' , name : 'Assigned To Me' } ],
-                statuslist:[ { id : 0 , name : 'All' } , { id : 1 , name : 'Pending' } , { id : 2 , name : 'Done' } , { id : 3 , name : 'Overdue' } , { id : 4 , name : 'Open' } ],
-                errors:[],
-                success:null,
+                tasks: [],
+                task: [],
+                task_completed: [],
+                type: 'by_me',
+                status: 0,
+                showCompleted: '',
+                selectedTaskCount: 0,
+                params: {},
+                arrow: 0,
+                show: '',
+                search: '',
+                assignedlist: [
+                    { id: 'by_me', name: 'Assigned By Me' },
+                    { id: 'to_me', name: 'Assigned To Me' }
+                ],
+                statuslist: [
+                    { id: 0, name: 'All' },
+                    { id: 1, name: 'Pending' },
+                    { id: 2, name: 'Done' },
+                    { id: 3, name: 'Overdue' },
+                    { id: 4, name: 'Open' }
+                ],
+                errors: [],
+                success: null,
             }
         },
 
-        methods:
-        {
-            getlist()
-            {
-                axios.get('/'+this.mode+'/task/list?status='+this.status+'&type='+this.type+'&search='+this.search).then(response => {
+        methods: {
+            getlist() {
+                axios.get('/' + this.mode + '/task/list?status=' + this.status + '&type=' + this.type + '&search=' + this.search).then(response => {
                     this.tasks = response.data;
                 });
             },
 
-            showModal(id)
-            {
-                this.show = id+'_show';
-                axios.get('/'+this.mode+'/task/show/'+id).then(response => {
+            showModal(id) {
+                this.show = id + '_show';
+                axios.get('/' + this.mode + '/task/show/' + id).then(response => {
                     this.task = response.data;
                 });
             },
 
-            closeModal()
-            {
+            closeModal() {
                 this.show = 0;
             },
 
-            searchList()
-            {
+            searchList() {
                 this.getlist();
             },
 
-            resetForm()
-            {
+            resetForm() {
                 this.search = '';
                 this.getlist();
             },
 
-            showTasks(key)
-            {
-                if( $('#'+key).hasClass('hidden') )
-                {
-                    $('#'+key).removeClass('hidden').addClass('block');
-                    this.arrow = '0_'+key;
-                }
-                else
-                {
-                    $('#'+key).removeClass('block').addClass('hidden');
-                    this.arrow = '1_'+key;
+            showTasks(key) {
+                if ($('#' + key).hasClass('hidden')) {
+                    $('#' + key).removeClass('hidden').addClass('block');
+                    this.arrow = '0_' + key;
+                } else {
+                    $('#' + key).removeClass('block').addClass('hidden');
+                    this.arrow = '1_' + key;
                 }
             },
 
-            selectAssigned()
-            {
-                this.final = this.url+'/'+this.mode+'/task/list?status='+this.status+'&type='+this.type;
+            selectAssigned() {
+                this.final = this.url + '/' + this.mode + '/task/list?status=' + this.status + '&type=' + this.type;
                 axios.get(this.final).then(response => {
                     this.tasks = response.data;
                 });
             },
 
-            showCompletedTask(e)
-            {
+            showCompletedTask(e) {
                 this.status = e;
-                this.final = this.url+'/'+this.mode+'/task/list?status='+this.status+'&type='+this.type;
+                this.final = this.url + '/' + this.mode + '/task/list?status=' + this.status + '&type=' + this.type;
                 axios.get(this.final).then(response => {
                     this.tasks = response.data;
                 });
             },
 
-            selectedCount(id,e)
-            {
-                if (e.target.checked)
-                {
+            selectedCount(id, e) {
+                if (e.target.checked) {
                     this.selectedTaskCount++;
                     this.task_completed.push(id);
-                    $('#'+id).addClass('student_selected');
-                }
-                else
-                {
+                    $('#' + id).addClass('student_selected');
+                } else {
                     this.selectedTaskCount--;
                     this.task_completed.splice(id);
-                    $('#'+id).removeClass('student_selected');
+                    $('#' + id).removeClass('student_selected');
                 }
             },
 
-            snoozeTask(id)
-            {
-                this.errors=[];
-                this.success=null;
-                axios.post('/'+this.mode+'/task/snooze/'+id).then(response => {
+            snoozeTask(id) {
+                this.errors = [];
+                this.success = null;
+                axios.post('/' + this.mode + '/task/snooze/' + id).then(response => {
                     this.success = response.data.success;
                 }).catch(error => {
                     this.errors = error.response.data.errors;
                 });
             },
 
-            submitForm()
-            {
-                this.errors=[];
-                this.success=null;
-                axios.post('/'+this.mode+'/task/completed',{
-                    task_completed:this.task_completed,
-                    selectedTaskCount:this.selectedTaskCount,
+            submitForm() {
+                this.errors = [];
+                this.success = null;
+                axios.post('/' + this.mode + '/task/completed', {
+                    task_completed: this.task_completed,
+                    selectedTaskCount: this.selectedTaskCount,
                 }).then(response => {
                     this.success = response.data.success;
                     window.location.reload();
@@ -337,72 +392,98 @@
                 });
             },
 
-            deleteTask(id)
-            {
+            deleteTask(id) {
                 var thisswal = this;
                 swal({
                     title: 'Are you sure',
                     text: 'Do you want to delete this task ?',
                     icon: "info",
-                    buttons: [ 'No', 'Yes' ],
+                    buttons: ['No', 'Yes'],
                     dangerMode: true,
                 }).then(function(isConfirm) {
-                    if (isConfirm)
-                    {
-                        axios.get('/'+thisswal.mode+'/task/'+id+'/delete').then(response => {
+                    if (isConfirm) {
+                        axios.get('/' + thisswal.mode + '/task/' + id + '/delete').then(response => {
                             thisswal.success = response.data.success;
                             thisswal.getlist();
                         });
-                    }
-                    else
-                    {
+                    } else {
                         swal("Cancelled");
                     }
                 });
             },
         },
 
-        created()
-        {
+        created() {
             this.getlist();
         }
     }
 </script>
 
 <style scoped>
-/* ── Page ───────────────────────────────────── */
-.task-page { font-family: var(--font-sans, system-ui, sans-serif); }
+/* ── Page ──────────────────────────────────────────────────── */
+.task-page {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #f4f5f7;
+    min-height: 100vh;
+    padding: 0;
+}
 
-/* ── Header controls ────────────────────────── */
-.task-title { font-size: 20px; font-weight: 500; margin: 0; }
-
-.task-type-select {
-    border: 0.5px solid #d1d5db;
+/* ── Success Banner ────────────────────────────────────────── */
+.success-banner {
+    background: #ecfdf5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
     border-radius: 8px;
-    padding: 4px 10px;
+    padding: 10px 16px;
     font-size: 13px;
-    background: #fff;
+    font-weight: 500;
+    margin-bottom: 16px;
+}
+
+/* ── Topbar ────────────────────────────────────────────────── */
+.topbar-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.page-title {
+    font-size: 19px;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+    letter-spacing: -0.01em;
+}
+
+.type-select {
+    border: 1.5px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 5px 28px 5px 10px;
+    font-size: 13px;
+    background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E") no-repeat right 8px center;
     color: #374151;
     cursor: pointer;
+    appearance: none;
+    outline: none;
 }
+.type-select:focus { border-color: #6b7280; }
 
-.filter-chip-row { display: flex; gap: 6px; align-items: center; }
-
-.filter-chip {
-    display: inline-block;
-    padding: 4px 14px;
-    border-radius: 20px;
-    border: 0.5px solid #d1d5db;
-    background: #fff;
-    font-size: 13px;
-    color: #374151;
-    text-decoration: none;
-    transition: background 0.15s, border-color 0.15s;
-    white-space: nowrap;
-}
-.filter-chip:hover { background: #f3f4f6; border-color: #9ca3af; }
-.filter-chip.active { background: #111827; color: #fff; border-color: #111827; }
-
+/* ── Search ────────────────────────────────────────────────── */
 .search-wrap {
     position: relative;
     display: flex;
@@ -411,36 +492,47 @@
 .search-icon {
     position: absolute;
     left: 9px;
-    width: 14px;
-    height: 14px;
+    width: 13px;
+    height: 13px;
     fill: #9ca3af;
     pointer-events: none;
 }
 .search-input {
-    border: 0.5px solid #d1d5db;
+    border: 1.5px solid #e5e7eb;
     border-radius: 8px;
     padding: 6px 10px 6px 30px;
     font-size: 13px;
     background: #fff;
     color: #111827;
-    width: 180px;
+    width: 200px;
     outline: none;
+    transition: border-color 0.15s;
 }
-.search-input:focus { border-color: #6b7280; box-shadow: 0 0 0 2px rgba(107,114,128,.15); }
+.search-input:focus { border-color: #9ca3af; box-shadow: 0 0 0 3px rgba(107,114,128,0.08); }
+.search-input::placeholder { color: #c4c9d4; }
 
+/* ── Buttons ───────────────────────────────────────────────── */
 .btn-ghost {
-    padding: 5px 12px;
-    border: 0.5px solid #d1d5db;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    border: 1.5px solid #e5e7eb;
     border-radius: 8px;
-    background: #f9fafb;
+    background: #fff;
     color: #374151;
     text-decoration: none;
     font-size: 13px;
+    font-weight: 500;
     white-space: nowrap;
+    transition: background 0.15s;
 }
 .btn-ghost:hover { background: #f3f4f6; }
 
 .btn-complete {
+    display: flex;
+    align-items: center;
+    gap: 6px;
     padding: 6px 14px;
     border-radius: 8px;
     background: #16a34a;
@@ -449,7 +541,10 @@
     font-weight: 500;
     text-decoration: none;
     white-space: nowrap;
+    border: none;
+    transition: background 0.15s;
 }
+.btn-complete:hover { background: #15803d; }
 
 .btn-new {
     display: flex;
@@ -463,212 +558,366 @@
     font-weight: 500;
     text-decoration: none;
     white-space: nowrap;
+    transition: background 0.15s;
 }
 .btn-new:hover { background: #1f2937; }
 
-/* ── Task list wrapper ──────────────────────── */
-.task-list-wrap { margin-top: 20px; display: flex; flex-direction: column; gap: 24px; background: #ffffff; }
+/* ── Board ─────────────────────────────────────────────────── */
+.task-board {
+    margin-top: 20px;
+    background: #fff;
+    border-radius: 12px;
+    border: 1.5px solid #e5e7eb;
+    overflow: hidden;
+}
 
-/* ── Group section ──────────────────────────── */
-.task-group {}
+.task-section {
+    border-bottom: 1.5px solid #f3f4f6;
+}
+.task-section:last-child { border-bottom: none; }
 
-.group-header {
+/* ── Section header ────────────────────────────────────────── */
+.section-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 6px 0 10px;
-    border-bottom: 1px solid #e5e7eb;
+    justify-content: space-between;
+    padding: 13px 20px;
+    background: #fafafa;
+    border-bottom: 1px solid #f3f4f6;
     cursor: pointer;
     user-select: none;
+    transition: background 0.12s;
+}
+.section-header:hover { background: #f5f6f8; }
+
+.section-header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-.chevron {
-    width: 10px;
-    height: 10px;
-    fill: #6b7280;
-    flex-shrink: 0;
+.section-chevron {
+    display: flex;
+    align-items: center;
+    color: #9ca3af;
+    transition: transform 0.2s;
 }
+.section-chevron svg {
+    width: 16px;
+    height: 16px;
+}
+.section-chevron.rotated { transform: rotate(-90deg); }
 
-.group-label {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.06em;
+.section-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    margin-right: 6px;
+}
+.dot-red { background: #ef4444; }
+.dot-blue { background: #3b82f6; }
+.dot-green { background: #22c55e; }
+
+.section-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
-    color: #6b7280;
 }
 
-.group-count {
+.overdue-label { color: #dc2626; }
+.today-label   { color: #2563eb; }
+.upcoming-label { color: #16a34a; }
+
+.section-count {
     font-size: 12px;
     color: #9ca3af;
+    font-weight: 500;
 }
 
-/* ── Task rows ──────────────────────────────── */
+/* ── Task rows ─────────────────────────────────────────────── */
 .task-rows { display: flex; flex-direction: column; }
 
 .task-row {
-    border-bottom: 0.5px solid #f3f4f6;
+    border-bottom: 1px solid #f9fafb;
     transition: background 0.1s;
 }
-.task-row:hover { background: #fafafa; }
 .task-row:last-child { border-bottom: none; }
+.task-row:hover { background: #fafafa; }
 
-.overdue-row { border-left: 3px solid #ef4444; border-radius: 0; }
-.overdue-row .task-row-main { padding-left: 13px; }
+.task-row-overdue {
+    border-left: 3px solid #ef4444;
+}
+.task-row-overdue .task-row-inner { padding-left: 17px; }
 
-.task-row-main {
+.task-row-done { opacity: 0.65; }
+
+.task-row-inner {
     display: flex;
     align-items: flex-start;
-    gap: 12px;
-    padding: 14px 4px;
+    gap: 14px;
+    padding: 14px 20px;
 }
 
-.task-checkbox {
-    width: 16px;
-    height: 16px;
-    margin-top: 2px;
-    flex-shrink: 0;
+/* ── Custom checkbox ───────────────────────────────────────── */
+.checkbox-wrap {
+    display: flex;
+    align-items: center;
     cursor: pointer;
-    accent-color: #16a34a;
+    flex-shrink: 0;
+    margin-top: 1px;
 }
+.task-checkbox { display: none; }
 
-.task-content { flex: 1; min-width: 0; }
+.checkbox-box {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #d1d5db;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    transition: background 0.15s, border-color 0.15s;
+    flex-shrink: 0;
+}
+.task-checkbox:checked + .checkbox-box {
+    background: #16a34a;
+    border-color: #16a34a;
+}
+.checkbox-check {
+    width: 10px;
+    height: 10px;
+    opacity: 0;
+    transition: opacity 0.1s;
+}
+.task-checkbox:checked + .checkbox-box .checkbox-check { opacity: 1; }
 
-.task-title-row { margin-bottom: 6px; }
+/* ── Task body ─────────────────────────────────────────────── */
+.task-body { flex: 1; min-width: 0; }
 
 .task-name {
     font-size: 14px;
     font-weight: 500;
     color: #111827;
-    line-height: 1.4;
+    line-height: 1.45;
+    margin-bottom: 6px;
 }
-.task-name.done {
+.task-name-done {
     text-decoration: line-through;
     color: #9ca3af;
 }
 
-/* ── Badges ─────────────────────────────────── */
-.task-badges { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 4px; }
+/* ── Meta chips ────────────────────────────────────────────── */
+.task-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    align-items: center;
+}
 
-.badge {
-    display: inline-block;
-    padding: 2px 10px;
+.meta-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 9px;
     border-radius: 20px;
     font-size: 11px;
     font-weight: 500;
     white-space: nowrap;
 }
-.badge-gray    { background: #f3f4f6; color: #374151; }
-.badge-purple  { background: #ede9fe; color: #5b21b6; }
-.badge-red     { background: #fee2e2; color: #991b1b; }
-.badge-neutral { background: #f3f4f6; color: #374151; }
-.badge-high    { background: #fef3c7; color: #92400e; }
-.badge-normal  { background: #e0f2fe; color: #075985; }
-.badge-low     { background: #f0fdf4; color: #166534; }
 
-/* ── Progress bar ───────────────────────────── */
-.progress-wrap { margin-top: 10px; }
+.chip-gray    { background: #f3f4f6;  color: #374151; }
+.chip-purple  { background: #ede9fe;  color: #5b21b6; }
+.chip-red     { background: #fee2e2;  color: #991b1b; }
+.chip-blue    { background: #dbeafe;  color: #1e40af; }
+.chip-neutral { background: #f3f4f6;  color: #374151; }
+.chip-amber   { background: #fef3c7;  color: #92400e; }
+.chip-sky     { background: #e0f2fe;  color: #075985; }
+.chip-green   { background: #dcfce7;  color: #166534; }
 
-.progress-label-row {
+/* ── Progress ──────────────────────────────────────────────── */
+.progress-block { margin-top: 10px; }
+
+.progress-info {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 4px;
+    font-size: 11px;
+    color: #9ca3af;
+    margin-bottom: 5px;
 }
-.progress-label { font-size: 11px; color: #6b7280; }
+.progress-fraction { font-weight: 600; color: #6b7280; }
 
-.progress-bar-bg {
+.progress-track {
     width: 100%;
-    max-width: 320px;
+    max-width: 300px;
     height: 5px;
     background: #e5e7eb;
     border-radius: 999px;
     overflow: hidden;
 }
-.progress-bar-fill {
+.progress-fill {
     height: 100%;
-    background: #2563eb;
+    background: linear-gradient(90deg, #3b82f6, #6366f1);
     border-radius: 999px;
-    transition: width 0.3s;
+    transition: width 0.4s ease;
 }
 
-/* ── Action icons ───────────────────────────── */
+/* ── Task actions ──────────────────────────────────────────── */
 .task-actions {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 2px;
     flex-shrink: 0;
     opacity: 0;
     transition: opacity 0.15s;
 }
 .task-row:hover .task-actions { opacity: 1; }
 
-.action-btn {
+.act-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 7px;
+    transition: background 0.15s;
+    text-decoration: none;
+    cursor: pointer;
+}
+.act-btn svg {
+    width: 14px;
+    height: 14px;
+    fill: #9ca3af;
+}
+.act-btn-default:hover { background: #f3f4f6; }
+.act-btn-default:hover svg { fill: #374151; }
+.act-btn-danger:hover { background: #fee2e2; }
+.act-btn-danger:hover svg { stroke: #dc2626 !important; }
+
+/* ── Empty states ──────────────────────────────────────────── */
+.task-empty {
+    padding: 20px;
+    font-size: 13px;
+    color: #c4c9d4;
+    text-align: center;
+}
+
+.empty-state {
+    background: #fff;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 56px 32px;
+    text-align: center;
+    margin-top: 20px;
+}
+.empty-icon {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 16px;
+}
+.empty-icon svg { width: 56px; height: 56px; }
+.empty-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #374151;
+    margin: 0 0 4px;
+}
+.empty-sub {
+    font-size: 13px;
+    color: #9ca3af;
+    margin: 0;
+}
+
+/* ── Modal ─────────────────────────────────────────────────── */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    background: rgba(0,0,0,0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(2px);
+}
+
+.modal-box {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+    width: 100%;
+    max-width: 480px;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: modalIn 0.2s ease;
+}
+
+@keyframes modalIn {
+    from { opacity: 0; transform: scale(0.96) translateY(8px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 22px 14px;
+    border-bottom: 1px solid #f3f4f6;
+}
+.modal-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+}
+.modal-close {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 28px;
     height: 28px;
-    border-radius: 6px;
+    border: none;
+    background: #f3f4f6;
+    border-radius: 7px;
+    cursor: pointer;
+    color: #6b7280;
     transition: background 0.15s;
-    text-decoration: none;
 }
-.action-btn svg {
-    width: 14px;
-    height: 14px;
-    fill: #6b7280;
-}
-.action-btn:hover { background: #f3f4f6; }
-.action-btn:hover svg { fill: #111827; }
-.action-btn-danger:hover { background: #fee2e2; }
-.action-btn-danger:hover svg { fill: #991b1b; }
+.modal-close:hover { background: #e5e7eb; color: #111827; }
+.modal-close svg { width: 14px; height: 14px; }
 
-/* ── Empty states ───────────────────────────── */
-.task-empty {
-    padding: 16px 4px;
-    font-size: 13px;
-    color: #9ca3af;
-    text-align: center;
+.modal-body-wrap { padding: 6px 0 16px; }
+
+.modal-field {
+    display: flex;
+    gap: 12px;
+    padding: 12px 22px;
+    border-bottom: 1px solid #f9fafb;
+    align-items: flex-start;
 }
-.task-empty-state {
-    background: #fff;
-    border: 0.5px solid #e5e7eb;
-    border-radius: 10px;
-    padding: 32px;
-    text-align: center;
+.modal-field-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    width: 110px;
+    flex-shrink: 0;
+    padding-top: 1px;
+}
+.modal-field-value {
     font-size: 14px;
-    color: #9ca3af;
-    margin-top: 20px;
+    color: #111827;
+    flex: 1;
+    min-width: 0;
+    line-height: 1.5;
 }
-
-/* ── Modal (unchanged) ──────────────────────── */
-.modal-mask {
-    position: fixed;
-    z-index: 9998;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,.5);
-    display: table;
-    transition: opacity .3s ease;
+.modal-link {
+    color: #4f46e5;
+    text-decoration: none;
+    font-weight: 500;
 }
-.modal-wrapper {
-    display: table-cell;
-    vertical-align: middle;
-    overflow: auto;
-}
-.modal-container {
-    margin: 0px auto;
-    background-color: #fff;
-    border-radius: 2px;
-    box-shadow: 0 2px 8px rgba(0,0,0,.33);
-    transition: all .3s ease;
-    overflow: auto;
-}
-.modal-header h3 { margin-top: 0; color: #42b983; }
-.modal-body { margin: 20px 0; }
-.modal-default-button { float: right; }
-.modal-enter { opacity: 0; }
-.modal-leave-active { opacity: 0; }
-.modal-enter .modal-container,
-.modal-leave-active .modal-container { -webkit-transform: scale(1.1); transform: scale(1.1); }
+.modal-link:hover { text-decoration: underline; }
 </style>

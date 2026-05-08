@@ -51,7 +51,7 @@
                         <li>
                             <div class="profile-click" dusk="profile-menu">
                                 @if(Auth::user()->userprofile->avatar!= null)
-                                    <img src="{{ url(Auth::user()->userprofile->avatar) }}" class="w-8 h-8 rounded-full cursor-pointer">
+                                    <img src="{{ url(Auth::user()->userprofile->AvatarPath) }}" class="w-8 h-8 rounded-full cursor-pointer">
                                 @else
                                     <img src="{{ asset('uploads/user/avatar/default-user.jpg') }}" class="w-8 h-8 rounded-full cursor-pointer">
                                 @endif
@@ -59,7 +59,7 @@
                                     <ul class="list-reset bg-white border border-gray-400 -mt-3 shadow-lg z-40">
                                         <div class="flex border-b p-2 items-center">
                                             @if(Auth::user()->userprofile->avatar!= null)
-                                                <img src="{{ url(Auth::user()->userprofile->avatar) }}" class="w-10 h-10 rounded-full cursor-pointer">
+                                                <img src="{{ url(Auth::user()->userprofile->AvatarPath) }}" class="w-10 h-10 rounded-full cursor-pointer">
                                             @else
                                                 <img src="{{asset('uploads/user/avatar/default-user.jpg')}}" class="w-10 h-10 rounded-full cursor-pointer">
                                             @endif

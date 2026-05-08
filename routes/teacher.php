@@ -426,4 +426,7 @@ Route::post('/bankdetails/update/{id}', 'BankDetailController@update');
 
 Route::get( '/notice/list', 'NoticeBoardController@noticelist' );
 
+// Group
+Route::get('groups/{standardLinkId}', 'GroupController@index');
+
 

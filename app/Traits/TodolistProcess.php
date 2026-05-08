@@ -45,7 +45,8 @@ trait TodolistProcess
             $task->to_do_list           =   $data->to_do_list;
             $task->task_date            =   date('Y-m-d H:i:s',strtotime($data->task_date));
             $task->reminder             =   $data->reminder;
-            $task->priority           =   $data->priority;
+            $task->priority             =   $data->priority;
+            $task->task_type            =   $data->task_type;
             if($data->reminder == 'others')
             {
                 $task->reminder_date    =   date('Y-m-d H:i:s',strtotime($data->reminder_date));
@@ -79,13 +80,8 @@ trait TodolistProcess
             {
                 foreach ($data->class_ids as $class_id) 
                 {
-                    $task_assignee = new TaskAssignee;
 
-                    $task_assignee->task_id             = $task->id;
-                    $task_assignee->standardLink_id     = $class_id;
-                    $task_assignee->assigned_type       = 'class';
-
-                    $task_assignee->save();
+                    $this->storeTaskAssignee($task->id,'class', null, $class_id);
 
 
                     $this->addClassReminder($school_id,$reminder_date,$task->title,$task->id,$data->standardLink_id);
@@ -113,13 +109,8 @@ trait TodolistProcess
                 $standard_id = $data->standardLink_id;
                 foreach ($data->selectedUsers as $student_id) 
                 {
-                    $task_assignee = new TaskAssignee;
 
-                    $task_assignee->task_id         = $task->id;
-                    $task_assignee->user_id         = $student_id;
-                    $task_assignee->standardLink_id = $standard_id;
-
-                    $task_assignee->save();
+                    $this->storeTaskAssignee($task->id,'user', $student_id, $standard_id);
 
                     $student = User::where('id',$student_id)->first();
 
@@ -149,12 +140,8 @@ trait TodolistProcess
             {
                 foreach ($data->selectedTeachers as $teacher_id) 
                 {
-                    $task_assignee = new TaskAssignee;
 
-                    $task_assignee->task_id     = $task->id;
-                    $task_assignee->user_id     = $teacher_id;
-
-                    $task_assignee->save();
+                    $this->storeTaskAssignee($task->id,'user', $teacher_id);
 
                     $teacher = User::where('id',$teacher_id)->first();
 
@@ -181,12 +168,8 @@ trait TodolistProcess
             {
                 foreach ($data->non_teachers as $teacher_id) 
                 {
-                    $task_assignee = new TaskAssignee;
 
-                    $task_assignee->task_id     = $task->id;
-                    $task_assignee->user_id     = $teacher_id;
-
-                    $task_assignee->save();
+                    $this->storeTaskAssignee($task->id,'user',$teacher_id);
 
                     $teacher = User::where('id',$teacher_id)->first();
 
@@ -209,18 +192,39 @@ trait TodolistProcess
                     event(new SingleNotificationEvent($data));
                 }
             }
-            // elseif($data->assignee == 'group')
-            // {
-                
-            // }
+
+            elseif($data->assignee == 'group')
+            {
+                foreach ($data->groups as $group_id) 
+                {
+
+                    $this->storeTaskAssignee($task->id,'group', null, null,$group_id);
+
+                    $teacher = User::where('id',$teacher_id)->first();
+
+                    $this->sendToTaskReminder($school_id,$reminder_date,$task->title,$task->id,$teacher->email,$teacher->mobile_no);
+
+                    $array=[];
+
+                    $array['school_id']  =   $school_id;
+                    $array['user_id']    =   $teacher->id;
+                    $array['message']    =   'New Task Assigned';
+                    $array['type']       =   'task';
+
+                    event(new SinglePushEvent($array));
+
+                    $data = [];
+
+                    $data['user']       =   $teacher;
+                    $data['details']    =   trans('notification.task_assign_msg');
+
+                    event(new SingleNotificationEvent($data));
+                }
+            }
             else
             {
-                $task_assignee = new TaskAssignee;
 
-                $task_assignee->task_id     = $task->id;
-                $task_assignee->user_id     = $auth_id;
-
-                $task_assignee->save();
+                $this->storeTaskAssignee($task->id,'user',$auth_id);
 
                 $auth_user = User::where('id',$auth_id)->first();
 
@@ -236,6 +240,16 @@ trait TodolistProcess
             Log::info($e->getMessage());
             dd($e->getMessage());
         } 
+    }
+    public function storeTaskAssignee($taskId, $assignedType = 'user', $userId = null, $standardLinkId = null, $groupId = null)
+    {
+        return TaskAssignee::create([
+            'task_id'         => $taskId,
+            'user_id'         => $userId,
+            'standardLink_id' => $standardLinkId,
+            'group_id'        => $groupId,
+            'assigned_type'   => $assignedType,
+        ]);
     }
 
     public function addClassReminder($school_id,$reminder_date,$title,$entity_id,$standardLink_id)

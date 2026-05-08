@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
  */
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Teacher;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -30,7 +30,7 @@ class GroupController extends Controller
     }
     public function index($standardLinkId)
     {
-        $groups = Group::withCount('members')->where('standardLink_id', $standardLinkId)
+        $groups = Group::where('standardLink_id', $standardLinkId)
             ->latest()
             ->get();
 

@@ -10,6 +10,8 @@ return [
             'driver' => 'local',
             'root' => storage_path('app'),
             'throw' => false,
+            'url' => env('APP_URL') . '/storage',
+
         ],
 
         'public' => [
@@ -42,7 +44,7 @@ return [
     ],
 
     'links' => [
-        public_path('storage') => storage_path('app/public'),
+        public_path('storage') => storage_path('app'),
     ],
 
 ];

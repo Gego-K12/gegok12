@@ -13,6 +13,7 @@ use App\Http\Requests\API\Teacher\TaskRequest;
 use App\Http\Requests\API\TaskStatusUpdateRequest;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 use App\Traits\TodolistProcess;
 use App\Models\TaskAssignee;
 use Illuminate\Http\Request;
@@ -24,6 +25,7 @@ use App\Models\User;
 use App\Models\Group;
 use Exception;
 use Log;
+
 
 class TaskController extends Controller
 {
@@ -326,43 +328,108 @@ public function create(Request $request)
         ],200);
     }
 
-    public function changestatus(TaskStatusUpdateRequest $request)
+    // public function changestatus(TaskStatusUpdateRequest $request)
+    // {
+    //     try
+    //     {
+    //         if( count($request->task_completed) > 0 )
+    //         {
+    //             foreach ($request->task_completed as $task_id) 
+    //             {
+    //                 $task = Task::where('id',$task_id)->first();
+
+    //                 $task->task_status = 1;
+
+    //                 $task->save();
+
+    //                 $message = trans('messages.task_check_success_msg');
+
+    //                 $ip= $this->getRequestIP();
+    //                 $this->doActivityLog(
+    //                     $task,
+    //                     Auth::user(),
+    //                     ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT'] ],
+    //                     LOGNAME_MARK_TASK_COMPLETE,
+    //                     $message
+    //                 ); 
+    //             }
+
+    //             return response()->json([
+    //                 'success'   =>  true,
+    //                 'message'   =>  $message,
+    //             ],200);
+    //         }
+    //     }
+    //     catch(Exception $e)
+    //     {
+    //         Log::info($e->getMessage());
+    //         dd($e->getMessage());
+    //     }   
+    // }
+
+    public function changeStatus(TaskStatusUpdateRequest $request)
     {
-        try
-        {
-            if( count($request->task_completed) > 0 )
+        DB::beginTransaction();
+
+        try {
+
+            foreach ($request->task_completed as $id)
             {
-                foreach ($request->task_completed as $task_id) 
+                $assignee = TaskAssignee::findOrFail($id);
+
+                $assignee->update([
+                    'status' => 'completed',
+                    // 'claimed_by' => Auth::id(),
+                ]);
+
+                // Check all assignees completed
+                $pendingCount = TaskAssignee::where('task_id', $assignee->task_id)
+                    ->where('status', 'pending')
+                    ->count();
+
+                if ($pendingCount == 0)
                 {
-                    $task = Task::where('id',$task_id)->first();
-
-                    $task->task_status = 1;
-
-                    $task->save();
-
-                    $message = trans('messages.task_check_success_msg');
-
-                    $ip= $this->getRequestIP();
-                    $this->doActivityLog(
-                        $task,
-                        Auth::user(),
-                        ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT'] ],
-                        LOGNAME_MARK_TASK_COMPLETE,
-                        $message
-                    ); 
+                    Task::where('id', $assignee->task_id)
+                        ->update([
+                            'task_status' => 1
+                        ]);
                 }
 
-                return response()->json([
-                    'success'   =>  true,
-                    'message'   =>  $message,
-                ],200);
+                // Activity Log
+                $message = trans('messages.task_check_success_msg');
+
+                $ip = $this->getRequestIP();
+
+                $this->doActivityLog(
+                    $assignee,
+                    Auth::user(),
+                    [
+                        'ip' => $ip,
+                        'details' => request()->userAgent()
+                    ],
+                    LOGNAME_MARK_TASK_COMPLETE,
+                    $message
+                );
             }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+            ]);
+
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+            Log::error($e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong'
+            ], 500);
         }
-        catch(Exception $e)
-        {
-            Log::info($e->getMessage());
-            dd($e->getMessage());
-        }   
     }
 
     /**

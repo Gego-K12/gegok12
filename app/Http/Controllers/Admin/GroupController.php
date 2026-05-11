@@ -30,7 +30,7 @@ class GroupController extends Controller
     }
     public function index($standardLinkId)
     {
-        $groups = Group::withCount('members')->where('standardLink_id', $standardLinkId)
+        $groups = Group::where('standardLink_id', $standardLinkId)
             ->latest()
             ->get();
 
@@ -43,7 +43,6 @@ class GroupController extends Controller
     public function list()
     {
         $groups = Group::get();
-        dd($groups);
 
         return response()->json([
             'data'    => GroupResource::collection($groups)

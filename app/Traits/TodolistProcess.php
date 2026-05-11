@@ -243,13 +243,23 @@ trait TodolistProcess
     }
     public function storeTaskAssignee($taskId, $assignedType = 'user', $userId = null, $standardLinkId = null, $groupId = null)
     {
-        return TaskAssignee::create([
-            'task_id'         => $taskId,
-            'user_id'         => $userId,
-            'standardLink_id' => $standardLinkId,
-            'group_id'        => $groupId,
-            'assigned_type'   => $assignedType,
-        ]);
+        try {
+
+            $taskAssignee = TaskAssignee::create([
+                'task_id'         => $taskId,
+                'user_id'         => $userId,
+                'standardLink_id' => $standardLinkId,
+                'group_id'        => $groupId,
+                'assigned_type'   => $assignedType,
+            ]);
+
+            return $taskAssignee;
+
+        } catch (\Exception $e) {
+
+            Log::info($e->getMessage());
+            return false;
+        }
     }
 
     public function addClassReminder($school_id,$reminder_date,$title,$entity_id,$standardLink_id)

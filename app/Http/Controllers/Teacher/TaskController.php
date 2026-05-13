@@ -280,55 +280,108 @@ class TaskController extends Controller
      * @param  int  $id
      * @return array
      */
-    public function show($id)
+  public function show($id)
     {
-        //
-        $task = Task::where('id',$id)->first(); 
-        $task_assignees = TaskAssignee::where('task_id',$id)->get();
-        
-        foreach ($task_assignees as $key => $task_assignee) 
-        {
-            if($task->type == 'teacher')
-            {
-                $selected_teachers[$key] = $task_assignee->user_id;
-            }
-            elseif($task->type == 'student')
-            {
-                $selectedUsers[$key] = $task_assignee->user_id;
-                $standardLink_id = $task_assignee->standardLink_id;
-                $class = $task_assignee->standardLink->StandardSection;
-            }
-            elseif ($task->type == 'class') 
-            {
-                $class = $task_assignee->standardLink->StandardSection;
-            }
-        }
-        $array = [];
+        $task = Task::where('id', $id)->firstOrFail();
 
-        if($task->type == 'student')
-        {
-            $selected_students = User::whereIn('id',$selectedUsers)->get();
-            $selected_students = UserResource::collection($selected_students);
+        $task_assignees = TaskAssignee::with(['user', 'standardLink'])
+            ->where('task_id', $id)
+            ->get();
+
+        $selectedUsers = [];
+        $selectedTeachers = [];
+        $selected_students = [];
+        $selected_teachers = [];
+        $standardLink_id = null;
+        $class = null;
+        $task_assignee_id = null;
+
+        $assignees = [];
+
+        foreach ($task_assignees as $task_assignee) {
+            $task_assignee_id = $task_assignee->id;
+
+            if ($task->type == 'teacher') {
+                $selectedTeachers[] = $task_assignee->user_id;
+            } elseif ($task->type == 'student') {
+                $selectedUsers[] = $task_assignee->user_id;
+                $standardLink_id = $task_assignee->standardLink_id;
+
+                if ($task_assignee->standardLink) {
+                    $class = $task_assignee->standardLink->StandardSection;
+                }
+            } elseif ($task->type == 'class') {
+                $standardLink_id = $task_assignee->standardLink_id;
+
+                if ($task_assignee->standardLink) {
+                    $class = $task_assignee->standardLink->StandardSection;
+                }
+            }
+
+            $name = '-';
+            $username = '-';
+
+            if ($task_assignee->user) {
+                if (isset($task_assignee->user->FullName)) {
+                    $name = $task_assignee->user->FullName;
+                } elseif (isset($task_assignee->user->fullname)) {
+                    $name = $task_assignee->user->fullname;
+                } else {
+                    $name = $task_assignee->user->name;
+                }
+
+                $username = $task_assignee->user->name;
+            }
+
+            $assignees[] = [
+                'id'             => $task_assignee->id,
+                'user_id'        => $task_assignee->user_id,
+                'name'           => $name,
+                'username'       => $username,
+                'class'          => $task_assignee->standardLink ? $task_assignee->standardLink->StandardSection : null,
+                'assigned_type'  => $task_assignee->assigned_type,
+                'status'         => $task_assignee->status,
+                'claimed_by'     => $task_assignee->claimed_by,
+            ];
         }
-        if($task->type == 'teacher')
-        {
-            $selected_teachers  = User::whereIn('id',$selected_teachers)->get();
-            $selected_teachers  = TeacherResource::collection($selected_teachers);
+
+        if ($task->type == 'student' && count($selectedUsers) > 0) {
+            $students = User::whereIn('id', $selectedUsers)->get();
+            $selected_students = UserResource::collection($students);
         }
-        $array['task_id']           =  $task->id;
-        $array['task_assignee_id']  =  $task_assignee->id;
-        $array['title']             =  $task->title;
-        $array['to_do_list']        =  $task->to_do_list;
-        $array['task_date']         =  date('d-m-Y H:i:s',strtotime($task->task_date));
-        $array['assignee_display']  =  ucwords($task->type);
-        $array['assignee']          =  $task->type;
-        $array['reminder_date']     =  date('d-m-Y H:i:s',strtotime($task->ReminderValue));
-        $array['selectedUsers']     =  $selected_students;
-        $array['standardLink_id']   =  $standardLink_id;
-        $array['class']             =  $class;
-        $array['teachers']          =  $selected_teachers;
-    
-        return $array;
+
+        if ($task->type == 'teacher' && count($selectedTeachers) > 0) {
+            $teachers = User::whereIn('id', $selectedTeachers)->get();
+            $selected_teachers = TeacherResource::collection($teachers);
+        }
+
+        return response()->json([
+            'task_id'           => $task->id,
+            'task_assignee_id'  => $task_assignee_id,
+            'title'             => $task->title,
+            'to_do_list'        => $task->to_do_list,
+            'task_date'         => $task->task_date ? date('d-m-Y H:i:s', strtotime($task->task_date)) : '-',
+            'assignee_display'  => ucwords($task->type),
+            'assignee'          => $task->type,
+            'reminder_date'     => $task->ReminderValue ? date('d-m-Y H:i:s', strtotime($task->ReminderValue)) : '-',
+            'selectedUsers'     => $selected_students,
+            'standardLink_id'   => $standardLink_id,
+            'class'             => $class,
+            'teachers'          => $selected_teachers,
+            'priority'          => $task->priority,
+            'task_status'       => $task->task_status,
+
+            // new table data
+            'assignees'         => $assignees,
+        ]);
+    }
+
+    public function view($id)
+    {
+        return view('/teacher/todolist/show', [
+            'taskId' => $id,
+            'mode' => 'teacher',
+        ]);
     }
 
     /**

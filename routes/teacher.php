@@ -101,6 +101,7 @@ Route::get('/holidays','HolidaysController@index');
 
     //show
     Route::get('/task/show/{id}', 'TaskController@show');
+     Route::get('/task/view/{id}', 'TaskController@view');
 
     //edit
     Route::get('/task/edit/list/{id}', 'TaskController@editList');

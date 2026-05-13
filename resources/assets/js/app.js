@@ -345,6 +345,7 @@ app.component('list-lentbook', () => import('./components/booklending/List.vue')
 app.component('create-todo', () => import('./components/todolist/Create.vue').then(m => m.default));
 app.component('edit-todo', () => import('./components/todolist/Edit.vue').then(m => m.default));
 app.component('list-todo', () => import('./components/todolist/List.vue').then(m => m.default));
+app.component('task-show', () => import('./components/todolist/Show.vue').then(m => m.default));
 
 //dashboard to do 
 app.component('list-task-tab', () => import('./components/todolist/listTab.vue').then(m => m.default));

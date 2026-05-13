@@ -222,6 +222,13 @@ class LessonPlanController extends Controller
             $lessonplan->duration = date('H:i:s', mktime(0, $request->duration, 0));
             $lessonplan->description = $request->description;
             $lessonplan->status = 'draft';
+            $lessonplan->start_date = $request->filled('start_date')
+                ? date('Y-m-d', strtotime($request->start_date))
+                : null;
+            $lessonplan->end_date = $request->filled('end_date')
+                ? date('Y-m-d', strtotime($request->end_date))
+                : null;
+
 
             $lessonplan->save();
 

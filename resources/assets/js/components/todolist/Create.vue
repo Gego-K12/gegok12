@@ -896,7 +896,7 @@
 <style>
 /* ── Shell ─────────────────────────────────────────────── */
 .task-form-shell {
-    background: #f4f5f7;
+    /*background: #f4f5f7;*/
     min-height: 100vh;
     padding: 24px 32px;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;

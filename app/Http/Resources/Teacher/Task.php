@@ -48,6 +48,9 @@ class Task extends JsonResource
             'reminder_date'     =>  $this->reminder_date,
             'auth_id'           =>  Auth::id(),
             'created_by'        =>  $this->user_id,
+            'priority'          =>  $this->priority,
+            'total_count'       =>  $this->taskAssignee->count(),
+            'completion_count'  =>  $this->taskAssignee->where('status','completed')->count(),
         ];
     }
 }

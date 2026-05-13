@@ -84,8 +84,8 @@ class LessonPlanController extends Controller
                 if (!Auth::user()->hasRole('principal')) {
                     $q->where('teacher_id', Auth::id());
                 }
-            })
-            ->where('status', 'approved');
+            });
+            // ->where('status', 'approved');
 
         // Optional filter
         if ($request->has('date')) {
@@ -485,5 +485,93 @@ class LessonPlanController extends Controller
         } catch (\Exception $e) {
             Log::info($e->getMessage());
         }
+    }
+
+    public function updateStepOne(LessonPlanStep1Request $request,$id)
+    {
+      //
+        try
+        {
+            $lessonplan = LessonPlan::where('id',$id)->first();
+
+            $lessonplan->unit_no            =   $request->unit_no;
+            $lessonplan->unit_name          =   $request->unit_name;
+            $lessonplan->title              =   $request->title;
+            $lessonplan->duration           =   date('H:i:s', mktime(0,$request->duration,0));
+            $lessonplan->description        =   $request->description;
+            $lessonplan->status             =   'pending';
+
+            $lessonplan->save();
+
+            $message=trans('messages.save_success_msg',['module' => 'Step 1']);
+
+            $ip= $this->getRequestIP();
+            $this->doActivityLog(
+                $lessonplan,
+                Auth::user(),
+                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT'] ],
+                LOGNAME_EDIT_LESSON_PLAN_1,
+                $message
+            );
+            // API Response
+            return response()->json([
+                'status' => true,
+                'message' => $message,
+                'data' => [
+                    'lessonplan_id' => $lessonplan->id,
+                    'status' => $lessonplan->status
+                ]
+            ], 200);
+
+            return $res;
+        }
+        catch(Exception $e)
+        {
+            Log::info($e->getMessage());
+        }
+    }
+    public function show($id)
+    {
+        $lessonplan = LessonPlan::with('teacherlink')->where('id', $id)->first();
+
+        if (!$lessonplan) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Lesson plan not found'
+            ], 404);
+        }
+
+        $parts = explode(':', $lessonplan->duration ?? '00:00');
+
+        $hours   = isset($parts[0]) ? (int) $parts[0] : 0;
+        $minutes = isset($parts[1]) ? (int) $parts[1] : 0;
+
+        $array = [];
+        
+        $array['id']                    = $lessonplan->id;
+        $array['standardLink_id']       = optional($lessonplan->teacherlink)->standardLink_id;
+        $array['subject_id']            = optional($lessonplan->teacherlink)->subject_id;
+        $array['unit_no']               = $lessonplan->unit_no;
+        $array['unit_name']             = $lessonplan->unit_name;
+        $array['description']           = $lessonplan->description;
+        $array['title']                 = $lessonplan->title;
+        $array['duration']              = ($hours * 60) + $minutes;
+        $array['objective']             = $lessonplan->objective;
+        $array['materials_required']    = $lessonplan->materials_required;
+        $array['introduction']          = $lessonplan->introduction;
+        $array['procedure']             = $lessonplan->procedure;
+        $array['conclusion']            = $lessonplan->conclusion;
+        $array['notes']                 = $lessonplan->notes ?? '';
+        $array['assessment']            = $lessonplan->assessment;
+        $array['modification']          = $lessonplan->modification;
+        $array['start_date']            = $lessonplan->start_date;
+        $array['end_date']              = $lessonplan->end_date;
+        $array['is_published']          = $lessonplan->is_published;
+        $array['published_at']          = $lessonplan->published_at;
+
+        return response()->json([
+                'status' => true,
+                'data' => $array
+            ], 200);
     }
 }

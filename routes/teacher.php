@@ -164,6 +164,7 @@ Route::get('/lessonplan/print/{id}', 'LessonPlanController@print');
 //delete
 Route::get( '/lessonplan/delete/{id}', 'LessonPlanController@destroy');
 
+
 //add
 Route::get('/lessonplan/add/list', 'LessonPlanAddController@addList');
 Route::get('/lessonplan/add', 'LessonPlanAddController@create');
@@ -172,6 +173,7 @@ Route::post('/lessonplan/add/stepOne', 'LessonPlanAddController@stepOne');
 Route::post('/lessonplan/add/stepTwo/{id}', 'LessonPlanAddController@stepTwo');
 Route::post('/lessonplan/add/stepThree/{id}', 'LessonPlanAddController@stepThree');
 Route::post('/lessonplan/add/stepFour/{id}', 'LessonPlanAddController@stepFour');
+Route::post('lesson-plans/{id}/publish', 'LessonPlanAddController@publish');
 
 //edit
 Route::get('/lessonplan/edit/list/{id}', 'LessonPlanEditController@editList');

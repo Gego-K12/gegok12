@@ -10,6 +10,7 @@ use App\Http\Requests\LessonPlanStep1Request;
 use App\Http\Requests\LessonPlanStep2Request;
 use App\Http\Requests\LessonPlanStep3Request;
 use App\Http\Requests\LessonPlanStep4Request;
+use App\Http\Requests\PublishLessonPlanRequest;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\TeacherProfile;
@@ -247,6 +248,44 @@ class LessonPlanAddController extends Controller
         catch(Exception $e)
         {
             //dd($e->getMessage());
+        }
+    }
+    public function publish(PublishLessonPlanRequest $request,$id)
+    {
+        try{
+            $lessonplan = LessonPlan::find($id);
+
+            if (!$lessonplan) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Lesson plan not found',
+                ], 404);
+            }
+
+            if ($lessonplan->status != 'approved') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Only approved lesson plan can be published',
+                ], 422);
+            }
+
+            $lessonplan->is_published = 1;
+            $lessonplan->published_at = now();
+            $lessonplan->start_date = date('Y-m-d', strtotime($request->start_date));
+            $lessonplan->end_date = date('Y-m-d', strtotime($request->end_date));
+
+            $lessonplan->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Lesson plan published successfully',
+                'data' => [
+                    'id' => $lessonplan->id,
+                ],
+            ]);
+
+        } catch (\Exception $e) {
+            Log::info($e->getMessage());
         }
     }
 }

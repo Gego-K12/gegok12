@@ -169,6 +169,12 @@ Route::group([ 'prefix' => 'teacher' , 'middleware'=>['auth:sanctum'] , 'namespa
         Route::post('/lesson-plan/step3/{id}', 'LessonPlanController@stepThree');
         Route::post('/lesson-plan/step4/{id}', 'LessonPlanController@stepFour');
 
+        Route::post('lesson-plans/{id}/publish', 'LessonPlanController@publish');
+
+        //edit
+        Route::get('/lessonplan/show/{id}', 'LessonPlanController@show');
+        Route::post('/lesson-plan/edit/step1/{id}', 'LessonPlanController@updateStepOne');
+
     //task
 
         //index

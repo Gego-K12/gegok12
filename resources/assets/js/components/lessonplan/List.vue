@@ -97,6 +97,26 @@
                   <a href="#" v-if="role == 'principal' && lessonplan.status == 'rejected'">
                     <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 512 512" xml:space="preserve" class="w-4 h-4 fill-current text-green-600 mx-auto"><g><g><path d="M383.841,171.838c-7.881-8.31-21.02-8.676-29.343-0.775L221.987,296.732l-63.204-64.893 c-8.005-8.213-21.13-8.393-29.35-0.387c-8.213,7.998-8.386,21.137-0.388,29.35l77.492,79.561 c4.061,4.172,9.458,6.275,14.869,6.275c5.134,0,10.268-1.896,14.288-5.694l147.373-139.762 C391.383,193.294,391.735,180.155,383.841,171.838z"></path></g></g> <g><g><path d="M256,0C114.84,0,0,114.84,0,256s114.84,256,256,256s256-114.84,256-256S397.16,0,256,0z M256,470.487 c-118.265,0-214.487-96.214-214.487-214.487c0-118.265,96.221-214.487,214.487-214.487c118.272,0,214.487,96.221,214.487,214.487 C470.487,374.272,374.272,470.487,256,470.487z"></path></g></g></svg>
                   </a>
+
+                 <a href="#"
+                     @click.prevent="openPublishModal(lessonplan)"
+                     v-if="role != 'principal' && lessonplan.status == 'approved' && lessonplan.is_published == 0"
+                     title="Publish">
+                    <svg version="1.1" id="publish_icon" xmlns="http://www.w3.org/2000/svg"
+                         viewBox="0 0 512 512"
+                         class="w-5 h-5 fill-current text-green-600 mx-1">
+                      <g>
+                        <path d="M256 0C114.84 0 0 114.84 0 256s114.84 256 256 256 256-114.84 256-256S397.16 0 256 0zm0 470.487c-118.265 0-214.487-96.214-214.487-214.487S137.735 41.513 256 41.513 470.487 137.735 470.487 256 374.272 470.487 256 470.487z"/>
+                        <path d="M383.841 171.838c-7.881-8.31-21.02-8.676-29.343-.775L221.987 296.732l-63.204-64.893c-8.005-8.213-21.13-8.393-29.35-.387-8.213 7.998-8.386 21.137-.388 29.35l77.492 79.561c4.061 4.172 9.458 6.275 14.869 6.275 5.134 0 10.268-1.896 14.288-5.694l147.373-139.762c8.316-7.888 8.668-21.027.774-29.344z"/>
+                      </g>
+                    </svg>
+                  </a>
+
+                  <span v-if="role != 'principal' && lessonplan.status == 'approved' && lessonplan.is_published == 1"
+                        class="text-green-600 text-xs font-semibold mx-1">
+                    Published
+                  </span>
+
                 </div>
               </td>
             </tr>
@@ -116,6 +136,50 @@
         </table>
       </div>
     </div>
+    <!-- Publish Modal -->
+      <div v-if="showPublishModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded shadow-lg w-11/12 md:w-1/3 p-5">
+          <h2 class="text-lg font-semibold mb-4">Publish Lesson Plan</h2>
+
+          <div class="mb-3">
+            <label class="block text-sm font-semibold mb-1">Start Date</label>
+            <input type="date"
+                   v-model="publishForm.start_date"
+                   :min="todayDate"
+                   class="border px-3 py-2 w-full rounded">
+
+            <p v-if="errors.start_date" class="text-red-600 text-xs mt-1">
+              {{ errors.start_date[0] }}
+            </p>
+          </div>
+
+          <div class="mb-3">
+            <label class="block text-sm font-semibold mb-1">End Date</label>
+            <input type="date"
+                   v-model="publishForm.end_date"
+                   :min="publishForm.start_date || todayDate"
+                   class="border px-3 py-2 w-full rounded">
+
+            <p v-if="errors.end_date" class="text-red-600 text-xs mt-1">
+              {{ errors.end_date[0] }}
+            </p>
+          </div>
+
+          <div class="flex justify-end mt-5">
+            <button type="button"
+                    class="px-4 py-2 bg-gray-400 text-white rounded mr-2"
+                    @click="closePublishModal">
+              Cancel
+            </button>
+
+            <button type="button"
+                    class="px-4 py-2 custom-green text-white rounded"
+                    @click="publishLessonPlan">
+              Submit
+            </button>
+          </div>
+        </div>
+      </div>
   </div>
 </template>
 
@@ -132,6 +196,13 @@
         params:{},
         errors:[],
         success:null,
+        showPublishModal: false,
+        selectedLessonPlanId: null,
+        todayDate: new Date().toISOString().slice(0, 10),
+        publishForm: {
+          start_date: '',
+          end_date: '',
+        },
       }
     },
 
@@ -252,6 +323,50 @@
           a.search = q;
         }
         return a.href ;
+      },
+      openPublishModal(lessonplan)
+      {
+        this.errors = {};
+        this.selectedLessonPlanId = lessonplan.id;
+
+        this.publishForm.start_date = lessonplan.start_date ? lessonplan.start_date : this.todayDate;
+        this.publishForm.end_date = lessonplan.end_date ? lessonplan.end_date : this.todayDate;
+
+        this.showPublishModal = true;
+      },
+
+      closePublishModal()
+      {
+        this.showPublishModal = false;
+        this.selectedLessonPlanId = null;
+        this.publishForm.start_date = '';
+        this.publishForm.end_date = '';
+        this.errors = {};
+      },
+
+      publishLessonPlan()
+      {
+        this.errors = {};
+
+        axios.post(this.url + '/teacher/lesson-plans/' + this.selectedLessonPlanId + '/publish', this.publishForm)
+          .then(response => {
+            this.success = response.data.message;
+            this.closePublishModal();
+            this.getData('/teacher/lessonplan/list/' + this.status);
+          })
+          .catch(error => {
+            if (error.response && error.response.status == 422) {
+              this.errors = error.response.data.errors ? error.response.data.errors : {};
+
+              swal(
+                "Validation Error",
+                error.response.data.message ? error.response.data.message : "Please check the form",
+                "error"
+              );
+            } else {
+              swal("Error", "Something went wrong", "error");
+            }
+          });
       },
     },
   

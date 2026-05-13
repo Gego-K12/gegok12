@@ -9,6 +9,7 @@ use App\Http\Resources\API\Teacher\LessonPlan as LessonPlanResource;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Events\Notification\SingleNotificationEvent;
+use App\Http\Requests\PublishLessonPlanRequest;
 use App\Http\Requests\LessonPlanStep1Request;
 use App\Http\Requests\LessonPlanStep2Request;
 use App\Http\Requests\LessonPlanStep3Request;
@@ -222,12 +223,7 @@ class LessonPlanController extends Controller
             $lessonplan->duration = date('H:i:s', mktime(0, $request->duration, 0));
             $lessonplan->description = $request->description;
             $lessonplan->status = 'draft';
-            $lessonplan->start_date = $request->filled('start_date')
-                ? date('Y-m-d', strtotime($request->start_date))
-                : null;
-            $lessonplan->end_date = $request->filled('end_date')
-                ? date('Y-m-d', strtotime($request->end_date))
-                : null;
+            
 
 
             $lessonplan->save();
@@ -449,6 +445,45 @@ class LessonPlanController extends Controller
                 'message' => 'Something went wrong',
                 'error' => $e->getMessage()
             ], 500);
+        }
+    }
+
+    public function publish(PublishLessonPlanRequest $request,$id)
+    {
+        try{
+            $lessonplan = LessonPlan::find($id);
+
+            if (!$lessonplan) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Lesson plan not found',
+                ], 404);
+            }
+
+            if ($lessonplan->status != 'approved') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Only approved lesson plan can be published',
+                ], 422);
+            }
+
+            $lessonplan->is_published = 1;
+            $lessonplan->published_at = now();
+            $lessonplan->start_date = date('Y-m-d', strtotime($request->start_date));
+            $lessonplan->end_date = date('Y-m-d', strtotime($request->end_date));
+
+            $lessonplan->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Lesson plan published successfully',
+                'data' => [
+                    'id' => $lessonplan->id,
+                ],
+            ]);
+
+        } catch (\Exception $e) {
+            Log::info($e->getMessage());
         }
     }
 }

@@ -40,6 +40,8 @@ class LessonPlan extends JsonResource
             'title'             =>  $this->title,
             'duration'          =>  $duration,
             'status'            =>  $this->status,
+            'start_date'        =>  $this->start_date ? date('d-m-Y', strtotime($this->start_date)) : null,
+            'end_date'          =>  $this->end_date ? date('d-m-Y', strtotime($this->end_date)) : null,
         ];
     }
 }

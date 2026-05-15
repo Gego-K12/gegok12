@@ -13,13 +13,15 @@ return new class extends Migration
     {
         Schema::create('groups', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('standardLink_id');
+            $table->unsignedInteger('standardLink_id')->nullable();
             $table->foreign('standardLink_id')
                   ->references('id')
                   ->on('standards_link')
                   ->onDelete('cascade');
                   
             $table->string('group_name');
+            $table->enum('type', ['global', 'class'])->default('class');
+            $table->boolean('status')->default(1)->;
             $table->timestamps();
             $table->softDeletes();
         });

@@ -20,7 +20,7 @@ Route::get(	'/admissions','AdmissionController@index' );
 Route::get( '/admission/show/{id}', 'AdmissionController@show' );
 Route::get( '/admission/edit/{id}', 'AdmissionController@edit' );
 Route::post( '/admission/update/{id}', 'AdmissionController@update' );
-Route::get( '/admission/delete/{id}', 'AdmissionController@destroy' );
+Route::delete( '/admission/delete/{id}', 'AdmissionController@destroy' );
 
 
 
@@ -768,6 +768,7 @@ Route::get( '/staffs/show-idcardprint/{name}', 'StaffController@showprintidcard'
 
 //Group
 Route::post('/group/store', 'GroupController@store');
+Route::get('groups', 'GroupController@showlist');
 Route::get('groups/{standardLinkId}', 'GroupController@index');
 Route::get('/groups/list', 'GroupController@list');
 Route::post('/groups/add-members', 'GroupController@addMembers');

@@ -95,7 +95,7 @@ class LessonPlanController extends Controller
         $lessonplans = $query->orderBy('id', 'desc')->get();
 
         $grouped = $lessonplans->groupBy(function ($item) {
-            return optional($item->teacherlink)->standard_link_id;
+            return optional($item->teacherlink)->standardLink_id;
         })->map(function ($standardGroup) {
 
             $first = $standardGroup->first();

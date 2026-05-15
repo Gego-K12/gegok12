@@ -50,7 +50,7 @@ class Task extends JsonResource
             'priority'          =>  $this->priority,
             'task_type'         =>  $this->task_type,
             'created_by'        =>  $this->user_id,
-             'task_assignee' => TaskAssigneeResource::collection($this->taskAssignee),
+            'task_assignee' => TaskAssigneeResource::collection($this->taskAssignee),
         ];
     }
 }

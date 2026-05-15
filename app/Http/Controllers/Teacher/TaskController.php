@@ -370,8 +370,9 @@ class TaskController extends Controller
             'teachers'          => $selected_teachers,
             'priority'          => $task->priority,
             'task_status'       => $task->task_status,
-
-            // new table data
+            'task_type'         => $task->task_type,
+            'total_count'       => $task_assignees->count(),
+            'completion_count'  => $task_assignees->where('status', 'completed')->count(),
             'assignees'         => $assignees,
         ]);
     }

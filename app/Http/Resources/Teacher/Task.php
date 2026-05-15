@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Teacher;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\TaskAssignee as TaskAssigneeResource;
 use Illuminate\Support\Facades\Auth;
 
 class Task extends JsonResource
@@ -51,6 +52,7 @@ class Task extends JsonResource
             'priority'          =>  $this->priority,
             'total_count'       =>  $this->taskAssignee->count(),
             'completion_count'  =>  $this->taskAssignee->where('status','completed')->count(),
+            'task_assignee' => TaskAssigneeResource::collection($this->taskAssignee),
         ];
     }
 }

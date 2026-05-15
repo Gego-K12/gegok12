@@ -70,4 +70,8 @@ class GroupController extends Controller
             'message' => 'Students added to group successfully'
         ]);
     }
+    public function showlist()
+    {
+        return view('admin.groups.list');
+    }
 }

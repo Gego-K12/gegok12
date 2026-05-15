@@ -12,7 +12,7 @@ class Group extends Model
     protected $table = 'groups';
 
     protected $fillable = [
-        'standardLink_id' , 'group_name'
+        'standardLink_id' , 'group_name' , 'type' ,'status'
     ];
 
     public function members()

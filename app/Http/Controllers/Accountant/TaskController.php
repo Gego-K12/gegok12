@@ -12,6 +12,7 @@ use App\Http\Resources\Teacher as TeacherResource;
 use App\Http\Resources\User as UserResource;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 use App\Http\Requests\TaskRequest;
 use App\Models\Users\TeacherUser;
 use App\Traits\TodolistProcess;
@@ -89,34 +90,99 @@ class TaskController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return array<string, string>|null
      */
+    // public function changestatus(Request $request)
+    // {
+    //     try {
+    //         if ($request->selectedTaskCount > 0) {
+    //             foreach ($request->task_completed as $task_id) {
+    //                 $task = Task::where('id', $task_id)->first();
+
+    //                 $task->task_status = 1;
+    //                 $task->save();
+
+    //                 $message = trans('messages.task_check_success_msg');
+
+    //                 $ip = $this->getRequestIP();
+    //                 $this->doActivityLog(
+    //                     $task,
+    //                     Auth::user(),
+    //                     ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT']],
+    //                     LOGNAME_MARK_TASK_COMPLETE,
+    //                     $message
+    //                 );
+    //             }
+
+    //             $res['success'] = $message;
+    //             return $res;
+    //         }
+    //     } catch (Exception $e) {
+    //         Log::info($e->getMessage());
+    //         dd($e->getMessage());
+    //     }
+    // }
     public function changestatus(Request $request)
     {
+        DB::beginTransaction();
+
         try {
-            if ($request->selectedTaskCount > 0) {
-                foreach ($request->task_completed as $task_id) {
-                    $task = Task::where('id', $task_id)->first();
 
-                    $task->task_status = 1;
-                    $task->save();
+            foreach ($request->task_completed as $id)
+            {
+                $assignee = TaskAssignee::findOrFail($id);
 
-                    $message = trans('messages.task_check_success_msg');
+                $assignee->update([
+                    'status' => 'completed',
+                    // 'claimed_by' => Auth::id(),
+                ]);
+                // dd($assignee);
 
-                    $ip = $this->getRequestIP();
-                    $this->doActivityLog(
-                        $task,
-                        Auth::user(),
-                        ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT']],
-                        LOGNAME_MARK_TASK_COMPLETE,
-                        $message
-                    );
+                // Check all assignees completed
+                $pendingCount = TaskAssignee::where('task_id', $assignee->task_id)
+                    ->where('status', 'pending')
+                    ->count();
+
+                if ($pendingCount == 0)
+                {
+                    Task::where('id', $assignee->task_id)
+                        ->update([
+                            'task_status' => 1
+                        ]);
                 }
 
-                $res['success'] = $message;
-                return $res;
+                // Activity Log
+                $message = trans('messages.task_check_success_msg');
+
+                $ip = $this->getRequestIP();
+
+                $this->doActivityLog(
+                    $assignee,
+                    Auth::user(),
+                    [
+                        'ip' => $ip,
+                        'details' => request()->userAgent()
+                    ],
+                    LOGNAME_MARK_TASK_COMPLETE,
+                    $message
+                );
             }
-        } catch (Exception $e) {
-            Log::info($e->getMessage());
-            dd($e->getMessage());
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+            ]);
+
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+            Log::error($e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong'
+            ], 500);
         }
     }
 

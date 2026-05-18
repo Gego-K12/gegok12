@@ -50,7 +50,7 @@ trait Common
 
         try
         {
-            $path = \Storage::putFile($folder, $file,'public');
+            $path = \Storage::disk('uploads')->putFile($folder, $file,'public');
         }
         catch(Exception $e)
         {

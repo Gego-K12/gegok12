@@ -235,8 +235,14 @@
           </div>
         </li>
       </ul>
-          <div class="list-reset leading-loose my-2 text-xs" v-for="qualification in user.details.qualification_name">
-            <li class="px-6">{{ qualification }}</li>
+          <div class="list-reset leading-loose my-2 text-xs" v-if="user.details.ug_degree_name">
+            <li class="px-6">UG: {{ user.details.ug_degree_name }}</li>
+          </div>
+          <div class="list-reset leading-loose my-2 text-xs" v-if="user.details.pg_degree_name || user.details.specialization">
+            <li class="px-6">PG: {{ [user.details.pg_degree_name, user.details.specialization].filter(Boolean).join(', ') }}</li>
+          </div>
+          <div class="list-reset leading-loose my-2 text-xs" v-if="user.details.qualification_name || user.details.sub_qualification">
+            <li class="px-6">Professional Courses/Certificates: {{ [].concat(user.details.qualification_name || []).concat(user.details.sub_qualification ? [user.details.sub_qualification] : []).filter(Boolean).join(', ') }}</li>
           </div>
     </div>
   </div>

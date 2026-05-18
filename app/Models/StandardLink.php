@@ -288,28 +288,9 @@ class StandardLink extends Model
      */
     public function getStandardSectionAttribute()
     {
-        if( ($this->standard->name == 'PREKG') || ($this->standard->name == 'prekg') )
-        {
-            $standard_name = 'PREKG';
-        }
-        elseif( ($this->standard->name == 'LKG') || ($this->standard->name == 'lkg') )
-        {
-            $standard_name = 'LKG';
-        }
-        elseif ( ($this->standard->name == 'UKG') || ($this->standard->name == 'ukg') )
-        {
-            $standard_name = 'UKG';
-        }
-        else
-        {
-            if($this->standard != null)
-            {
-                $standard_name = $this->standard->present()->integerToRoman($this->standard->name);
-            }
-        }
-        return $standard_name.' - '.$this->section->name;
+        $standard_name = $this->standard ? $this->standard->name : "";
+        return $standard_name . " - " . ($this->section ? $this->section->name : "");
     }
-
     /**
      * Get the standard name formatted as Roman numerals or standard name.
      *
@@ -317,27 +298,7 @@ class StandardLink extends Model
      */
     public function getStandardNameAttribute()
     {
-        if( ($this->standard->name == 'PREKG') || ($this->standard->name == 'prekg') )
-        {
-            $standard_name = 'PREKG';
-        }
-        elseif( ($this->standard->name == 'LKG') || ($this->standard->name == 'lkg') )
-        {
-            $standard_name = 'LKG';
-        }
-        elseif ( ($this->standard->name == 'UKG') || ($this->standard->name == 'ukg') )
-        {
-            $standard_name = 'UKG';
-        }
-        else
-        {
-            if($this->standard != null)
-            {
-                $standard_name = $this->standard->present()->integerToRoman($this->standard->name);
-            }
-        }
-
-        return $standard_name;
+        return $this->standard ? $this->standard->name : null;
     }
 
     /**

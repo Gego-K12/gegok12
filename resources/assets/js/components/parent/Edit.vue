@@ -207,7 +207,7 @@ export default {
       annual_income:'',
       qualificationlist:[],
       occupationlist:['business','central_government_employee','private','state_government_employee','others'],
-      professions:[{num:'business' , name:'Business'} , {num:'central_government_employee' , name:'Central Government Employee'} , {num:'private' , name:'Private'} , {num:'home_maker' , name:'Home Maker'} , {num:'state_government_employee' , name:'State Government Employee'} , {num:'others' , name:'Others'} ],
+      professions:[{num:'admin' , name:'Admin'} , {num:'business' , name:'Business'} , {num:'central_government_employee' , name:'Central Govt Employee'} , {num:'home_maker' , name:'Home Maker'} , {num:'librarian' , name:'Librarian'} , {num:'private' , name:'Private'} , {num:'state_government_employee' , name:'State Govt Employee'} , {num:'teacher' , name:'Teacher'} , {num:'others' , name:'Others'}],
       errors:[],
       success:null,
       latitude:'',

@@ -95,7 +95,7 @@ class UserProfileController extends Controller
             $userprofile = Userprofile::where('user_id', Auth::id())->first();
            // $path=$this->uploadFile(Auth::user()->school->slug.'/uploads/avatars', $request->avatar);
 
-            $path = \Storage::putFile(Auth::user()->school->slug.'/uploads/avatars', $request->avatar,'public');
+            $path = \Storage::disk('uploads')->putFile(Auth::user()->school->slug.'/uploads/avatars', $request->avatar,'public');
 
             if($path!='')
             {

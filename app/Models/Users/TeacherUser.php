@@ -101,7 +101,9 @@ class TeacherUser extends User
             $array['sub_designation'] = $teacher->sub_designation;
             $array['employee_id'] = $teacher->employee_id;
             $array['ug_degree'] = $teacher->ug_degree;
+            $array['ug_degree_name'] = $teacher->ug_degree ? \App\Models\Qualification::find($teacher->ug_degree)?->display_name : null;
             $array['pg_degree'] = $teacher->pg_degree;
+            $array['pg_degree_name'] = $teacher->pg_degree ? \App\Models\Qualification::find($teacher->pg_degree)?->display_name : null;
             $array['specialization'] = $teacher->specialization;
             $array['job_type'] = $teacher->job_type;
             $array['interested_in'] = $teacher->interested_in;

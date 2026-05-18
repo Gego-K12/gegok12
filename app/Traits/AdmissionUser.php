@@ -150,7 +150,7 @@ trait AdmissionUser
             $academic->id_card_number               = $user->registration_number;
             $academic->board_registration_number    = $data->board_registration_number;
             $academic->mode_of_transport            = $data->mode_of_transport;
-            $academic->transport_details            = $data->transport_details;
+            $academic->transport_details            = is_array($data->transport_details) ? $data->transport_details : null;
 
             $academic->siblings                     = $data->siblings;
             $academic->siblings_count               = $data->siblings_count;
@@ -261,11 +261,11 @@ trait AdmissionUser
             $parent->user_id            =   $user->id;
             $parent->qualification_id   =   $data->father_qualification_id;
             $parent->profession         =   $data->father_occupation;
-            $parent->sub_occupation     =   $data->sub_occupation;
+            $parent->sub_occupation     =   $data->sub_occupation ?? null;
             $parent->designation        =   $data->father_designation;
             $parent->organization_name  =   $data->father_organisation;
             //$parent->official_address   =   $data->official_address;
-            $parent->relation           =   'Father';
+            $parent->relation           =   'father';
             $parent->annual_income      =   $data->father_income;
 
             $parent->save();
@@ -321,7 +321,7 @@ trait AdmissionUser
                 $user->name = $data->mother_name;
             }*/
             $user->password = bcrypt('password'); //demo 
-            $user->email = $data->motherr_email;
+            $user->email = $data->mother_email;
             $user->mobile_no = $data->mother_mobile_no;
             $user->email_verification_code = Str::random(40);
 
@@ -346,11 +346,11 @@ trait AdmissionUser
             $parent->user_id            =   $user->id;
             $parent->qualification_id   =   $data->mother_qualification_id;
             $parent->profession         =   $data->mother_occupation;
-            $parent->sub_occupation     =   $data->sub_occupation;
+            $parent->sub_occupation     =   $data->sub_occupation ?? null;
             $parent->designation        =   $data->mother_designation;
             $parent->organization_name  =   $data->mother_organisation;
             //$parent->official_address   =   $data->official_address;
-            $parent->relation           =   'Mother';
+            $parent->relation           =   'mother';
             $parent->annual_income      =   $data->mother_income;
 
             $parent->save();

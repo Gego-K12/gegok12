@@ -22,6 +22,7 @@ use App\Models\Subscription;
 use Illuminate\Http\Request;
 use App\Models\AcademicYear;
 use App\Helpers\SiteHelper;
+use Illuminate\Support\Facades\Log;
 use App\Traits\LogActivity;
 use App\Models\Userprofile;
 use App\Models\RoleUser;

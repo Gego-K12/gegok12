@@ -160,7 +160,7 @@
             this.pg_degree          = this.user.pg_degree;
             this.specialization     = this.user.specialization;
             this.sub_qualification  = this.user.sub_qualification;
-            this.inputs             = this.user.qualification_id;
+            this.inputs             = this.user.qualification_id || [{ qualification_id: '' }];
 
             if(this.sub_qualification != null)
             {

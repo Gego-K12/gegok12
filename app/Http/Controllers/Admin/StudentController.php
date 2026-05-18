@@ -247,8 +247,8 @@ class StudentController extends Controller
       $array['id_card_number']            = $studentAcademic->id_card_number==NULL ? '':$studentAcademic->id_card_number;
       $array['board_registration_number'] = $studentAcademic->board_registration_number==NULL ? '':$studentAcademic->board_registration_number;
       $array['mode_of_transport']         = $studentAcademic->mode_of_transport;
-      $array['driver_name']               = $studentAcademic->transport_details['driver_name'];
-      $array['driver_contact_number']     = $studentAcademic->transport_details['driver_contact_number'];
+      $array['driver_name']               = is_array($studentAcademic->transport_details) ? ($studentAcademic->transport_details['driver_name'] ?? '') : '';
+      $array['driver_contact_number']     = is_array($studentAcademic->transport_details) ? ($studentAcademic->transport_details['driver_contact_number'] ?? '') : '';
       $array['siblings']                  = $studentAcademic->siblings;
       $array['siblings_count']            = $studentAcademic->siblings_count;
 

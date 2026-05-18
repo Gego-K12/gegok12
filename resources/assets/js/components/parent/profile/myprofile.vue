@@ -17,9 +17,9 @@
             <span class="text-gray-700 font-medium mx-2">Profession : </span>
           </div>
           <div>
-            <p v-if="user.profession == 'home_maker'">{{ user.profession }}</p>
-            <p v-if="user.profession == null"> -- </p>
-            <p v-else>{{ user.sub_occupation }}</p>
+            <p v-if="user.profession">{{ user.profession.replace(/_/g, ' ') }}</p>
+            <p v-else-if="user.sub_occupation">{{ user.sub_occupation }}</p>
+            <p v-else> -- </p>
           </div>
         </li>
         <li class="flex py-1">

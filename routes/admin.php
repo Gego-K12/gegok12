@@ -21,6 +21,7 @@ Route::get( '/admission/show/{id}', 'AdmissionController@show' );
 Route::get( '/admission/edit/{id}', 'AdmissionController@edit' );
 Route::post( '/admission/update/{id}', 'AdmissionController@update' );
 Route::get( '/admission/delete/{id}', 'AdmissionController@destroy' );
+Route::post( '/admission/import-approved', 'AdmissionController@importApproved' );
 
 
 

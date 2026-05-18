@@ -45,6 +45,9 @@ class TelephoneDirectoryController extends Controller
 
         $users = User::where('school_id', Auth::user()->school_id)
         ->whereNotIn('usergroup_id', [1, 2, 3, 4])
+        ->whereHas('userprofile', function($query) {
+            $query->where('status', 'active');
+        })
         ->get();
 
     // $merged = $numberlist->merge($users);

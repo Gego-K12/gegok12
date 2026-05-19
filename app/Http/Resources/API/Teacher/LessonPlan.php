@@ -3,6 +3,7 @@
 namespace App\Http\Resources\API\Teacher;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Auth;
 
 class LessonPlan extends JsonResource
 {
@@ -28,6 +29,16 @@ class LessonPlan extends JsonResource
         {
             $duration = $hour.' hours '.$minutes.' minutes';
         }
+
+        $user = Auth::user();
+        $role = null;
+
+        if ($user && $user->hasRole('principal')) {
+            $role = 'principal';
+        } elseif ($user && $user->hasRole('teacher')) {
+            $role = 'teacher';
+        }
+
         return 
         [
             //
@@ -42,8 +53,9 @@ class LessonPlan extends JsonResource
             'status'            =>  $this->status,
             'start_date'        =>  $this->start_date ? date('d-m-Y', strtotime($this->start_date)) : null,
             'end_date'          =>  $this->end_date ? date('d-m-Y', strtotime($this->end_date)) : null,
-            'is_published'            =>  $this->is_published,
-            'published_at'            =>  $this->published_at ? date('d-m-Y', strtotime($this->published_at)) : null,
+            'is_published'      =>  $this->is_published,
+            'published_at'      =>  $this->published_at ? date('d-m-Y', strtotime($this->published_at)) : null,
+            'role'              => $role,
         ];
     }
 }

@@ -32,6 +32,21 @@ Route::group([
     Route::post('/teacher/logout/devices', 'LoginController@logoutDevices');
 });
 
+// lesson-plan-approval
+Route::group([
+    'prefix' => 'teacher',
+    'middleware' => ['auth:sanctum', 'role:principal'],
+    'namespace' => 'Api\Teacher'
+], function () {
+
+    // approve
+    Route::post('/lessonplan/approve/{id}', 'LessonPlanController@approve');
+
+    // reject
+    Route::post('/lessonplan/reject/{id}', 'LessonPlanController@reject');
+
+});
+
 Route::group([ 'prefix' => 'teacher' , 'middleware'=>['auth:sanctum'] , 'namespace' =>'Api\Teacher' ], 
     function() 
 {

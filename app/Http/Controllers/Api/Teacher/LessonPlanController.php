@@ -15,6 +15,7 @@ use App\Http\Requests\LessonPlanStep2Request;
 use App\Http\Requests\LessonPlanStep3Request;
 use App\Http\Requests\LessonPlanStep4Request;
 use Illuminate\Http\Request;
+use App\Models\LessonPlanApproval;
 use App\Traits\LogActivity;
 use App\Helpers\SiteHelper;
 use App\Models\LessonPlan;
@@ -414,6 +415,11 @@ class LessonPlanController extends Controller
             $lessonplan->notes = $request->notes;
             $lessonplan->modification = $request->modification;
             $lessonplan->status = 'pending';
+            
+            if(Auth::user()->hasRole('principal'))
+            {
+                $lessonplan->status = 'approved';
+            }
 
             $lessonplan->save();
 
@@ -546,6 +552,13 @@ class LessonPlanController extends Controller
         $hours   = isset($parts[0]) ? (int) $parts[0] : 0;
         $minutes = isset($parts[1]) ? (int) $parts[1] : 0;
 
+        $user = Auth::user();
+        $role = null;
+
+        if ($user && $user->hasRole('principal')) {
+            $role = 'principal';
+        }
+
         $array = [];
         
         $array['id']                    = $lessonplan->id;
@@ -568,10 +581,108 @@ class LessonPlanController extends Controller
         $array['end_date']              = $lessonplan->end_date;
         $array['is_published']          = $lessonplan->is_published;
         $array['published_at']          = $lessonplan->published_at;
+        $array['role']                  = $role;
 
         return response()->json([
                 'status' => true,
                 'data' => $array
             ], 200);
+    }
+     /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function approve(Request $request,$id)
+    {
+        \DB::beginTransaction();
+        try
+        {
+            $lessonplan             = LessonPlan::where('id',$id)->first();
+
+            $lessonplan->status     = 'approved';
+
+            $lessonplan->save();
+
+            $lessonplanapproval = new LessonPlanApproval;
+
+            $lessonplanapproval->lesson_plan_id     =   $lessonplan->id;
+            $lessonplanapproval->comments           =   $request->comments;
+            $lessonplanapproval->approved_by        =   Auth::id();
+            $lessonplanapproval->approved_at        =   date('Y-m-d');
+
+            $lessonplanapproval->save();
+
+            $message=trans('messages.approve_success_msg',['module' => 'Lesson Plan']);
+
+            $ip= $this->getRequestIP();
+            $this->doActivityLog(
+                $lessonplanapproval,
+                Auth::user(),
+                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT'] ],
+                LOGNAME_APPROVE_LESSON_PLAN,
+                $message
+            );
+            $res['success'] = $message;
+
+            \DB::commit();
+            return $res;
+        }
+        catch(Exception $e)
+        {
+            \DB::rollBack();
+            //dd($e->getMessage());
+        }
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function reject(Request $request, $id)
+    {
+        //
+        \DB::beginTransaction();
+        try
+        {
+            $lessonplan             = LessonPlan::where('id',$id)->first();
+
+            $lessonplan->status     = 'rejected';
+
+            $lessonplan->save();
+
+            $lessonplanapproval = new LessonPlanApproval;
+
+            $lessonplanapproval->lesson_plan_id     =   $lessonplan->id;
+            $lessonplanapproval->comments           =   $request->comments;
+            $lessonplanapproval->approved_by        =   Auth::id();
+            $lessonplanapproval->approved_at        =   date('Y-m-d');
+
+            $lessonplanapproval->save();
+
+            $message=trans('messages.reject_success_msg',['module' => 'Lesson Plan']);
+
+            $ip= $this->getRequestIP();
+            $this->doActivityLog(
+                $lessonplanapproval,
+                Auth::user(),
+                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT'] ],
+                LOGNAME_REJECT_LESSON_PLAN,
+                $message
+            );
+            $res['success'] = $message;
+
+            \DB::commit();
+            return $res;
+        }
+        catch(Exception $e)
+        {
+            \DB::rollBack();
+            //dd($e->getMessage());
+        }
     }
 }

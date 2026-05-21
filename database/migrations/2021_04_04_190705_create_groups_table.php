@@ -21,7 +21,7 @@ return new class extends Migration
                   
             $table->string('group_name');
             $table->enum('type', ['global', 'class'])->default('class');
-            $table->boolean('status')->default(1)->;
+            $table->boolean('status')->default(1);
             $table->timestamps();
             $table->softDeletes();
         });

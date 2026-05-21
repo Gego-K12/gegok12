@@ -46,7 +46,11 @@ class Tag extends Model
      * @var array
      */
     protected $fillable = [
-        'tag_name'
+        'tag_name',
+        'name',
+        'slug',
+        'type',
+        'order_column',
     ];
 
     /**
@@ -54,7 +58,10 @@ class Tag extends Model
      *
      * @var array
      */
-
+    protected $casts = [
+        'name' => 'array',
+        'slug' => 'array',
+    ];
 
     /**
      * The attributes that should be mutated to dates.

@@ -773,6 +773,11 @@ Route::get('groups/{standardLinkId}', 'GroupController@index');
 Route::get('/groups/list', 'GroupController@list');
 Route::post('/groups/add-members', 'GroupController@addMembers');
 
+//student tag
+Route::get('/student-tags', 'StudentTagController@index');
+Route::get('/student/{id}/tags', 'StudentTagController@show');
+Route::post('/student/{id}/tags', 'StudentTagController@sync');
+
 //Addons
 
 Route::get('/addon', function () {

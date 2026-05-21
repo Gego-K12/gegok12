@@ -7,6 +7,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Spatie\Tags\HasTags;
 
 /**
  * Class StudentAcademic
@@ -54,6 +55,7 @@ class StudentAcademic extends Model
     //
     use SoftDeletes;
     use HasFactory;
+     use HasTags;
 
     /**
      * The table associated with the model.

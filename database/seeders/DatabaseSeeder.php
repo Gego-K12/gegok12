@@ -63,5 +63,6 @@ class DatabaseSeeder extends Seeder
         // $this->call(HomeworkSeeder::class); //test
         $this->call(NoticeBoardSeeder::class); //test
         $this->call(PayrollSeeder::class); //test
+        $this->call(TagSeeder::class);
     }
 }

@@ -6,6 +6,7 @@
 namespace App\Models\Users;
 
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class StudentUser
@@ -82,5 +83,42 @@ class StudentUser extends User
             $data[] = $child->userStudent->FullName . ' (' . $child->userStudent->studentAcademicLatest->standardLink->StandardSection . ')';
         }
         return implode(', ', $data);
+    }
+    /**
+     * Scope to filter students by tag.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param string $tag
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeByStudentTag($query, $tag)
+    {
+        // return $query->whereHas('studentAcademic', function ($q) use ($tag) {
+        //     $q->whereIn('id', function ($sub) use ($tag) {
+        //         $sub->select('taggables.taggable_id')
+        //             ->from('taggables')
+        //             ->join('tags', 'tags.id', '=', 'taggables.tag_id')
+        //             ->where('taggables.taggable_type', 'App\\Models\\StudentAcademic')
+        //             ->where('tags.type', 'student')
+        //             ->where(function ($tagQuery) use ($tag) {
+        //                 $tagQuery->where('tags.tag_name', $tag)
+        //                     ->orWhere('tags.name->en', $tag);
+        //             });
+        //     });
+        // });
+
+         return $query->whereHas('studentAcademic', function ($q) use ($tag) {
+        $q->whereIn('id', function ($sub) use ($tag) {
+            $sub->select('taggables.taggable_id')
+                ->from('taggables')
+                ->join('tags', 'tags.id', '=', 'taggables.tag_id')
+                ->where('taggables.taggable_type', 'App\\Models\\StudentAcademic')
+                ->where('tags.type', 'student')
+                ->where(function ($tagQuery) use ($tag) {
+                    $tagQuery->where('tags.tag_name', $tag)
+                        ->orWhere('tags.name->en', $tag);
+                });
+        });
+    });
     }
 }

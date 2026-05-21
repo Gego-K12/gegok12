@@ -101,7 +101,7 @@
     </li>
     <!--end-->
 
-    <li class="py-3 px-3 {{ in_array(Request::segment(2), ['standardlinks', 'standardlink', 'standardLink']) ? 'active' : '' }}">
+    <li class="py-3 px-3 {{ in_array(Request::segment(2), ['groups']) ? 'active' : '' }}">
     <a href="{{ url('/admin/groups') }}" class="flex items-center whitespace-no-wrap">
 
         <!-- Group Icon -->

@@ -28,7 +28,8 @@ class GroupList extends Component
         return [
             'group_name' => 'required|string|max:255',
             'type' => 'nullable|string|max:255',
-            'standardLink_id' => 'required',
+
+            'standardLink_id' => 'required_if:type,class',
         ];
     }
 

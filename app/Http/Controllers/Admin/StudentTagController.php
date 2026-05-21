@@ -8,6 +8,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\StudentAcademic;
+use App\Models\Users\StudentUser;
 use App\Models\SpatieTag;
 
 class StudentTagController extends Controller
@@ -25,7 +26,7 @@ class StudentTagController extends Controller
 
     public function show($id)
     {
-        $student = StudentAcademic::findOrFail($id);
+        $student = StudentUser::findOrFail($id);
 
         return response()->json([
             'tags' => $student->tags->pluck('tag_name')->values(),
@@ -39,9 +40,9 @@ class StudentTagController extends Controller
             'tags.*' => 'string',
         ]);
 
-        $student = StudentAcademic::findOrFail($id);
+        $user = StudentUser::findOrFail($id);
 
-        $student->syncTagsWithType($request->tags ?? [], 'student');
+        $user->syncTagsWithType($request->tags ?? [], 'student');
 
         return response()->json([
             'message' => 'Student tags updated successfully',

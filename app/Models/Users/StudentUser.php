@@ -7,6 +7,7 @@ namespace App\Models\Users;
 
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Spatie\Tags\HasTags;
 
 /**
  * Class StudentUser
@@ -29,6 +30,7 @@ use Illuminate\Support\Facades\DB;
  */
 class StudentUser extends User
 {
+    use HasTags;
     /**
      * Scope to filter students by standard/grade.
      *
@@ -93,32 +95,7 @@ class StudentUser extends User
      */
     public function scopeByStudentTag($query, $tag)
     {
-        // return $query->whereHas('studentAcademic', function ($q) use ($tag) {
-        //     $q->whereIn('id', function ($sub) use ($tag) {
-        //         $sub->select('taggables.taggable_id')
-        //             ->from('taggables')
-        //             ->join('tags', 'tags.id', '=', 'taggables.tag_id')
-        //             ->where('taggables.taggable_type', 'App\\Models\\StudentAcademic')
-        //             ->where('tags.type', 'student')
-        //             ->where(function ($tagQuery) use ($tag) {
-        //                 $tagQuery->where('tags.tag_name', $tag)
-        //                     ->orWhere('tags.name->en', $tag);
-        //             });
-        //     });
-        // });
 
-         return $query->whereHas('studentAcademic', function ($q) use ($tag) {
-        $q->whereIn('id', function ($sub) use ($tag) {
-            $sub->select('taggables.taggable_id')
-                ->from('taggables')
-                ->join('tags', 'tags.id', '=', 'taggables.tag_id')
-                ->where('taggables.taggable_type', 'App\\Models\\StudentAcademic')
-                ->where('tags.type', 'student')
-                ->where(function ($tagQuery) use ($tag) {
-                    $tagQuery->where('tags.tag_name', $tag)
-                        ->orWhere('tags.name->en', $tag);
-                });
-        });
-    });
+         return $query->withAnyTags([$tag], 'student');
     }
 }

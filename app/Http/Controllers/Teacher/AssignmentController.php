@@ -130,14 +130,15 @@ class AssignmentController extends Controller
             $assignment->marks              =   $request->marks;
             $assignment->assigned_date      =   date('Y-m-d',strtotime($request->assigned_date));
             $assignment->submission_date    =   date('Y-m-d',strtotime($request->submission_date));
-            if($request->assigned_date == date('Y-m-d'))
-            {
-                $assignment->status             =   'ongoing';
-            }
-            else
-            {
-                $assignment->status             =   'pending';
-            }
+            $assignment->status             = $request->status;
+            // if($request->assigned_date == date('Y-m-d'))
+            // {
+            //     $assignment->status             =   'ongoing';
+            // }
+            // else
+            // {
+            //     $assignment->status             =   'pending';
+            // }
 
             $assignment->save();
 
@@ -264,14 +265,15 @@ class AssignmentController extends Controller
             $assignment->marks              =   $request->marks;
             $assignment->assigned_date      =   date('Y-m-d',strtotime($request->assigned_date));
             $assignment->submission_date    =   date('Y-m-d',strtotime($request->submission_date));
-            if($request->assigned_date == date('Y-m-d'))
-            {
-                $assignment->status             =   'ongoing';
-            }
-            else
-            {
-                $assignment->status             =   'pending';
-            }
+            $assignment->status             = $request->status;
+            // if($request->assigned_date == date('Y-m-d'))
+            // {
+            //     $assignment->status             =   'ongoing';
+            // }
+            // else
+            // {
+            //     $assignment->status             =   'pending';
+            // }
 
             $assignment->save();
 

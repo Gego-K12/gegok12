@@ -167,17 +167,20 @@ class AssignmentController extends Controller
             }
 
             $assignment->marks              =   $request->marks;
-            $assigned_date = date('Y-m-d',strtotime($request->assigned_date));
-            $assignment->assigned_date      =   $assigned_date;
-            $assignment->submission_date    =   date('Y-m-d',strtotime($request->submission_date));
-            if($assigned_date == date('Y-m-d'))
-            {
-                $assignment->status             =   'ongoing';
-            }
-            else
-            {
-                $assignment->status             =   'pending';
-            }
+            $assignment->assigned_date = $request->assigned_date ? date('Y-m-d', strtotime($request->assigned_date)) : null;
+
+            $assignment->submission_date = !empty($request->submission_date) ? date('Y-m-d', strtotime($request->submission_date)) : null;
+            
+            $assignment->status             =   $request->status;
+
+            // if($assigned_date == date('Y-m-d'))
+            // {
+            //     $assignment->status             =   'ongoing';
+            // }
+            // else
+            // {
+            //     $assignment->status             =   'pending';
+            // }
 
             $assignment->save();
 
@@ -306,17 +309,19 @@ class AssignmentController extends Controller
 
 
             $assignment->marks              =   $request->marks;
-            $assigned_date = date('Y-m-d',strtotime($request->assigned_date));
-            $assignment->assigned_date      =   $assigned_date;
-            $assignment->submission_date    =   date('Y-m-d',strtotime($request->submission_date));
-            if($assigned_date == date('Y-m-d'))
-            {
-                $assignment->status             =   'ongoing';
-            }
-            else
-            {
-                $assignment->status             =   'pending';
-            }
+            $assignment->assigned_date = $request->assigned_date ? date('Y-m-d', strtotime($request->assigned_date)) : null;
+
+            $assignment->submission_date = !empty($request->submission_date) ? date('Y-m-d', strtotime($request->submission_date)) : null;
+            
+            $assignment->status             =   $request->status;
+            // if($assigned_date == date('Y-m-d'))
+            // {
+            //     $assignment->status             =   'ongoing';
+            // }
+            // else
+            // {
+            //     $assignment->status             =   'pending';
+            // }
 
             $assignment->save(); 
 

@@ -115,11 +115,14 @@ class TaskController extends Controller
         DB::beginTransaction();
 
         try {
-
+            
             foreach ($request->task_completed as $id)
             {
-                $assignee = TaskAssignee::findOrFail($id);
-
+                $assignee = TaskAssignee::where([
+                    ['task_id', $id],
+                    ['user_id', Auth::id()]
+                ])->first();
+                
                 $assignee->update([
                     'status' => 'completed',
                     // 'claimed_by' => Auth::id(),

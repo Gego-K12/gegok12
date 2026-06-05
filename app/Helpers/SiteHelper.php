@@ -59,7 +59,7 @@ class SiteHelper
     {
         $schoolCacheKey = "academic_year_for_school_" . $school_id;
         return Cache::remember($schoolCacheKey, env('CACHE_TIME'), function () use ($school_id) {
-            $academic_year = AcademicYear::where([['school_id', $school_id]]);   //['status',1]
+            $academic_year = AcademicYear::where([['school_id', $school_id],['status',1]]);   //['status',1]
             if (Cache::has('academic_year') && Cache::get('academic_year') != '') {
                 $academic_year_id = Cache::get('academic_year');
                 $academic_year = $academic_year->where('id', $academic_year_id);

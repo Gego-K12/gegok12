@@ -54,7 +54,13 @@ Route::group([ 'namespace' =>'Approval' ], function () {
 
             //reject
             Route::post('/assignment/reject/{id}', 'AssignmentApprovalController@reject');
+
+            Route::post('/homework/approve/{id}', 'HomeWorkApprovalController@approve');
+
+            //reject
+            Route::post('/homework/reject/{id}', 'HomeWorkApprovalController@reject');
         });
+
     //with approval  
 });
 

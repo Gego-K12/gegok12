@@ -99,6 +99,28 @@ class SettingsTableSeeder extends Seeder
             'updated_at'    => date("Y-m-d H:i:s"), 
 
         ]);
+        DB::table('settings')->insert([
+            'key'           => 'assignment_status',
+            'name'          => 'Assignment Status',
+            'description'   => 'Assignment Status',
+            'value'         => 1,
+            'field'         => '{"name":"value","label":"Register Status" ,"type":"radio", "options":{"1":"Active", "0":"Inactive"}}',
+            'active'        => 1,
+            'created_at'    => date("Y-m-d H:i:s"),
+            'updated_at'    => date("Y-m-d H:i:s"), 
+
+        ]);
+        DB::table('settings')->insert([
+            'key'           => 'homework_status',
+            'name'          => 'Homework Status',
+            'description'   => 'Homework Status',
+            'value'         => 1,
+            'field'         => '{"name":"value","label":"Register Status" ,"type":"radio", "options":{"1":"Active", "0":"Inactive"}}',
+            'active'        => 1,
+            'created_at'    => date("Y-m-d H:i:s"),
+            'updated_at'    => date("Y-m-d H:i:s"), 
+
+        ]);
 
       
     }

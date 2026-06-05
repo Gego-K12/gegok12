@@ -18,4 +18,14 @@ class GroupMember extends Model
         'group_id' , 'member_id' ,'member_type'
     ];
 
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'member_id');
+    }
+
+    public function userprofile()
+    {
+        return $this->hasOne(Userprofile::class, 'user_id', 'member_id');
+    }
+
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Resources\API\Teacher;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Auth;
 
 class Assignment extends JsonResource
 {
@@ -68,6 +69,12 @@ class Assignment extends JsonResource
         {
             $show = 0;
         }
+
+        $role = 'teacher';
+        if(Auth::user()->hasRole('principal'))
+        {
+            $role = 'principal';
+        }
         
         return 
         [
@@ -91,6 +98,8 @@ class Assignment extends JsonResource
             //'student_assignment_id'     =>  $this->studentAssignment->id,
             'show'                      =>  $show,
             'type'                      =>  $type,
+            'approve_status'            =>  $this->assignmentApproval->status,
+            'role'                      =>  $role  
         ];
     }
 }

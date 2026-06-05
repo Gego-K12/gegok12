@@ -6,13 +6,14 @@
                 <a href="#" class="text-gray-700 font-medium" @click="setProfileTab('pending')" v-else>Pending</a>
             </li> -->
 
-            <li class="px-2 mx-1 py-1" v-bind:class="[{'active' : status === 'publish'}]">
-                <a href="#" class="text-gray-700 font-medium" @click="setProfileTab('publish')">Published</a>
-            </li>
-
             <li class="px-2 mx-1 py-1" v-bind:class="[{'active' : status === 'draft'}]">
                 <a href="#" class="text-gray-700 font-medium" @click="setProfileTab('draft')">Draft</a>
             </li>
+
+            <li class="px-2 mx-1 py-1" v-bind:class="[{'active' : status === 'publish'}]">
+                <a href="#" class="text-gray-700 font-medium" @click="setProfileTab('publish')">Publish</a>
+            </li>
+
         </ul>
 
         <Teleport to="#list_homework">
@@ -30,7 +31,7 @@
         props:['url' , 'role' , 'mode' , 'scope' , 'hidecolumns', 'searchquery'],
         data () {
             return {
-                status:'publish',     
+                status:'draft',     
             }
         },
         components: {

@@ -19,5 +19,9 @@ class Group extends Model
     {
         return $this->hasMany(GroupMember::class,'id','group_id');
     }
+    public function standardlink()
+    {
+        return $this->belongsTo(StandardLink::class,'standardLink_id');
+    }
 
 }

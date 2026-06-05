@@ -942,6 +942,16 @@
                     <span class="mx-3 whitespace-no-wrap">Cities</span>
                 </a>
             </li>
+            <li class="py-3 px-3 hover:font-semibold {{Request::segment ('3') == 'cities' ? 'active':''}} && {{Request::segment ('3') == 'city' ? 'active':''}}">
+                <a href="{{ url('/admin/settings/generalsettings') }}" class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                     stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M4.5 12a7.5 7.5 0 1115 0 7.5 7.5 0 01-15 0Zm7.5-3v3m0 3h.008v.008H12V15Z" />
+                </svg>
+                    <span class="mx-3 whitespace-no-wrap">Settings</span>
+                </a>
+            </li>
         </ul>
     </li>
     <!-- end -->

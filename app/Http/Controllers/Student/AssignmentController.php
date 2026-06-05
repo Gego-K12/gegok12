@@ -54,8 +54,10 @@ class AssignmentController extends Controller
                     ['academic_year_id',$academic_year->id],
                     ['standardLink_id',Auth::user()->studentAcademicLatest->standardLink_id],
                     ['submission_date','<=',date('Y-m-d')],
-                    ['status','completed']
-                ]);
+                    ['status','ongoing']
+                ])->whereHas('assignmentApproval' , function($query) {
+                    $query->where('status','approved');
+                });
             }
 
             if($request->search != null)

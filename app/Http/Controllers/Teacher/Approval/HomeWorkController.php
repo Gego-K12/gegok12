@@ -43,12 +43,19 @@ class HomeWorkController extends Controller
         $homework = Homework::where([
             ['school_id',$school_id],
             ['academic_year_id',$academic_year->id],
-            ['teacher_id',Auth::id()]
-        ])
-        ->where('status',$status)
-        ->orderBy('date','DESC');
-        // ->whereHas('homeworkApproval' ,function ($query) use ($status) {
-        //     $query->where('status',$status);
+            ['status',$status]
+        ])->orderBy('date','DESC');
+
+        $approve_status ='pending';
+
+        if(!Auth::user()->hasRole('principal'))
+        {
+            $homework = $homework->where('teacher_id',Auth::id());
+            $approve_status ='approved';
+        }
+
+        // $homework=$homework->whereHas('homeworkApproval' ,function ($query) use ($approve_status) {
+        //     $query->where('status',$approve_status);
         // });
         /*->orWhereHas('standardLink' , function ($q) use ($admin){
             $q->where('class_teacher_id',$admin);
@@ -81,9 +88,13 @@ class HomeWorkController extends Controller
      */
     public function index()
     { 
+        if(Auth::user()->hasRole('principal'))
+        {
+            $role = 'principal';
+        }
         $query = \Request::getQueryString();
 
-        return view('/teacher/homework/index' ,['query' => $query]);
+        return view('/teacher/homework/index' ,['role' => $role,'query' => $query]);
     }
 
     /**
@@ -179,10 +190,16 @@ class HomeWorkController extends Controller
 
             $admin = User::BySchool(Auth::user()->school_id)->ByRole(3)->first();
 
+            $status_approval='approved';
+            if(config('settings.homework_status') == 1)
+            {
+                $status_approval='pending';
+            }
+
             if($admin->id != Auth::id())
             {
                 $homeworkapproval->homework_id  = $work->id;
-                $homeworkapproval->status       = 'pending';
+                $homeworkapproval->status       = $status_approval;
 
                 $data = [];
 
@@ -197,7 +214,7 @@ class HomeWorkController extends Controller
                 $homeworkapproval->comments       = 'Created By Admin';
                 $homeworkapproval->approved_by    = Auth::id();
                 $homeworkapproval->approved_at    = date('Y-m-d');
-                $homeworkapproval->status         = 'approved';
+                $homeworkapproval->status         = $status_approval;
             }
             $homeworkapproval->save();
 

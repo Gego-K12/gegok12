@@ -61,11 +61,19 @@ class AssignmentController extends Controller
                     ['teacher_id',Auth::id()],
                     ['status',$status]
                 ]);
-            // ->whereHas('assignmentApproval' , function($query) use($status) {
-            //         $query->where('status',$status);
-            //     });
+
+            $approve_status =$status;
+            if($status=='ongoing')
+            {
+                $approve_status ='approved';
+
+            }
+
+            $assignment=$assignment->whereHas('assignmentApproval' , function($query) use($approve_status) {
+                    $query->where('status',$approve_status);
+                });
         }
-        // dump($status);
+       
         if(count((array)\Request::getQueryString())>0)
         {
             if($request->standardLink_id != '')
@@ -143,6 +151,7 @@ class AssignmentController extends Controller
      */
     public function store(AssignmentAddRequest $request)
     {
+        // dd('hii');
         //
         try
         {
@@ -173,7 +182,8 @@ class AssignmentController extends Controller
             
             $assignment->status             =   $request->status;
 
-            // if($assigned_date == date('Y-m-d'))
+
+            // if($assignment->assigned_date == date('Y-m-d'))
             // {
             //     $assignment->status             =   'ongoing';
             // }
@@ -181,13 +191,21 @@ class AssignmentController extends Controller
             // {
             //     $assignment->status             =   'pending';
             // }
+   
 
             $assignment->save();
 
             $assignmentapproval = new AssignmentApproval;
 
             $assignmentapproval->assignment_id  = $assignment->id;
-            $assignmentapproval->status         = 'pending';
+
+            $status_approval='approved';
+            if(config('settings.assignment_status') == 1)
+            {
+                $status_approval='pending';
+            }
+
+            $assignmentapproval->status         = $status_approval;
 
             $assignmentapproval->save();
 

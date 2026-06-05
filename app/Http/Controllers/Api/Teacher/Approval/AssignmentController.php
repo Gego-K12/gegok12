@@ -49,8 +49,13 @@ class AssignmentController extends Controller
         $query = Assignment::where([
             ['school_id', $school_id],
             ['academic_year_id', $academic_year->id],
-            ['teacher_id', Auth::id()],
+            // ['teacher_id', Auth::id()],
         ]);
+        if(!Auth::user()->hasRole('principal'))
+        {
+            $query = $query->where('teacher_id',Auth::id());
+
+        }
 
 
         // Filter: status
@@ -258,10 +263,16 @@ class AssignmentController extends Controller
             $assignmentapproval->assignment_id  = $assignment->id;
             // $assignmentapproval->status         = 'pending';
             // $assignmentapproval->status         = $request->status;
+            $status_approval='approved';
+
+            if(config('settings.assignment_status') == 1)
+            {
+                $status_approval='pending';
+            }
 
             // if ($request->status == 'completed')
             // {
-                $assignmentapproval->status         = 'approved';
+                $assignmentapproval->status         = $status_approval;
             // }
 
             $assignmentapproval->save();

@@ -102,22 +102,6 @@ Route::group([
 
     Route::get('/leave/delete/{id}','LeaveController@destroy'); 
 
-    //media files
-
-    Route::get('/my-school/media-files','VideosController@showfiles');
-
-	Route::get('/media-files/video/{student_id}','VideosController@showvideo');
-
-	Route::get('/media-files/audio/{student_id}','VideosController@showaudio');
-
-    Route::get('/media-files/image/{student_id}','VideosController@showimage');
-
-    Route::get('/value-education/image','VideosController@showimagevalueducation');
-
-    Route::get('/value-education/audio','VideosController@showaudiovalueducation');
-
-    Route::get('/value-education/video','VideosController@showvideovalueducation');
-
     //messages
 
     Route::get('/messages','FeedbackController@sentMessages');

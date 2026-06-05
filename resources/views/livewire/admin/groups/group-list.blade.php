@@ -31,7 +31,9 @@
                         <th class="border px-4 py-2 text-left">#</th>
                         <th class="border px-4 py-2 text-left">Group Name</th>
                         <th class="border px-4 py-2 text-left">Type</th>
-                        <th class="border px-4 py-2 text-left">Created At</th>
+                        <th class="border px-4 py-2 text-left">class</th>
+                        {{-- <th class="border px-4 py-2 text-left">Created At</th> --}}
+                        <th class="border px-4 py-2 text-left">Action</th>
                     </tr>
                 </thead>
 
@@ -51,7 +53,29 @@
                             </td>
 
                             <td class="border px-4 py-2">
+                                {{ $group->standardlink->standard_section }}
+                            </td>
+
+                            {{-- <td class="border px-4 py-2">
                                 {{ $group->created_at ? $group->created_at->format('d-m-Y') : '-' }}
+                            </td> --}}
+                            <td class="border px-4 py-2">
+                                <div class="flex gap-2">
+                                    <a href="{{ url('admin/group/'.$group->id.'/members') }}">
+                                        <button
+                                            class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs"
+                                        >
+                                            View
+                                        </button>
+                                    </a>
+                                    {{-- <a href="#">
+                                    <button
+                                        class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs"
+                                    >
+                                        Edit
+                                    </button>
+                                </a> --}}
+                                </div>
                             </td>
                         </tr>
                     @empty

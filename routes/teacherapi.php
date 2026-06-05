@@ -356,5 +356,11 @@ Route::group(['prefix' => 'teacher' , 'middleware' => ['auth:sanctum','role:prin
 
     //reject
     Route::post('/assignment/reject/{id}', 'AssignmentApprovalController@reject');
+
+    //approve
+    Route::post('/homework/approve/{id}', 'HomeworkApprovalController@approve');
+
+    //reject
+    Route::post('/homework/reject/{id}', 'HomeworkApprovalController@reject');
 });
 

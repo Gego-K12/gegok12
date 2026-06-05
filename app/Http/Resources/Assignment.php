@@ -58,7 +58,7 @@ class Assignment extends JsonResource
             'assigned_date'             =>  date('d M Y', strtotime($this->assigned_date)),
             'submission_date'           =>  date('d M Y', strtotime($this->submission_date)),
             'attachment'                =>  $attachment,
-            'status_display'            =>  $this->status == 'pending' ? 'Draft' : ($this->status == 'ongoing' ? 'Publish' : ucfirst($this->status)),
+            'status_display'            =>  ucfirst($this->assignmentApproval->status),
             'status'                    =>  $this->status,
             'comments'                  =>  $this->assignmentApproval->comments,
             'studentAssignmentStatus'   =>  $studentAssignmentStatus,
@@ -67,6 +67,7 @@ class Assignment extends JsonResource
             'marks'                     =>  $this->marks,
             'student_assignment_id'     =>  $this->studentAssignment->id,
             'show'                      =>  $show,
+            'approve_status'            =>  $this->assignmentApproval->status,
         ];
     }
 }

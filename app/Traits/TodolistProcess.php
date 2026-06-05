@@ -6,11 +6,14 @@ namespace App\Traits;
 
 use App\Events\Notification\SingleNotificationEvent;
 use App\Events\Notification\ClassNotificationEvent;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use App\Models\Users\StudentUser;
 use App\Events\StandardPushEvent;
 use App\Events\SinglePushEvent;
 use App\Models\TaskAssignee;
 use App\Traits\EventProcess;
+use App\Traits\LogActivity;
 use App\Models\Reminder;
 use App\Models\Task;
 use App\Models\User;
@@ -574,5 +577,73 @@ trait TodolistProcess
             Log::info($e->getMessage());
             dd($e->getMessage());
         } 
+    }
+    public function updatestatus($data)
+    {
+        DB::beginTransaction();
+
+        try {
+
+            foreach ($data->task_completed as $id)
+            {
+                $assignee = TaskAssignee::where([
+                    ['task_id', $id],
+                    ['user_id', Auth::id()]
+                ])->first();
+
+                $assignee->update([
+                    'status' => 'completed',
+                    // 'claimed_by' => Auth::id(),
+                ]);
+                // dd($assignee);
+
+                // Check all assignees completed
+                $pendingCount = TaskAssignee::where('task_id', $assignee->task_id)
+                    ->where('status', 'pending')
+                    ->count();
+
+                if ($pendingCount == 0)
+                {
+                    Task::where('id', $assignee->task_id)
+                        ->update([
+                            'task_status' => 1
+                        ]);
+                }
+
+                // Activity Log
+                $message = trans('messages.task_check_success_msg');
+
+                $ip = $this->getRequestIP();
+
+                $this->doActivityLog(
+                    $assignee,
+                    Auth::user(),
+                    [
+                        'ip' => $ip,
+                        'details' => request()->userAgent()
+                    ],
+                    LOGNAME_MARK_TASK_COMPLETE,
+                    $message
+                );
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+            ]);
+
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+            Log::error($e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong'
+            ], 500);
+        }
     }
 }

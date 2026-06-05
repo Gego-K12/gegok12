@@ -3,6 +3,7 @@
 namespace App\Http\Resources\API\Teacher;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Auth;
 
 class Homework extends JsonResource
 {
@@ -53,6 +54,11 @@ class Homework extends JsonResource
             $attachment = '';
             $type='';
         }
+        $role = 'teacher';
+        if(Auth::user()->hasRole('principal'))
+        {
+            $role = 'principal';
+        }
 
 
         return 
@@ -69,6 +75,8 @@ class Homework extends JsonResource
             'comments'          =>  $this->homeworkApproval->comments,
             'type'              =>  $type,
             'submission_date'   => $this->submission_date ? date('d-m-Y', strtotime($this->submission_date)) : '',
+            'approve_status'            =>  $this->homeworkApproval->status,
+            'role'                      =>  $role 
         ];
     }
 }

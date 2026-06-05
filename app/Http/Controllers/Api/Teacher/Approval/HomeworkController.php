@@ -53,9 +53,14 @@ class HomeworkController extends Controller
         $query = Homework::where([
             ['school_id',Auth::user()->school_id],
             ['academic_year_id',$academic_year->id],
-            ['teacher_id',Auth::id()],
+            // ['teacher_id',Auth::id()],
             ['date','>=',date('Y-m-d')]
         ]);
+
+        if(!Auth::user()->hasRole('principal'))
+        {
+            $query = $query->where('teacher_id',Auth::id());
+        }
 
         //  Filter by standardLink_id (dynamic)
         if (isset($request->standardLink_id)) {
@@ -148,8 +153,14 @@ class HomeworkController extends Controller
         $query = Homework::where([
             ['school_id',Auth::user()->school_id],
             ['academic_year_id',$academic_year->id],
-            ['teacher_id',Auth::id()],
+            // ['teacher_id',Auth::id()],
         ]);
+
+        if(!Auth::user()->hasRole('principal'))
+        {
+            $query = $query->where('teacher_id',Auth::id());
+
+        }
 
         // // Optional: status filter (if needed)
         if (isset($request->status)) 
@@ -299,7 +310,13 @@ class HomeworkController extends Controller
 
             $homeworkapproval->homework_id    = $work->id;
             // $homeworkapproval->status         = 'pending';
-            $homeworkapproval->status         = 'approved';
+            $status_approval='approved';
+
+            if(config('settings.homework_status') == 1)
+            {
+                $status_approval='pending';
+            }
+            $homeworkapproval->status         = $status_approval;
 
             $homeworkapproval->save();
 

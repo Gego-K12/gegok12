@@ -12,6 +12,7 @@ use App\Models\SchoolDetail;
 use Illuminate\Http\Request;
 use App\Helpers\SiteHelper;
 use App\Models\School;
+use App\Models\Setting;
 use App\Traits\Common;
 
 class SchoolController extends Controller
@@ -45,6 +46,17 @@ class SchoolController extends Controller
         $array['state']                 = $school->state->name;
         $array['city']                  = $school->city->name;
         $array['pincode']               = $school->pincode; 
+
+        $settings = Setting::whereIn('key', [
+            'assignment_status',
+            'homework_status'
+        ])
+        ->pluck('value', 'key');
+
+        $array['settings'] = [
+        'assignmentStatus' => (int)($settings['assignment_status'] ?? 1),
+        'homeworkStatus'   => (int)($settings['homework_status'] ?? 1),
+    ];
         
         return response()->json([
             'success'   =>  true,
@@ -99,7 +111,18 @@ class SchoolController extends Controller
         $array['country']               = $school->country->name;
         $array['state']                 = $school->state->name;
         $array['city']                  = $school->city->name;
-        $array['pincode']               = $school->pincode; 
+        $array['pincode']               = $school->pincode;
+
+         $settings = Setting::whereIn('key', [
+            'assignment_status',
+            'homework_status'
+        ])
+        ->pluck('value', 'key');
+
+        $array['settings'] = [
+        'assignmentStatus' => (int)($settings['assignment_status'] ?? 1),
+        'homeworkStatus'   => (int)($settings['homework_status'] ?? 1),
+    ];
         
         return response()->json([
             'success'   =>  true,

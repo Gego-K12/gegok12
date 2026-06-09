@@ -172,8 +172,7 @@ class TaskController extends Controller
             DB::commit();
 
             return response()->json([
-                'success' => true,
-                'message' => $message,
+                'success' => $message,
             ]);
 
         } catch (\Exception $e) {

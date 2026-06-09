@@ -41,6 +41,13 @@
                         </div>
                     </div> 
                     <div class="relative flex items-center w-full lg:w-1/3 md:w-1/3 lg:justify-end mx-3 lg:mx-0 md:mx-0 my-2 lg:my-0 md:my-0" v-if="this.selectedUsersCount > 0">
+                        <a
+                            href="#"
+                            class="no-underline text-white px-4 my-3 mx-1 flex items-center custom-green py-1 justify-center"
+                            @click="showModal('tag')"
+                        >
+                            Add Tag
+                        </a>
                         <a href="#" class="btn btn-submit blue-bg text-white px-3 py-1 text-sm font-medium rounded mx-1" @click="showModal('message')">Send Message</a>
                        <a href="#" class="btn btn-submit blue-bg text-white px-3 py-1  text-sm font-medium rounded mx-1" @click="showModal('shift')">Shift</a>
                        <a href="#" class="no-underline text-white  px-4 my-3 mx-1 flex items-center custom-green py-1 justify-center" @click="showModal('group')">Add Group</a>
@@ -347,6 +354,54 @@
         </div>
     </div>
 </div>
+<div v-if="this.tab == 'tag'" class="modal modal-mask">
+    <div class="modal-wrapper px-4">
+        <div class="modal-container w-full max-w-md px-8 mx-auto">
+
+            <div class="modal-header flex justify-between items-center">
+                <h2>Add Tag To Students</h2>
+
+                <button
+                    class="modal-default-button text-2xl py-1"
+                    @click="closeModal()"
+                >
+                    &times;
+                </button>
+            </div>
+
+            <div class="modal-body">
+
+                <label class="tw-form-label">Tag Name</label>
+
+                <input
+                    type="text"
+                    class="tw-form-control w-full"
+                    v-model="tag_name"
+                    placeholder="Enter Tag Name"
+                >
+
+                <span
+                    v-if="errors.tag_name"
+                    class="text-red-500 text-xs font-semibold"
+                >
+                    {{ errors.tag_name[0] }}
+                </span>
+
+            </div>
+
+            <div class="my-6">
+                <a
+                    href="#"
+                    class="btn btn-submit blue-bg text-white rounded px-3 py-1"
+                    @click="submitTag()"
+                >
+                    Save Tag
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
     </div>
 </template>
 
@@ -396,6 +451,7 @@
                 isFeeEnabled: window.AppConfig?.gfee_enabled ?? false,
                 groups: [],
                 group_id: '',
+                tag_name: '',
             }
         },
 
@@ -596,13 +652,13 @@
             },
             getGroups()
             {
-                axios.get('/admin/groups/' + this.selected_standard)
+                axios.get('/admin/groups/list')
                 .then(response => {
-
+                    console.log('SUCCESS', response.data);
                     this.groups = response.data.data;
-
-                    console.log(this.groups);
-
+                })
+                .catch(error => {
+                    console.log('ERROR', error.response);
                 });
             },
 
@@ -725,6 +781,26 @@
 
                     this.tab = 0;
 
+                    window.location.reload();
+
+                }).catch(error => {
+
+                    this.errors = error.response.data.errors;
+
+                });
+            },
+            submitTag()
+            {
+                this.errors = [];
+                this.success = null;
+
+                axios.post('/admin/tags/add-students', {
+                    tag_name: this.tag_name,
+                    selectedUsers: this.selectedUsers,
+                }).then(response => {
+
+                    this.success = response.data.message;
+                    this.tab = 0;
                     window.location.reload();
 
                 }).catch(error => {

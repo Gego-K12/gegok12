@@ -781,6 +781,7 @@ Route::get('/group/{id}/members', function ($id) {
 Route::get('/student-tags', 'StudentTagController@index');
 Route::get('/student/{id}/tags', 'StudentTagController@show');
 Route::post('/student/{id}/tags', 'StudentTagController@sync');
+Route::post('/tags/add-students', 'StudentTagController@addStudents');
 
 //Addons
 

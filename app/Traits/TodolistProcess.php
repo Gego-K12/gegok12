@@ -10,11 +10,13 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\Users\StudentUser;
 use App\Events\StandardPushEvent;
+use App\Models\StudentAcademic;
 use App\Events\SinglePushEvent;
 use App\Models\TaskAssignee;
 use App\Traits\EventProcess;
 use App\Traits\LogActivity;
 use App\Models\Reminder;
+use App\Models\GroupMember;
 use App\Models\Task;
 use App\Models\User;
 use Carbon\Carbon;
@@ -83,10 +85,14 @@ trait TodolistProcess
             {
                 foreach ($data->class_ids as $class_id) 
                 {
+                    $students =StudentAcademic::where('standardLink_id',$class_id)->get();
+                    // dd($students);
+                    foreach($students as $student)
+                    {
+                        $this->storeTaskAssignee($task->id,'class', $student->user_id, $class_id);
+                    }
 
-                    $this->storeTaskAssignee($task->id,'class', null, $class_id);
-
-
+                    
                     $this->addClassReminder($school_id,$reminder_date,$task->title,$task->id,$data->standardLink_id);
 
                     $data=[];
@@ -200,8 +206,12 @@ trait TodolistProcess
             {
                 foreach ($data->groups as $group_id) 
                 {
+                    $groups =GroupMember::where('group_id',$group_id)->get();
+                    foreach($groups as $group)
+                    {
+                        $this->storeTaskAssignee($task->id,'group', $group->member_id, $group->group->standardLink_id,$group_id);
 
-                    $this->storeTaskAssignee($task->id,'group', null, null,$group_id);
+                    }
 
                     $teacher = User::where('id',$teacher_id)->first();
 
@@ -630,8 +640,7 @@ trait TodolistProcess
             DB::commit();
 
             return response()->json([
-                'success' => true,
-                'message' => $message,
+                'success' => $message,
             ]);
 
         } catch (\Exception $e) {

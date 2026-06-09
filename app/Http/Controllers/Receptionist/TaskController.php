@@ -69,31 +69,32 @@ class TaskController extends Controller
     {
         try
         {
-            if($request->selectedTaskCount > 0 )
-            {
-                foreach ($request->task_completed as $task_id) 
-                {
-                    $task = Task::where('id',$task_id)->first();
+            $task = $this->updatestatus($request);
+            // if($request->selectedTaskCount > 0 )
+            // {
+            //     foreach ($request->task_completed as $task_id) 
+            //     {
+            //         $task = Task::where('id',$task_id)->first();
 
-                    $task->task_status = 1;
+            //         $task->task_status = 1;
 
-                    $task->save();
+            //         $task->save();
 
-                    $message = trans('messages.task_check_success_msg');
+            //         $message = trans('messages.task_check_success_msg');
 
-                    $ip= $this->getRequestIP();
-                    $this->doActivityLog(
-                        $task,
-                        Auth::user(),
-                        ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT'] ],
-                        LOGNAME_MARK_TASK_COMPLETE,
-                        $message
-                    ); 
-                }
+            //         $ip= $this->getRequestIP();
+            //         $this->doActivityLog(
+            //             $task,
+            //             Auth::user(),
+            //             ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT'] ],
+            //             LOGNAME_MARK_TASK_COMPLETE,
+            //             $message
+            //         ); 
+            //     }
 
-                $res['success'] = $message;
-                return $res;
-            }
+                // $res['success'] = $message;
+                return $task;
+            // }
         }
         catch(Exception $e)
         {

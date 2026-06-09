@@ -88,8 +88,8 @@
                                 <tr>
                                     <th>#</th>
 
-                                    <th v-if="showUserColumn">Name</th>
-                                    <th v-if="showUserColumn">User Name</th>
+                                    <th>Name</th>
+                                    <th>User Name</th>
 
                                     <th>Assigned Type</th>
 
@@ -105,11 +105,11 @@
                                 <tr v-for="(assignee, index) in assignees" :key="assignee.id || index">
                                     <td>{{ index + 1 }}</td>
 
-                                    <td v-if="showUserColumn">
+                                    <td>
                                         {{ assignee.name || '-' }}
                                     </td>
 
-                                    <td v-if="showUserColumn">
+                                    <td>
                                         {{ assignee.username || '-' }}
                                     </td>
 

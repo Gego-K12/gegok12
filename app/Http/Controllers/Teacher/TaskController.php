@@ -18,6 +18,8 @@ use App\Models\TaskAssignee;
 use Illuminate\Http\Request;
 use App\Traits\LogActivity;
 use App\Helpers\SiteHelper;
+use App\Models\Users\StudentUser;
+use App\Models\Users\TeacherUser;
 use App\Traits\Common;
 use App\Models\Task;
 use App\Models\User;
@@ -162,10 +164,14 @@ class TaskController extends Controller
                     ['user_id', Auth::id()]
                 ])->first();
 
-                $assignee->update([
-                    'status' => 'completed',
-                    // 'claimed_by' => Auth::id(),
-                ]);
+                if($assignee)
+                {
+                    $assignee->update([
+                        'status' => 'completed',
+                        // 'claimed_by' => Auth::id(),
+                    ]);
+                }
+                
 
                 // Check all assignees completed
                 $pendingCount = TaskAssignee::where('task_id', $assignee->task_id)
@@ -179,29 +185,33 @@ class TaskController extends Controller
                             'task_status' => 1
                         ]);
                 }
-
-                // Activity Log
                 $message = trans('messages.task_check_success_msg');
 
-                $ip = $this->getRequestIP();
+                if($assignee)
+                {
 
-                $this->doActivityLog(
-                    $assignee,
-                    Auth::user(),
-                    [
-                        'ip' => $ip,
-                        'details' => request()->userAgent()
-                    ],
-                    LOGNAME_MARK_TASK_COMPLETE,
-                    $message
-                );
+                    // Activity Log
+
+
+                    $ip = $this->getRequestIP();
+
+                    $this->doActivityLog(
+                        $assignee,
+                        Auth::user(),
+                        [
+                            'ip' => $ip,
+                            'details' => request()->userAgent()
+                        ],
+                        LOGNAME_MARK_TASK_COMPLETE,
+                        $message
+                    );
+                }
             }
 
             DB::commit();
 
             return response()->json([
-                'success' => true,
-                'message' => $message,
+                'success' => $message,
             ]);
 
         } catch (\Exception $e) {
@@ -349,12 +359,12 @@ class TaskController extends Controller
         }
 
         if ($task->type == 'student' && count($selectedUsers) > 0) {
-            $students = User::whereIn('id', $selectedUsers)->get();
+            $students = StudentUser::whereIn('id', $selectedUsers)->get();
             $selected_students = UserResource::collection($students);
         }
 
         if ($task->type == 'teacher' && count($selectedTeachers) > 0) {
-            $teachers = User::whereIn('id', $selectedTeachers)->get();
+            $teachers = TeacherUser::whereIn('id', $selectedTeachers)->get();
             $selected_teachers = TeacherResource::collection($teachers);
         }
 

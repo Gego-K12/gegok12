@@ -31,7 +31,7 @@ class Task extends JsonResource
         {
             $snooze = 0;
         }
-        
+                
         return [
             //
             'task_id'           =>  $this->id,
@@ -53,6 +53,7 @@ class Task extends JsonResource
             'total_count'       =>  $this->taskAssignee->count(),
             'completion_count'  =>  $this->taskAssignee->where('status','completed')->count(),
             'task_assignee' => TaskAssigneeResource::collection($this->taskAssignee),
+            'task_completed' => $this->taskAssignee()->forUser()->completed()->exists(),
         ];
     }
 }

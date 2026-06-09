@@ -27,5 +27,9 @@ class GroupMember extends Model
     {
         return $this->hasOne(Userprofile::class, 'user_id', 'member_id');
     }
+    public function group()
+    {
+        return $this->belongsTo(Group::class, 'group_id','id');
+    }
 
 }

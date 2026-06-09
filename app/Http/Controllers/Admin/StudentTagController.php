@@ -6,6 +6,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StudentTagRequest;
 use Illuminate\Http\Request;
 use App\Models\StudentAcademic;
 use App\Models\Users\StudentUser;
@@ -48,4 +49,26 @@ class StudentTagController extends Controller
             'message' => 'Student tags updated successfully',
         ]);
     }
+    public function addStudents(StudentTagRequest $request)
+    {
+
+        $tag = SpatieTag::findOrCreate(
+            trim($request->tag_name),
+            'student'
+        );
+
+        foreach ($request->selectedUsers as $studentId) {
+
+            $student = StudentUser::find($studentId);
+
+            if ($student && !$student->tags()->where('tags.id', $tag->id)->exists()) {
+                $student->attachTag($tag);
+            }
+        }
+
+        return response()->json([
+            'message' => 'Tag assigned successfully'
+        ]);
+    }
+
 }

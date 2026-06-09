@@ -28,11 +28,18 @@ class GroupController extends Controller
             'data' => $group
         ]);
     }
-    public function index($standardLinkId)
+    public function index($standardLinkId = null)
     {
-        $groups = Group::where('standardLink_id', $standardLinkId)
-            ->latest()
-            ->get();
+
+        // dd($standardLinkId);
+        $groups = Group::query();
+
+        if (!empty($standardLinkId) && $standardLinkId !== 'null') {
+            $groups->where('standardLink_id', $standardLinkId);
+        }
+
+        $groups = $groups->latest()->get();
+
 
         return response()->json([
             'success' => true,
@@ -74,4 +81,5 @@ class GroupController extends Controller
     {
         return view('admin.groups.list');
     }
+
 }

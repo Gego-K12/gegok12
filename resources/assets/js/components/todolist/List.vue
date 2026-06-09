@@ -85,7 +85,11 @@
                         <div class="task-row-inner">
 
                             <!-- Checkbox -->
-                            <label class="checkbox-wrap" :for="'chk_'+list.task_id">
+                            <label
+                                v-if="type == 'to_me'"
+                                class="checkbox-wrap"
+                                :for="'chk_'+list.task_id"
+                            >
                                 <input
                                     class="task-checkbox"
                                     type="checkbox"
@@ -95,15 +99,22 @@
                                     @click="selectedCount(list.task_id,$event)"
                                 >
                                 <span class="checkbox-box">
-                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="checkbox-check">
-                                        <polyline points="20 6 9 17 4 12" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <svg viewBox="0 0 24 24" fill="none" class="checkbox-check">
+                                        <polyline points="20 6 9 17 4 12"
+                                            stroke="#fff"
+                                            stroke-width="2.5"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"/>
                                     </svg>
                                 </span>
                             </label>
 
                             <!-- Content -->
                             <div class="task-body">
-                                <div class="task-name" :class="{ 'task-name-done': task_completed.includes(list.task_id) }">
+                                <div
+                                    class="task-name"
+                                    :class="{ 'task-name-done': list.task_completed }"
+                                >
                                     {{ list.title }}
                                 </div>
 
@@ -174,8 +185,28 @@
                                         <path d="M458.742,19.142c-12.254-12.256-28.875-19.14-46.206-19.138c-17.341-0.05-33.979,6.846-46.199,19.149L141.534,243.937c-1.865,1.879-3.272,4.163-4.113,6.673l-34.133,102.4c-2.979,8.943,1.856,18.607,10.799,21.585c1.735,0.578,3.552,0.873,5.38,0.875c1.832-0.003,3.653-0.297,5.393-0.87l102.4-34.133c2.515-0.84,4.8-2.254,6.673-4.13l224.802-224.802C484.25,86.023,484.253,44.657,458.742,19.142z"/>
                                     </svg>
                                 </a> -->
-                                 <a :href="url+'/'+mode+'/task/view/'+list.task_id" title="View" class="act-btn act-btn-default">
-                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;stroke:#6b7280;stroke-width:2;stroke-linecap:round;stroke-linejoin:round">
+                                 <!-- Admin & Principal -->
+                                <a
+                                    v-if="mode == 'admin' || mode == 'principal' || mode == 'teacher'"
+                                    :href="url+'/'+mode+'/task/view/'+list.task_id"
+                                    title="View"
+                                    class="act-btn act-btn-default"
+                                >
+                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                </a>
+
+                                <!-- Remaining Users -->
+                                <a
+                                    v-else
+                                    href="#"
+                                    @click.prevent="showModal(list.task_id)"
+                                    title="View"
+                                    class="act-btn act-btn-default"
+                                >
+                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                                         <circle cx="12" cy="12" r="3"></circle>
                                     </svg>

@@ -770,7 +770,7 @@ Route::get( '/staffs/show-idcardprint/{name}', 'StaffController@showprintidcard'
 Route::post('/group/store', 'GroupController@store');
 Route::get('groups', 'GroupController@showlist');
 Route::get('groups/{standardLinkId}', 'GroupController@index');
-Route::get('/groups/list', 'GroupController@list');
+Route::get('/grouplist', 'GroupController@list');
 Route::post('/groups/add-members', 'GroupController@addMembers');
 
 Route::get('/group/{id}/members', function ($id) {

@@ -652,7 +652,7 @@
             },
             getGroups()
             {
-                axios.get('/admin/groups/list')
+                axios.get('/admin/grouplist')
                 .then(response => {
                     console.log('SUCCESS', response.data);
                     this.groups = response.data.data;

@@ -59,7 +59,7 @@ class SiteHelper
     {
         $schoolCacheKey = "academic_year_for_school_" . $school_id;
         return Cache::remember($schoolCacheKey, env('CACHE_TIME'), function () use ($school_id) {
-            $academic_year = AcademicYear::where([['school_id', $school_id]]);   //['status',1]
+            $academic_year = AcademicYear::where([['school_id', $school_id],['status',1]]);   //['status',1]
             if (Cache::has('academic_year') && Cache::get('academic_year') != '') {
                 $academic_year_id = Cache::get('academic_year');
                 $academic_year = $academic_year->where('id', $academic_year_id);
@@ -630,6 +630,31 @@ class SiteHelper
             })->get()->sortBy('userprofile.firstname');
         });
     }
+
+    public static function getDoToTeachers($school_id, $academic_year_id)
+    {
+        $key = "do_to_teacher_lists_" . $school_id . '_' . $academic_year_id;
+        return Cache::remember($key, env('CACHE_TIME'), function () use ($school_id, $academic_year_id) {
+            return TeacherUser::where('usergroup_id', 5)->where('status', 'active')->whereHas('teacherprofile', function ($query) use ($school_id, $academic_year_id) {
+                $query->where([
+                    ['school_id', $school_id],
+                    ['academic_year_id', $academic_year_id]
+                ]);
+            })->get()->sortBy('userprofile.firstname');
+        });
+    }
+     public static function getNonTeachers($school_id, $academic_year_id)
+    {
+        $key = "non_teacher_lists_" . $school_id . '_' . $academic_year_id;
+        return Cache::remember($key, env('CACHE_TIME'), function () use ($school_id, $academic_year_id) {
+            return TeacherUser::whereIn('usergroup_id', [8, 10, 11, 12])->where('status', 'active')->whereHas('teacherprofile', function ($query) use ($school_id, $academic_year_id) {
+                $query->where([
+                    ['school_id', $school_id],
+                    ['academic_year_id', $academic_year_id]
+                ]);
+            })->get()->sortBy('userprofile.firstname');
+        });
+    }
     /**
      * Get the count of pending leave applications under a teacher.
      *
@@ -713,8 +738,8 @@ class SiteHelper
     {
         $array = [];
 
-        $list_id = array('class', 'self', 'student', 'teacher');
-        $list_name = array('Class', 'Self', 'Student', 'Teachers');
+        $list_id = array('class', 'self', 'student', 'teacher','group','non_teaching');
+        $list_name = array('Class', 'Self', 'Student', 'Teachers','Group','Non-Teaching');
 
         return Cache::remember("task_assignee_list", env('CACHE_TIME'), function () use ($list_id, $list_name) {
             for ($i = 0; $i < count($list_name); $i++) {

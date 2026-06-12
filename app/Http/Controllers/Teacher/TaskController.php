@@ -12,11 +12,14 @@ use App\Http\Resources\User as UserResource;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TaskRequest;
+use Illuminate\Support\Facades\DB;
 use App\Traits\TodolistProcess;
 use App\Models\TaskAssignee;
 use Illuminate\Http\Request;
 use App\Traits\LogActivity;
 use App\Helpers\SiteHelper;
+use App\Models\Users\StudentUser;
+use App\Models\Users\TeacherUser;
 use App\Traits\Common;
 use App\Models\Task;
 use App\Models\User;
@@ -59,7 +62,7 @@ class TaskController extends Controller
                 $tasks = $tasks->where('title','LIKE','%'.$request->search.'%')->orWhere('to_do_list','LIKE','%'.$request->search.'%');
             }
         }
-        $tasks = $tasks->get(); 
+        $tasks = $tasks->orderby('id','desc')->get(); 
 
         $tasks = TaskResource::collection($tasks)->groupby('task_flag');
         
@@ -77,7 +80,8 @@ class TaskController extends Controller
     public function list(Request $request)
     {
         $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
-        $teachers = SiteHelper::getTeachers(Auth::user()->school_id,$academic_year->id);
+        $teachers = SiteHelper::getDoToTeachers(Auth::user()->school_id,$academic_year->id);
+        $non_teachers = SiteHelper::getNonTeachers(Auth::user()->school_id,$academic_year->id);
         $array = [];
 
         $standardlink_subject_list = SiteHelper::getStandardSubjectList(Auth::user()->school_id,Auth::id());
@@ -99,6 +103,7 @@ class TaskController extends Controller
         }
 
         $array['teachers']  = TeacherResource::collection($teachers);
+        $array['nonteachers']  = TeacherResource::collection($non_teachers);
         $array['task_date'] = date('Y-m-d');
 
         return response()->json($array);
@@ -109,42 +114,119 @@ class TaskController extends Controller
      * @param  Request  $request
      * @return array|null
      */
-    public function changestatus(Request $request)
+    // public function changestatus(Request $request)
+    // {
+    //     try
+    //     {
+    //         if( $request->selectedTaskCount > 0 ) // if( count($request->selectedTaskCount) > 0 )
+    //         {
+    //             foreach ($request->task_completed as $task_id) 
+    //             {
+    //                 $task = Task::where('id',$task_id)->first();
+
+    //                 $task->task_status = 1;
+
+    //                 $task->save();
+
+    //                 $message = trans('messages.task_check_success_msg');
+
+    //                 $ip= $this->getRequestIP();
+    //                 $this->doActivityLog(
+    //                     $task,
+    //                     Auth::user(),
+    //                     ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT'] ],
+    //                     LOGNAME_MARK_TASK_COMPLETE,
+    //                     $message
+    //                 ); 
+    //             }
+
+    //             $res['success'] = $message;
+    //             return $res;
+    //         }
+    //     }
+    //     catch(Exception $e)
+    //     {
+    //         Log::info($e->getMessage());
+    //         dd($e->getMessage());
+    //     }   
+    // }
+
+    public function changeStatus(Request $request)
     {
-        try
-        {
-            if( $request->selectedTaskCount > 0 ) // if( count($request->selectedTaskCount) > 0 )
+        DB::beginTransaction();
+
+        try {
+
+            foreach ($request->task_completed as $id)
             {
-                foreach ($request->task_completed as $task_id) 
+                $assignee = TaskAssignee::where([
+                    ['task_id', $id],
+                    ['user_id', Auth::id()]
+                ])->first();
+
+                if($assignee)
                 {
-                    $task = Task::where('id',$task_id)->first();
+                    $assignee->update([
+                        'status' => 'completed',
+                        // 'claimed_by' => Auth::id(),
+                    ]);
+                }
+                
 
-                    $task->task_status = 1;
+                // Check all assignees completed
+                $pendingCount = TaskAssignee::where('task_id', $assignee->task_id)
+                    ->where('status', 'pending')
+                    ->count();
 
-                    $task->save();
+                if ($pendingCount == 0)
+                {
+                    Task::where('id', $assignee->task_id)
+                        ->update([
+                            'task_status' => 1
+                        ]);
+                }
+                $message = trans('messages.task_check_success_msg');
 
-                    $message = trans('messages.task_check_success_msg');
+                if($assignee)
+                {
 
-                    $ip= $this->getRequestIP();
+                    // Activity Log
+
+
+                    $ip = $this->getRequestIP();
+
                     $this->doActivityLog(
-                        $task,
+                        $assignee,
                         Auth::user(),
-                        ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT'] ],
+                        [
+                            'ip' => $ip,
+                            'details' => request()->userAgent()
+                        ],
                         LOGNAME_MARK_TASK_COMPLETE,
                         $message
-                    ); 
+                    );
                 }
-
-                $res['success'] = $message;
-                return $res;
             }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => $message,
+            ]);
+
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+            Log::error($e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong'
+            ], 500);
         }
-        catch(Exception $e)
-        {
-            Log::info($e->getMessage());
-            dd($e->getMessage());
-        }   
     }
+
     
     /**
      * Display task list page.
@@ -211,55 +293,109 @@ class TaskController extends Controller
      * @param  int  $id
      * @return array
      */
-    public function show($id)
+  public function show($id)
     {
-        //
-        $task = Task::where('id',$id)->first(); 
-        $task_assignees = TaskAssignee::where('task_id',$id)->get();
-        
-        foreach ($task_assignees as $key => $task_assignee) 
-        {
-            if($task->type == 'teacher')
-            {
-                $selected_teachers[$key] = $task_assignee->user_id;
-            }
-            elseif($task->type == 'student')
-            {
-                $selectedUsers[$key] = $task_assignee->user_id;
-                $standardLink_id = $task_assignee->standardLink_id;
-                $class = $task_assignee->standardLink->StandardSection;
-            }
-            elseif ($task->type == 'class') 
-            {
-                $class = $task_assignee->standardLink->StandardSection;
-            }
-        }
-        $array = [];
+        $task = Task::where('id', $id)->firstOrFail();
 
-        if($task->type == 'student')
-        {
-            $selected_students = User::whereIn('id',$selectedUsers)->get();
-            $selected_students = UserResource::collection($selected_students);
+        $task_assignees = TaskAssignee::with(['user', 'standardLink'])
+            ->where('task_id', $id)
+            ->get();
+
+        $selectedUsers = [];
+        $selectedTeachers = [];
+        $selected_students = [];
+        $selected_teachers = [];
+        $standardLink_id = null;
+        $class = null;
+        $task_assignee_id = null;
+
+        $assignees = [];
+
+        foreach ($task_assignees as $task_assignee) {
+            $task_assignee_id = $task_assignee->id;
+
+            if ($task->type == 'teacher') {
+                $selectedTeachers[] = $task_assignee->user_id;
+            } elseif ($task->type == 'student') {
+                $selectedUsers[] = $task_assignee->user_id;
+                $standardLink_id = $task_assignee->standardLink_id;
+
+                if ($task_assignee->standardLink) {
+                    $class = $task_assignee->standardLink->StandardSection;
+                }
+            } elseif ($task->type == 'class') {
+                $standardLink_id = $task_assignee->standardLink_id;
+
+                if ($task_assignee->standardLink) {
+                    $class = $task_assignee->standardLink->StandardSection;
+                }
+            }
+
+            $name = '-';
+            $username = '-';
+
+            if ($task_assignee->user) {
+                if (isset($task_assignee->user->FullName)) {
+                    $name = $task_assignee->user->FullName;
+                } elseif (isset($task_assignee->user->fullname)) {
+                    $name = $task_assignee->user->fullname;
+                } else {
+                    $name = $task_assignee->user->name;
+                }
+
+                $username = $task_assignee->user->name;
+            }
+
+            $assignees[] = [
+                'id'             => $task_assignee->id,
+                'user_id'        => $task_assignee->user_id,
+                'name'           => $name,
+                'username'       => $username,
+                'class'          => $task_assignee->standardLink ? $task_assignee->standardLink->StandardSection : null,
+                'assigned_type'  => $task_assignee->assigned_type,
+                'status'         => $task_assignee->status,
+                'claimed_by'     => $task_assignee->claimed_by,
+            ];
         }
-        if($task->type == 'teacher')
-        {
-            $selected_teachers  = User::whereIn('id',$selected_teachers)->get();
-            $selected_teachers  = TeacherResource::collection($selected_teachers);
+
+        if ($task->type == 'student' && count($selectedUsers) > 0) {
+            $students = StudentUser::whereIn('id', $selectedUsers)->get();
+            $selected_students = UserResource::collection($students);
         }
-        $array['task_id']           =  $task->id;
-        $array['task_assignee_id']  =  $task_assignee->id;
-        $array['title']             =  $task->title;
-        $array['to_do_list']        =  $task->to_do_list;
-        $array['task_date']         =  date('d-m-Y H:i:s',strtotime($task->task_date));
-        $array['assignee_display']  =  ucwords($task->type);
-        $array['assignee']          =  $task->type;
-        $array['reminder_date']     =  date('d-m-Y H:i:s',strtotime($task->ReminderValue));
-        $array['selectedUsers']     =  $selected_students;
-        $array['standardLink_id']   =  $standardLink_id;
-        $array['class']             =  $class;
-        $array['teachers']          =  $selected_teachers;
-    
-        return $array;
+
+        if ($task->type == 'teacher' && count($selectedTeachers) > 0) {
+            $teachers = TeacherUser::whereIn('id', $selectedTeachers)->get();
+            $selected_teachers = TeacherResource::collection($teachers);
+        }
+
+        return response()->json([
+            'task_id'           => $task->id,
+            'task_assignee_id'  => $task_assignee_id,
+            'title'             => $task->title,
+            'to_do_list'        => $task->to_do_list,
+            'task_date'         => $task->task_date ? date('d-m-Y H:i:s', strtotime($task->task_date)) : '-',
+            'assignee_display'  => ucwords($task->type),
+            'assignee'          => $task->type,
+            'reminder_date'     => $task->ReminderValue ? date('d-m-Y H:i:s', strtotime($task->ReminderValue)) : '-',
+            'selectedUsers'     => $selected_students,
+            'standardLink_id'   => $standardLink_id,
+            'class'             => $class,
+            'teachers'          => $selected_teachers,
+            'priority'          => $task->priority,
+            'task_status'       => $task->task_status,
+            'task_type'         => $task->task_type,
+            'total_count'       => $task_assignees->count(),
+            'completion_count'  => $task_assignees->where('status', 'completed')->count(),
+            'assignees'         => $assignees,
+        ]);
+    }
+
+    public function view($id)
+    {
+        return view('/teacher/todolist/show', [
+            'taskId' => $id,
+            'mode' => 'teacher',
+        ]);
     }
 
     /**

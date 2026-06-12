@@ -109,8 +109,19 @@
         <!-- end -->
 
         <div class="my-6">
-            <a href="#" id="submit-btn" class="btn btn-submit blue-bg text-white rounded px-3 py-1 mr-3 text-sm font-medium" @click="submitForm('2')">Save & Continue</a>
-    	       <a href="#" class="btn btn-reset bg-gray-100 text-gray-700 border rounded px-3 py-1 mr-3 text-sm font-medium" @click="resetForm()" v-if="this.type == 'add'">Reset</a>	
+            <button 
+                type="button"
+                class="btn btn-submit blue-bg text-white rounded px-3 py-1 mr-3 text-sm font-medium"
+                @click="submitForm('2')">
+                Save & Continue
+            </button>
+    	       <button 
+                    type="button"
+                    class="btn btn-reset bg-gray-100 text-gray-700 border rounded px-3 py-1 mr-3 text-sm font-medium"
+                    @click="resetForm()"
+                    v-if="this.type == 'add'">
+                    Reset
+                </button>	
         </div>
     </div>
 </template>

@@ -32,6 +32,21 @@ Route::group([
     Route::post('/teacher/logout/devices', 'LoginController@logoutDevices');
 });
 
+// lesson-plan-approval
+Route::group([
+    'prefix' => 'teacher',
+    'middleware' => ['auth:sanctum', 'role:principal'],
+    'namespace' => 'Api\Teacher'
+], function () {
+
+    // approve
+    Route::post('/lessonplan/approve/{id}', 'LessonPlanController@approve');
+
+    // reject
+    Route::post('/lessonplan/reject/{id}', 'LessonPlanController@reject');
+
+});
+
 Route::group([ 'prefix' => 'teacher' , 'middleware'=>['auth:sanctum'] , 'namespace' =>'Api\Teacher' ], 
     function() 
 {
@@ -92,7 +107,7 @@ Route::group([ 'prefix' => 'teacher' , 'middleware'=>['auth:sanctum'] , 'namespa
             Route::post('/assignment/edit/{id}', 'AssignmentController@update');
 
             //delete
-            Route::get('/assignment/delete/{id}', 'AssignmentController@destroy');
+            Route::delete('/assignment/delete/{id}', 'AssignmentController@destroy');
 
         //homework
             //index
@@ -102,7 +117,7 @@ Route::group([ 'prefix' => 'teacher' , 'middleware'=>['auth:sanctum'] , 'namespa
 
             Route::get('/homeworks/rejectedApproval','HomeworkController@rejectedApprovalList');
 
-            Route::get('/homeworks/completed','HomeworkController@completedList');
+            Route::get('/homeworks','HomeworkController@index');
 
             //add
             Route::get('/homework/add/list','HomeworkController@create');
@@ -118,7 +133,7 @@ Route::group([ 'prefix' => 'teacher' , 'middleware'=>['auth:sanctum'] , 'namespa
             Route::post('/homework/edit/{id}','HomeworkController@update');
 
             //delete
-            Route::get('/homework/delete/{id}','HomeworkController@destroy');
+            Route::delete('/homework/delete/{id}','HomeworkController@destroy');
     //with approval
     }); 
 
@@ -154,7 +169,7 @@ Route::group([ 'prefix' => 'teacher' , 'middleware'=>['auth:sanctum'] , 'namespa
         Route::post('/leave/edit/{id}','LeaveController@update');
 
         //delete
-        Route::get('/leave/delete/{id}','LeaveController@destroy');
+        Route::delete('/leave/delete/{id}','LeaveController@destroy');
 
     //lesson plan
 
@@ -163,6 +178,17 @@ Route::group([ 'prefix' => 'teacher' , 'middleware'=>['auth:sanctum'] , 'namespa
 
         //show
         Route::get('/lessonplan/print/{id}','LessonPlanController@print');
+
+        Route::post('/lesson-plan/step1', 'LessonPlanController@stepOne');
+        Route::post('/lesson-plan/step2/{id}', 'LessonPlanController@stepTwo');
+        Route::post('/lesson-plan/step3/{id}', 'LessonPlanController@stepThree');
+        Route::post('/lesson-plan/step4/{id}', 'LessonPlanController@stepFour');
+
+        Route::post('lesson-plans/{id}/publish', 'LessonPlanController@publish');
+
+        //edit
+        Route::get('/lessonplan/show/{id}', 'LessonPlanController@show');
+        Route::post('/lesson-plan/edit/step1/{id}', 'LessonPlanController@updateStepOne');
 
     //task
 
@@ -178,6 +204,7 @@ Route::group([ 'prefix' => 'teacher' , 'middleware'=>['auth:sanctum'] , 'namespa
         //add
         Route::get('/task/add/list','TaskController@create'); 
         Route::get('/task/add/teacher/list','TaskController@teacherList'); 
+        Route::get('/task/add/nonteacher/list','TaskController@nonTeacherList'); 
         Route::get('/task/add/student/{standardlink_id}','TaskController@studentList'); 
         Route::post('/task/add','TaskController@store'); 
 
@@ -192,7 +219,7 @@ Route::group([ 'prefix' => 'teacher' , 'middleware'=>['auth:sanctum'] , 'namespa
         Route::post('/task/snooze/{id}', 'TaskController@snooze'); 
 
         //delete
-        Route::get('/task/delete/{id}','TaskController@destroy'); 
+        Route::delete('/task/delete/{id}','TaskController@destroy'); 
 
     //school details
 
@@ -283,7 +310,7 @@ Route::group([ 'prefix' => 'teacher' , 'middleware'=>['auth:sanctum'] , 'namespa
         Route::post('/performance/add','DisciplineController@store');
         Route::get('/performance/edit/{performance_id}','DisciplineController@editlist');
         Route::post('/performance/update/{performance_id}','DisciplineController@update');
-        Route::get('/performance/delete/{performance_id}','DisciplineController@destroy');
+        Route::delete('/performance/delete/{performance_id}','DisciplineController@destroy');
 
   
         
@@ -329,5 +356,11 @@ Route::group(['prefix' => 'teacher' , 'middleware' => ['auth:sanctum','role:prin
 
     //reject
     Route::post('/assignment/reject/{id}', 'AssignmentApprovalController@reject');
+
+    //approve
+    Route::post('/homework/approve/{id}', 'HomeworkApprovalController@approve');
+
+    //reject
+    Route::post('/homework/reject/{id}', 'HomeworkApprovalController@reject');
 });
 

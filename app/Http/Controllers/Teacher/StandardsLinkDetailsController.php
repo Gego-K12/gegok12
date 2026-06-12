@@ -121,94 +121,108 @@ class StandardsLinkDetailsController extends Controller
      */
     public function getAttendance($id)
     {
-        //
-        $standardLink = StandardLink::where('id',$id)->first();
+        $standardLink = StandardLink::findOrFail($id);
 
-        if(Gate::allows('standardlink',$standardLink))
+        if (Gate::allows('standardlink', $standardLink))
         {
             $array = [];
-            $academic_year  = SiteHelper::getAcademicYear(Auth::user()->school_id);
-            $array['select_month']  = Carbon::now()->format('m-Y');
+
+            $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
+
+            $array['select_month'] = Carbon::now()->format('m-Y');
+
+            // Months
             $months = [];
             $start = strtotime('last month', strtotime($academic_year->start_date));
-            $now = strtotime($academic_year->end_date);
-            $i = 0;
-            // while(($start = strtotime('next month', $start)) <= $now) 
-            // {
-            //     $array['months']->$i->id = date('m-Y', $start);
-            //     $array['months']->$i->name = date('M Y', $start);
-            //     $i++;
-            // }
+            $now   = strtotime($academic_year->end_date);
 
-            // new
             while (($start = strtotime('next month', $start)) <= $now) 
             {
                 $months[] = [
-                    'id' => date('m-Y', $start),
+                    'id'   => date('m-Y', $start),
                     'name' => date('M Y', $start),
                 ];
             }
 
             $array['months'] = $months;
 
-            $startDate  = Carbon::now()->firstOfMonth()->format('Y-m-d');  
-            $endDate    = Carbon::now()->lastOfMonth()->format('Y-m-d');
-            
-            $attendances    = Attendance::where([
-                ['school_id',Auth::user()->school_id],
-                ['academic_year_id',$academic_year->id],
-                ['standardLink_id',$id],
-                ['status',0],
-                ['date','>=',$startDate],
-                ['date','<=',$endDate]
-            ])->orderBy('date','DESC')->get();
-            $array['attendances'] = AttendanceResource::collection($attendances)->groupBy([function($attendance) {
-                    return Carbon::parse($attendance->date)->format('d M Y'); 
-                },'session']);
+            // Current Month Range
+            $startDate = Carbon::now()->firstOfMonth()->format('Y-m-d');  
+            $endDate   = Carbon::now()->lastOfMonth()->format('Y-m-d');
 
-            $attendancechart  = Attendance::where([
-                ['school_id',Auth::user()->school_id],
-                ['academic_year_id',$academic_year->id],
-                ['standardLink_id',$id],
-                ['date','>=',$startDate],
-                ['date','<=',$endDate]
-            ])->orderBy('date','DESC')->get()->groupBy([function($attendancechart) {
-                    return Carbon::parse($attendancechart->date)->format('d M Y'); 
-                },'session','status']);
+            // Attendance list
+            $attendances = Attendance::where([
+                ['school_id', Auth::user()->school_id],
+                ['academic_year_id', $academic_year->id],
+                ['standardLink_id', $id],
+                ['status', 0],
+                ['date', '>=', $startDate],
+                ['date', '<=', $endDate]
+            ])
+            ->orderBy('date', 'DESC')
+            ->get();
+
+            $array['attendances'] = AttendanceResource::collection($attendances)
+                ->groupBy([
+                    fn($a) => Carbon::parse($a->date)->format('d M Y'),
+                    'session'
+                ]);
+
+            // Chart Data
+            $attendancechart = Attendance::where([
+                ['school_id', Auth::user()->school_id],
+                ['academic_year_id', $academic_year->id],
+                ['standardLink_id', $id],
+                ['date', '>=', $startDate],
+                ['date', '<=', $endDate]
+            ])
+            ->orderBy('date', 'ASC') // better for chart
+            ->get()
+            ->groupBy([
+                fn($a) => Carbon::parse($a->date)->format('d M Y'),
+                'session',
+                'status'
+            ]);
 
             $i = 0;
-            foreach ($attendancechart as $date => $attendance) 
+
+            foreach ($attendancechart as $date => $attendance)
             {
-                $array['dates'][$i]  =   $date;
-                foreach ($attendance as $session => $student) 
-                { 
-                    if($session == 'forenoon')
+                $array['dates'][$i] = $date;
+
+                // default values (important)
+                $forenoonPresent  = 0;
+                $forenoonAbsent   = 0;
+                $afternoonPresent = 0;
+                $afternoonAbsent  = 0;
+
+                foreach ($attendance as $session => $student)
+                {
+                    if ($session === 'forenoon')
                     {
-                        $forenoonpresent[$i]    = count($student[1]);
-                        $forenoonabsent[$i]     = count($student[0]);
+                        $forenoonPresent = count($student[1] ?? []);
+                        $forenoonAbsent  = count($student[0] ?? []);
                     }
                     else
                     {
-                        $afternoonpresent[$i]   = count($student[1]);
-                        $afternoonabsent[$i]    = count($student[0]);
+                        $afternoonPresent = count($student[1] ?? []);
+                        $afternoonAbsent  = count($student[0] ?? []);
                     }
                 }
-                for ($j = 0 ;$j < count($attendancechart) ; $j++) 
-                {
-                   $array['forenoon_present'][$j]    = $forenoonpresent[$j];
-                   $array['forenoon_absent'][$j]     = $forenoonabsent[$j];
-                   $array['afternoon_present'][$j]   = $afternoonpresent[$j];
-                   $array['afternoon_absent'][$j]    = $afternoonabsent[$j];
-                }
+
+                // assign directly
+                $array['forenoon_present'][]  = $forenoonPresent;
+                $array['forenoon_absent'][]   = $forenoonAbsent;
+                $array['afternoon_present'][] = $afternoonPresent;
+                $array['afternoon_absent'][]  = $afternoonAbsent;
+
                 $i++;
             }
-            
+
             return $array;
         }
-        else
-        {
-            abort(403);
-        }
+
+        abort(403);
     }
 
     /**

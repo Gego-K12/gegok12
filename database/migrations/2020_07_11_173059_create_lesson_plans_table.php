@@ -31,6 +31,10 @@ class CreateLessonPlansTable extends Migration
             $table->longtext('modification')->nullable();
             $table->longtext('notes')->nullable();
             $table->enum('status',['approved','archived','cancel','draft','pending','rejected']);
+            $table->boolean('is_published')->default(0);
+            $table->timestamp('published_at')->nullable();
+            $table->date('start_date')->nullable();
+            $table->date('end_date')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

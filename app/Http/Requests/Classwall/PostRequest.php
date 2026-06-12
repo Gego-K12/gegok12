@@ -4,6 +4,7 @@ namespace App\Http\Requests\Classwall;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Validator;
+use Carbon\Carbon;
 
 class PostRequest extends FormRequest
 {
@@ -30,13 +31,29 @@ class PostRequest extends FormRequest
         });
 
 
-        Validator::extend('check_posted_at',function($attribute,$value,$parameters,$validator)
-        { 
-            if ( request('posted_at') > date('d-m-Y H:i:s') )
-            {
-                return true;
+        // Validator::extend('check_posted_at',function($attribute,$value,$parameters,$validator)
+        // { 
+        //     if ( request('posted_at') > date('d-m-Y H:i:s') )
+        //     {
+        //         return true;
+        //     }
+        //     return false;
+        // });
+
+         Validator::extend('check_posted_at', function ($attribute, $value, $parameters, $validator) {
+            // dd($value);
+            if (!$value) {
+                return false;
             }
-            return false;
+
+            try {
+                // Your input format: 05/16/2026 13:03
+                $postedAt = Carbon::createFromFormat('m/d/Y, H:i', $value);
+
+                return $postedAt->greaterThan(now());
+            } catch (\Exception $e) {
+                return false;
+            }
         });
 
         $rules = [

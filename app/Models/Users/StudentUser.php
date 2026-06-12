@@ -6,6 +6,8 @@
 namespace App\Models\Users;
 
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
+use Spatie\Tags\HasTags;
 
 /**
  * Class StudentUser
@@ -28,6 +30,7 @@ use App\Models\User;
  */
 class StudentUser extends User
 {
+    use HasTags;
     /**
      * Scope to filter students by standard/grade.
      *
@@ -82,5 +85,17 @@ class StudentUser extends User
             $data[] = $child->userStudent->FullName . ' (' . $child->userStudent->studentAcademicLatest->standardLink->StandardSection . ')';
         }
         return implode(', ', $data);
+    }
+    /**
+     * Scope to filter students by tag.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param string $tag
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeByStudentTag($query, $tag)
+    {
+
+         return $query->withAnyTags([$tag], 'student');
     }
 }

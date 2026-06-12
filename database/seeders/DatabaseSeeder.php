@@ -44,7 +44,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call(BooksCategoryTableSeeder::class); 
         $this->call(BooksTableSeeder::class); 
-        $this->call(AssignmentTableSeeder::class); //test
+        // $this->call(AssignmentTableSeeder::class); //test
         //$this->call(StudentAssignmentTableSeeder::class); //test
         $this->call(ScholasticGradesTableSeeder::class); 
         $this->call(NonScholasticGradesTableSeeder::class);
@@ -60,8 +60,9 @@ class DatabaseSeeder extends Seeder
 
         $this->call(TrasactionAccountTableSeeder::class);
 
-        $this->call(HomeworkSeeder::class); //test
+        // $this->call(HomeworkSeeder::class); //test
         $this->call(NoticeBoardSeeder::class); //test
         $this->call(PayrollSeeder::class); //test
+        $this->call(TagSeeder::class);
     }
 }

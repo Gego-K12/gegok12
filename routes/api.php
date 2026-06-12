@@ -102,22 +102,6 @@ Route::group([
 
     Route::get('/leave/delete/{id}','LeaveController@destroy'); 
 
-    //media files
-
-    Route::get('/my-school/media-files','VideosController@showfiles');
-
-	Route::get('/media-files/video/{student_id}','VideosController@showvideo');
-
-	Route::get('/media-files/audio/{student_id}','VideosController@showaudio');
-
-    Route::get('/media-files/image/{student_id}','VideosController@showimage');
-
-    Route::get('/value-education/image','VideosController@showimagevalueducation');
-
-    Route::get('/value-education/audio','VideosController@showaudiovalueducation');
-
-    Route::get('/value-education/video','VideosController@showvideovalueducation');
-
     //messages
 
     Route::get('/messages','FeedbackController@sentMessages');
@@ -156,7 +140,7 @@ Route::group([
 
     Route::post('/homework/submit/{homework_id}/{student_id}','HomeworkController@store');
 
-    Route::get('/homework/delete/{id}/{student_id}','HomeworkController@destroy');
+    Route::delete('/homework/delete/{id}/{student_id}','HomeworkController@destroy');
 
     Route::post('/homework/reply/{homework_id}/{student_id}','HomeworkController@replycomment');
 
@@ -226,7 +210,7 @@ Route::group([
 
     Route::post('/assignment/submit/{assignment_id}/{student_id}','AssignmentController@store');
 
-    Route::get('/assignment/delete/{id}/{student_id}','AssignmentController@destroy');  
+    Route::delete('/assignment/delete/{id}/{student_id}','AssignmentController@destroy');  
 
 
 

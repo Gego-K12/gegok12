@@ -100,6 +100,19 @@
         </a>
     </li>
     <!--end-->
+
+    <li class="py-3 px-3 {{ in_array(Request::segment(2), ['groups']) ? 'active' : '' }}">
+    <a href="{{ url('/admin/groups') }}" class="flex items-center whitespace-no-wrap">
+
+        <!-- Group Icon -->
+        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="#FFFFFF" viewBox="0 0 24 24">
+            <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+        </svg>
+
+        <span class="mx-3 whitespace-no-wrap">Groups</span>
+    </a>
+</li>
+
     @if(config('gcertificate.enabled', false))
     <!--start-->
         <li class="py-3 px-3  {{Request::segment ('2') == 'certificate' ? 'active':''}}">
@@ -927,6 +940,16 @@
                               d="M3 21h18M4 21V7l8-4 8 4v14M9 21v-6h6v6"/>
                     </svg>
                     <span class="mx-3 whitespace-no-wrap">Cities</span>
+                </a>
+            </li>
+            <li class="py-3 px-3 hover:font-semibold {{Request::segment ('3') == 'cities' ? 'active':''}} && {{Request::segment ('3') == 'city' ? 'active':''}}">
+                <a href="{{ url('/admin/settings/generalsettings') }}" class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                     stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M4.5 12a7.5 7.5 0 1115 0 7.5 7.5 0 01-15 0Zm7.5-3v3m0 3h.008v.008H12V15Z" />
+                </svg>
+                    <span class="mx-3 whitespace-no-wrap">Settings</span>
                 </a>
             </li>
         </ul>

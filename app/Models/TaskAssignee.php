@@ -6,6 +6,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Class TaskAssignee
@@ -44,7 +45,7 @@ class TaskAssignee extends Model
      * @var array
      */
     protected $fillable = [
-        'task_id' , 'user_id' , 'standardLink_id' , 'status'
+        'task_id' , 'user_id' , 'standardLink_id' , 'status' , 'assigned_type','group_id','claimed_by'
     ];
 
     /**
@@ -82,5 +83,13 @@ class TaskAssignee extends Model
     public function standardLink()
     {
     	return $this->belongsTo('\App\Models\StandardLink','standardLink_id');
+    }
+    public function scopeForUser($query, $userId = null)
+    {
+        return $query->where('user_id', $userId ?? Auth::id());
+    }
+    public function scopeCompleted($query)
+    {
+        return $query->where('status', 'completed');
     }
 }

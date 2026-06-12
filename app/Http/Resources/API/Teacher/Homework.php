@@ -3,6 +3,7 @@
 namespace App\Http\Resources\API\Teacher;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Auth;
 
 class Homework extends JsonResource
 {
@@ -53,6 +54,11 @@ class Homework extends JsonResource
             $attachment = '';
             $type='';
         }
+        $role = 'teacher';
+        if(Auth::user()->hasRole('principal'))
+        {
+            $role = 'principal';
+        }
 
 
         return 
@@ -60,15 +66,18 @@ class Homework extends JsonResource
             'id'                =>  $this->id,
             'class_name'        =>  $class_name,
             'subject_name'      =>  $this->subject->name,
-            'date'              =>  date('d-m-Y', strtotime($this->date)),
+            'date'              => $this->date ? date('d-m-Y', strtotime($this->date)) : '',
             'description'       =>  $this->description,
             'attachment'        =>  $attachment,
             'pending_count'     =>  $this->PendingCount,
-            'status_display'    =>  ucwords($this->homeworkApproval->status),
-            'status'            =>  $this->homeworkApproval->status,
+            'status_display'    =>  ucwords($this->status),//$this->homeworkApproval->status
+            'status'            =>  $this->status,//$this->homeworkApproval->status
             'comments'          =>  $this->homeworkApproval->comments,
             'type'              =>  $type,
-            'submission_date'   =>  $this->submission_date==null?'':date('d-m-Y', strtotime($this->submission_date)),
+            'submission_date'   => $this->submission_date ? date('d-m-Y', strtotime($this->submission_date)) : '',
+            'approve_status'            =>  $this->homeworkApproval->status,
+            'role'                      =>  $role,
+            'created_by'                => $this->createdBy->fullname,  
         ];
     }
 }

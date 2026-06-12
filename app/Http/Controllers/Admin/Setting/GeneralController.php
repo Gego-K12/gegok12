@@ -41,12 +41,21 @@ class GeneralController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(SettingGeneralRequest $request)
+    public function store(Request $request) //SettingGeneralRequest
     {
         try
         {
             $this->updatesettings('sitetitle',$request->sitetitle);
             $this->updatesettings('sitename',$request->sitename);
+            $this->updatesettings(
+                'assignment_status',
+                $request->has('assignment_status') ? 1 : 0
+            );
+
+            $this->updatesettings(
+                'homework_status',
+                $request->has('homework_status') ? 1 : 0
+            );
 
             if (($request->sitelogo)==null)
             {
@@ -70,11 +79,12 @@ class GeneralController extends Controller
                 $this->updatesettings('favicon',$faviconpath);
             }
 
-            return redirect()->back();
+            return redirect()->back()->with('success', 'Settings updated successfully.');
         }
         catch(Exception $e)
         {
             //dd($e->getMessage());
+            return redirect()->back()->with('error', 'Something went wrong.');
         }
     }
 }

@@ -47,6 +47,8 @@ class LessonPlanStep1Request extends FormRequest
             'duration'              => 'required|numeric',
             'title'                 => 'required|check_title|max:50',
             'description'           => 'required|check_description',
+            // 'start_date'            => 'required|date|after_or_equal:today',
+            // 'end_date'              => 'required|date|after_or_equal:start_date',
         ];
 
         if(request('type') == 'add')

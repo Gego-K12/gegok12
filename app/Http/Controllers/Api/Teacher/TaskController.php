@@ -10,8 +10,10 @@ use App\Http\Resources\Teacher\Teacher as TeacherResource;
 use App\Http\Resources\API\Teacher\Task as TaskResource;
 use App\Http\Resources\User as UserResource;
 use App\Http\Requests\API\Teacher\TaskRequest;
+use App\Http\Requests\API\TaskStatusUpdateRequest;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 use App\Traits\TodolistProcess;
 use App\Models\TaskAssignee;
 use Illuminate\Http\Request;
@@ -20,8 +22,10 @@ use App\Helpers\SiteHelper;
 use App\Traits\Common;
 use App\Models\Task;
 use App\Models\User;
+use App\Models\Group;
 use Exception;
 use Log;
+
 
 class TaskController extends Controller
 {
@@ -246,24 +250,34 @@ class TaskController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(Request $request)
-    {
-        $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
-        $standardlink_subject_list = SiteHelper::getStandardSubjectList(Auth::user()->school_id,Auth::id());
+public function create(Request $request)
+{
+    $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
 
-        $array = [];
+    $standardlink_subject_list = SiteHelper::getStandardSubjectList(
+        Auth::user()->school_id,
+        Auth::id()
+    );
 
-        $array['task_assignee_list']    = SiteHelper::getTaskAssigneeList();
-        $array['task_reminder_list']    = SiteHelper::getTaskReminderList();
-        $array['standardlinks']         = $standardlink_subject_list['standardLinklist'];
-        
-        /*return response()->json([
-            'success'   =>  true,
-            'message'   =>  'Add Task List',
-            'data'      =>  $array
-        ],200);*/
-        return response()->json($array,200);
-    }
+    $standardlinks = collect($standardlink_subject_list['standardLinklist']->toArray($request))
+        ->map(function ($item) {
+
+            $item['groups'] = Group::where('standardLink_id', $item['id'])
+                ->select('id', 'group_name')
+                ->get()
+                ->toArray();
+
+            return $item;
+        });
+
+    $array = [];
+
+    $array['task_assignee_list'] = SiteHelper::getTaskAssigneeList();
+    $array['task_reminder_list'] = SiteHelper::getTaskReminderList();
+    $array['standardlinks'] = $standardlinks->values();
+
+    return response()->json($array, 200);
+}
 
     /**
      * Display a listing of the resource.
@@ -273,12 +287,25 @@ class TaskController extends Controller
     public function teacherList()
     {
         $academic_year  = SiteHelper::getAcademicYear(Auth::user()->school_id);
-        $teachers       = SiteHelper::getTeachers(Auth::user()->school_id,$academic_year->id);
+        $teachers       = SiteHelper::getDoToTeachers(Auth::user()->school_id,$academic_year->id);
         $teachers       = TeacherResource::collection($teachers);
         
         return response()->json([
             'success'   =>  true,
             'message'   =>  'Add Task Teacher List',
+            'data'      =>  $teachers
+        ],200);
+    }
+
+    public function nonTeacherList()
+    {
+        $academic_year  = SiteHelper::getAcademicYear(Auth::user()->school_id);
+        $teachers       = SiteHelper::getNonTeachers(Auth::user()->school_id,$academic_year->id);
+        $teachers       = TeacherResource::collection($teachers);
+        
+        return response()->json([
+            'success'   =>  true,
+            'message'   =>  'Add Task Non-Teacher List',
             'data'      =>  $teachers
         ],200);
     }
@@ -301,43 +328,108 @@ class TaskController extends Controller
         ],200);
     }
 
-    public function changestatus(Request $request)
+    // public function changestatus(TaskStatusUpdateRequest $request)
+    // {
+    //     try
+    //     {
+    //         if( count($request->task_completed) > 0 )
+    //         {
+    //             foreach ($request->task_completed as $task_id) 
+    //             {
+    //                 $task = Task::where('id',$task_id)->first();
+
+    //                 $task->task_status = 1;
+
+    //                 $task->save();
+
+    //                 $message = trans('messages.task_check_success_msg');
+
+    //                 $ip= $this->getRequestIP();
+    //                 $this->doActivityLog(
+    //                     $task,
+    //                     Auth::user(),
+    //                     ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT'] ],
+    //                     LOGNAME_MARK_TASK_COMPLETE,
+    //                     $message
+    //                 ); 
+    //             }
+
+    //             return response()->json([
+    //                 'success'   =>  true,
+    //                 'message'   =>  $message,
+    //             ],200);
+    //         }
+    //     }
+    //     catch(Exception $e)
+    //     {
+    //         Log::info($e->getMessage());
+    //         dd($e->getMessage());
+    //     }   
+    // }
+
+    public function changeStatus(TaskStatusUpdateRequest $request)
     {
-        try
-        {
-            if( count($request->task_completed) > 0 )
+        DB::beginTransaction();
+
+        try {
+
+            foreach ($request->task_completed as $id)
             {
-                foreach ($request->task_completed as $task_id) 
+                $assignee = TaskAssignee::findOrFail($id);
+
+                $assignee->update([
+                    'status' => 'completed',
+                    // 'claimed_by' => Auth::id(),
+                ]);
+
+                // Check all assignees completed
+                $pendingCount = TaskAssignee::where('task_id', $assignee->task_id)
+                    ->where('status', 'pending')
+                    ->count();
+
+                if ($pendingCount == 0)
                 {
-                    $task = Task::where('id',$task_id)->first();
-
-                    $task->task_status = 1;
-
-                    $task->save();
-
-                    $message = trans('messages.task_check_success_msg');
-
-                    $ip= $this->getRequestIP();
-                    $this->doActivityLog(
-                        $task,
-                        Auth::user(),
-                        ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT'] ],
-                        LOGNAME_MARK_TASK_COMPLETE,
-                        $message
-                    ); 
+                    Task::where('id', $assignee->task_id)
+                        ->update([
+                            'task_status' => 1
+                        ]);
                 }
 
-                return response()->json([
-                    'success'   =>  true,
-                    'message'   =>  $message,
-                ],200);
+                // Activity Log
+                $message = trans('messages.task_check_success_msg');
+
+                $ip = $this->getRequestIP();
+
+                $this->doActivityLog(
+                    $assignee,
+                    Auth::user(),
+                    [
+                        'ip' => $ip,
+                        'details' => request()->userAgent()
+                    ],
+                    LOGNAME_MARK_TASK_COMPLETE,
+                    $message
+                );
             }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+            ]);
+
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+            Log::error($e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong'
+            ], 500);
         }
-        catch(Exception $e)
-        {
-            Log::info($e->getMessage());
-            dd($e->getMessage());
-        }   
     }
 
     /**

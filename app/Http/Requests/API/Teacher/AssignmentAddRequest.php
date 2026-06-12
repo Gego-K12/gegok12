@@ -25,73 +25,149 @@ class AssignmentAddRequest extends FormRequest
      *
      * @return array
      */
+    // public function rules()
+    // {
+    //     Validator::extend('check_title', function ($attribute, $value,$parameters,$validator) 
+    //     {
+    //         //return preg_match('/^[\pL\s]+$/u', request('title')); 
+    //         return preg_match('/\pL\pM*|./u', request('title')); 
+    //     });
+
+    //     Validator::extend('check_assigned_date', function ($attribute, $value, $parameters, $validator) 
+    //     {
+    //         if( date('Y-m-d',strtotime(request('assigned_date'))) >date('Y-m-d',strtotime('-1 days',strtotime(date('Y-m-d')))))
+    //         {
+    //             return true;
+    //         }
+    //         return false;
+    //     });
+
+    //     Validator::extend('check_exists', function ($attribute, $value, $parameters, $validator) 
+    //     {
+    //         $assigned_date = date('Y-m-d',strtotime(request('assigned_date')));
+    //         $school_id = Auth::user()->school_id;
+    //         $academic_year = SiteHelper::getAcademicYear($school_id);
+    //         $standardLink_id = (int)request('standardLink_id');
+    //         $subject_id = (int)request('subject_id');
+    //         $assignment = Assignment::where([
+    //             ['school_id',$school_id],
+    //             ['academic_year_id',$academic_year->id],
+    //             ['standardLink_id',$standardLink_id],
+    //             ['subject_id',$subject_id],
+    //             ['assigned_date',$assigned_date]
+    //         ])->first();
+    //         if( $assignment == null )
+    //         {
+    //             return true;
+    //         }
+    //         return false;
+    //     });
+
+    //     Validator::extend('check_marks', function ($attribute, $value, $parameters, $validator) 
+    //     {
+    //         if( request('marks') < 100)
+    //         {
+    //             return true;
+    //         }
+    //         return false;
+    //     });
+
+    //     Validator::extend('check_valid_marks', function ($attribute, $value, $parameters, $validator) 
+    //     {
+    //         return preg_match('/^[0-9]+$/', request('marks')) ;
+    //     });
+
+    //     $rules= [
+    //         //
+    //         'standardLink_id'   =>  'required',
+    //         'subject_id'        =>  'required',
+    //         'title'             =>  'required|max:50|check_title',
+    //         'description'       =>  'required|max:255',
+    //         'attachment'        =>  'nullable',
+    //         'marks'             =>  'nullable|numeric|check_marks|check_valid_marks',    
+    //         'assigned_date'     =>  'required|check_assigned_date|check_exists|before:submission_date',
+    //         'submission_date'   =>  'required|after:assigned_date',
+    //     ];
+
+    //     return $rules;
+    // }
+    
     public function rules()
     {
-        Validator::extend('check_title', function ($attribute, $value,$parameters,$validator) 
-        {
-            //return preg_match('/^[\pL\s]+$/u', request('title')); 
+        Validator::extend('check_title', function ($attribute, $value,$parameters,$validator) {
+            if (request('status') == 'pending') 
+            {
+                return true;
+            }
             return preg_match('/\pL\pM*|./u', request('title')); 
         });
 
-        Validator::extend('check_assigned_date', function ($attribute, $value, $parameters, $validator) 
-        {
-            if( date('Y-m-d',strtotime(request('assigned_date'))) >date('Y-m-d',strtotime('-1 days',strtotime(date('Y-m-d')))))
+        Validator::extend('check_assigned_date', function ($attribute, $value, $parameters, $validator) {
+            if (request('status') == 'pending') 
             {
+                return true;
+            }
+
+            if(date('Y-m-d',strtotime(request('assigned_date'))) > date('Y-m-d',strtotime('-1 days'))) {
                 return true;
             }
             return false;
         });
 
-        Validator::extend('check_exists', function ($attribute, $value, $parameters, $validator) 
-        {
+        Validator::extend('check_exists', function ($attribute, $value, $parameters, $validator) {
             $assigned_date = date('Y-m-d',strtotime(request('assigned_date')));
             $school_id = Auth::user()->school_id;
             $academic_year = SiteHelper::getAcademicYear($school_id);
-            $standardLink_id = (int)request('standardLink_id');
-            $subject_id = (int)request('subject_id');
+
             $assignment = Assignment::where([
                 ['school_id',$school_id],
                 ['academic_year_id',$academic_year->id],
-                ['standardLink_id',$standardLink_id],
-                ['subject_id',$subject_id],
+                ['standardLink_id',(int)request('standardLink_id')],
+                ['subject_id',(int)request('subject_id')],
                 ['assigned_date',$assigned_date]
             ])->first();
-            if( $assignment == null )
-            {
-                return true;
-            }
-            return false;
+
+            return $assignment == null;
         });
 
-        Validator::extend('check_marks', function ($attribute, $value, $parameters, $validator) 
-        {
-            if( request('marks') < 100)
-            {
-                return true;
-            }
-            return false;
+        Validator::extend('check_marks', function ($attribute, $value) {
+            return request('marks') < 100;
         });
 
-        Validator::extend('check_valid_marks', function ($attribute, $value, $parameters, $validator) 
-        {
-            return preg_match('/^[0-9]+$/', request('marks')) ;
+        Validator::extend('check_valid_marks', function ($attribute, $value) {
+            return preg_match('/^[0-9]+$/', request('marks'));
         });
 
-        $rules= [
-            //
-            'standardLink_id'   =>  'required',
-            'subject_id'        =>  'required',
-            'title'             =>  'required|max:50|check_title',
-            'description'       =>  'required|max:255',
-            'attachment'        =>  'nullable',
-            'marks'             =>  'nullable|numeric|check_marks|check_valid_marks',    
-            'assigned_date'     =>  'required|check_assigned_date|check_exists|before:submission_date',
-            'submission_date'   =>  'required|after:assigned_date',
+        $status = request('status');
+
+        $rules = [
+            'status' => 'required|in:pending,ongoing,cancel,completed',
+
+            'standardLink_id' => 'required',
+            'subject_id'      => 'required',
+
+            'title'        => 'nullable|max:50|check_title',
+            'description'  => 'nullable|max:255',
+
+            'attachment'   => 'nullable',
+
+            'marks'        => 'nullable|numeric|check_marks|check_valid_marks',
+
+            'assigned_date'   => 'nullable|check_assigned_date|check_exists',
+            'submission_date' => 'nullable',
         ];
+
+        if ($status === 'completed') {
+
+            $rules['title']           .= '|required';
+            $rules['description']     .= '|required';
+
+            $rules['assigned_date']   .= '|required|before:submission_date';
+            $rules['submission_date'] .= '|required|after:assigned_date';
+        }
 
         return $rules;
     }
-
     public function messages()
     {
         return

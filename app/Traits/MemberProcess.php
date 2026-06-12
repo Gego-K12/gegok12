@@ -59,6 +59,11 @@ trait MemberProcess
                 $users = $users->ByStatus($status);
             }
 
+            $tag = $request->tag;
+            if ($tag != '') {
+                $users = $users->ByStudentTag($tag);
+            }
+
             if ($status == '') {
                 $users = $users->where('status', '!=', 'exit');
             }

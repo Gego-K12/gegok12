@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Teacher;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\TaskAssignee as TaskAssigneeResource;
 use Illuminate\Support\Facades\Auth;
 
 class Task extends JsonResource
@@ -30,11 +31,11 @@ class Task extends JsonResource
         {
             $snooze = 0;
         }
-        
+                
         return [
             //
             'task_id'           =>  $this->id,
-            'title'             =>  $this->title,
+            'title'             =>  ucfirst($this->title),
             'to_do_list'        =>  $this->to_do_list,
             'task_date'         =>  date('d-m-Y H:i:s',strtotime($this->task_date)),
             'task_flag'         =>  $this->task_flag,
@@ -48,6 +49,11 @@ class Task extends JsonResource
             'reminder_date'     =>  $this->reminder_date,
             'auth_id'           =>  Auth::id(),
             'created_by'        =>  $this->user_id,
+            'priority'          =>  $this->priority,
+            'total_count'       =>  $this->taskAssignee->count(),
+            'completion_count'  =>  $this->taskAssignee->where('status','completed')->count(),
+            'task_assignee' => TaskAssigneeResource::collection($this->taskAssignee),
+            'task_completed' => $this->taskAssignee()->forUser()->completed()->exists(),
         ];
     }
 }

@@ -36,6 +36,7 @@ class TaskRequest extends FormRequest
 
         Validator::extend('check_student_count',function($attribute,$value,$parameters,$validator)
         {
+
             if( request('selectedUsersCount') > 0 )
             {
                 return true;
@@ -69,13 +70,14 @@ class TaskRequest extends FormRequest
             'to_do_list'    =>  'required|max:500',
             'task_date'     =>  'required|date|check_task_date',
             'reminder'      =>  'required',
+            'priority'      =>  'required',
         ];
 
-        if(request('assignee') == 'class')
-        {
-            $rules['standardLink_id'] = 'required';
-        }
-        elseif (request('assignee') == 'student') 
+        // if(request('assignee') == 'class')
+        // {
+        //     $rules['standardLink_id'] = 'required';
+        // }
+        if (request('assignee') == 'student') 
         {
             $rules['standardLink_id']       = 'required';
             $rules['selectedUsersCount']    = 'check_student_count';

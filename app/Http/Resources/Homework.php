@@ -64,13 +64,14 @@ class Homework extends JsonResource
             'attachment'        =>  $attachment,
             'pending_count'     =>  $this->PendingCount,
             'finished_count'    =>  $this->FinishedCount,
-            'status_display'    =>  ucwords($this->homeworkApproval->status),
-            'status'            =>  $this->homeworkApproval->status,
+            'status_display'    =>  ucwords($this->homeworkApproval->status),//$this->homeworkApproval->status
+            'status'            =>  $this->status,
             'comments'          =>  $this->homeworkApproval->comments ==  null ? '--':$this->homeworkApproval->comments,
             'auth_id'           =>  \Auth::id(),
             'created_by'        =>  $this->created_by,
             'type'              =>  $type,
             'submission_date'   =>  $this->submission_date==null?'':date('d-m-Y', strtotime($this->submission_date)),
+            'approve_status'            =>  $this->homeworkApproval->status,
         ];
     }
 }

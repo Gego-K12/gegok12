@@ -3,6 +3,7 @@
 namespace App\Http\Resources\API\Teacher;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Auth;
 
 class Assignment extends JsonResource
 {
@@ -68,6 +69,12 @@ class Assignment extends JsonResource
         {
             $show = 0;
         }
+
+        $role = 'teacher';
+        if(Auth::user()->hasRole('principal'))
+        {
+            $role = 'principal';
+        }
         
         return 
         [
@@ -77,11 +84,12 @@ class Assignment extends JsonResource
             'title'                     =>  $this->title,
             'subject'                   =>  $this->subject->name,
             'description'               =>  $this->description,
-            'assigned_date'             =>  date('d M Y', strtotime($this->assigned_date)),
-            'submission_date'           =>  date('d M Y', strtotime($this->submission_date)),
+            'assigned_date' => $this->assigned_date ? date('d M Y', strtotime($this->assigned_date)) : null,
+
+            'submission_date' => $this->submission_date ? date('d M Y', strtotime($this->submission_date)) : null,
             'attachment'                =>  $attachment,
-            'status_display'            =>  ucwords($this->assignmentApproval->status),
-            'status'                    =>  $this->assignmentApproval->status,
+            'status_display'            =>  ucwords($this->status), //$this->assignmentApproval->status
+            'status'                    =>  $this->status, //$this->assignmentApproval->status
             'comments'                  =>  $this->assignmentApproval->comments,
             //'studentAssignmentStatus'   =>  $studentAssignmentStatus,
             //'studentStatus'             =>  ucwords($this->studentAssignment->status),
@@ -90,6 +98,9 @@ class Assignment extends JsonResource
             //'student_assignment_id'     =>  $this->studentAssignment->id,
             'show'                      =>  $show,
             'type'                      =>  $type,
+            'approve_status'            =>  $this->assignmentApproval->status,
+            'role'                      =>  $role,
+            'created_by'                => $this->teacher->fullname,  
         ];
     }
 }

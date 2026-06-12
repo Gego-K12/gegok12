@@ -4,6 +4,9 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
+use App\Helpers\SiteHelper;
+use App\Models\Assignment;
 
 class AssignmentUpdateRequest extends FormRequest
 {
@@ -24,6 +27,8 @@ class AssignmentUpdateRequest extends FormRequest
      */
     public function rules()
     {
+        $status = request('status');
+
         Validator::extend('check_title', function ($attribute, $value,$parameters,$validator) 
         {
             //return preg_match('/^[\pL\s]+$/u', request('title')); 
@@ -53,14 +58,49 @@ class AssignmentUpdateRequest extends FormRequest
             return preg_match('/^[0-9]+$/', request('marks')) ;
         });
 
-        $rules= [
-            //
-            'title'             =>  'required|max:50|check_title',
-            'description'       =>  'required|max:255',
-            'marks'             =>  'nullable|numeric|check_marks|check_valid_marks',    
-            'assigned_date'     =>  'required|check_assigned_date|before_or_equal:submission_date',
-            'submission_date'   =>  'required|after_or_equal:assigned_date',
+        Validator::extend('check_exists', function ($attribute, $value, $parameters, $validator) 
+        {
+            $assigned_date = date('Y-m-d',strtotime(request('assigned_date')));
+            $school_id = Auth::user()->school_id;
+            $academic_year = SiteHelper::getAcademicYear($school_id);
+            $assignment = Assignment::where([
+                ['school_id',$school_id],
+                ['academic_year_id',$academic_year->id],
+                ['standardLink_id',request('standardLink_id')],
+                ['subject_id',request('subject_id')],
+                ['assigned_date',$assigned_date]
+            ])->first();
+            if( $assignment == null )
+            {
+                return true;
+            }
+            return false;
+        });
+
+         $rules = [
+            'status' => 'required|in:pending,ongoing',
+
+            'title'        => 'nullable|max:50|check_title',
+            'description'  => 'nullable|max:255',
+
+            'attachment'   => 'nullable|mimes:jpeg,png,jpg,pdf',
+
+            'marks'        => 'nullable',
+
+            'assigned_date'   => 'nullable|check_assigned_date|check_exists',
+            'submission_date' => 'nullable',
         ];
+
+        if ($status === 'ongoing') {
+
+            $rules['title'] = 'required|max:50|check_title'; 
+            $rules['description'] = 'required|max:255';     
+
+            $rules['marks'] = 'required|numeric|check_marks|check_valid_marks';
+
+            $rules['assigned_date'] = 'required|check_assigned_date|before:submission_date';
+            $rules['submission_date'] = 'required|after:assigned_date';
+        }
 
         if(\Request('attachment')!= '')
         { 

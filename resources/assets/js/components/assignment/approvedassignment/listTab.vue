@@ -2,17 +2,17 @@
     <div>
         <ul class="list-reset flex text-xs profile-tab flex-wrap">
             <li class="px-2 mx-1 py-1" v-bind:class="[{'active' : status === 'pending'}]">
-                <a href="#" class="text-gray-700 font-medium" @click="setProfileTab('pending')" v-if="this.role == 'principal'">Waiting For Review</a>
-                <a href="#" class="text-gray-700 font-medium" @click="setProfileTab('pending')" v-else>Pending</a>
+                <!-- <a href="#" class="text-gray-700 font-medium" @click="setProfileTab('pending')" v-if="this.role == 'principal'">Waiting For Review</a> -->
+                <a href="#" class="text-gray-700 font-medium" @click="setProfileTab('pending')">Draft</a>
             </li>
 
-            <li class="px-2 mx-1 py-1" v-bind:class="[{'active' : status === 'approved'}]">
-                <a href="#" class="text-gray-700 font-medium" @click="setProfileTab('approved')">Approved</a>
+            <li class="px-2 mx-1 py-1" v-bind:class="[{'active' : status === 'ongoing'}]">
+                <a href="#" class="text-gray-700 font-medium" @click="setProfileTab('ongoing')">Publish</a>
             </li>
 
-            <li class="px-2 mx-1 py-1" v-bind:class="[{'active' : status === 'rejected'}]">
+            <!-- <li class="px-2 mx-1 py-1" v-bind:class="[{'active' : status === 'rejected'}]">
                 <a href="#" class="text-gray-700 font-medium" @click="setProfileTab('rejected')">Rejected</a>
-            </li>
+            </li> -->
         </ul>
 
         <Teleport to="#list_assignment">

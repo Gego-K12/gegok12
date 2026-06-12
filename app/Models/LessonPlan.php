@@ -56,7 +56,7 @@ class LessonPlan extends Model
      * @var array
      */
     protected $fillable = [
-        'teacher_link_id' , 'unit_no' , 'unit_name' , 'description' , 'title' , 'duration' , 'objective' , 'materials_required' , 'introduction' , 'procedure' , 'conclusion' , 'notes' , 'assessment' , 'modification' , 'status'
+        'teacher_link_id' , 'unit_no' , 'unit_name' , 'description' , 'title' , 'duration' , 'objective' , 'materials_required' , 'introduction' , 'procedure' , 'conclusion' , 'notes' , 'assessment' , 'modification' , 'status', 'is_published', 'published_at' ,'start_date' , 'end_date'
     ];
 
     /**

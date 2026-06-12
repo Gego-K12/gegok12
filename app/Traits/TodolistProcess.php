@@ -6,12 +6,17 @@ namespace App\Traits;
 
 use App\Events\Notification\SingleNotificationEvent;
 use App\Events\Notification\ClassNotificationEvent;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use App\Models\Users\StudentUser;
 use App\Events\StandardPushEvent;
+use App\Models\StudentAcademic;
 use App\Events\SinglePushEvent;
 use App\Models\TaskAssignee;
 use App\Traits\EventProcess;
+use App\Traits\LogActivity;
 use App\Models\Reminder;
+use App\Models\GroupMember;
 use App\Models\Task;
 use App\Models\User;
 use Carbon\Carbon;
@@ -32,6 +37,7 @@ trait TodolistProcess
         \DB::beginTransaction();
         try
         {
+            // dd($data);
             $today = date('Y-m-d H:i:s');
 
             $task                       =   new Task;
@@ -44,6 +50,8 @@ trait TodolistProcess
             $task->to_do_list           =   $data->to_do_list;
             $task->task_date            =   date('Y-m-d H:i:s',strtotime($data->task_date));
             $task->reminder             =   $data->reminder;
+            $task->priority             =   $data->priority;
+            $task->task_type            =   $data->task_type;
             if($data->reminder == 'others')
             {
                 $task->reminder_date    =   date('Y-m-d H:i:s',strtotime($data->reminder_date));
@@ -75,46 +83,43 @@ trait TodolistProcess
 
             if($data->assignee == 'class')
             {
-                $task_assignee = new TaskAssignee;
+                foreach ($data->class_ids as $class_id) 
+                {
+                    $students =StudentAcademic::where('standardLink_id',$class_id)->get();
+                    // dd($students);
+                    foreach($students as $student)
+                    {
+                        $this->storeTaskAssignee($task->id,'class', $student->user_id, $class_id);
+                    }
 
-                $task_assignee->task_id             = $task->id;
-                $task_assignee->standardLink_id     = $data->standardLink_id;
-                $task_assignee->status              = 1;
+                    
+                    $this->addClassReminder($school_id,$reminder_date,$task->title,$task->id,$data->standardLink_id);
 
-                $task_assignee->save();
+                    $data=[];
 
-                $this->addClassReminder($school_id,$reminder_date,$task->title,$task->id,$data->standardLink_id);
+                    $data['school_id']      =   $school_id;
+                    $data['standard_id']    =   $data->standardLink_id;
+                    $data['message']        =   'New Task Assigned';
+                    $data['type']           =   'task';
 
-                $data=[];
+                    event(new StandardPushEvent($data));
 
-                $data['school_id']      =   $school_id;
-                $data['standard_id']    =   $data->standardLink_id;
-                $data['message']        =   'New Task Assigned';
-                $data['type']           =   'task';
+                    $array = [];
 
-                event(new StandardPushEvent($data));
+                    $array['school_id']         = $school_id;
+                    $array['standardLink_id']   = $data->standardLink_id;
+                    $array['details']           = trans('notification.task_assign_msg');  
 
-                $array = [];
-
-                $array['school_id']         = $school_id;
-                $array['standardLink_id']   = $data->standardLink_id;
-                $array['details']           = trans('notification.task_assign_msg');  
-
-                event(new ClassNotificationEvent($array));
+                    event(new ClassNotificationEvent($array));
+                    }
             }
             elseif($data->assignee == 'student')
             {
                 $standard_id = $data->standardLink_id;
                 foreach ($data->selectedUsers as $student_id) 
                 {
-                    $task_assignee = new TaskAssignee;
 
-                    $task_assignee->task_id         = $task->id;
-                    $task_assignee->user_id         = $student_id;
-                    $task_assignee->standardLink_id = $standard_id;
-                    $task_assignee->status          = 1;
-
-                    $task_assignee->save();
+                    $this->storeTaskAssignee($task->id,'user', $student_id, $standard_id);
 
                     $student = User::where('id',$student_id)->first();
 
@@ -144,13 +149,69 @@ trait TodolistProcess
             {
                 foreach ($data->selectedTeachers as $teacher_id) 
                 {
-                    $task_assignee = new TaskAssignee;
 
-                    $task_assignee->task_id     = $task->id;
-                    $task_assignee->user_id     = $teacher_id;
-                    $task_assignee->status      = 1;
+                    $this->storeTaskAssignee($task->id,'user', $teacher_id);
 
-                    $task_assignee->save();
+                    $teacher = User::where('id',$teacher_id)->first();
+
+                    $this->sendToTaskReminder($school_id,$reminder_date,$task->title,$task->id,$teacher->email,$teacher->mobile_no);
+
+                    $array=[];
+
+                    $array['school_id']  =   $school_id;
+                    $array['user_id']    =   $teacher->id;
+                    $array['message']    =   'New Task Assigned';
+                    $array['type']       =   'task';
+
+                    event(new SinglePushEvent($array));
+
+                    $data = [];
+
+                    $data['user']       =   $teacher;
+                    $data['details']    =   trans('notification.task_assign_msg');
+
+                    event(new SingleNotificationEvent($data));
+                }
+            }
+            elseif($data->assignee == 'non_teaching')
+            {
+                foreach ($data->non_teachers as $teacher_id) 
+                {
+
+                    $this->storeTaskAssignee($task->id,'user',$teacher_id);
+
+                    $teacher = User::where('id',$teacher_id)->first();
+
+                    $this->sendToTaskReminder($school_id,$reminder_date,$task->title,$task->id,$teacher->email,$teacher->mobile_no);
+
+                    $array=[];
+
+                    $array['school_id']  =   $school_id;
+                    $array['user_id']    =   $teacher->id;
+                    $array['message']    =   'New Task Assigned';
+                    $array['type']       =   'task';
+
+                    event(new SinglePushEvent($array));
+
+                    $data = [];
+
+                    $data['user']       =   $teacher;
+                    $data['details']    =   trans('notification.task_assign_msg');
+
+                    event(new SingleNotificationEvent($data));
+                }
+            }
+
+            elseif($data->assignee == 'group')
+            {
+                foreach ($data->groups as $group_id) 
+                {
+                    $groups =GroupMember::where('group_id',$group_id)->get();
+                    foreach($groups as $group)
+                    {
+                        $this->storeTaskAssignee($task->id,'group', $group->member_id, $group->group->standardLink_id,$group_id);
+
+                    }
 
                     $teacher = User::where('id',$teacher_id)->first();
 
@@ -175,13 +236,8 @@ trait TodolistProcess
             }
             else
             {
-                $task_assignee = new TaskAssignee;
 
-                $task_assignee->task_id     = $task->id;
-                $task_assignee->user_id     = $auth_id;
-                $task_assignee->status      = 1;
-
-                $task_assignee->save();
+                $this->storeTaskAssignee($task->id,'user',$auth_id);
 
                 $auth_user = User::where('id',$auth_id)->first();
 
@@ -197,6 +253,26 @@ trait TodolistProcess
             Log::info($e->getMessage());
             dd($e->getMessage());
         } 
+    }
+    public function storeTaskAssignee($taskId, $assignedType = 'user', $userId = null, $standardLinkId = null, $groupId = null)
+    {
+        try {
+
+            $taskAssignee = TaskAssignee::create([
+                'task_id'         => $taskId,
+                'user_id'         => $userId,
+                'standardLink_id' => $standardLinkId,
+                'group_id'        => $groupId,
+                'assigned_type'   => $assignedType,
+            ]);
+
+            return $taskAssignee;
+
+        } catch (\Exception $e) {
+
+            Log::info($e->getMessage());
+            return false;
+        }
     }
 
     public function addClassReminder($school_id,$reminder_date,$title,$entity_id,$standardLink_id)
@@ -511,5 +587,72 @@ trait TodolistProcess
             Log::info($e->getMessage());
             dd($e->getMessage());
         } 
+    }
+    public function updatestatus($data)
+    {
+        DB::beginTransaction();
+
+        try {
+
+            foreach ($data->task_completed as $id)
+            {
+                $assignee = TaskAssignee::where([
+                    ['task_id', $id],
+                    ['user_id', Auth::id()]
+                ])->first();
+
+                $assignee->update([
+                    'status' => 'completed',
+                    // 'claimed_by' => Auth::id(),
+                ]);
+                // dd($assignee);
+
+                // Check all assignees completed
+                $pendingCount = TaskAssignee::where('task_id', $assignee->task_id)
+                    ->where('status', 'pending')
+                    ->count();
+
+                if ($pendingCount == 0)
+                {
+                    Task::where('id', $assignee->task_id)
+                        ->update([
+                            'task_status' => 1
+                        ]);
+                }
+
+                // Activity Log
+                $message = trans('messages.task_check_success_msg');
+
+                $ip = $this->getRequestIP();
+
+                $this->doActivityLog(
+                    $assignee,
+                    Auth::user(),
+                    [
+                        'ip' => $ip,
+                        'details' => request()->userAgent()
+                    ],
+                    LOGNAME_MARK_TASK_COMPLETE,
+                    $message
+                );
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => $message,
+            ]);
+
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+            Log::error($e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong'
+            ], 500);
+        }
     }
 }

@@ -50,6 +50,9 @@
        <li class="px-2 mx-3 py-2" v-bind:class="[{'active' : profile_tab === '13'}]">
         <a href="#" class="text-gray-700 font-medium" @click="setProfileTab('13')">Bank Details</a>
       </li>
+      <li class="px-2 mx-3 py-2" v-bind:class="[{'active' : profile_tab === '14'}]">
+      <a href="#" class="text-gray-700 font-medium" @click="setProfileTab('14')">Tags</a>
+    </li>
 
     </ul>
     <Teleport to="#profile">
@@ -65,6 +68,13 @@
             <fees :url="this.url" :name="this.name" :mode="mode"></fees>
             <leaveHistory :url="this.url" :name="this.name" :mode="mode"></leaveHistory>
              <bankdetails :url="this.url" :name="this.name" :mode="mode"></bankdetails>
+             <studentTags 
+  :url="this.url" 
+  :name="this.name" 
+  :entity_id="this.entity_id" 
+  :school_id="this.school_id" 
+  :mode="mode">
+</studentTags>
     </Teleport>
     <Teleport to="#notes">
       <div class="px-3 overflow-x-scroll lg:overflow-x-auto md:overflow-x-auto py-3" v-bind:class="[this.profile_tab==6?'block' :'hidden']">
@@ -89,6 +99,7 @@
   import leaveHistory from './leaveHistory';
   import bankdetails from './bankdetails';
   import fees from './fees';
+  import studentTags from './studentTags';
  
   export default {
     props:['url','name','entity_id','school_id','mode'],
@@ -115,7 +126,8 @@
       medicalHistory,
       fees,
       leaveHistory,
-      bankdetails
+      bankdetails,
+      studentTags
     },
 
     methods:

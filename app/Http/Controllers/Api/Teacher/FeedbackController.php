@@ -153,7 +153,7 @@ class FeedbackController extends Controller
         $messages =  SendMail::where([['school_id',$school_id],['academic_year_id',$academic_year->id],['user_id',Auth::id()]])->whereHas('user',function ($query) 
             {
                 $query->where('usergroup_id',5);
-            })->orderBy('fired_at','desc')->get();
+            })->orderBy('fired_at','desc')->paginate(10);
 
         
 
@@ -166,7 +166,15 @@ class FeedbackController extends Controller
             'message'   =>  'Messages List',
             'type'      =>  'message',
             'count'      =>  $count,
-            'data'      =>  $messages
+            'data'      =>  $messages,
+            'meta' => [
+                'current_page' => $messages->currentPage(),
+                'last_page' => $messages->lastPage(),
+                'per_page' => $messages->perPage(),
+                'total' => $messages->total(),
+                'next_page_url' => $messages->nextPageUrl(),
+                'prev_page_url' => $messages->previousPageUrl(),
+            ]
         ],200);
     }
 
@@ -215,6 +223,7 @@ class FeedbackController extends Controller
         {
 
             $notifications=\DB::table('notifications')->where('notifiable_id',$id)->latest()->get();
+            // ->paginate(10);
 
             $notifications = NotificationResource::collection($notifications);
             
@@ -223,6 +232,14 @@ class FeedbackController extends Controller
                 'message'   =>  'Notification List',
                 'type'      =>  'notification',
                 'data'      =>  $notifications,
+                // 'meta' => [
+                //     'current_page' => $notifications->currentPage(),
+                //     'last_page' => $notifications->lastPage(),
+                //     'per_page' => $notifications->perPage(),
+                //     'total' => $notifications->total(),
+                //     'next_page_url' => $notifications->nextPageUrl(),
+                //     'prev_page_url' => $notifications->previousPageUrl(),
+                // ]
             ],200);
 
         }

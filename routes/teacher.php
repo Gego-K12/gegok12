@@ -54,7 +54,13 @@ Route::group([ 'namespace' =>'Approval' ], function () {
 
             //reject
             Route::post('/assignment/reject/{id}', 'AssignmentApprovalController@reject');
+
+            Route::post('/homework/approve/{id}', 'HomeWorkApprovalController@approve');
+
+            //reject
+            Route::post('/homework/reject/{id}', 'HomeWorkApprovalController@reject');
         });
+
     //with approval  
 });
 
@@ -101,6 +107,7 @@ Route::get('/holidays','HolidaysController@index');
 
     //show
     Route::get('/task/show/{id}', 'TaskController@show');
+     Route::get('/task/view/{id}', 'TaskController@view');
 
     //edit
     Route::get('/task/edit/list/{id}', 'TaskController@editList');
@@ -163,6 +170,7 @@ Route::get('/lessonplan/print/{id}', 'LessonPlanController@print');
 //delete
 Route::get( '/lessonplan/delete/{id}', 'LessonPlanController@destroy');
 
+
 //add
 Route::get('/lessonplan/add/list', 'LessonPlanAddController@addList');
 Route::get('/lessonplan/add', 'LessonPlanAddController@create');
@@ -171,6 +179,7 @@ Route::post('/lessonplan/add/stepOne', 'LessonPlanAddController@stepOne');
 Route::post('/lessonplan/add/stepTwo/{id}', 'LessonPlanAddController@stepTwo');
 Route::post('/lessonplan/add/stepThree/{id}', 'LessonPlanAddController@stepThree');
 Route::post('/lessonplan/add/stepFour/{id}', 'LessonPlanAddController@stepFour');
+Route::post('lesson-plans/{id}/publish', 'LessonPlanAddController@publish');
 
 //edit
 Route::get('/lessonplan/edit/list/{id}', 'LessonPlanEditController@editList');
@@ -425,5 +434,8 @@ Route::get('/bankdetails/edit/{id}', 'BankDetailController@edit');
 Route::post('/bankdetails/update/{id}', 'BankDetailController@update');
 
 Route::get( '/notice/list', 'NoticeBoardController@noticelist' );
+
+// Group
+Route::get('groups/{standardLinkId}', 'GroupController@index');
 
 

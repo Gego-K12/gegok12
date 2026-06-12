@@ -33,7 +33,7 @@ class HomeworkController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function pending($student_id)
+    public function pending(Request $request,$student_id)
     {
         //
         $school_id = Auth::user()->school_id;
@@ -41,9 +41,25 @@ class HomeworkController extends Controller
 
         $student = User::where('id',$student_id)->first();
 
-        $homeworks = Homework::where([['standardLink_id',$student->studentAcademicLatest->standardLink_id],['school_id',$school_id],['academic_year_id',$academic_year->id]])->where('date','>=',date('Y-m-d'))->whereHas('homeworkApproval' ,function ($query) {
-            $query->where('status','approved');
-        })->orderBy('date','DESC')->get();
+        $query = Homework::where([
+            ['standardLink_id',$student->studentAcademicLatest->standardLink_id],
+            ['school_id',$school_id],
+            ['academic_year_id',$academic_year->id]
+        ])
+        ->where('date','>=',date('Y-m-d'))
+        ->where('status','publish');
+
+        //subject filter  
+        if (isset($request->subject_id)) {
+            $query->where('subject_id', $request->subject_id);
+        }
+        
+        //date filter 
+        if (isset($request->date)) {
+            $query->whereDate('date', $request->date);
+        }
+
+        $homeworks=$query->orderBy('date','DESC')->paginate(10);
 
 
 
@@ -95,7 +111,15 @@ class HomeworkController extends Controller
         return response()->json([
             'success'   =>  true,
             'message'   =>  'Pending Homework List',
-            'data'      =>  $array == null ? []:$array
+            'data'      =>  $array == null ? []:$array,
+            'meta' => [
+                'current_page' => $homeworks->currentPage(),
+                'last_page' => $homeworks->lastPage(),
+                'per_page' => $homeworks->perPage(),
+                'total' => $homeworks->total(),
+                'next_page_url' => $homeworks->nextPageUrl(),
+                'prev_page_url' => $homeworks->previousPageUrl(),
+            ]
         ],200);
     }
 
@@ -104,16 +128,32 @@ class HomeworkController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function finished($student_id)
+    public function finished(Request $request,$student_id)
     {
         //
          $school_id = Auth::user()->school_id;
         $academic_year = SiteHelper::getAcademicYear($school_id);
 
         $student = User::where('id',$student_id)->first();
-        $homeworks = Homework::where([['standardLink_id',$student->studentAcademicLatest->standardLink_id],['school_id',$school_id],['academic_year_id',$academic_year->id]])->where('date','<',date('Y-m-d'))->whereHas('homeworkApproval' ,function ($query) {
-            $query->where('status','approved');
-        })->orderBy('date','DESC')->get();
+
+        $query = Homework::where([
+                ['standardLink_id',$student->studentAcademicLatest->standardLink_id],
+                ['school_id',$school_id],
+                ['academic_year_id',$academic_year->id]
+            ])
+            ->where('date','<',date('Y-m-d'))
+            ->where('status','publish');
+
+        //subject filter  
+        if (isset($request->subject_id)) {
+            $query->where('subject_id', $request->subject_id);
+        }
+        
+        //date filter 
+        if (isset($request->date)) {
+            $query->whereDate('date', $request->date);
+        }
+        $homeworks = $query->orderBy('date','DESC')->paginate(10);
 
         //$homework = HomeworkResource::collection($homework);
         $array = [];
@@ -163,7 +203,15 @@ class HomeworkController extends Controller
         return response()->json([
             'success'   =>  true,
             'message'   =>  'Finished Homework List',
-            'data'      =>  $array == null ? []:$array
+            'data'      =>  $array == null ? []:$array,
+            'meta' => [
+                'current_page' => $homeworks->currentPage(),
+                'last_page' => $homeworks->lastPage(),
+                'per_page' => $homeworks->perPage(),
+                'total' => $homeworks->total(),
+                'next_page_url' => $homeworks->nextPageUrl(),
+                'prev_page_url' => $homeworks->previousPageUrl(),
+            ]
         ],200);
     }
 

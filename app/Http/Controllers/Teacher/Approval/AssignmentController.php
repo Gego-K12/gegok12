@@ -46,21 +46,34 @@ class AssignmentController extends Controller
         {
             $assignment = Assignment::where([
                     ['school_id',Auth::user()->school_id],
-                    ['academic_year_id',$academic_year->id]
-                ])->whereHas('assignmentApproval' , function($query) use($status) {
-                    $query->where('status',$status);
-                });
+                    ['academic_year_id',$academic_year->id],
+                    ['status',$status]
+                ]);
+            // ->whereHas('assignmentApproval' , function($query) use($status) {
+            //         $query->where('status',$status);
+            //     });
         }
         else
         {
             $assignment = Assignment::where([
                     ['school_id',Auth::user()->school_id],
                     ['academic_year_id',$academic_year->id],
-                    ['teacher_id',Auth::id()]
-                ])->whereHas('assignmentApproval' , function($query) use($status) {
-                    $query->where('status',$status);
-                });
+                    ['teacher_id',Auth::id()],
+                    ['status',$status]
+                ]);
+
+            // $approve_status =$status;
+            // if($status=='ongoing')
+            // {
+            //     $approve_status ='approved';
+
+            // }
+
+            // $assignment=$assignment->whereHas('assignmentApproval' , function($query) use($approve_status) {
+            //         $query->where('status',$approve_status);
+            //     });
         }
+       
         if(count((array)\Request::getQueryString())>0)
         {
             if($request->standardLink_id != '')
@@ -138,6 +151,7 @@ class AssignmentController extends Controller
      */
     public function store(AssignmentAddRequest $request)
     {
+        // dd('hii');
         //
         try
         {
@@ -162,24 +176,36 @@ class AssignmentController extends Controller
             }
 
             $assignment->marks              =   $request->marks;
-            $assigned_date = date('Y-m-d',strtotime($request->assigned_date));
-            $assignment->assigned_date      =   $assigned_date;
-            $assignment->submission_date    =   date('Y-m-d',strtotime($request->submission_date));
-            if($assigned_date == date('Y-m-d'))
-            {
-                $assignment->status             =   'ongoing';
-            }
-            else
-            {
-                $assignment->status             =   'pending';
-            }
+            $assignment->assigned_date = $request->assigned_date ? date('Y-m-d', strtotime($request->assigned_date)) : null;
+
+            $assignment->submission_date = !empty($request->submission_date) ? date('Y-m-d', strtotime($request->submission_date)) : null;
+            
+            $assignment->status             =   $request->status;
+
+
+            // if($assignment->assigned_date == date('Y-m-d'))
+            // {
+            //     $assignment->status             =   'ongoing';
+            // }
+            // else
+            // {
+            //     $assignment->status             =   'pending';
+            // }
+   
 
             $assignment->save();
 
             $assignmentapproval = new AssignmentApproval;
 
             $assignmentapproval->assignment_id  = $assignment->id;
-            $assignmentapproval->status         = 'pending';
+
+            $status_approval='approved';
+            if(config('settings.assignment_status') == 1)
+            {
+                $status_approval='pending';
+            }
+
+            $assignmentapproval->status         = $status_approval;
 
             $assignmentapproval->save();
 
@@ -242,6 +268,7 @@ class AssignmentController extends Controller
         $array['assigned_date']     =   date('Y-m-d',strtotime($assignment->assigned_date));
         $array['submission_date']   =   date('Y-m-d',strtotime($assignment->submission_date));
         $array['attachment']        =   $assignment->attachment==null ? '':$assignment->attachment;
+        $array['status']        =   $assignment->status;
 
         return $array;
     }
@@ -300,17 +327,19 @@ class AssignmentController extends Controller
 
 
             $assignment->marks              =   $request->marks;
-            $assigned_date = date('Y-m-d',strtotime($request->assigned_date));
-            $assignment->assigned_date      =   $assigned_date;
-            $assignment->submission_date    =   date('Y-m-d',strtotime($request->submission_date));
-            if($assigned_date == date('Y-m-d'))
-            {
-                $assignment->status             =   'ongoing';
-            }
-            else
-            {
-                $assignment->status             =   'pending';
-            }
+            $assignment->assigned_date = $request->assigned_date ? date('Y-m-d', strtotime($request->assigned_date)) : null;
+
+            $assignment->submission_date = !empty($request->submission_date) ? date('Y-m-d', strtotime($request->submission_date)) : null;
+            
+            $assignment->status             =   $request->status;
+            // if($assigned_date == date('Y-m-d'))
+            // {
+            //     $assignment->status             =   'ongoing';
+            // }
+            // else
+            // {
+            //     $assignment->status             =   'pending';
+            // }
 
             $assignment->save(); 
 

@@ -63,7 +63,6 @@ class LeaveController extends Controller
      */
     public function availableList()
     {
-        //
         $school_id = Auth::user()->school_id;
         $academic_year = SiteHelper::getAcademicYear($school_id);
         $leavetypes       = LeaveType::where([['school_id',$school_id],['academic_year_id',$academic_year->id],['status',1]])->orWhereHas('teacherLeaveApplication',function ($query){

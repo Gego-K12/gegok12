@@ -91,6 +91,21 @@
                                     </div> 
                                 
                                 </li>
+                                <li id="filter-content-tag" class="filter_container hide flex">
+                                    <div class="flex flex-col lg:flex-row md:flex-row items-center my-1 w-1/2 px-4">
+                                        <div class="person_filter_name_title w-full lg:w-2/5 md:w-2/5">
+                                            <p class="text-gray-700">Tag</p>
+                                        </div>
+                                        <div class="advanced_search_option_container my-1 w-full lg:w-3/5 md:w-2/5">
+                                            <select name="tag" v-model="tag" id="tag" class="filter-form-control" data-type="dropdown">
+                                                <option value="" disabled="disabled">Tag</option>
+                                                <option v-for="tag in taglist" :key="tag.id" :value="tag.tag_name">
+                                                    {{ tag.tag_name }}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </li>
 
                                  <li id="filter-content-age" class="filter_container hide flex">
                                     <div class="flex flex-col lg:flex-row md:flex-row items-center my-1 w-1/2 px-4">
@@ -211,6 +226,8 @@
                 months:[{id:'01' , name:'January'} , {id:'02' , name:'February'} , {id:'03' , name:'March'} , {id:'04' , name:'April'} , {id:'05' , name:'May'} , {id:'06' , name:'June'} , {id:'07' , name:'July'} , {id:'08' , name:'August'} , {id:'09' , name:'September'} , {id:'10' , name:'October'} , {id:'11' , name:'November'} , {id:'12' , name:'December'}],
                 admission_number:'',
                 status:'',
+                tag: '',
+                taglist: [],
             }
         },
 
@@ -255,6 +272,7 @@
                     caste:this.caste,
                     admission_number:this.admission_number,
                     status:this.status,
+                    tag:this.tag,
                 };
 
                 if(this.type == 'report')
@@ -272,6 +290,7 @@
                         caste:this.caste,
                         standard:this.standard,
                         status:this.status,
+                        tag:this.tag,
                     };
                 }
 
@@ -344,6 +363,13 @@
                     //console.log(this.standardLinklist)
                 }
             },
+            getTags()
+            {
+                axios.get(this.url + '/admin/student-tags')
+                    .then(response => {
+                        this.taglist = response.data.tags;
+                    });
+            },
         },
 
         created()
@@ -355,6 +381,7 @@
                 }
             });
             this.getData();
+             this.getTags();
         },
     }
 </script>

@@ -66,6 +66,21 @@
         </div>
         @endif
 
+        <div class="w-1/3 lg:w-1/4 md:w-1/3 text-center py-4">
+          <a href="javascript:void(0)" onclick="openModal()">
+            <div class="bg-gray-200 rounded-full w-8 h-8 lg:w-10 md:h-10 md:w-10 flex items-center justify-center mx-auto hover:bg-gray-100">
+              
+              <!-- Simple Group Icon -->
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 lg:w-5 lg:h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87M7 7a4 4 0 118 0 4 4 0 01-8 0zm10 4a4 4 0 110-8 4 4 0 010 8z"/>
+              </svg>
+
+            </div>
+            <span class="hover:font-semibold hidden lg:block md:block">Groups</span>
+          </a>
+        </div>
+
         <div class=" mb-2 px-2 py-2">
           <div class="bg-gray-200 rounded-full w-6 h-6 ml-auto flex items-center justify-center cursor-pointer" onclick="show('showdetail')">
             <svg class="w-3 h-3 fill-current text-gray-600" id="Capa_1" enable-background="new 0 0 515.555 515.555" height="512" viewBox="0 0 515.555 515.555" width="512" xmlns="http://www.w3.org/2000/svg"><path d="m303.347 18.875c25.167 25.167 25.167 65.971 0 91.138s-65.971 25.167-91.138 0-25.167-65.971 0-91.138c25.166-25.167 65.97-25.167 91.138 0"/><path d="m303.347 212.209c25.167 25.167 25.167 65.971 0 91.138s-65.971 25.167-91.138 0-25.167-65.971 0-91.138c25.166-25.167 65.97-25.167 91.138 0"/><path d="m303.347 405.541c25.167 25.167 25.167 65.971 0 91.138s-65.971 25.167-91.138 0-25.167-65.971 0-91.138c25.166-25.167 65.97-25.167 91.138 0"/></svg>
@@ -95,6 +110,37 @@
     <div id="class"></div>
     <div id="notes"></div>
   </div>
+
+  <div id="groupModal" class="hidden fixed inset-0 bg-black bg-opacity-50 items-center justify-center">
+    
+    <div class="bg-white p-6 rounded-lg w-full max-w-lg shadow-lg">
+        
+        <h2 class="font-bold text-lg mb-4">Add Group</h2>
+
+        <!-- Input -->
+        <input 
+            type="text" 
+            id="group_name" 
+            class="border w-full p-2 rounded mb-1" 
+            placeholder="Enter Group Name"
+        >
+
+        <!-- Validation error -->
+        <p id="group_error" class="text-red-500 text-sm mb-3 hidden"></p>
+
+        <!-- Buttons -->
+        <div class="flex justify-end mt-4">
+            <button onclick="closeModal()" class="mr-2 px-4 py-2 bg-gray-300 rounded">
+                Cancel
+            </button>
+
+            <button onclick="saveGroup()" class="px-4 py-2 bg-green-500 text-white rounded">
+                Save
+            </button>
+        </div>
+
+    </div>
+</div>
 </div>
 
 @push('scripts')
@@ -113,4 +159,52 @@
       }
     }
   </script>
+  <script>
+function openModal() {
+    let modal = document.getElementById('groupModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+function closeModal() {
+    let modal = document.getElementById('groupModal');
+    modal.classList.remove('flex');
+    modal.classList.add('hidden');
+
+    // reset input + error
+    document.getElementById('group_name').value = '';
+    document.getElementById('group_error').classList.add('hidden');
+}
+
+function saveGroup() {
+    let name = document.getElementById('group_name').value;
+    let errorBox = document.getElementById('group_error');
+
+    // reset error
+    errorBox.classList.add('hidden');
+    errorBox.innerText = '';
+
+    // frontend validation
+    if (!name) {
+        errorBox.innerText = "Group name is required";
+        errorBox.classList.remove('hidden');
+        return;
+    }
+
+    axios.post('/admin/group/store', {
+        group_name: name,
+        standards_link_id: {{ $standardLink->id }}
+    })
+    .then(response => {
+        closeModal();
+        location.reload();
+    })
+    .catch(error => {
+        if (error.response && error.response.data.errors) {
+            errorBox.innerText = Object.values(error.response.data.errors)[0][0];
+            errorBox.classList.remove('hidden');
+        }
+    });
+}
+</script>
 @endpush

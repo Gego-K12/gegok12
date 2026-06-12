@@ -32,20 +32,31 @@ class AssignmentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index($student_id)
+    public function index(Request $request,$student_id)
     {
         //
         $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
         $student = User::where('id',$student_id)->first();
-        $assignments = Assignment::where([
+
+        $query = Assignment::where([
                 ['school_id',Auth::user()->school_id],
                 ['academic_year_id',$academic_year->id],
                 ['standardLink_id',$student->studentAcademicLatest->standardLink_id],
                 ['submission_date','>=',date('Y-m-d')],
                 ['status','ongoing']
-            ])->orderBy('submission_date','ASC')->whereHas('assignmentApproval' , function($query) {
-                    $query->where('status','approved');
-                })->get();
+            ]);
+
+        //date filter  
+        if (isset($request->date)) {
+            $query->whereDate('assigned_date', $request->date);
+        }
+
+        //subject filter  
+        if (isset($request->subject_id)) {
+            $query->where('subject_id', $request->subject_id);
+        }
+
+        $assignments = $query->orderBy('submission_date','ASC')->paginate(10);
 
         $array = [];
         //$assignment = AssignmentResource::collection($assignment);
@@ -99,7 +110,15 @@ class AssignmentController extends Controller
         return response()->json([
             'success'   =>  true,
             'message'   =>  'Ongoing Assignment',
-            'data'      =>  $array == null ? []:$array
+            'data'      =>  $array == null ? []:$array,
+            'meta' => [
+                'current_page' => $assignments->currentPage(),
+                'last_page' => $assignments->lastPage(),
+                'per_page' => $assignments->perPage(),
+                'total' => $assignments->total(),
+                'next_page_url' => $assignments->nextPageUrl(),
+                'prev_page_url' => $assignments->previousPageUrl(),
+            ]
         ],200);
     }
 
@@ -113,15 +132,29 @@ class AssignmentController extends Controller
         //
         $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
         $student = User::where('id',$student_id)->first();
-        $assignment = Assignment::where([
+
+        $query = Assignment::where([
                 ['school_id',Auth::user()->school_id],
                 ['academic_year_id',$academic_year->id],
                 ['standardLink_id',$student->studentAcademicLatest->standardLink_id],
                 ['submission_date','<=',date('Y-m-d')],
                 ['status','completed']
-            ])->whereHas('assignmentApproval' , function($query) {
-                    $query->where('status','approved');
-                })->get();
+            ]);
+        // ->whereHas('assignmentApproval' , function($query) {
+        //             $query->where('status','approved');
+        //         })->get();
+        //date filter  
+        if (isset($request->date)) {
+            $query->whereDate('assigned_date', $request->date);
+        }
+
+        //subject filter  
+        if (isset($request->subject_id)) {
+            $query->where('subject_id', $request->subject_id);
+        }
+
+        $assignments = $query->orderBy('submission_date','ASC')->paginate(10);
+
         $array = [];
         //$assignment = AssignmentResource::collection($assignment);
         foreach ($assignments as $key => $assignment) 
@@ -172,7 +205,15 @@ class AssignmentController extends Controller
         return response()->json([
             'success'   =>  true,
             'message'   =>  'Completed Assignment',
-            'data'      =>  $array == null ? []:$array
+            'data'      =>  $array == null ? []:$array,
+            'meta' => [
+                'current_page' => $assignments->currentPage(),
+                'last_page' => $assignments->lastPage(),
+                'per_page' => $assignments->perPage(),
+                'total' => $assignments->total(),
+                'next_page_url' => $assignments->nextPageUrl(),
+                'prev_page_url' => $assignments->previousPageUrl(),
+            ]
         ],200);
     }
 
@@ -234,7 +275,8 @@ class AssignmentController extends Controller
 
             $studentAssignment->assignment_id   =   $assignment_id;
             $studentAssignment->user_id         =   $student_id;
-            $files   =   $request->file('assignment_file');
+            $files[]   =   $request->file('assignment_file');
+            
             $path = [];
             $i = 1;
             foreach($files as $file) 

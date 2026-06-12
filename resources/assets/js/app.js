@@ -17,6 +17,13 @@ window.bus = bus;
 import uploader from 'vue-simple-uploader'
 import AudioRecorder from 'vue-audio-recorder'
 
+import PrimeVue from 'primevue/config'
+
+// styles
+import 'primevue/resources/themes/lara-light-blue/theme.css'
+import 'primevue/resources/primevue.min.css'
+import 'primeicons/primeicons.css'
+
 import registerCustomAddon from './custom_addon'
 
 /**
@@ -338,6 +345,7 @@ app.component('list-lentbook', () => import('./components/booklending/List.vue')
 app.component('create-todo', () => import('./components/todolist/Create.vue').then(m => m.default));
 app.component('edit-todo', () => import('./components/todolist/Edit.vue').then(m => m.default));
 app.component('list-todo', () => import('./components/todolist/List.vue').then(m => m.default));
+app.component('task-show', () => import('./components/todolist/Show.vue').then(m => m.default));
 
 //dashboard to do 
 app.component('list-task-tab', () => import('./components/todolist/listTab.vue').then(m => m.default));
@@ -401,6 +409,10 @@ app.use(Toast)
 registerCustomAddon(app)
 // app.use(uploader)
 // app.use(AudioRecorder)
+import PickList from 'primevue/picklist';
 
+app.component('PickList', PickList);
+
+app.use(PrimeVue)
 
 app.mount('#app');

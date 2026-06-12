@@ -222,6 +222,11 @@ class LessonPlanEditController extends Controller
             $lessonplan->notes              =   $request->notes;
             $lessonplan->modification       =   $request->modification;
             $lessonplan->status             =   'pending';
+            
+            if(Auth::user()->hasRole('principal'))
+            {
+                $lessonplan->status = 'approved';
+            }
 
             $lessonplan->save();
 

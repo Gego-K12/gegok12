@@ -25,6 +25,7 @@ use App\Models\Userprofile;
 use App\Models\Standard;
 use App\Traits\Common;
 use App\Models\User;
+use App\Models\Group;
 use Carbon\Carbon;
 use Exception;
 use Hash;
@@ -127,24 +128,57 @@ class StudentController extends Controller
      *
      * @return array
      */
+    // public function member()
+    // {
+    //   $academic_year  = SiteHelper::getAcademicYear(Auth::user()->school_id);
+
+    //   $array = [];
+        
+    //   $array['academic_year_id']  =   $academic_year->id;
+    //   $array['countrylist']       =   SiteHelper::getCountries();
+    //   $array['statelist']         =   SiteHelper::getStates();
+    //   $array['citylist']          =   SiteHelper::getCities();
+    //   $array['standardLinklist']  =   SiteHelper::getStandardLinkList(Auth::user()->school_id);
+    //   $array['blood_groups']      =   SiteHelper::getBloodGroups();
+    //   $array['castelist']         =   SiteHelper::getCasteList();
+    //   $array['transportlist']     =   SiteHelper::getTransportList();
+    //   $array['date_of_birth']     =   date('Y-m-d',strtotime('-4 years',strtotime(date('Y'))));
+    //   $array['joining_date']      =   date('Y-m-d');
+        
+    //   return $array;
+    // }
     public function member()
     {
-      $academic_year  = SiteHelper::getAcademicYear(Auth::user()->school_id);
+        $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
 
-      $array = [];
-        
-      $array['academic_year_id']  =   $academic_year->id;
-      $array['countrylist']       =   SiteHelper::getCountries();
-      $array['statelist']         =   SiteHelper::getStates();
-      $array['citylist']          =   SiteHelper::getCities();
-      $array['standardLinklist']  =   SiteHelper::getStandardLinkList(Auth::user()->school_id);
-      $array['blood_groups']      =   SiteHelper::getBloodGroups();
-      $array['castelist']         =   SiteHelper::getCasteList();
-      $array['transportlist']     =   SiteHelper::getTransportList();
-      $array['date_of_birth']     =   date('Y-m-d',strtotime('-4 years',strtotime(date('Y'))));
-      $array['joining_date']      =   date('Y-m-d');
-        
-      return $array;
+        $standardlinks = collect(
+            SiteHelper::getStandardLinkList(Auth::user()->school_id)
+        )->map(function ($item) {
+
+            $item['groups'] = Group::where('standardLink_id', $item['id'])
+                ->select('id', 'group_name')
+                ->get();
+
+            return $item;
+        });
+
+        $array = [];
+
+        $array['academic_year_id'] = $academic_year->id;
+        $array['countrylist']      = SiteHelper::getCountries();
+        $array['statelist']        = SiteHelper::getStates();
+        $array['citylist']         = SiteHelper::getCities();
+
+        // updated
+        $array['standardLinklist'] = $standardlinks;
+
+        $array['blood_groups']     = SiteHelper::getBloodGroups();
+        $array['castelist']        = SiteHelper::getCasteList();
+        $array['transportlist']    = SiteHelper::getTransportList();
+        $array['date_of_birth']    = date('Y-m-d', strtotime('-4 years', strtotime(date('Y'))));
+        $array['joining_date']     = date('Y-m-d');
+
+        return $array;
     }
 
     /**

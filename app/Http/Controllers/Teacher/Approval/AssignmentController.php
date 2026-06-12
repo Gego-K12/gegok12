@@ -62,16 +62,16 @@ class AssignmentController extends Controller
                     ['status',$status]
                 ]);
 
-            $approve_status =$status;
-            if($status=='ongoing')
-            {
-                $approve_status ='approved';
+            // $approve_status =$status;
+            // if($status=='ongoing')
+            // {
+            //     $approve_status ='approved';
 
-            }
+            // }
 
-            $assignment=$assignment->whereHas('assignmentApproval' , function($query) use($approve_status) {
-                    $query->where('status',$approve_status);
-                });
+            // $assignment=$assignment->whereHas('assignmentApproval' , function($query) use($approve_status) {
+            //         $query->where('status',$approve_status);
+            //     });
         }
        
         if(count((array)\Request::getQueryString())>0)

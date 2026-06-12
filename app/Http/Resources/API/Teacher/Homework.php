@@ -76,7 +76,8 @@ class Homework extends JsonResource
             'type'              =>  $type,
             'submission_date'   => $this->submission_date ? date('d-m-Y', strtotime($this->submission_date)) : '',
             'approve_status'            =>  $this->homeworkApproval->status,
-            'role'                      =>  $role 
+            'role'                      =>  $role,
+            'created_by'                => $this->createdBy->fullname,  
         ];
     }
 }

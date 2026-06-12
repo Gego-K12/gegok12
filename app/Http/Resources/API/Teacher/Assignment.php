@@ -99,7 +99,8 @@ class Assignment extends JsonResource
             'show'                      =>  $show,
             'type'                      =>  $type,
             'approve_status'            =>  $this->assignmentApproval->status,
-            'role'                      =>  $role  
+            'role'                      =>  $role,
+            'created_by'                => $this->teacher->fullname,  
         ];
     }
 }

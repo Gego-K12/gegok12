@@ -55,18 +55,37 @@ class SiteHelper
      * @return \App\Models\AcademicYear|null
      */
 
-    public static function getAcademicYear($school_id)
+    // public static function getAcademicYear($school_id)
+    // {
+    //     $schoolCacheKey = "academic_year_for_school_" . $school_id;
+    //     return Cache::remember($schoolCacheKey, env('CACHE_TIME'), function () use ($school_id) {
+    //         $academic_year = AcademicYear::where([['school_id', $school_id],['status',1]]);   //['status',1]
+    //         if (Cache::has('academic_year') && Cache::get('academic_year') != '') {
+    //             $academic_year_id = Cache::get('academic_year');
+    //             $academic_year = $academic_year->where('id', $academic_year_id);
+    //         }
+
+    //         $academic_year = $academic_year->first();
+    //         return $academic_year;
+    //     });
+    // }
+   public static function getAcademicYear($school_id)
     {
-        $schoolCacheKey = "academic_year_for_school_" . $school_id;
-        return Cache::remember($schoolCacheKey, env('CACHE_TIME'), function () use ($school_id) {
-            $academic_year = AcademicYear::where([['school_id', $school_id],['status',1]]);   //['status',1]
-            if (Cache::has('academic_year') && Cache::get('academic_year') != '') {
-                $academic_year_id = Cache::get('academic_year');
-                $academic_year = $academic_year->where('id', $academic_year_id);
+        $academic_year_id = Cache::get('academic_year');
+
+        $schoolCacheKey = "academic_year_for_school_{$school_id}_{$academic_year_id}";
+
+        return Cache::remember($schoolCacheKey, env('CACHE_TIME'), function () use ($school_id, $academic_year_id) {
+
+            $query = AcademicYear::where('school_id', $school_id);
+
+            if (!empty($academic_year_id)) {
+                $query->where('id', $academic_year_id);
+            } else {
+                $query->where('status', 1);
             }
 
-            $academic_year = $academic_year->first();
-            return $academic_year;
+            return $query->first();
         });
     }
     /**

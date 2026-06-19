@@ -105,7 +105,7 @@ class SettingsTableSeeder extends Seeder
             'description'   => 'Assignment Status',
             'value'         => 1,
             'field'         => '{"name":"value","label":"Register Status" ,"type":"radio", "options":{"1":"Active", "0":"Inactive"}}',
-            'active'        => 1,
+            'active'        => 0,
             'created_at'    => date("Y-m-d H:i:s"),
             'updated_at'    => date("Y-m-d H:i:s"), 
 
@@ -114,7 +114,7 @@ class SettingsTableSeeder extends Seeder
             'key'           => 'homework_status',
             'name'          => 'Homework Status',
             'description'   => 'Homework Status',
-            'value'         => 1,
+            'value'         => 0,
             'field'         => '{"name":"value","label":"Register Status" ,"type":"radio", "options":{"1":"Active", "0":"Inactive"}}',
             'active'        => 1,
             'created_at'    => date("Y-m-d H:i:s"),

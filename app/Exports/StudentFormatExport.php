@@ -9,6 +9,13 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class StudentFormatExport implements FromArray, WithStyles, ShouldAutoSize
 {
+    protected $classes;
+
+    public function __construct($classes)
+    {
+        $this->classes = $classes;
+    }
+
     public function array(): array
     {
         return [
@@ -75,7 +82,7 @@ class StudentFormatExport implements FromArray, WithStyles, ShouldAutoSize
                 '(male,female)',
                 '',
                 '(a+,a1+,b+,b1+,o+,ab+,a1b+,a-,a1-,b-,b1-,o-,ab-,a1b-)',
-                'example : 1',
+                implode(',', $this->classes),
                 '(A,B)',
                 '',
                 '',

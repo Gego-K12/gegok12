@@ -13,6 +13,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\StudentFormatExport;
 use Illuminate\Http\Request;
 use App\Models\Subscription;
+use App\Models\Standard;
 use App\Imports\UsersImport;
 use App\Traits\LogActivity;
 use App\Traits\Common;
@@ -123,10 +124,12 @@ class ImportMemberController extends Controller
      */
     public function downloadFormat(Request $request)
     {      
-    
+        $classes = Standard::orderBy('name')
+                ->pluck('name')
+                ->toArray();
 
         return Excel::download(
-            new StudentFormatExport(),
+            new StudentFormatExport($classes),
             'School_Plus_Add_Student_Format.xlsx'
         );
         // $message = 'Downloaded Sample Format File Successfully';

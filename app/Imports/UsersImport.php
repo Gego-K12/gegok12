@@ -96,14 +96,14 @@ class UsersImport implements ToCollection, WithHeadingRow
                     $qualification_id[$i]     = $qualification_array[$i] === '' ? 1 : $qualification_array[$i];
                 }
 
-                // --- Class / standard resolution ------------------------------------
+                // --- Class / standard resolution
                 if (is_int($row['class']))
                 {
                     $class_name = $row['class'];
                 }
                 else
                 {
-                    if (in_array($row['class'], ['LKG', 'UKG'], true))
+                    if (in_array($row['class'], ['prekg', 'lkg', 'ukg'], true))
                     {
                         $class_name = $row['class'];
                     }
@@ -157,7 +157,7 @@ class UsersImport implements ToCollection, WithHeadingRow
                     continue;
                 }
 
-                // --- Build student object -------------------------------------------
+                // --- Build student object 
                 $student->firstname           = $row['firstname'];
                 $student->lastname            = $row['lastname'];
                 $student->mobile_no           = $row['mobile_no'];

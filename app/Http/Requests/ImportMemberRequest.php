@@ -55,7 +55,7 @@ class ImportMemberRequest extends FormRequest
         [
             'import_file.required'              => 'File is required',
             'import_file.check_academic_year'   => 'Academic Year Is Not Found',
-            'import_file.file_extension'        => 'Choose csv file',
+            'import_file.mimes'              => 'Please choose an Excel file (.xlsx or .xls).',
             'import_file.max'                   => 'Maximum file size to upload is 2MB',
         ];
     }

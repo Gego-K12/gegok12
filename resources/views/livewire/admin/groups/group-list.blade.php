@@ -28,7 +28,6 @@
             <table class="w-full border-collapse border">
                 <thead>
                     <tr class="bg-gray-100">
-                        <th class="border px-4 py-2 text-left">#</th>
                         <th class="border px-4 py-2 text-left">Group Name</th>
                         <th class="border px-4 py-2 text-left">Type</th>
                         <th class="border px-4 py-2 text-left">class</th>
@@ -40,16 +39,13 @@
                 <tbody>
                     @forelse($groups as $index => $group)
                         <tr>
-                            <td class="border px-4 py-2">
-                                {{ $groups->firstItem() + $index }}
-                            </td>
 
                             <td class="border px-4 py-2">
                                 {{ ucfirst($group->group_name) }}
                             </td>
 
                             <td class="border px-4 py-2">
-                                {{ $group->type ?? '-' }}
+                                {{ $group->type == 'global' ? 'General' : ($group->type == 'class' ? 'Class Wise' : '-') }}
                             </td>
 
                             <td class="border px-4 py-2">
@@ -139,7 +135,7 @@
                             class="w-full border rounded px-3 py-2 text-sm"
                         >
                             <option value="">Select Type</option>
-                            <option value="global">Global</option>
+                            <option value="global">General</option>
                             <option value="class">Class</option>
                         </select>
 

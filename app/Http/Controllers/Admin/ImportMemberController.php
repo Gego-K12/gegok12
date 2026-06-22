@@ -10,6 +10,7 @@ use App\Http\Requests\ImportMemberRequest;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\StudentFormatExport;
 use Illuminate\Http\Request;
 use App\Models\Subscription;
 use App\Imports\UsersImport;
@@ -122,61 +123,21 @@ class ImportMemberController extends Controller
      */
     public function downloadFormat(Request $request)
     {      
-        $csv = Writer::createFromFileObject(new \SplTempFileObject());
+    
 
-        $csv->insertOne([
-            'firstname','lastname','mobile_no','email','gender','date_of_birth',
-            'blood_group','class','section','address','city','state','country',
-            'pincode','birth_place','native_place','mother_tongue','caste',
-            'sub_caste','aadhar_number','joining_date','admission_number',
-            'EMIS_number','roll_number','id_card_number',
-            'board_registration_number','mode_of_transport','driver_name',
-            'driver_contact_number','siblings','siblings_count',
-            'sibling_relation','sibling_name','sibling_date_of_birth',
-            'sibling_class','notes','parent_firstname','parent_lastname',
-            'parent_mobile_no','parent_alternate_no','parent_email',
-            'parent_qualification','parent_occupation','parent_sub_occupation',
-            'parent_designation','parent_organization_name',
-            'parent_official_address','parent_annual_income','relation'
-        ]);
-
-        $csv->insertOne([
-            'firstname','lastname','mobile_no','email','(male , female)',
-            'date_of_birth',
-            '(a+,a1+,b+,b1+,o+,ab+,a1b+,a-,a1-,b-,b1-,o-,ab-,a1b-)',
-            'example : 1','(A,B)','address','city','state','country','pincode',
-            'birth_place','native_place','mother_tongue',
-            '(BC,BCM,FC,MBC,OBC,Others,SC,SCA,ST)',
-            'sub_caste','aadhar_number','joining_date','admission_number',
-            'EMIS_number','roll_number','id_card_number',
-            '(only for 10th and 12th students)',
-            '(auto,car,city_bus,cycle,rickshaw,school_bus,taxi,walking)',
-            'if auto,rickshaw,taxi','if auto,rickshaw,taxi',
-            '(yes,no)','siblings_count',
-            'sibling_relation1,sibling_relation2,..',
-            'sibling_name1,sibling_name2,..',
-            'sibling_date_of_birth1,sibling_date_of_birth2,..',
-            'sibling_standard1,sibling_standard2,..',
-            'notes','parent_firstname','parent_lastname',
-            'parent_mobile_no','parent_alternate_no','parent_email',
-            'UG Degree,PG Degree',
-            '(business,central_government_employee,private,home_maker,state_government_employee,others)',
-            'enter if not home_maker','enter if not home_maker',
-            'enter if not home_maker','enter if not home_maker',
-            'enter if not home_maker','(father,mother,guardian)',
-        ]);
-
-        $csv->output('School Plus Add Student Format' . date('_d-m-Y_H:i') . '.csv');
-
-        $message = 'Downloaded Sample Format File Successfully';
-
-        $ip = $this->getRequestIP();
-        $this->doActivityLog(
-            Auth::user(),
-            Auth::user(),
-            ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT']],
-            LOGNAME_DOWNLOAD_SAMPLE_FORMAT,
-            $message
+        return Excel::download(
+            new StudentFormatExport(),
+            'School_Plus_Add_Student_Format.xlsx'
         );
+        // $message = 'Downloaded Sample Format File Successfully';
+
+        // $ip = $this->getRequestIP();
+        // $this->doActivityLog(
+        //     Auth::user(),
+        //     Auth::user(),
+        //     ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT']],
+        //     LOGNAME_DOWNLOAD_SAMPLE_FORMAT,
+        //     $message
+        // );
     }
 }

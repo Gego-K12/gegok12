@@ -1,8 +1,8 @@
 <?php
-   
+
 namespace App\Imports;
 
-use Maatwebsite\Excel\Concerns\WithHeadingRow;  
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Collection;
@@ -56,40 +56,54 @@ class UsersImport implements ToCollection, WithHeadingRow
      */
     public function collection(Collection $rows)
     {
-        try 
-        {
-            $school_id      = Auth::user()->school_id;
-            $academic_year  = AcademicYear::where('school_id', $school_id)->where('status', 1)->first();
-            $user_count     = User::ByRole(6)->where('school_id', $school_id)->count();
-            $subscription   = Subscription::where('school_id', $school_id)->first();
-            $count          = $subscription->plan->no_of_members - $user_count;
+        $school_id     = Auth::user()->school_id;
+        $academic_year = AcademicYear::where('school_id', $school_id)->where('status', 1)->first();
+        $user_count    = User::ByRole(6)->where('school_id', $school_id)->count();
+        $subscription  = Subscription::where('school_id', $school_id)->first();
+        $count         = $subscription && $subscription->plan
+            ? $subscription->plan->no_of_members - $user_count
+            : 0;
 
-            foreach ($rows as $row) 
-            { 
-                $array = str_getcsv($row['parent_qualification']);
-                for ($i = 0; $i < count($array); $i++)
+        $insertedcount = 0;
+        $skipped_rows  = [];
+
+        foreach ($rows as $rowIndex => $row)
+        {
+            // Fresh objects every row - this is what was missing and caused
+            // "Attempt to assign property on null"
+            $student = new \stdClass();
+            $parent  = new \stdClass();
+
+            // Reset per-row scratch arrays so previous row's data can't leak in
+            $arr                 = [];
+            $qualification_array = [];
+            $qualification_id    = [];
+
+            try
+            {
+                // --- Qualifications -------------------------------------------------
+                $qualArray = str_getcsv((string) $row['parent_qualification']);
+
+                foreach ($qualArray as $i => $qualName)
                 {
-                    $arr[$i] = Qualification::where('type', 'ug')
-                        ->where('type', 'pg')
-                        ->where('display_name', 'LIKE', '%' . $array[$i] . '%')
+                    $ids = Qualification::whereIn('type', ['ug', 'pg'])
+                        ->where('display_name', 'LIKE', '%' . $qualName . '%')
                         ->pluck('id')
                         ->toArray();
 
-                    $qualification_array[$i] = implode('', $arr[$i]);
-
-                    if ($qualification_array[$i] == null)
-                    {
-                        $qualification_id[$i] = 1;
-                    }
+                    $arr[$i]                 = $ids;
+                    $qualification_array[$i] = implode('', $ids);
+                    $qualification_id[$i]     = $qualification_array[$i] === '' ? 1 : $qualification_array[$i];
                 }
 
+                // --- Class / standard resolution ------------------------------------
                 if (is_int($row['class']))
                 {
                     $class_name = $row['class'];
                 }
                 else
                 {
-                    if (($row['class'] == 'LKG') || ($row['class'] == 'UKG'))
+                    if (in_array($row['class'], ['LKG', 'UKG'], true))
                     {
                         $class_name = $row['class'];
                     }
@@ -99,43 +113,79 @@ class UsersImport implements ToCollection, WithHeadingRow
                     }
                 }
 
-                $country      = Country::where('name', 'LIKE', '%' . $row['country'] . '%')->first();
-                $state        = State::where('name', 'LIKE', '%' . $row['state'] . '%')->first();
-                $city         = City::where('name', 'LIKE', '%' . $row['city'] . '%')->first();
-                $standard     = Standard::where([['school_id', $school_id], ['name', 'LIKE', $class_name]])->first();
-                $section      = Section::where([['school_id', $school_id], ['name', 'LIKE', $row['section']]])->first();
-                $standardLink = StandardLink::where([
-                    ['school_id', Auth::user()->school_id],
-                    ['standard_id', $standard->id],
-                    ['section_id', $section->id]
+                $country = Country::where('name', 'LIKE', '%' . $row['country'] . '%')->first();
+                $state   = State::where('name', 'LIKE', '%' . $row['state'] . '%')->first();
+                $city    = City::where('name', 'LIKE', '%' . $row['city'] . '%')->first();
+
+                $standard = Standard::where([
+                    ['school_id', $school_id],
+                    ['name', 'LIKE', $class_name],
                 ])->first();
 
-                $student->firstname             = $row['firstname'];
-                $student->lastname              = $row['lastname'];
-                $student->mobile_no             = $row['mobile_no'];
-                $student->email                 = $row['email'] == '' ? null : strtolower($row['email']);
-                $student->gender                = strtolower($row['gender']); 
-                $student->date_of_birth         = date('Y-m-d', strtotime($row['date_of_birth']));
-                $student->blood_group           = $row['blood_group'] == '' ? null : str_replace('ve', '', strtolower($row['blood_group']));
-                $student->standard              = $standardLink->id; 
-                $student->address               = $row['address'];
-                $student->city_id               = $city->id;
-                $student->state_id              = $state->id; 
-                $student->country_id            = $country->id;
-                $student->pincode               = $row['pincode'];
-                $student->birth_place           = $row['birth_place'];
-                $student->native_place          = $row['native_place'];
-                $student->mother_tongue         = $row['mother_tongue'];
-                $student->caste                 = $row['caste'];
-                $student->sub_caste             = $row['sub_caste'];
-                $student->aadhar_number         = $row['aadhar_number'];
-                $student->joining_date          = date('Y-m-d', strtotime($row['joining_date']));
-                $student->registration_number   = $row['admission_number'];
+                $section = Section::where([
+                    ['school_id', $school_id],
+                    ['name', 'LIKE', $row['section']],
+                ])->first();
+
+                // Guard: can't build a standard link without standard + section
+                if (! $standard || ! $section)
+                {
+                    Log::warning('UsersImport: skipping row, standard/section not found', [
+                        'row'         => $rowIndex + 2, // +2 to account for heading row + 0-index
+                        'class'       => $row['class'] ?? null,
+                        'section'     => $row['section'] ?? null,
+                        'firstname'   => $row['firstname'] ?? null,
+                    ]);
+                    $skipped_rows[] = $rowIndex + 2;
+                    continue;
+                }
+
+                $standardLink = StandardLink::where([
+                    ['school_id', $school_id],
+                    ['standard_id', $standard->id],
+                    ['section_id', $section->id],
+                ])->first();
+
+                if (! $standardLink)
+                {
+                    Log::warning('UsersImport: skipping row, standard link not found', [
+                        'row'         => $rowIndex + 2,
+                        'standard_id' => $standard->id,
+                        'section_id'  => $section->id,
+                    ]);
+                    $skipped_rows[] = $rowIndex + 2;
+                    continue;
+                }
+
+                // --- Build student object -------------------------------------------
+                $student->firstname           = $row['firstname'];
+                $student->lastname            = $row['lastname'];
+                $student->mobile_no           = $row['mobile_no'];
+                $student->email               = empty($row['email']) ? null : strtolower($row['email']);
+                $student->gender              = strtolower((string) $row['gender']);
+                $student->date_of_birth       = date('Y-m-d', strtotime($row['date_of_birth']));
+                $student->blood_group         = empty($row['blood_group'])
+                    ? null
+                    : str_replace('ve', '', strtolower($row['blood_group']));
+                $student->standard            = $standardLink->id;
+                $student->address             = $row['address'];
+                $student->city_id             = $city->id ?? null;
+                $student->state_id            = $state->id ?? null;
+                $student->country_id          = $country->id ?? null;
+                $student->pincode             = $row['pincode'];
+                $student->birth_place         = $row['birth_place'];
+                $student->native_place        = $row['native_place'];
+                $student->mother_tongue       = $row['mother_tongue'];
+                $student->caste                = $row['caste'];
+                $student->sub_caste            = $row['sub_caste'];
+                $student->aadhar_number        = $row['aadhar_number'];
+                $student->joining_date         = date('Y-m-d', strtotime($row['joining_date']));
+                $student->registration_number  = $row['admission_number'];
                 $student->EMIS_number           = $row['emis_number'];
                 $student->roll_number           = $row['roll_number'];
                 $student->id_card_number        = $row['id_card_number'];
 
-                if (($class_name == 10) || ($class_name == 12))
+                if (in_array($class_name, [10, 12], true))
                 {
                     $student->board_registration_number = $row['board_registration_number'];
                 }
@@ -149,19 +199,20 @@ class UsersImport implements ToCollection, WithHeadingRow
                 $student->driver_contact_number = $row['driver_contact_number'];
                 $student->siblings              = $row['siblings'];
                 $student->siblings_count        = $row['siblings_count'];
-                $student->sibling_relation      = str_getcsv($row['sibling_relation']);
-                $student->sibling_name          = str_getcsv($row['sibling_name']);
-                $student->sibling_date_of_birth = str_getcsv($row['sibling_date_of_birth']);
-                $student->sibling_standard      = str_getcsv($row['sibling_class']);
+                $student->sibling_relation      = str_getcsv((string) $row['sibling_relation']);
+                $student->sibling_name          = str_getcsv((string) $row['sibling_name']);
+                $student->sibling_date_of_birth = str_getcsv((string) $row['sibling_date_of_birth']);
+                $student->sibling_standard      = str_getcsv((string) $row['sibling_class']);
                 $student->notes                 = $row['notes'];
 
+                // --- Parent resolution / build ---------------------------------------
                 $parent_status = User::where([
                     ['school_id', $school_id],
                     ['mobile_no', $row['parent_mobile_no']],
-                    ['usergroup_id', 7]
+                    ['usergroup_id', 7],
                 ])->first();
 
-                if (count($parent_status) <= 0)
+                if (! $parent_status)
                 {
                     $parent->parent            = 'add';
                     $parent->firstname         = $row['parent_firstname'];
@@ -189,14 +240,24 @@ class UsersImport implements ToCollection, WithHeadingRow
                 $student = $this->CreateUser($student, $school_id, $academic_year->id, $avatar, 6);
                 $this->CreateParent($student->id, $parent, $school_id, 7);
 
-                $insertedcount++;   
+                $insertedcount++;
             }
+            catch (Exception $e)
+            {
+                // Log full context + trace instead of just the message,
+                // and continue with the next row instead of aborting the whole import.
+                Log::error('UsersImport: failed to import row', [
+                    'row'       => $rowIndex + 2,
+                    'firstname' => $row['firstname'] ?? null,
+                    'message'   => $e->getMessage(),
+                    'trace'     => $e->getTraceAsString(),
+                ]);
+                $skipped_rows[] = $rowIndex + 2;
+                continue;
+            }
+        }
 
-            \Session::put('insertedcount', $insertedcount);      
-        }
-        catch (Exception $e)
-        {
-            Log::info($e->getMessage());
-        }
+        \Session::put('insertedcount', $insertedcount);
+        \Session::put('skipped_rows', $skipped_rows);
     }
 }

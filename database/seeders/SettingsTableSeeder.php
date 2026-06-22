@@ -103,9 +103,9 @@ class SettingsTableSeeder extends Seeder
             'key'           => 'assignment_status',
             'name'          => 'Assignment Status',
             'description'   => 'Assignment Status',
-            'value'         => 1,
+            'value'         => 0,
             'field'         => '{"name":"value","label":"Register Status" ,"type":"radio", "options":{"1":"Active", "0":"Inactive"}}',
-            'active'        => 0,
+            'active'        => 1,
             'created_at'    => date("Y-m-d H:i:s"),
             'updated_at'    => date("Y-m-d H:i:s"), 
 

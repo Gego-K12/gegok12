@@ -50,7 +50,7 @@ class Standard extends Model
      * @var array
      */
     protected $fillable = [
-       'school_id' ,  'name' , 'order' , 'status'
+       'school_id' ,  'name' ,'slug' , 'order' , 'status'
     ];
 
     /**
@@ -101,5 +101,31 @@ class Standard extends Model
     public function standardLink()
     {
         return $this->hasMany('\App\Models\StandardLink','standard_id','id');
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('status', 1);
+    }
+
+    public function getStandardNameAttribute()
+    {
+        
+
+        $name = strtoupper($this->name);
+
+        if (in_array($name, ['PREKG', 'LKG', 'UKG'])) {
+            return $name;
+        }
+
+        // Convert only numeric standards to Roman
+        if (is_numeric($this->name)) {
+
+            return $this->present()->integerToRoman($this->name);
+        }
+
+        // Return any other standard name as it is
+
+        return strtoupper($this->name);
     }
 }

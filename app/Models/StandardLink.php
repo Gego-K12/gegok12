@@ -288,26 +288,16 @@ class StandardLink extends Model
      */
     public function getStandardSectionAttribute()
     {
-        if( ($this->standard->name == 'PREKG') || ($this->standard->name == 'prekg') )
-        {
-            $standard_name = 'PREKG';
+        if ($this->standard == null) {
+            return $this->section->name ?? '';
         }
-        elseif( ($this->standard->name == 'LKG') || ($this->standard->name == 'lkg') )
-        {
-            $standard_name = 'LKG';
+
+        if (is_numeric($this->standard->name)) {
+            $standard_name = $this->standard->present()->integerToRoman($this->standard->name);
+        } else {
+            $standard_name = $this->standard->name;
         }
-        elseif ( ($this->standard->name == 'UKG') || ($this->standard->name == 'ukg') )
-        {
-            $standard_name = 'UKG';
-        }
-        else
-        {
-            if($this->standard != null)
-            {
-                $standard_name = $this->standard->present()->integerToRoman($this->standard->name);
-            }
-        }
-        return $standard_name.' - '.$this->section->name;
+        return strtoupper($standard_name) . ' - ' . ($this->section->name ?? '');
     }
 
     /**
@@ -317,27 +307,18 @@ class StandardLink extends Model
      */
     public function getStandardNameAttribute()
     {
-        if( ($this->standard->name == 'PREKG') || ($this->standard->name == 'prekg') )
-        {
-            $standard_name = 'PREKG';
+        
+        if ($this->standard == null) {
+            return null;
         }
-        elseif( ($this->standard->name == 'LKG') || ($this->standard->name == 'lkg') )
-        {
-            $standard_name = 'LKG';
-        }
-        elseif ( ($this->standard->name == 'UKG') || ($this->standard->name == 'ukg') )
-        {
-            $standard_name = 'UKG';
-        }
-        else
-        {
-            if($this->standard != null)
-            {
-                $standard_name = $this->standard->present()->integerToRoman($this->standard->name);
-            }
-        }
+        // Convert only numeric standards to Roman
+        if (is_numeric($this->standard->name)) {
 
-        return $standard_name;
+            return $this->standard->present()->integerToRoman($this->standard->name);
+        }
+        // Return any other standard name as it is
+
+        return strtoupper($this->standard->name);
     }
 
     /**

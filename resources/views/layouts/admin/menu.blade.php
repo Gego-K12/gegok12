@@ -952,6 +952,16 @@
                     <span class="mx-3 whitespace-no-wrap">Settings</span>
                 </a>
             </li>
+            <li class="py-3 px-3 hover:font-semibold {{Request::segment ('3') == 'standards' ? 'active':''}} && {{Request::segment ('3') == 'standards' ? 'active':''}}">
+                <a href="{{ url('/admin/settings/standards') }}" class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                     stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M12 3 2 8l10 5 8-4v6m-8-2L4 9v5c0 2.5 3.6 4.5 8 4.5s8-2 8-4.5V9" />
+                </svg>
+                    <span class="mx-3 whitespace-no-wrap">Standards</span>
+                </a>
+            </li>
         </ul>
     </li>
     <!-- end -->

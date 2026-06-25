@@ -18,6 +18,7 @@ class CreateStandardsTable extends Migration
             $table->bigInteger('school_id')->unsigned();
             $table->foreign('school_id')->references('id')->on('schools');
             $table->string('name');
+            $table->string('slug')->unique();
             $table->integer('order')->nullable();
             $table->boolean('status')->default(true);
             $table->timestamps();

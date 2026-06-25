@@ -118,9 +118,13 @@ class StandardsLinkController extends Controller
             ['type', '!=', 'exam']
         ])->get()->groupBy(['standard_id', 'section_id']);
 
-        $standardlist = DB::table('standards')
+        // $standardlist = DB::table('standards')
+        //     ->where('school_id', Auth::user()->school_id)
+        //     ->orderByRaw('FIELD(name,"prekg","lkg","ukg","1","2","3","4","5","6","7","8","9","10","11","12")')
+        //     ->get();
+        $standardlist = Standard::active()
             ->where('school_id', Auth::user()->school_id)
-            ->orderByRaw('FIELD(name,"prekg","lkg","ukg","1","2","3","4","5","6","7","8","9","10","11","12")')
+            ->orderBy('id', 'ASC')
             ->get();
 
         $sectionlist = Section::where('school_id', Auth::user()->school_id)

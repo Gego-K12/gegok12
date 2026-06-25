@@ -1,7 +1,7 @@
 <template>
   
   <div class="" >
-     <flash-message :position="'right bottom'" :timeout="3000" class="myCustomClass"></flash-message>
+    
     <div class="flex flex-wrap lg:flex-row justify-between">
       <div class=""></div>
       <div class="flex items-center">
@@ -59,9 +59,9 @@
 
 <script>
 
-    import 'vue-flash-message/dist/vue-flash-message.min.css';
-    import VueFlashMessage from 'vue-flash-message';
-    Vue.use(VueFlashMessage);
+    // import 'vue-flash-message/dist/vue-flash-message.min.css';
+    // import VueFlashMessage from 'vue-flash-message';
+    // Vue.use(VueFlashMessage);
   export default {
     props:['url' , 'name'],
     data () {
@@ -114,7 +114,7 @@
         formData.append('user_group',this.user_group); 
 
         axios.post('/admin/credentials/add/'+this.name,formData,{headers: {'Content-Type': 'multipart/form-data'}}).then(response => {     
-          this.flash(response.data.message,'success',{timeout: 8000});
+          // this.flash(response.data.message,'success',{timeout: 8000});
           this.closeModal();
           this.reset();
           location.reload();

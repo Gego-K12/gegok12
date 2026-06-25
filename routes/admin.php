@@ -864,3 +864,16 @@ Route::get('/purchase/addon/histories', function () {
         return view('admin.setting.edit_smstemplate',compact('id'));
     })->name('admin.setting.smstemplate.update');
 
+    Route::get('settings/standards', function () {
+		return view('admin.standard.index');
+	})->name('admin.standards');
+
+	Route::get('setting/standard/create', function () {
+		$id='';
+		return view('admin.standard.create',compact('id'));
+	})->name('admin.setting.standards.create');
+
+	Route::get('setting/edit/standard/{id}', function ($id) {
+		return view('admin.standard.edit_form',compact('id'));
+	})->name('admin.setting.standards.update');
+

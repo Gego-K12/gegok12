@@ -36,6 +36,9 @@ Route::get( '/events/showdetails/{id}', 'EventsController@showdetails' );
     //delete
     Route::get('/task/{id}/delete', 'TaskController@destroy');
 
+    // routes/web.php — alongside your other task routes
+    Route::post('/task/claim/{id}', 'TaskController@claim');
+
 //assignment
 //index
 Route::get( '/assignment/show/list', 'AssignmentController@showList' );

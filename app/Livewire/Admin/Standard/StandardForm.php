@@ -47,7 +47,7 @@ class StandardForm extends Component
 
             'order' => 'required|numeric|min:1',
 
-            'status' => 'required',
+            'status' => 'required|boolean',
         ]);
 
         Standard::updateOrCreate(

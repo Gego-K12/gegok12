@@ -30,6 +30,10 @@ class Task extends JsonResource
         {
             $snooze = 0;
         }
+        $claimed = $this->taskAssignee()
+            ->whereNotNull('claimed_by')
+            ->with('claimedBy')
+            ->first();
         
         return [
             //
@@ -49,6 +53,13 @@ class Task extends JsonResource
             'auth_id'           =>  Auth::id(),
             'created_by'        =>  $this->user_id,
             'task_completed' => $this->taskAssignee()->forUser()->completed()->exists(),
+            'task_type' => $this->task_type,
+
+            'is_claimed' => $claimed ? true : false,
+
+            'claimed_by' => optional($claimed)->claimed_by,
+
+            'claimed_by_name' => optional(optional($claimed)->claimedBy)->FullName,
         ];
     }
 }

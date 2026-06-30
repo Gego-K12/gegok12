@@ -432,4 +432,29 @@ class TaskController extends Controller
             dd($e->getMessage());
         }
     }
+    public function claim($id)
+    {
+        
+        $taskAssignee = TaskAssignee::where([['task_id',$id],['user_id',Auth::id()]])->first();
+
+        if ($taskAssignee->task->task_type !== 'open') {
+            return response()->json([
+                'errors' => ['This task is not open for claiming.']
+            ], 422);
+        }
+
+        if (!is_null($taskAssignee->claimed_by)) {
+            return response()->json([
+                'errors' => ['This task has already been claimed by ' . $task->claimedBy->FullName . '.']
+            ], 422);
+        }
+
+        $taskAssignee->claimed_by = Auth::id();
+        $taskAssignee->save();
+
+        return response()->json([
+            'success' => 'Task claimed successfully.',
+            'claimed_by_name' => Auth::user()->FullName,
+        ]);
+    }
 }

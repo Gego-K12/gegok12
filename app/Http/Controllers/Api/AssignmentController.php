@@ -44,7 +44,9 @@ class AssignmentController extends Controller
                 ['standardLink_id',$student->studentAcademicLatest->standardLink_id],
                 ['submission_date','>=',date('Y-m-d')],
                 ['status','ongoing']
-            ]);
+            ])->whereHas('assignmentApproval' ,function ($q) {
+            $q->where('status','approved');
+        });
 
         //date filter  
         if (isset($request->date)) {
@@ -139,7 +141,9 @@ class AssignmentController extends Controller
                 ['standardLink_id',$student->studentAcademicLatest->standardLink_id],
                 ['submission_date','<=',date('Y-m-d')],
                 ['status','completed']
-            ]);
+            ])->whereHas('assignmentApproval' ,function ($q) {
+            $q->where('status','approved');
+        });
         // ->whereHas('assignmentApproval' , function($query) {
         //             $query->where('status','approved');
         //         })->get();

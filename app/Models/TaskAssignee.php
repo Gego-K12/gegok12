@@ -92,4 +92,8 @@ class TaskAssignee extends Model
     {
         return $query->where('status', 'completed');
     }
+    public function claimedBy()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'claimed_by');
+    }
 }

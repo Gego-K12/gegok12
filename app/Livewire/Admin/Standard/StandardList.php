@@ -14,7 +14,7 @@ class StandardList extends Component
 
     public function render()
     {
-        $standards = Standard::orderby('id','desc')->paginate(15);
+        $standards = Standard::orderby('id','desc')->get();
         return view('livewire.admin.standard.standard-list',[
             'standards' => $standards
         ]);

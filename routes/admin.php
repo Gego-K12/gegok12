@@ -73,7 +73,7 @@ Route::post( '/schooldetails/update/{school_id}', 'SchoolDetailsController@updat
 	Route::post( '/academic/updateStatus', 'AcademicYearController@updateStatus' );
 
 	//delete
-	Route::get( '/academic/delete/{id}', 'AcademicYearController@destroy' );
+	Route::delete( '/academic/delete/{id}', 'AcademicYearController@destroy' );
 
 //holidays
 	//index
@@ -87,7 +87,7 @@ Route::post( '/schooldetails/update/{school_id}', 'SchoolDetailsController@updat
 	Route::get( '/holiday/edit/{id}', 'HolidaysController@edit' );
 	Route::post( '/holiday/edit/{id}', 'HolidaysController@update' );
 	//delete
-	Route::get( '/holiday/delete/{id}', 'HolidaysController@destroy' );
+	Route::delete( '/holiday/delete/{id}', 'HolidaysController@destroy' );
 
 //standardlinks
 	//index
@@ -118,7 +118,7 @@ Route::post( '/schooldetails/update/{school_id}', 'SchoolDetailsController@updat
 	Route::post( '/standardLink/edit/{id}', 'StandardsLinkController@update' );
 	Route::post( '/standardLink/updateStatus/{id}', 'StandardsLinkController@updateStatus' );
 	//delete
-	Route::get( '/standardLink/delete/{id}', 'StandardsLinkController@destroy' );
+	Route::delete( '/standardLink/delete/{id}', 'StandardsLinkController@destroy' );
 
 //standards
 	//add

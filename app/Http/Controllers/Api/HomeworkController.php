@@ -47,7 +47,10 @@ class HomeworkController extends Controller
             ['academic_year_id',$academic_year->id]
         ])
         ->where('date','>=',date('Y-m-d'))
-        ->where('status','publish');
+        ->where('status','publish')
+        ->whereHas('homeworkApproval' ,function ($q) {
+            $q->where('status','approved');
+        });
 
         //subject filter  
         if (isset($request->subject_id)) {
@@ -142,7 +145,10 @@ class HomeworkController extends Controller
                 ['academic_year_id',$academic_year->id]
             ])
             ->where('date','<',date('Y-m-d'))
-            ->where('status','publish');
+            ->where('status','publish')
+            ->whereHas('homeworkApproval' ,function ($q) {
+            $q->where('status','approved');
+        });
 
         //subject filter  
         if (isset($request->subject_id)) {

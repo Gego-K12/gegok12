@@ -144,7 +144,7 @@
                     {
                         $.ajax({
                             url: link,
-                            type: "GET",
+                            type: "DELETE",
                             headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                             success:function(data)
                             { 

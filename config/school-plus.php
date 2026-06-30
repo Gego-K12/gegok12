@@ -428,6 +428,8 @@ defined('CURRENCY_SYMBOL') or define('CURRENCY_SYMBOL','₹');
 
 defined('LOGNAME_DOWNLOAD_SAMPLE_FORMAT_LIBRARYCARD') or define('LOGNAME_DOWNLOAD_SAMPLE_FORMAT_LIBRARYCARD','downloadsampleformatlibrary');
 
+defined('LOGNAME_DELETE_HOLIDAY') or define('LOGNAME_DELETE_HOLIDAY','deleteholiday');
+
 
 
 

@@ -7,6 +7,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\CalendarMail;
+use App\Models\Users\TeacherUser;
 use App\Models\User;
 use App\Models\Events;
 
@@ -30,7 +31,7 @@ class CalendarEventListener implements ShouldQueue
      */
     public function handle(CalendarEvent $events)
     {
-        $users=User::where('school_id',$events->events->school_id)->ByRole(5)->get();
+        $users=TeacherUser::where('school_id',$events->events->school_id)->ByRole(5)->get();
         
         foreach ($users as $user) 
         {

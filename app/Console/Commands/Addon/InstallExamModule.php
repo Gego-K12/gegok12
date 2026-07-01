@@ -187,8 +187,40 @@ class InstallExamModule extends Command
 
             // Step 9: Seeder
             if ($this->confirm('Do you want to run seeders?', true)) {
-                exec('php artisan db:seed --class="Gegok12\Exam\Database\Seeders\GradesTableSeeder"');
-                exec('php artisan db:seed --class="Gegok12\Exam\Database\Seeders\ExamRulesTableSeeder"');
+                $output = [];
+                $status = 0;
+
+                // Grades Seeder
+                exec(
+                    'php artisan db:seed --class="Gegok12\\Exam\\Database\\Seeders\\GradesTableSeeder" --force 2>&1',
+                    $output,
+                    $status
+                );
+
+                $this->line(implode(PHP_EOL, $output));
+
+                if ($status !== 0) {
+                    $this->error("GradesTableSeeder failed.");
+                    return Command::FAILURE;
+                }
+
+                $output = [];
+                $status = 0;
+
+                // Exam Rules Seeder
+                exec(
+                    'php artisan db:seed --class="Gegok12\\Exam\\Database\\Seeders\\ExamRulesTableSeeder" --force 2>&1',
+                    $output,
+                    $status
+                );
+
+                $this->line(implode(PHP_EOL, $output));
+
+                if ($status !== 0) {
+                    $this->error("ExamRulesTableSeeder failed.");
+                    return Command::FAILURE;
+                }
+                
                 $this->info("Table Seeded");
             } else {
                 $this->warn("Skipped seeding");

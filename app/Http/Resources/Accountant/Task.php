@@ -49,6 +49,7 @@ class Task extends JsonResource
             'auth_id'           =>  Auth::id(),
             'created_by'        =>  $this->user_id,
             'task_completed' => $this->taskAssignee()->forUser()->completed()->exists(),
+            'priority'          =>  $this->priority,
         ];
     }
 }

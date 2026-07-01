@@ -20,6 +20,7 @@ class GroupList extends Component
     public $type = '';
     public $standardLink_id = '';
     public $standardLinks = [];
+    public $group_id = null;
 
     protected $paginationTheme = 'tailwind';
 
@@ -41,7 +42,14 @@ class GroupList extends Component
     public function openModal()
     {
         $this->resetValidation();
-        $this->reset(['group_name', 'type']);
+        $this->reset([
+            'group_id',
+            'group_name',
+            'type',
+            'standardLink_id',
+            'standardLinks'
+        ]);
+
         $this->showModal = true;
     }
 
@@ -49,25 +57,61 @@ class GroupList extends Component
     {
         $this->showModal = false;
         $this->resetValidation();
-        $this->reset(['group_name', 'type']);
+
+        $this->reset([
+            'group_id',
+            'group_name',
+            'type',
+            'standardLink_id',
+            'standardLinks'
+        ]);
     }
 
     public function saveGroup()
     {
         $this->validate();
 
-        Group::create([
-            'group_name' => $this->group_name,
-            'type' => $this->type,
-            'standardLink_id' => $this->type === 'class'
-                            ? $this->standardLink_id
-                            : null,
-        ]);
+        Group::updateOrCreate(
+            ['id' => $this->group_id],
+            [
+                'group_name' => $this->group_name,
+                'type' => $this->type,
+                'standardLink_id' => $this->type === 'class'
+                    ? $this->standardLink_id
+                    : null,
+            ]
+        );
 
-        session()->flash('success', 'Group added successfully.');
+        session()->flash(
+            'success',
+            $this->group_id
+                ? 'Group updated successfully.'
+                : 'Group added successfully.'
+        );
 
         $this->closeModal();
         $this->resetPage();
+    }
+    public function edit($id)
+    {
+        $group = Group::findOrFail($id);
+
+        $this->group_id = $group->id;
+        $this->group_name = $group->group_name;
+        $this->type = $group->type;
+        $this->standardLink_id = $group->standardLink_id;
+
+        if ($group->type == 'class') {
+            $school_id = Auth::user()->school_id;
+            $academic_year = SiteHelper::getAcademicYear($school_id);
+
+            $this->standardLinks = StandardLink::where([
+                ['school_id', $school_id],
+                ['academic_year_id', $academic_year->id]
+            ])->get();
+        }
+
+        $this->showModal = true;
     }
 
     public function render()

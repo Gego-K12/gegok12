@@ -50,7 +50,7 @@ class TaskController extends Controller
                 $tasks = $tasks->where('title','LIKE','%'.$request->search.'%')->orWhere('to_do_list','LIKE','%'.$request->search.'%');
             }
         }
-        $tasks = $tasks->get(); 
+        $tasks = $tasks->orderby('id','desc')->get(); 
 
         $tasks = TaskResource::collection($tasks)->groupby('task_flag');
         

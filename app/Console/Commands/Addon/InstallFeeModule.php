@@ -187,7 +187,21 @@ class InstallFeeModule extends Command
 
             // Step 9: Seeder
             if ($this->confirm('Do you want to run seeders?', true)) {
-                exec('php artisan db:seed --class="Gegok12\Fee\Database\Seeders\FeeGroupTableSeeder"');
+                $output = [];
+                    $status = 0;
+
+                exec(
+                    'php artisan db:seed --class="Gegok12\\Fee\\Database\\Seeders\\FeeGroupTableSeeder" --force 2>&1',
+                    $output,
+                    $status
+                );
+
+                $this->line(implode(PHP_EOL, $output));
+
+                if ($status !== 0) {
+                    $this->error("Seeder failed.");
+                    return Command::FAILURE;
+                }
                 $this->info("Table Seeded");
             } else {
                 $this->warn("Skipped seeding");

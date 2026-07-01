@@ -10,6 +10,7 @@ use App\Traits\SendPushNotification;
 use App\Models\StudentParentLink;
 use App\Models\User;
 use App\Notifications\SendDeviceNotification;
+use App\Models\Users\StudentUser;
 
 class StandardPushEventListener 
 {
@@ -35,7 +36,7 @@ class StandardPushEventListener
     {
         $standard_id=$event->data['standard_id'];
 
-        $users=User::where('school_id',$event->data['school_id'])->ByRole(6)->whereHas('studentAcademic',function ($query) use ($standard_id)
+        $users=StudentUser::where('school_id',$event->data['school_id'])->ByRole(6)->whereHas('studentAcademic',function ($query) use ($standard_id)
             {
                 $query->where('standardLink_id',$standard_id);
             })->get();

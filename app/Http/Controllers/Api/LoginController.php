@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use App\Models\Users\ParentUser;
 use App\Models\User;
 use Validator;
 use Exception;
@@ -39,7 +40,7 @@ class LoginController extends Controller implements ShouldQueue
 
                 //$token = $auth_user->createToken($request->device_name)->plainTextToken;
 
-                $user = User::where([['id',$auth_user->id],['school_id',$auth_user->school_id]])->first();
+                $user = ParentUser::where([['id',$auth_user->id],['school_id',$auth_user->school_id]])->first();
                      
                 $user->platform_token = $request->device_name;
 

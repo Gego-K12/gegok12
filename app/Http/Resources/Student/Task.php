@@ -38,7 +38,7 @@ class Task extends JsonResource
         return [
             //
             'task_id'           =>  $this->id,
-            'title'             =>  $this->title,
+            'title'             =>  ucfirst($this->title),
             'to_do_list'        =>  $this->to_do_list,
             'task_date'         =>  date('d-m-Y H:i:s',strtotime($this->task_date)),
             'task_flag'         =>  $this->task_flag,
@@ -60,6 +60,7 @@ class Task extends JsonResource
             'claimed_by' => optional($claimed)->claimed_by,
 
             'claimed_by_name' => optional(optional($claimed)->claimedBy)->FullName,
+            'priority'          =>  $this->priority,
         ];
     }
 }

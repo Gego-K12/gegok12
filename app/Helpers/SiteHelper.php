@@ -665,8 +665,15 @@ class SiteHelper
      public static function getNonTeachers($school_id, $academic_year_id)
     {
         $key = "non_teacher_lists_" . $school_id . '_' . $academic_year_id;
+        $non_teacher_ids = [8, 10, 11];
+
+        if (config('ginventory.enabled', false)) 
+        {
+            $non_teacher_ids = array_merge($non_teacher_ids, [12]);
+        }
+        
         return Cache::remember($key, env('CACHE_TIME'), function () use ($school_id, $academic_year_id) {
-            return TeacherUser::whereIn('usergroup_id', [8, 10, 11, 12])->where('status', 'active')->whereHas('teacherprofile', function ($query) use ($school_id, $academic_year_id) {
+            return TeacherUser::whereIn('usergroup_id', $non_teacher_ids)->where('status', 'active')->whereHas('teacherprofile', function ($query) use ($school_id, $academic_year_id) {
                 $query->where([
                     ['school_id', $school_id],
                     ['academic_year_id', $academic_year_id]

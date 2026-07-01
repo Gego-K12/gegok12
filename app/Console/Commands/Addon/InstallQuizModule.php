@@ -170,7 +170,21 @@ class InstallQuizModule extends Command
 
             // Step 9: Seeder
             if ($this->confirm('Do you want to run seeders?', true)) {
-                exec('php artisan db:seed --class="Gegok12\Quiz\Database\Seeders\QuizDatabaseSeeder"');
+                $output = [];
+                $status = 0;
+
+                exec(
+                    'php artisan db:seed --class="Gegok12\\Quiz\\Database\\Seeders\\QuizDatabaseSeeder" --force 2>&1',
+                    $output,
+                    $status
+                );
+
+                $this->line(implode(PHP_EOL, $output));
+
+                if ($status !== 0) {
+                    $this->error("Seeder failed.");
+                    return Command::FAILURE;
+                }
             } else {
                 $this->warn("Skipped seeding");
             }

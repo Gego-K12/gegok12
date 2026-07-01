@@ -8,6 +8,7 @@ use Illuminate\Queue\InteractsWithQueue;
 //use App\Traits\SendPushNotification;
 use App\Models\User;
 use App\Notifications\SendTeacherNotification;
+use App\Models\Users\TeacherUser;
 
 class TeacherPushEventListener implements ShouldQueue
 {
@@ -31,7 +32,7 @@ class TeacherPushEventListener implements ShouldQueue
     public function handle(TeacherPushEvent $event)
     {
         //
-        $users = User::where('school_id',$event->data['school_id'])->ByRole(5)->whereNotNull('platform_token')->get();
+        $users = TeacherUser::where('school_id',$event->data['school_id'])->ByRole(5)->whereNotNull('platform_token')->get();
 
         foreach($users as $user)
         {

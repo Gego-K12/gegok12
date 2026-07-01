@@ -8,6 +8,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use App\Traits\SendMessageProcess;
 use App\Traits\LogActivity;
 use App\Traits\Common;
+use App\Models\Users\ParentUser;
+use App\Models\Users\StudentUser;
 use App\Models\User;
 
 class SendMessageEventListener  
@@ -41,9 +43,9 @@ class SendMessageEventListener
             {
                 foreach($event->request->selectedUsers as $student_id)
                 {
-                    $student = User::where([['usergroup_id',6],['id',$student_id]])->first();
+                    $student = StudentUser::where([['usergroup_id',6],['id',$student_id]])->first();
                 }
-                $user = User::where([['usergroup_id',7],['id',$parent_id]])->first();
+                $user = ParentUser::where([['usergroup_id',7],['id',$parent_id]])->first();
                 $send = $this->selectSendMessage($event->request , $event->school_id , $event->admin_email , $user , $event->admin , $student);
             }
         }

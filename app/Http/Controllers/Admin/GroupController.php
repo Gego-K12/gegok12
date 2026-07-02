@@ -31,7 +31,6 @@ class GroupController extends Controller
     public function index($standardLinkId = null)
     {
 
-        // dd($standardLinkId);
         $groups = Group::query();
 
         if (!empty($standardLinkId) && $standardLinkId !== 'null') {

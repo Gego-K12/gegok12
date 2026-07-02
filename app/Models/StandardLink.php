@@ -362,7 +362,6 @@ class StandardLink extends Model
 
          $language=$this->hasMany('\App\Models\Teacherlink','standardLink_id','id')->where('subject_type','language')->get();
 
-         //dd($language);
          $science=$this->hasMany('\App\Models\Teacherlink','standardLink_id','id')->where('subject_type','science')->get();
          $arts=$this->hasMany('\App\Models\Teacherlink','standardLink_id','id')->where('subject_type','arts')->get();
          $group_subject=$this->hasMany('\App\Models\Teacherlink','standardLink_id','id')->where('subject_type','group_dedicated_subject')->get();
@@ -423,7 +422,6 @@ class StandardLink extends Model
 
 //         $mentry=$mdata->where('day','Monday');
 
-//         //dd($mentry);
 
 //         //$mentry=$this->hasMany('\App\Models\TempTimetable','standardLink_id','id')->orderBy('schedule')->where('day','Monday')->get();
 
@@ -483,7 +481,6 @@ class StandardLink extends Model
 
 //         $tuentry=$this->getAll()->where('day','Tuesday');
 
-//         //dd($tuentry);
 //         // $tuentry=$this->hasMany('\App\Models\TempTimetable','standardLink_id','id')->where('day','Tuesday')->orderBy('schedule')->get();
 //         // $tucount=$this->hasMany('\App\Models\TempTimetable','standardLink_id','id')->where('day','Tuesday')->count();
 

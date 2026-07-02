@@ -209,7 +209,6 @@ trait AdmissionUser
         {
             \DB::rollBack();
             Log::info($e->getMessage());
-            dd($e->getMessage());
         } 
     }
 
@@ -295,7 +294,6 @@ trait AdmissionUser
         {
             \DB::rollBack();
             Log::info($e->getMessage());
-            dd($e->getMessage());
         } 
     }
 
@@ -380,7 +378,6 @@ trait AdmissionUser
         {
             \DB::rollBack();
             Log::info($e->getMessage());
-            dd($e->getMessage());
         } 
     }
 }

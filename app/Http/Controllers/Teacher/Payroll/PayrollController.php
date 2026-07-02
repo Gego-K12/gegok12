@@ -36,7 +36,6 @@ class PayrollController extends Controller
     {
       $logo=null;
       $payroll=Payroll::where('id',$id)->first();
-      //dd($payroll);
       if(Auth::user()->SchoolLogo['meta_value'] != '-'){
       $logo=Auth::user()->SchoolLogoPath;
       }

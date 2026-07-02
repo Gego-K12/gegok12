@@ -53,7 +53,6 @@ class SendEmergencyMessageController extends Controller
     public function store(EmergencyNotificationRequest $request)
     {
         //
-        //dump($request->all());
         try
         {
             $data=[];
@@ -75,7 +74,6 @@ class SendEmergencyMessageController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 }

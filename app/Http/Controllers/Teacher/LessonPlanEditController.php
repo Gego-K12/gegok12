@@ -111,7 +111,6 @@ class LessonPlanEditController extends Controller
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 
@@ -152,7 +151,6 @@ class LessonPlanEditController extends Controller
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 
@@ -202,7 +200,6 @@ class LessonPlanEditController extends Controller
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 
@@ -246,7 +243,6 @@ class LessonPlanEditController extends Controller
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 
@@ -268,7 +264,6 @@ class LessonPlanEditController extends Controller
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 }

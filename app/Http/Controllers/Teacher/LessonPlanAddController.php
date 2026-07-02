@@ -96,7 +96,6 @@ class LessonPlanAddController extends Controller
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 
@@ -137,7 +136,6 @@ class LessonPlanAddController extends Controller
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 
@@ -187,7 +185,6 @@ class LessonPlanAddController extends Controller
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 
@@ -231,7 +228,6 @@ class LessonPlanAddController extends Controller
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 
@@ -252,7 +248,6 @@ class LessonPlanAddController extends Controller
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
     public function publish(PublishLessonPlanRequest $request,$id)

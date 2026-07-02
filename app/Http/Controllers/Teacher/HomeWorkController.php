@@ -192,7 +192,6 @@ class HomeWorkController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -316,7 +315,6 @@ class HomeWorkController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     } 
 
@@ -364,7 +362,6 @@ class HomeWorkController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     } 
 }

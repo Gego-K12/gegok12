@@ -76,7 +76,7 @@ trait AcademicProcess
         }
         catch(Exception $e)
         {
-            dd($e->getMessage());
+            \Log::error($e->getMessage());
         }
     }
 
@@ -113,7 +113,6 @@ trait AcademicProcess
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 
@@ -140,7 +139,6 @@ trait AcademicProcess
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 
@@ -173,7 +171,6 @@ trait AcademicProcess
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 
@@ -240,7 +237,7 @@ trait AcademicProcess
         catch(Exception $e)
         {
             DB::rollBack();
-            dd($e->getMessage());
+            \Log::error($e->getMessage());
         }
     }
 
@@ -297,7 +294,6 @@ trait AcademicProcess
 
             $teacherlinks = Teacherlink::where('standardLink_id',$standardLink_id)->get();
 
-            //dd($temptimetable);
 
             foreach($teacherlinks as $teacher)
             {
@@ -343,7 +339,6 @@ trait AcademicProcess
         catch(Exception $e)
         {
             DB::rollBack();
-            //dd($e->getMessage());
         }
     }
 
@@ -431,7 +426,6 @@ trait AcademicProcess
         catch(Exception $e)
         {
             DB::rollBack();
-            //dd($e->getMessage());
         }
     }
 
@@ -507,7 +501,6 @@ trait AcademicProcess
         catch(Exception $e)
         {
             DB::rollBack();
-            //dd($e->getMessage());
         }
     }
 }

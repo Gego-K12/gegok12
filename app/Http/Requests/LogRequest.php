@@ -25,7 +25,6 @@ class LogRequest extends FormRequest
      */
     public function rules()
     {
-       //dd('rules');
 
         Validator::extend('check_call_date',function($attribute,$value,$parameters,$validator)
         { 

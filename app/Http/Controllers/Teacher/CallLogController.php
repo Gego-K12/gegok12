@@ -71,19 +71,6 @@ class CallLogController extends Controller
             $calllog->start_time=$request->start_time;
             $calllog->end_time=$request->end_time;
 
-           /* $end_time=$request->end_time;
-            $start_time=$request->start_time;
-
-             $hours = $end_time->diffInHours($start_time);
-             $minutes = $end_time->diffInMinutes($start_time);
-             $seconds = $end_time->diffInSeconds($start_time);
-
-            $calllog->duration=$hours . ':' . $minutes. ':' .$seconds;*/
-
-           /* $diff_in_minutes = $request->end_time->diff($request->start_time);
-
-            dd($diff_in_minutes);
-*/
             $calllog->description=$request->description;
             $calllog->entry_by=Auth::user()->name;
            
@@ -112,7 +99,6 @@ class CallLogController extends Controller
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 
@@ -199,7 +185,6 @@ class CallLogController extends Controller
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 
@@ -240,7 +225,6 @@ class CallLogController extends Controller
         }
         catch(Exception $e) 
         {
-            //dd($e->getMessage());
         }
     }
 }

@@ -42,7 +42,6 @@ class ImpersonateController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -67,7 +66,6 @@ class ImpersonateController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -92,7 +90,6 @@ class ImpersonateController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -104,11 +101,11 @@ class ImpersonateController extends Controller
               
             $is_admin = $this->is_admin($user->id);
             if($is_admin == true)
-            { //dd('if');
+            {
                 Auth::user()->setImpersonating($user->id);
             }
             else
-            {//dd('false');
+            {
                 \Session::put('Impersonate disabled for this user.');
             }
 
@@ -117,7 +114,6 @@ class ImpersonateController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -132,7 +128,6 @@ class ImpersonateController extends Controller
         {      
             $user = User::where('id', Auth::user()->id)->first();
             Auth::user()->stopImpersonating();
-           // dd($user->usergroup_id);
             if ($user->usergroup_id == 5)
             {
                 return redirect('/teacher/dashboard');
@@ -159,7 +154,6 @@ class ImpersonateController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         } 
     }
 }

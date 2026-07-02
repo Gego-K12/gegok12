@@ -118,7 +118,6 @@ class UserProfileController extends Controller
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 
@@ -158,7 +157,7 @@ class UserProfileController extends Controller
     }
     
     public function update(Request $request)
-    {//dump($request);
+    {
         try
         {
             $userprofile = Userprofile::where('user_id', Auth::id())->first();
@@ -191,7 +190,6 @@ class UserProfileController extends Controller
         }
         catch(Exception $e)
         {
-           //dd($e->getMessage());
         } 
     } 
 
@@ -215,18 +213,15 @@ class UserProfileController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
     public function updateCredentials(CredentialsUpdateRequest $request,$name)
     {
-        //dd($name);
         try
         {
         $user = User::where([['name',$name],['usergroup_id',$request->user_group],['school_id',Auth::user()->school_id]])->first();
          $user->tokens()->delete();
-        //dd($user);
         $user->email=$request->email;
         $user->mobile_no=$request->mobile_no;
         $user->platform_token  = NULL;
@@ -250,7 +245,6 @@ class UserProfileController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            dd($e->getMessage());
         }
     }  
 }

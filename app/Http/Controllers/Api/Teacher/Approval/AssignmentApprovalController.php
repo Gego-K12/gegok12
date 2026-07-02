@@ -99,7 +99,6 @@ class AssignmentApprovalController extends Controller
         {
             \DB::rollBack();
             Log::info($e->getMessage());
-            dd($e->getMessage());
         }
     }
 
@@ -146,7 +145,6 @@ class AssignmentApprovalController extends Controller
         {
             \DB::rollBack();
             Log::info($e->getMessage());
-            dd($e->getMessage());
         }
     }
 }

@@ -22,7 +22,6 @@ class TransportNotificationEventListener implements ShouldQueue
      */
     public function __construct()
     {
-        //dd('testlis');
     }
 
     /**
@@ -32,25 +31,20 @@ class TransportNotificationEventListener implements ShouldQueue
      * @return void
      */
     public function handle(TransportNotificationEvent $event)
-    {//dd('lis');
+    {
         try{
 
             $users = RouteStudent::where('route_id', $event->data['route_id'])->pluck('user_id')->toArray();
-        //dd($users);
         $students = User::whereIn('id', $users)->with('parents')->get();
        // $students = StudentParentLink::whereIn('student_id', $users)->get();
 
         //$parentId = $students->parents[0]['parent_id'];
 
-        //dd($students->parents[0]['parent_id']);
-        //dd($students);
         foreach($students as $student)
         {
             $parentId1 = $student->parents[0]['parent_id'];
             $parentId2 = $student->parents[1]['parent_id'];
-            //dd($parentId);
             $parents = User::whereIn('id', [$parentId1, $parentId2])->get();
-            //dd($parents);
             foreach($parents as $parent)
             {   
                 if($event->data['trip_name'] != 'others')

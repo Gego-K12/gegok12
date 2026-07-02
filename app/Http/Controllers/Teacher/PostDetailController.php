@@ -116,7 +116,6 @@ class PostDetailController extends Controller
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 
@@ -213,7 +212,6 @@ class PostDetailController extends Controller
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 
@@ -266,7 +264,6 @@ class PostDetailController extends Controller
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 
@@ -319,7 +316,6 @@ class PostDetailController extends Controller
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 }

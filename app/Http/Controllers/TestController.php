@@ -36,7 +36,6 @@ class TestController extends Controller
 
 		catch(Exception $e)
 		{
-			//dd($e->getMessage());
 		}
    }
    public function createaudio()
@@ -53,7 +52,6 @@ class TestController extends Controller
 		}
 		catch(Exception $e)
 		{
-     // dd($e->getMessage());
 		}
 
 

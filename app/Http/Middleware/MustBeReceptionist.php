@@ -15,7 +15,6 @@ class MustBeReceptionist
      */
      public function handle($request, Closure $next)
     {
-        //dd('kjjkh');
 
         if(\Auth::user()->isReceptionist())
         {

@@ -41,7 +41,6 @@ class PostRequest extends FormRequest
         // });
 
          Validator::extend('check_posted_at', function ($attribute, $value, $parameters, $validator) {
-            // dd($value);
             if (!$value) {
                 return false;
             }

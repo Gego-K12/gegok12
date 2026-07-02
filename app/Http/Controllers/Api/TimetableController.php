@@ -29,7 +29,6 @@ class TimetableController extends Controller
         $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
         $student = User::where('id',$student_id)->first();
 
-        //dd($student->studentAcademicLatest->standardLink_id);
 
         // $timetable = TempTimetable::where([['school_id',Auth::user()->school_id],['academic_year_id',$academic_year->id],['standardLink_id',$student->studentAcademicLatest->standardLink_id]])->get();
 
@@ -44,19 +43,16 @@ class TimetableController extends Controller
         $Mondays= $timetable->temp_timetable->where('day',$weekday)->take(8);
 
 
-                   // dd($Mondays);
          if(count($Mondays)>0){
 
             $i=0;
 
          foreach($Mondays as $Monday){
 
-            //dd($Monday->subject_name);
 
 
             if($Monday->subject_name!=''){
 
-                //dd($Monday->teacher);
 
 
 

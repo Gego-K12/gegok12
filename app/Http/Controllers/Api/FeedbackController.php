@@ -117,7 +117,6 @@ class FeedbackController extends Controller
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }*/
 
@@ -189,7 +188,6 @@ class FeedbackController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -249,7 +247,6 @@ class FeedbackController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 

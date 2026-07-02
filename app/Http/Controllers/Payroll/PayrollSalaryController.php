@@ -105,7 +105,6 @@ class PayrollSalaryController extends Controller
         } catch (Exception $e) {
             \DB::rollBack();
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -169,7 +168,6 @@ class PayrollSalaryController extends Controller
      */
     public function update(SalaryUpdateRequest $request, $id)
     {
-        // dd($request->all());
         \DB::beginTransaction();
         try {
             $salary = Salary::find($id);
@@ -202,7 +200,6 @@ class PayrollSalaryController extends Controller
         } catch (Exception $e) {
             \DB::rollBack();
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 

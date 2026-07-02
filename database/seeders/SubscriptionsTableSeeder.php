@@ -22,7 +22,6 @@ class SubscriptionsTableSeeder extends Seeder
         foreach ($schools as $school) 
         {
             $admin = User::where([['school_id',$school->id],['usergroup_id',3]])->first();
-            //dd($admin);
             DB::table('subscriptions')->insert([
                 'school_id'         =>  $school->id,
                 'user_id'           =>  $admin->id,

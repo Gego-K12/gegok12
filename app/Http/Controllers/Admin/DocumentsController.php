@@ -93,7 +93,6 @@ class DocumentsController extends Controller
             $res['success'] = $message;
             return $res;
         } catch (Exception $e) {
-            //dd($e->getMessage());
         }
     }
 
@@ -165,7 +164,6 @@ class DocumentsController extends Controller
             $res['success'] = $message;
             return $res;
         } catch (Exception $e) {
-            //dd($e->getMessage());
         }
     }
 
@@ -200,7 +198,6 @@ class DocumentsController extends Controller
                 abort(403);
             }
         } catch (Exception $e) {
-            //dd($e->getMessage());
         }
     }
 }

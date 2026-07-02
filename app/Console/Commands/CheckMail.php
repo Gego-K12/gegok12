@@ -82,7 +82,7 @@ class CheckMail extends Command
                         }
 
                         elseif($reminder->data == 'absent_message')
-                        {   //dump('elseif');
+                        {
                             event(new AbsentReminderMailEvent($reminder));
                         }
                     }     
@@ -96,7 +96,6 @@ class CheckMail extends Command
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }      
 }

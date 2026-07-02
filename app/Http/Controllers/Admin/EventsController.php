@@ -114,7 +114,6 @@ class EventsController extends Controller
     {
         $school = SchoolDetail::where('school_id',Auth::user()->school_id)->where('meta_key','date_of_establishment')->first();
 
-       // dd($school['meta_value']);
 
         //$end_date = Carbon::parse($school['meta_value'])->format('Y');
         $end_date = date('Y');
@@ -256,7 +255,6 @@ class EventsController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }        
     }
 
@@ -390,7 +388,6 @@ class EventsController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
     
@@ -501,7 +498,6 @@ class EventsController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         } 
     }
 

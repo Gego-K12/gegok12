@@ -44,7 +44,6 @@ class ReminderEvent
         $this->via         = $via;
         $this->executed_at = $executed_at;
         $this->data        = $data;
-        //dd($this->from);
     }
 
     /**

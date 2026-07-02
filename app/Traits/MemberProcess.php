@@ -129,7 +129,6 @@ trait MemberProcess
             return $users;
         } catch (Exception $e) {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -215,7 +214,6 @@ trait MemberProcess
             return $users;
         } catch (Exception $e) {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -301,7 +299,6 @@ trait MemberProcess
             return $users;
         } catch (Exception $e) {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -376,7 +373,6 @@ trait MemberProcess
             return $users;
         } catch (Exception $e) {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -415,7 +411,6 @@ trait MemberProcess
             return $users;
         } catch (Exception $e) {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -455,7 +450,6 @@ trait MemberProcess
             return $users;
         } catch (Exception $e) {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
     //new
@@ -584,7 +578,6 @@ trait MemberProcess
                 }
 
                 $library_card_no = $request->library_card_no;
-                //    dd($library_card_no);
                 if ($library_card_no != '') {
                     $users = $users->whereHas('librarycard', function ($query) use ($library_card_no) {
                         $query->where('library_card_no', $library_card_no);

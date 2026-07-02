@@ -29,7 +29,6 @@ class TemplateUpdateRequest extends FormRequest
         Validator::extend('check_use', function ($attribute, $value, $parameters, $validator) 
         {
              $template=PayrollTemplate::find($value);
-            // dd(count($template->salaries));
 
             if(count($template->salaries)>0)
             { 

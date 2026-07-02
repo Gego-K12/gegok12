@@ -80,7 +80,6 @@ class StaffController extends Controller
     public function store(Request $request)
     {
         //
-       // dd($request->designation);
         try
       {
         $school_id = Auth::user()->school_id;
@@ -127,7 +126,6 @@ class StaffController extends Controller
       catch(Exception $e)
       {
             Log::info($e->getMessage());
-        //dd($e->getMessage());
       } 
     
 
@@ -322,7 +320,6 @@ class StaffController extends Controller
       }
       catch(Exception $e)
       {
-        //dd($e->getMessage());
       } 
     }
 
@@ -355,7 +352,6 @@ class StaffController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         } 
     }
 
@@ -369,21 +365,18 @@ class StaffController extends Controller
     $heads=[];
     $heads=array_values($request->headings);
     \Session::put('staff_headings', $heads);
-        //dd($heads);
 
    }
    public function staffexports(Request $request)
    {
     $headings=\Session::get('staff_headings');
     $heads=array_values($headings);
-    //dd($heads);
      $users = $this->StaffFilter($request,Auth::user()->school_id,[8,10,11,12,13]);    
         $csv = Writer::createFromFileObject(new \SplTempFileObject());
      $default=array('employee_id','designation','name','email','mobile_no','gender','Joining_date','adhaar','blood_group','date_of_birth','address','city','state','country','pincode',);
      $result=[];
      $result = array_intersect($default, $heads);
      $result = array_map('ucfirst', $result);
-     //dd($result);
 
         if(count($users) > 0)
         {
@@ -507,7 +500,6 @@ class StaffController extends Controller
     {
        $academic = SiteHelper::getAcademicYear(Auth::user()->school_id);
       $staffs = User::where('name',$name)->first();
-      // dd($teacher);
 
         $pdf = PDF::loadView('admin/staff/show-idcardprint', ['staffs' => $staffs,'academic'=>$academic]);
          return $pdf->stream('result.pdf', array('Attachment'=>0)); 

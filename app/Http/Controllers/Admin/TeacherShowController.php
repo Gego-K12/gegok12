@@ -116,7 +116,6 @@ class TeacherShowController extends Controller
   {
     //
     $user = TeacherUser::with('userprofile')->where('name', $name)->first();
-    // dd($user->members[0]['id']);
     $activitylog = ActivityLog::where('causer_id', $user->id)->orWhere('subject_id', $user->members[0]['id'])->paginate(5);
     $activitylog = ActivityLogResource::collection($activitylog);
 

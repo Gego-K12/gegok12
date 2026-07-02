@@ -62,7 +62,6 @@ class FeedController extends Controller
 
          
 
-        //dd($class->standardLink_id);
         
         return view('/student/feed/feed',['feeds'=>$feeds,'tags'=>$tags,'birthday'=>$birthday, 'anniversary'=>$anniversary,'exam'=>$exam]);
     }
@@ -80,7 +79,6 @@ class FeedController extends Controller
         ->take(20)
         ->get();
 
-//dd($counts);
 
      $birthday = $this->getFilePath('uploads/images/birthday.jpg');
      $anniversary = $this->getFilePath('uploads/images/work_anniversary.jpg');
@@ -99,7 +97,6 @@ class FeedController extends Controller
             $tags=Tag::where('tag_name',$category)->first();
             
             $post_tag=PostTag::where('tag_id',$tags->id)->pluck('post_id')->toArray();
-            //dd($post_tag);          
             $feeds=Post::whereIn('id',$post_tag)->get();            
 
         }

@@ -41,7 +41,7 @@ trait AutoPostProcess
     {
         \DB::beginTransaction();
         try
-        {       //dd($data->studentAcademic[0][academic_year_id]); 
+        {
             if($data->usergroup_id=='6')
             {
                 $academic_year_id = $data->studentAcademic[0]['academic_year_id'];
@@ -88,11 +88,9 @@ trait AutoPostProcess
 
             $event->save();
 */
-            //dump($event);
             
             $post = new Post;
 
-            //dd($data->studentAcademic[0][standardLink_id]);
 
             $post->school_id     = $school_id;
             if($data->usergroup_id=='6')
@@ -115,10 +113,8 @@ trait AutoPostProcess
             $post->attachment_file     = ['uploads/images/birthday.jpg'];
 
 
-            //dump($post->attachment_file);
             
             $post->post_created_at     = $date;
-            //dd($post->post_created_at);
             $post->is_posted     = '1';
             if($argument!=NULL)
             {
@@ -176,7 +172,7 @@ trait AutoPostProcess
     {
         \DB::beginTransaction();
         try
-        {       //dd($data->studentAcademic[0]); 
+        {
          
          $academic_year_id=$data->teacherprofile[0]['academic_year_id'];
          $eventdata=[
@@ -208,7 +204,6 @@ trait AutoPostProcess
 
             $event->save();*/
 
-            //dump($event);
             
             $post = new Post;
 
@@ -222,7 +217,6 @@ trait AutoPostProcess
             $post->visibility     = 'all_class';
             $post->visible_for     = NULL;
             $post->post_created_at     = $date;
-            //dd($post->post_created_at);
             $post->is_posted     = '1';
             $post->posted_at     = $date;
             // $post->tag     = 'Workanniversary';
@@ -236,7 +230,6 @@ trait AutoPostProcess
             }
             
              $post->tag()->saveMany($tagObjects);*/
-            //dump($tag);
 
             $post->status     = 'posted';
             $post->created_by     = '2';
@@ -290,7 +283,6 @@ trait AutoPostProcess
             $post->entity_id  = '2';
             $post->entity_name     = 'App\Models\Exam';
             $post->description     = $data->standardlink['standard']['name'].'-'.$data->standardlink['section']['name'].'  '. $data->subject->name.' '.'Exam';
-            //dd($post->description);
             $post->attachment_file     = '['.$image.']';
             $post->visibility     = 'all_class';
             //$post->visible_for     = $data->exam->standard_id;
@@ -327,7 +319,6 @@ trait AutoPostProcess
         catch(Exception $e)
         {
             \DB::rollBack();
-            //dd($e->getMessage());
         } 
     }
 

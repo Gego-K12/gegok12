@@ -117,7 +117,6 @@ class TaskController extends Controller
     //         }
     //     } catch (Exception $e) {
     //         Log::info($e->getMessage());
-    //         dd($e->getMessage());
     //     }
     // }
     public function changestatus(Request $request)
@@ -137,7 +136,6 @@ class TaskController extends Controller
                     'status' => 'completed',
                     // 'claimed_by' => Auth::id(),
                 ]);
-                // dd($assignee);
 
                 // Check all assignees completed
                 $pendingCount = TaskAssignee::where('task_id', $assignee->task_id)
@@ -240,7 +238,6 @@ class TaskController extends Controller
             return $res;
         } catch (Exception $e) {
             Log::info($e->getMessage());
-            dd($e->getMessage());
         }
     }
 
@@ -362,7 +359,6 @@ class TaskController extends Controller
             return $res;
         } catch (Exception $e) {
             Log::info($e->getMessage());
-            dd($e->getMessage());
         }
     }
 
@@ -401,7 +397,6 @@ class TaskController extends Controller
             return $res;
         } catch (Exception $e) {
             Log::info($e->getMessage());
-            dd($e->getMessage());
         }
     }
 
@@ -432,7 +427,6 @@ class TaskController extends Controller
             return $res;
         } catch (Exception $e) {
             Log::info($e->getMessage());
-            dd($e->getMessage());
         }
     }
 }

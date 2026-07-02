@@ -125,7 +125,6 @@ class TeacherImportExportController extends Controller
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 
@@ -183,21 +182,18 @@ class TeacherImportExportController extends Controller
     $heads=[];
     $heads=array_values($request->headings);
     \Session::put('teacher_headings', $heads);
-       // dd($heads);
 
    }
    public function teacherexports(Request $request)
    {
     $headings=\Session::get('teacher_headings');
     $heads=array_values($headings);
-    //dd($heads);
      $users = $this->TeacherFilter($request,Auth::user()->school_id,5);    
         $csv = Writer::createFromFileObject(new \SplTempFileObject());
      $default=array('employee_id','designation','name','email','mobile_no','gender','Joining_date','adhaar','blood_group','date_of_birth','address','city','state','country','pincode',);
      $result=[];
      $result = array_intersect($default, $heads);
      $result = array_map('ucfirst', $result);
-     //dd($result);
 
         if(count($users) > 0)
         {

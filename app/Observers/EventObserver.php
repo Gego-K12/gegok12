@@ -19,7 +19,6 @@ class EventObserver
         'created_by'=>Auth::id(),
         'updated_by'=>Auth::id(),
         ];
-        //dd($update);
         Events::where('id',$events->id)->update($update);*/
     }
 

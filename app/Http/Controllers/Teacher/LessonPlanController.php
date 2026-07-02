@@ -136,7 +136,6 @@ class LessonPlanController extends Controller
 
             $pdf = PDF::loadView('/teacher/lessonplan/print', $array);
 
-            //dd($pdf);
             
             $folder = Auth::user()->school->slug.'/lessonplan';
             $filename = str_replace(' ', '_', $array['title']).'_'.$array['class'].'.pdf';
@@ -158,7 +157,6 @@ class LessonPlanController extends Controller
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 
@@ -201,7 +199,6 @@ class LessonPlanController extends Controller
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 }

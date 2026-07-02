@@ -302,7 +302,6 @@ class StudentDetailsController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
     
@@ -397,7 +396,6 @@ class StudentDetailsController extends Controller
         $standardId=$users[0]['studentAcademicLatest']['standardLink_id'];
 
         $exam=Mark::where('school_id',Auth::user()->school_id)->where('standard_id',$standardId)->take(2)->orderBy('exam_id',DESC)->groupBy('exam_id')->pluck('exam_id')->toArray();
-        //dd($exam);
         $examIdOne=$exam[0];
         $examIdTwo=$exam[1];
 
@@ -408,10 +406,8 @@ class StudentDetailsController extends Controller
 
         $standard_id=$standard->standard_id;
         $section_id=$standard->section_id;
-        //dd($standard_id);
         //$subjects=$subjects['name'];
     
-        //dd($classCount);
         $subjects=Subject::where('standard_id',$standard_id)->where('section_id',$section_id)->pluck('name')->toArray();
         $marksone=Mark::where('user_id',$studentId)->where('exam_id',$examIdOne)->pluck('obtained_marks')->toArray();
         $markstwo=Mark::where('user_id',$studentId)->where('exam_id',$examIdTwo)->pluck('obtained_marks')->toArray();
@@ -419,7 +415,6 @@ class StudentDetailsController extends Controller
         $examone=Exam::where('standard_id',$standardId)->where('id',$examIdOne)->pluck('name')->toArray();
 
         $examtwo=Exam::where('standard_id',$standardId)->where('id',$examIdTwo)->pluck('name')->toArray();
-        //dd($examIdTwo);
         $examOneAverage=Mark::where([['standard_id',$standardId],['exam_id',$examIdOne]])->groupBy('subject_id')->selectRaw('round(avg(obtained_marks)) as avg')->pluck('avg');
 
         $examTwoAverage=Mark::where([['standard_id',$standardId],['exam_id',$examIdTwo]])->groupBy('subject_id')->selectRaw('round(avg(obtained_marks)) as avg')->pluck('avg');
@@ -430,7 +425,6 @@ class StudentDetailsController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            dd($e->getMessage());
         }
     } 
 
@@ -461,7 +455,6 @@ class StudentDetailsController extends Controller
             return back();
         }
          
-          //dd($subjects);
         $subjects_array[]=array_merge(['Subjects'],$subjects,['average']);
         
          $data=[];
@@ -493,7 +486,6 @@ class StudentDetailsController extends Controller
                     return "0";
                 }
             })->toArray();
-            //dd($records);
            //if(count($exam->schedule)==count($exam_marks)){
             $data[]=array_merge([$exam->name],array_map('intval',$records),[$exam_avg]);
            //}

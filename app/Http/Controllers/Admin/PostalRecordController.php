@@ -137,7 +137,6 @@ class PostalRecordController extends Controller
         }
         catch (Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 
@@ -229,7 +228,6 @@ class PostalRecordController extends Controller
         }
         catch (Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 
@@ -266,7 +264,6 @@ class PostalRecordController extends Controller
         catch (Exception $e)
         {
             \DB::rollBack();
-            //dd($e->getMessage());
         }
     }
 }

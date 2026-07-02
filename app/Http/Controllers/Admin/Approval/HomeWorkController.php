@@ -222,7 +222,6 @@ class HomeWorkController extends Controller
             return $res;
         } catch (Exception $e) {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -242,7 +241,6 @@ class HomeWorkController extends Controller
     {
         $homework = Homework::where('id', $id)->first();
         $viewers = $homework->viewers()->latest()->paginate(10);
-        // dd($viewers);
 
         return view('/admin/homework/view', ['homework' => $homework, 'viewers' => $viewers]);
     }
@@ -375,7 +373,6 @@ class HomeWorkController extends Controller
             return $res;
         } catch (Exception $e) {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -429,7 +426,6 @@ class HomeWorkController extends Controller
             }
         } catch (Exception $e) {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 }

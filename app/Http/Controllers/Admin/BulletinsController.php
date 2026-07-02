@@ -119,7 +119,6 @@ class BulletinsController extends Controller
             if($cover_image)
             {
                 $folder=Auth::user()->school->slug.'/magazine/coverimage';
-                //dd($folder);
                // $folder=Auth::user()->school_id.'/magazine/coverimage';
                 $cover_image_path = $this->uploadFile($folder,$cover_image);
                 $bulletin->cover_image = $cover_image_path; 
@@ -167,7 +166,6 @@ class BulletinsController extends Controller
         catch (Exception $e) 
         {
             Log::info($e->getMessage());
-           //dd($e->getMessage());
         }
     }
 

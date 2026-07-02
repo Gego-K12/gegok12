@@ -173,7 +173,6 @@ class DisciplineController extends Controller
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 
@@ -313,7 +312,6 @@ class DisciplineController extends Controller
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 
@@ -321,7 +319,6 @@ class DisciplineController extends Controller
      public function updateStatus(Request $request, $id)
     {
         //
-        //dd($request->status);
         try
         {
             $discipline = Discipline::where('id',$id)->first();
@@ -379,7 +376,6 @@ class DisciplineController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-           //dd($e->getMessage());
         }
     }
 
@@ -437,7 +433,6 @@ class DisciplineController extends Controller
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 }

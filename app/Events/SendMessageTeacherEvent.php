@@ -26,7 +26,6 @@ class SendMessageTeacherEvent
     public function __construct($data,$school_id,$admin_email,$admin)
     {
         //
-       // dump($data);
         $this->data = $data;
         $this->school_id = $school_id;
         $this->admin_email = $admin_email;

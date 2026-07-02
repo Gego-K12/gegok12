@@ -125,7 +125,6 @@ class VideosController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -148,7 +147,6 @@ class VideosController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -302,7 +300,6 @@ class VideosController extends Controller
         catch (Exception $e) 
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -330,7 +327,6 @@ class VideosController extends Controller
     {
         $video = Video::where('id',$id)->first();
         $viewers=$video->viewers()->latest()->paginate(10);
-       // dd($viewers);
 
         return view('/admin/mediafiles/view',['video' => $video,'viewers' => $viewers]); 
     }
@@ -484,7 +480,6 @@ class VideosController extends Controller
         catch (Exception $e) 
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -602,7 +597,6 @@ class VideosController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 }

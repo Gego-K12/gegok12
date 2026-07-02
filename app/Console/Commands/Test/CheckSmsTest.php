@@ -52,13 +52,13 @@ class CheckSmsTest extends Command
                     {
  
                        $msg=$this->sendSMS('hii',$mobileno);
-                       dd($msg);
+                       $this->info(is_scalar($msg) ? $msg : json_encode($msg));
                     }
-     
+
         }
         catch(Exception $e)
         {
-            dd($e->getMessage());
+            $this->error($e->getMessage());
         }
     }
 }

@@ -18,7 +18,7 @@ class Assignment extends JsonResource
         if($this->attachment != null)
         {
             $attachment = $this->AttachmentPath;
-            $extension=pathinfo( $attachment, PATHINFO_EXTENSION);//dd($extension);
+            $extension=pathinfo( $attachment, PATHINFO_EXTENSION);
             if(in_array($extension,['jpg','jpeg','png']))
             {
               $type='image';

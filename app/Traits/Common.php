@@ -32,7 +32,6 @@ trait Common
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
         return $path;
     }
@@ -55,7 +54,6 @@ trait Common
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
 
         return $path;
@@ -79,7 +77,6 @@ trait Common
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
 
         return $path;
@@ -103,7 +100,6 @@ trait Common
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
         return $ip;
     }
@@ -143,7 +139,6 @@ trait Common
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }   
     }
 
@@ -165,7 +160,6 @@ trait Common
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
 
         return $path;
@@ -190,7 +184,6 @@ trait Common
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
 
         return $path;
@@ -238,7 +231,6 @@ trait Common
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -267,7 +259,6 @@ trait Common
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
 
         return $path;
@@ -289,7 +280,6 @@ trait Common
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
 
         return TRUE;

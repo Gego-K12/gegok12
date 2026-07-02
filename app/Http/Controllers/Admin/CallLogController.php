@@ -119,7 +119,6 @@ class CallLogController extends Controller
                 $duration=$diff_in_minutes->format('%h:%i');
             }
           
-            //dd($duration);
             $calllog->duration=$duration;
             $calllog->description=$request->description;
             $calllog->entry_by=Auth::user()->name;
@@ -146,7 +145,6 @@ class CallLogController extends Controller
 
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
 
     }
@@ -247,7 +245,6 @@ class CallLogController extends Controller
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 
@@ -289,7 +286,6 @@ class CallLogController extends Controller
         catch(Exception $e) 
         {
             \DB::rollBack();
-            //dd($e->getMessage());
         }
     }
 }

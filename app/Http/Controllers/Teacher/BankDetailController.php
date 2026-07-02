@@ -50,8 +50,6 @@ class BankDetailController extends Controller
      */
     public function store(BankDetailRequest $request,$name)
     {
-        /* try
-        {*/
             $user = User::where('name',$name)->first();
     
             $account = new TransactionAccount;
@@ -70,12 +68,6 @@ class BankDetailController extends Controller
 
             $res['success'] = $message;
             return $res;
-       /* }
-        catch(Exception $e)
-        {
-
-            dd($e->getMessage());
-        } */
     }
 
     /**

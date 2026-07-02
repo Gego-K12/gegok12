@@ -149,7 +149,6 @@ class HolidaysController extends Controller
             $res['success'] = $message;
             return $res;
         } catch (Exception $e) {
-            //dd($e->getMessage());
         }
     }
 
@@ -204,7 +203,6 @@ class HolidaysController extends Controller
             $res['success'] = $message;
             return $res;
         } catch (Exception $e) {
-            //dd($e->getMessage());
         }
     }
 
@@ -235,7 +233,6 @@ class HolidaysController extends Controller
             $res['success'] = $message;
             return $res;
         } catch (Exception $e) {
-            //dd($e->getMessage());
         }
     }
 }

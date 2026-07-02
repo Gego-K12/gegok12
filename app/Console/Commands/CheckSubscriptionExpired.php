@@ -63,7 +63,6 @@ class CheckSubscriptionExpired extends Command
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            // dd($e->getMessage());
         }
     }
 }

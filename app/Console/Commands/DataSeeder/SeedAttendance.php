@@ -45,7 +45,6 @@ class SeedAttendance extends Command {
         $stdLink = StandardLink::find( $stdLink );
 
         $allStudents = $stdLink->studentAcademic;
-        //dd($allStudents->count());
         $carbonDate = Carbon::createFromFormat( 'm-Y', $seedDate );
 
         $carbonDate->startOfMonth();

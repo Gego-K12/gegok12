@@ -110,7 +110,6 @@ class StaffAttendanceController extends Controller
     public function store(StaffAttendanceRequest $request)
     {
         //
-        // dd($request->all());
         try
         {
             $school_id     = Auth::user()->school_id;
@@ -142,7 +141,6 @@ class StaffAttendanceController extends Controller
         catch(Exception $e)
         {
             //Log::info($e->getMessage());
-            dd($e->getMessage());
         }
     }
 

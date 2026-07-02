@@ -26,8 +26,6 @@ trait SendPushNotification
    
          config(['fcm.http.server_key' => env('FCM_SERVER_KEY')]);
          config(['fcm.http.sender_id' => env('FCM_SENDER_ID')]);  
-        //  dump(config('fcm.http.server_key'));
-    //  dump(config('fcm.http.sender_id'));
       $optionBuilder       = new OptionsBuilder();
       $optionBuilder       ->setTimeToLive(60 * 20);
       $notificationBuilder = new PayloadNotificationBuilder($array['type']);
@@ -43,7 +41,6 @@ trait SendPushNotification
       $downstreamResponse   = FCM::sendTo($token, $option, $notification, $data);
       $downstreamResponse   -> numberSuccess();
       $downstreamResponse   ->numberFailure();
-    //  dump($downstreamResponse);
       if($downstreamResponse->numberSuccess())
       {
         return $downstreamResponse;

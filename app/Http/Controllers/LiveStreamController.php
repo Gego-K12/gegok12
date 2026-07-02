@@ -72,7 +72,6 @@ class LiveStreamController extends Controller {
 
         \Storage::append( 'uploads\live-stream\$streamName.mp4', $output->get( 'Payload' ) );
 
-        dd( $output );
         return $output;
     }
 

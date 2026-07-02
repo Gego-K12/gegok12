@@ -164,7 +164,6 @@ class AssignmentController extends Controller
             ['teacher_id',Auth::id()]
         ])->pluck('standardLink_id')->toArray();
 
-        // dd($teacherlinks);
 
         $standards = array_merge($standardLinks,$teacherlinks);
 
@@ -314,7 +313,6 @@ class AssignmentController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            dd($e->getMessage());
         }
     }
 
@@ -456,7 +454,6 @@ class AssignmentController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            dd($e->getMessage());
         }
     }
 
@@ -521,7 +518,6 @@ class AssignmentController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            dd($e->getMessage());
         }
     }
 }

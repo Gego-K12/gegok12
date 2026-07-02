@@ -155,7 +155,6 @@ class NotesController extends Controller
       $res['message'] = 'Notes Deleted Successfully';
       return $res;
     } catch (Exception $e) {
-      //dd($e->getMessage());
     }
   }
 }

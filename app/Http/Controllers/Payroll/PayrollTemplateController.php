@@ -106,7 +106,6 @@ class PayrollTemplateController extends Controller
         {
             \DB::rollBack();
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -168,7 +167,6 @@ class PayrollTemplateController extends Controller
         {
             \DB::rollBack();
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 

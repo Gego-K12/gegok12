@@ -43,9 +43,6 @@ class AdminForm extends Component
 
 	public function mount($id)
 	{	
-		//dd($id);
-		//dd($school_id);
-		//dd(\Request::segment ('5'));
 		$this->school_id = $id;
 
 		$this->adminId = $id;
@@ -55,9 +52,7 @@ class AdminForm extends Component
 		//if($this->adminId != '')
 		if(\Request::segment ('5') == 'update')
 		{	
-			//dd($this->school_id);
 			$this->admin = User::where('id', $this->adminId)->first();
-			//dd('in');
 			$this->school_id = $this->admin->school_id;
 			$this->usergroup = $this->admin->usergroup_id;
 			$this->name = $this->admin->name;
@@ -68,9 +63,6 @@ class AdminForm extends Component
 
 	public function submitAdmin()
 	{
-		//dd($this->segment);
-		//dd($this->school_name);
-		//dd($this->school_id);
 
 		$this->validate();
 
@@ -83,12 +75,11 @@ class AdminForm extends Component
 			'password' => Hash::make($this->password ?? ''),
 		];
 		
-		//dd(\Request::segment ('5'));
 
 		//if($this->adminId == '')
 		//if(\Request::segment ('5') == 'create')
 		if($this->segment == 'create')
-		{//dd('in');
+		{
 
 			$validatedData = $this->validate([
             	'email' => 'required|unique:'.School::class,
@@ -108,18 +99,15 @@ class AdminForm extends Component
 		                // 'avatar'        =>  'uploads/male.png',
 		            ]);
 
-			//dd($adminUser);
 
 			$this->alert('success', 'Admin created successfully');
 		}
 		else
-		{//dd('else');
+		{
 			$adminUser = User::where('id', $this->adminId)->update($data);
-			//dd($adminUser);
 
 			$this->alert('success', 'Admin updated successfully');
 		}
-		//dd($adminUser);
 		
 		return redirect(url('superadmin/academics/school/detail/'.$this->school_id));
 		//return redirect(url('superadmin/academics/schools'));
@@ -127,12 +115,10 @@ class AdminForm extends Component
 	
     public function render()
     {	
-    	//dd($this->school_name);
 
     	$usergroups = Usergroup::get();
 
     	$schoolDetail = School::where('id', $this->school_id)->first();
-//dd($this->school_id);
         return view('livewire.superadmin.academics.admin-form',[
         	'usergroups' => $usergroups,
         	'schoolDetail' => $schoolDetail,

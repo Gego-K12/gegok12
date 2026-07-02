@@ -75,7 +75,6 @@ class EmailRecordController extends Controller
             {
                 $folder=Auth::user()->school->slug.'/emailrecord';
                 $path = $this->uploadFile($folder,$file);
-                //dd($path);
                 $emailrecord->attachment = $path; 
             }
 
@@ -98,7 +97,6 @@ class EmailRecordController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
 
     }
@@ -159,7 +157,6 @@ class EmailRecordController extends Controller
             {
                 $folder=Auth::user()->school->slug.'/emailrecord';
                 $path = $this->uploadFile($folder,$file);
-                //dd($path);
                 $emailrecord->attachment = $path; 
             }
           
@@ -184,7 +181,6 @@ class EmailRecordController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -220,7 +216,6 @@ class EmailRecordController extends Controller
         catch(Exception $e) 
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 }

@@ -95,7 +95,6 @@ class PageDetailsController extends Controller
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 
@@ -170,7 +169,6 @@ class PageDetailsController extends Controller
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 
@@ -246,7 +244,6 @@ class PageDetailsController extends Controller
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 }

@@ -51,7 +51,6 @@ class TaskController extends Controller
 
         $tasks = TaskResource::collection($tasks)->groupby('Flag');
 
-         //dd($tasks['Today']);
         // if($tasks['Today']!=null)
         // {
         //     $tasks['Today'] = [];
@@ -363,7 +362,6 @@ public function create(Request $request)
     //     catch(Exception $e)
     //     {
     //         Log::info($e->getMessage());
-    //         dd($e->getMessage());
     //     }   
     // }
 
@@ -468,7 +466,6 @@ public function create(Request $request)
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            dd($e->getMessage());
         }
     }
 
@@ -624,7 +621,6 @@ public function create(Request $request)
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            dd($e->getMessage());
         }
     }
 
@@ -670,7 +666,6 @@ public function create(Request $request)
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            dd($e->getMessage());
         }
     }
 
@@ -714,7 +709,6 @@ public function create(Request $request)
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            dd($e->getMessage());
         }
     }
 }

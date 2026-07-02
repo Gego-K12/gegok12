@@ -107,7 +107,6 @@ class HomeworkApprovalController extends Controller
         {
             \DB::rollBack();
             Log::info($e->getMessage());
-            dd($e->getMessage());
         }
     }
 
@@ -164,7 +163,6 @@ class HomeworkApprovalController extends Controller
         {
             \DB::rollBack();
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -200,7 +198,6 @@ class HomeworkApprovalController extends Controller
         catch (Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 

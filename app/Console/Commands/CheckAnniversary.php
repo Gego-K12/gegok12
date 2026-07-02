@@ -69,7 +69,6 @@ class CheckAnniversary extends Command
                                 ->orWhere('usergroup_id',11);
                 })->get();
 
-         //dump($teacheranniversary);
 
             if(count($teacheranniversary)>0)
             {
@@ -107,7 +106,6 @@ class CheckAnniversary extends Command
                     // $image = $this->getFilePath('uploads/images/work_anniversary.jpg');
                     $image = 'uploads/images/work_anniversary.jpg';
 
-                    //dd($academic_year_id);            
 
                     $event = $this->CreateWorkAnniversary($teacher,$image, $description,$anniversary_date,$date);
                     
@@ -119,7 +117,6 @@ class CheckAnniversary extends Command
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 }

@@ -29,7 +29,6 @@ class UserprofileObserver
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 

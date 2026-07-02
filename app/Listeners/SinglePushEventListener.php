@@ -42,7 +42,6 @@ class SinglePushEventListener implements ShouldQueue
        //  $data['title']="Test";
        //  $data['body']="Test Notification";
        //  $data['token']=$user_device_token->token;
-       //  dump($data);
        // $user->notify(new SendDeviceNotification($data));
       //  \Notification::send($user_device_token->token, new SendDeviceNotification($data));
 

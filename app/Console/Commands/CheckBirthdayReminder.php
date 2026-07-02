@@ -93,7 +93,6 @@ class CheckBirthdayReminder extends Command
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 }

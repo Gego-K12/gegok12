@@ -21,7 +21,7 @@ class TransportNotificationEvent
      * @return void
      */
     public function __construct($data)
-    {//dd('evsdcsd');
+    {
         $this->data = $data;
     }
 

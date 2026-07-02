@@ -118,7 +118,6 @@ class PostCommentDetailsController extends Controller
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 
@@ -214,7 +213,6 @@ class PostCommentDetailsController extends Controller
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 }

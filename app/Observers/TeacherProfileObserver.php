@@ -41,7 +41,6 @@ class TeacherProfileObserver
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 

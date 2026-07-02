@@ -26,7 +26,6 @@ class CalendarEvent
 
     public function __construct(Events $events)
     {
-         //dd($events);
         $this->events = $events;
     }
 

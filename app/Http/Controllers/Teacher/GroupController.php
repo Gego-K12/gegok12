@@ -43,7 +43,6 @@ class GroupController extends Controller
     public function list()
     {
         $groups = Group::get();
-        dd($groups);
 
         return response()->json([
             'data'    => GroupResource::collection($groups)

@@ -141,7 +141,6 @@ class DisciplineController extends Controller
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 
@@ -274,7 +273,6 @@ class DisciplineController extends Controller
         }
         catch(Exception $e)
         {
-           // dd($e->getMessage());
         }
     }
 
@@ -322,7 +320,6 @@ class DisciplineController extends Controller
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 }

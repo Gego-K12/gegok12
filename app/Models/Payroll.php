@@ -183,7 +183,6 @@ class Payroll extends Model
 
       $from_date=date('Y-m-d',strtotime($leave->from_date));
       $to_date=date('Y-m-d',strtotime($leave->to_date));
-     //dd($from_date);
       if($leave){
     if($to_date>=$end_date){
       $days = Carbon::parse($from_date)->diffInDays(Carbon::parse($end_date))+1;

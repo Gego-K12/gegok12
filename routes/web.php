@@ -23,9 +23,6 @@ Route::get('/teacher/impersonate/stop', 'Auth\ImpersonateController@stopImperson
 
 Route::get('/schooladmin/{id}/impersonate', 'Auth\ImpersonateController@schoolAdminimpersonate')->middleware('auth', 'superadmin');
 
-//Reset Password for member
-// Route::get('/password/reset/{token}', 'Auth\ResetPasswordController@showResetForm');
-// Route::post('/password/reset', 'Auth\ResetPasswordController@reset')->name('password.reset');
 //Email Verification for Member
 Route::get('/emailverification/{token}', 'Auth\EmailVerificationController@emailverification');
 // OTP Verification

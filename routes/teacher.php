@@ -132,10 +132,6 @@ Route::get( '/getavatar', 'UserProfileController@getavatar' );
 //activitylog
 Route::get( '/activity', 'ActivityLogController@index' );
 
-//chat room
-// Route::get( '/chats', 'ChatController@index' );
-// Route::get( '/chat/{room}', 'ChatController@show' );
-
 //Private chat room
 Route::get( '/conversations', 'ConversationController@index' )->name( 'teacher.conversations.index' );
 Route::get( '/conversations/create', 'ConversationController@create' )->name( 'teacher.conversations.create' );
@@ -336,11 +332,6 @@ Route::get( '/student/showallmark/{name}', 'StudentDetailsController@showAllMark
 Route::get( '/student/comparemark/{name}', 'StudentDetailsController@compareMarks' );
 Route::get( '/student/show/medicalHistory/{name}', 'StudentDetailsController@showMedicalHistory' );
 Route::get( '/document/get/{name}', 'StudentDetailsController@showDocuments' );
-
-//marks
-// Route::get( '/marks/view/{standard_id}', 'MarkController@view' );
-// Route::get( '/marks/show', 'MarkController@show' );
-// Route::get( '/marks/viewmark/{standard_id}/{user_id}/{exam_id}/{academic_year_id}', 'MarkController@viewmark' );
 
 //class wall
 

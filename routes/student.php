@@ -75,9 +75,6 @@ Route::get( '/activity', 'ActivityLogController@index' );
 //library activity
 Route::get( '/libraryactivity', 'LibraryActivityController@index' );
 Route::get( '/libraryactivity/show', 'LibraryActivityController@show' );
-//chat room
-// Route::get( '/chats', 'ChatController@index' );
-// Route::get( '/chat/{room}', 'ChatController@show' );
 //Private chat room
 Route::get( '/conversations', 'ConversationController@index' )->name( 'student.conversations.index' );
 Route::get( '/conversations/create', 'ConversationController@create' )->name( 'student.conversations.create' );

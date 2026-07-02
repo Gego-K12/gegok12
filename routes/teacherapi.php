@@ -53,7 +53,6 @@ Route::group([ 'prefix' => 'teacher' , 'middleware'=>['auth:sanctum'] , 'namespa
     //Logout
     
     Route::post('/logout', 'LoginController@logout');
-    //Route::post('/logout/devices', 'LoginController@logoutDevices');
 
     //me
     

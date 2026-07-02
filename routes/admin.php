@@ -44,10 +44,6 @@ Route::post( '/dashboard/workAnniversary', 'BirthdayController@workAnniversaryMe
 
 //school details
 Route::get( '/schooldetails', 'SchoolDetailsController@index' );
-//Route::get( '/schooldetails/list', 'SchoolDetailsController@list' );
-//Route::get( '/schooldetails/create', 'SchoolDetailsController@create' );
-//Route::post( '/schooldetails/create/validationStore', 'SchoolDetailsController@validationStore' );
-//Route::post( '/schooldetails/create', 'SchoolDetailsController@store' );
 Route::get( '/schooldetails/edit/{school_id}', 'SchoolDetailsController@edit' );
 Route::get( '/schooldetails/editdetail/{school_id}', 'SchoolDetailsController@editdetail' );
 Route::post( '/schooldetails/update/validationUpdate/{school_id}', 'SchoolDetailsController@update' );
@@ -200,7 +196,6 @@ Route::get( '/activity', 'ActivityLogController@index' );
 	Route::get( '/student/show/{name}', 'StudentDetailsController@show' );
 	Route::get( '/student/showmark/{name}', 'StudentDetailsController@showmark' );
 	Route::get( '/student/showallmark/{name}', 'StudentDetailsController@showAllMark' );
-	//Route::get( '/student/comparemark/{name}', 'StudentDetailsController@compareMarks' );
 	Route::get( '/student/comparemark/{name}', 'StudentDetailsController@marksGraph' );
 	Route::get( '/student/show/fees/{name}', 'StudentDetailsController@showFees' );
 	Route::get( '/student/show/medicalHistory/{name}', 'StudentDetailsController@showMedicalHistory' );
@@ -339,7 +334,6 @@ Route::get( '/events/delete/{id}', 'EventsController@destroy' );
 Route::get( '/event/approve/{id}', 'EventsController@eventapprove' );
 
 //Settings
-//Route::get( 'settings/', 'SettingController@index' );
 Route::get( '/settings/generalsettings', 'Setting\GeneralController@create' );
 Route::post( '/settings/generalsettings', 'Setting\GeneralController@store' );
 Route::get( '/settings/maintenancesettings', 'Setting\MaintenanceController@create' );
@@ -484,35 +478,6 @@ Route::get( '/downloadformat', 'ImportMemberController@downloadFormat' );
 	//delete
 	Route::get( '/leavetype/delete/{id}', 'LeaveTypesController@destroy' );
 
-// //videos
-// 	//index 
-//     Route::get( '/videos/list', 'VideosController@standardlist' );
-// 	Route::get( '/files', 'VideosController@index' );
-// 	Route::get( '/file/list/{type}', 'VideosController@list' );
-
-// 	//add
-// 	Route::get( '/file/add', 'VideosController@create' );
-// 	Route::post( '/file/add', 'VideosController@store' );
-// 	Route::post( '/storevideos', 'VideosController@videostore' );
-// 	Route::post( '/storeimage', 'VideosController@storeimage' );
-// 	Route::post( '/sessionsave', 'VideosController@save' );
-
-// 	//show
-// 	Route::get( '/file/show/{id}', 'VideosController@show' );
-
-// 	Route::get( '/video/show', 'VideosController@view' );
-
-// 	//edit
-// 	Route::get( '/file/edit/{id}', 'VideosController@edit' );
-// 	Route::post( '/file/edit/{id}', 'VideosController@update' );
-// 	Route::get( '/videos/download/{id}', 'VideosController@downloadattachments' );
-
-// 	//delete
-// 	Route::get( '/file/delete/{id}', 'VideosController@destroy' );
-// 	Route::get( '/file/viewers/{id}', 'VideosController@viewers' );
-
-
-
 //event_gallery
 Route::post( '/upload/photos/{event_id}', 'EventGalleryController@store' );
 Route::get( '/display/photos/{event_id}', 'EventsController@showimage' );
@@ -529,9 +494,6 @@ Route::get( '/magazine/download/{id}', 'BulletinsController@downloadattachments'
 //reports
 Route::get( '/reports', 'ReportsController@report' );
 Route::get( '/report/events', 'ReportsController@eventReport' );
-//Route::get( '/report/index', 'ReportsController@index' );
-//Route::get( '/report/show/{id}', 'ReportsController@show' );
-//Route::post( '/report/filter', 'ReportsController@create' );
 Route::get( '/report/fees', 'ReportsController@exportFee' );
 Route::get( '/report/downloadholidayformat', 'ReportsController@holidayFormat' );
 Route::get( '/report/holidays', 'ReportsController@holidayCreate' );

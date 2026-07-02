@@ -8,6 +8,10 @@
 /.vagrant
 /_co-pilot_docs
 /_todo
+/phpdoc.phar
+/docs/.phpdoc
+/docs/storage
+/storage/phpdoc
 Homestead.json
 Homestead.yaml
 npm-debug.log

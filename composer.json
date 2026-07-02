@@ -29,7 +29,7 @@
         "league/csv": "^9.11",
         "league/flysystem-aws-s3-v3": "^3.24.0",
         "livewire/livewire": "^3.4",
-        "maatwebsite/excel": "3.1.x-dev",
+        "maatwebsite/excel": "4.x-dev",
         "nckg/laravel-impersonate": "4.0.1",
         "predis/predis": "v3.0.0-alpha1",
         "pusher/pusher-php-server": "7.2",

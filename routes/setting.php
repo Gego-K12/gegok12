@@ -8,7 +8,6 @@ Route::post('/academicyear/index','NavigationController@index');
 Route::get('/notification/showList', 'NotificationController@showList');
 
 //dashboard
-//Route::get( '/dashboard', 'DashboardController@index' )->name( 'dashboard' );
 Route::get( '/dashboard/event', 'DashboardController@event' );
 
 //dashboard-birthday
@@ -21,9 +20,6 @@ Route::get( '/absentees/student', 'AttendanceController@student' );
 Route::get( '/absentees/student/list', 'AttendanceController@studentList' );
 Route::get( '/absentees/staff', 'StaffAttendanceController@staff' );
 Route::get( '/absentees/staff/list', 'StaffAttendanceController@stafflist' );
-
-//fees-dashboard
-// Route::get( '/fees/list/{status}', 'FeesController@indexList' ); //error in fees addon
 
 //academics
 	//index

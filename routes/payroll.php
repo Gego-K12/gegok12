@@ -12,7 +12,6 @@ Route::get( '/payroll/template/showlist',
 Route::post( '/payroll/template/add',
 	'PayrollTemplateController@store');
 Route::get( '/payroll/template/{id}/edit','PayrollTemplateController@edit');
-//Route::get( '/payroll/template/{id}/show','PayrollTemplateController@show');
 Route::get( '/payroll/template/{id}/itemlist','PayrollTemplateController@itemlist');
 Route::get( '/payroll/template/{id}/editshow','PayrollTemplateController@editshow');
 Route::post( '/payroll/template/{id}/update', 'PayrollTemplateController@update');
@@ -39,7 +38,6 @@ Route::get( '/payroll/payslip/list','PayrollController@showlist');
 Route::get( '/payroll/payslip/create','PayrollController@create');
 Route::get( '/payroll/payslip/showlist','PayrollController@list');
 Route::post( '/payroll/payslip/details','PayrollController@details');
-//Route::get( '/payroll/template/{id}/payslip','Payslip\PayrollController@detail');
 Route::post( '/payroll/payslip/add','PayrollController@store');
 Route::get( '/payroll/payslip/{id}/view','PayrollController@downloadpayroll');
 Route::get( '/payroll/payslip/{id}/edit','PayrollController@edit');

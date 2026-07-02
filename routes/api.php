@@ -6,8 +6,6 @@ Route::post('/parent/login', 'Api\TokenController@issueToken');
 
 Route::post('/logout/devices', 'Api\LoginController@logoutDevices');
 
-//Route::get('/search/users','Api\Search\UserSearchController@index'); --test route hidden
-
 Route::get('/schools/list','Api\SchoolController@list');
 
 Route::get('/apk/parent','Api\ApkController@parentApp');
@@ -35,8 +33,6 @@ Route::group([
 
     //Logout
 
-    //Route::post('/logout/devices', 'LoginController@logoutDevices');
-    
     Route::post('/logout', 'LoginController@logout');
 
     //me
@@ -119,8 +115,6 @@ Route::group([
     Route::get('/feedback/category/list','FeedbackController@list');
 
 	Route::post('/feedback/send/{student_id}','FeedbackController@store');
-    
-    //Route::post('/feedback/save/{feedbackid}','FeedbackController@conversationsave');	
 
     //Discipline
 
@@ -144,10 +138,6 @@ Route::group([
 
     Route::post('/homework/reply/{homework_id}/{student_id}','HomeworkController@replycomment');
 
-    //Timetable
-
-    // Route::get('/timetable/{student_id}','TimetableController@index');
-
     //LessonPlan
 
     Route::get('/lessonplan/{student_id}','LessonPlanController@index');
@@ -155,16 +145,6 @@ Route::group([
      Route::get('/lessonplan/print/{id}','LessonPlanController@print');
 
     Route::get('/lessonplan/{student_id}/{subject_id}','LessonPlanController@subjectIndex');
-
-   
-
-    //Fees
-
-    // Route::get('/fees/paid/{student_id}','FeesController@paid');
-
-    // Route::get('/fees/unpaid/{student_id}','FeesController@unpaid');
-
-    // Route::get('/fees/show/{id}','FeesController@show');
 
     //Notice
 
@@ -182,19 +162,6 @@ Route::group([
     //Attendance
 
     Route::get('/attendance/{student_id}','AttendanceController@index');
-
-    //Exam
-
-    // Route::get('/exams/upcoming/{student_id}','ExamController@upcomingExam');
-
-    // Route::get('/exams/past/{student_id}','ExamController@pastExam');
-
-    //Mark
-
-    // Route::get('/marks/{student_id}/{exam_id}','MarksController@index');
-    // Route::get('/marks/graph/{student_id}/{exam_id}','MarksController@getmarks');
-
-    // Route::get('/mark/show/{mark_id}','MarksController@show');
 
     //Teacher
 
@@ -262,16 +229,5 @@ Route::get('/get/state/{id}','Api\UserprofileController@state');
 Route::get('/get/city/{id}','Api\UserprofileController@city');
 
 Route::get('/events/show/details/{id}','Api\EventsController@showdetails');
-
-//Testing Purpose start
-
-//Route::get('/users', 'Api\TestController@index');
-
-//Route::get('/teachers', 'Api\TestController@teachers');
-
-//Route::get('/parents', 'Api\TestController@parents');
-
-//Route::get('/events','Api\TestController@events');
-
 
 

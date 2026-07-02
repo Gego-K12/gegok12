@@ -612,7 +612,6 @@ class SiteHelper
      */
     public static function getClassStudents($school_id, $academic_year_id, $standardLink_id)
     {
-        //dd($standardLink_id);
 
         $key = "class_students_" . $standardLink_id;
         return Cache::remember($key, env('CACHE_TIME'), function () use ($school_id, $academic_year_id, $standardLink_id) {

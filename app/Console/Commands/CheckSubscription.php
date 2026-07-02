@@ -71,7 +71,6 @@ class CheckSubscription extends Command
         {
             \DB::rollBack();
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 }

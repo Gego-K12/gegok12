@@ -82,7 +82,7 @@ class StudentController extends Controller
     {
         $school_id = Auth::user()->school_id;
         $academic_year = SiteHelper::getAcademicYear($school_id);
-        $count    = StudentUser::ByRole(6)->where('school_id',$school_id)->where('deleted_at',NULL)->//count();dd($count);
+        $count    = StudentUser::ByRole(6)->where('school_id',$school_id)->where('deleted_at',NULL)->count();
         $alphabet = request('alphabet')?request('alphabet'):'';
         $query    = \Request::getQueryString();
         $standardLink = SiteHelper::getStandardLinkList($school_id);
@@ -234,7 +234,6 @@ class StudentController extends Controller
       }
       catch(Exception $e)
       {
-        //dd($e->getMessage());
       } 
     }
 
@@ -393,7 +392,6 @@ class StudentController extends Controller
       }
       catch(Exception $e)
       {
-        //dd($e->getMessage());
       } 
     }
     
@@ -437,7 +435,6 @@ class StudentController extends Controller
       }
       catch(Exception $e)
       {
-        //dd($e->getMessage());
       } 
     }
     

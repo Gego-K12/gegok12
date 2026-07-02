@@ -47,7 +47,7 @@ class CheckPushNotification extends Command
            // $data['type']       =   'notice';
            // $data['platform_token']=$user->platform_token;
            //  $this->sendNotification($data,$user->platform_token);
-            dump($user->platform_token);
+            $this->info('Platform token: ' . $user->platform_token);
             if($user->usergroup_id==7)
             {
              $user->notify(new SendDeviceNotification($data,$user->platform_token));

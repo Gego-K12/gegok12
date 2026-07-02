@@ -20,7 +20,6 @@ class EventGalleryController extends Controller
 	public function showimage($event_id)
     {  
     	$event=Events::where([['id',$event_id],['school_id',Auth::user()->school_id]])->get();
-//dd($event);
     	$event=ShowEventResource::collection($event);
 
     	return $event;

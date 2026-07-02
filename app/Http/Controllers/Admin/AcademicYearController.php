@@ -139,7 +139,6 @@ class AcademicYearController extends Controller
             return $res;
         } catch (Exception $e) {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -249,7 +248,6 @@ class AcademicYearController extends Controller
             return $res;
         } catch (Exception $e) {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -294,7 +292,6 @@ class AcademicYearController extends Controller
             return $res;
         } catch (Exception $e) {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -330,7 +327,6 @@ class AcademicYearController extends Controller
             }
         } catch (Exception $e) {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 }

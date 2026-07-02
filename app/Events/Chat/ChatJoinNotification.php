@@ -20,7 +20,6 @@ class ChatJoinNotification  implements ShouldBroadcast
       public function __construct($user_name)
     {
         $this->user_name=$user_name;
-        //dd($this->user_name);
     }
     /**
      * Get the channels the event should broadcast on.

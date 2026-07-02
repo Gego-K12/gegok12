@@ -42,7 +42,6 @@ class PayrollController extends Controller
     {
       $logo=null;
       $payroll=Payroll::where('id',$id)->first();
-      //dd($payroll);
       if(Auth::user()->SchoolLogo['meta_value'] != '-'){
       $logo=Auth::user()->SchoolLogoPath;
       }
@@ -136,7 +135,6 @@ class PayrollController extends Controller
      */
     public function store(PayrollRequest $request)
     {
-       //dd($request->all());
          \DB::beginTransaction();
         try 
         {
@@ -181,7 +179,6 @@ class PayrollController extends Controller
         {
             \DB::rollBack();
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -253,7 +250,6 @@ class PayrollController extends Controller
         {
             \DB::rollBack();
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 

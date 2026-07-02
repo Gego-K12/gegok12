@@ -111,7 +111,6 @@ class SendMessageController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -150,7 +149,6 @@ class SendMessageController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -167,7 +165,6 @@ class SendMessageController extends Controller
     public function shift(Request $request)
     {
         //
-        // dd($request);  
         try
         {
             $school_id = Auth::user()->school_id;
@@ -221,7 +218,6 @@ class SendMessageController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 }

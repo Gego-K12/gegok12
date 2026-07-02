@@ -32,6 +32,6 @@ class CheckEnv extends Command
    public function handle()
    {
       $env_var = $this->ask('Enter the Env Variable');
-      dd(env($env_var));
+      $this->line(var_export(env($env_var), true));
    }
 }

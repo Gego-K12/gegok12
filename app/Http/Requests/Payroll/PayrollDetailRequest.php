@@ -30,7 +30,6 @@ class PayrollDetailRequest extends FormRequest
          Validator::extend('checksalary', function ($attribute, $value, $parameters, $validator) 
         {
              $salary=Salary::where([['school_id',Auth::user()->school_id],['staff_id',$value],['effective_date','>=',date('Y-m-d')]])->first();
-             //dd($salary);
 
             if(!$salary)
             { 
@@ -38,7 +37,6 @@ class PayrollDetailRequest extends FormRequest
             }
             else
             {
-               // dd($salary->effective_date);
                 if($salary->effective_date>= date('Y-m-d')){
                  return true;
               }

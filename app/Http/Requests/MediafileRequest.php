@@ -25,7 +25,6 @@ class MediafileRequest extends FormRequest
      */
     public function rules(Request $request)
     {
-        //dd(\Session::get('video_extension'));
         Validator::extend('file_extension', function ($attribute, $value, $parameters, $validator)
         {
             $extension=$value->getClientOriginalExtension();

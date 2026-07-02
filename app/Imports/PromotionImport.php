@@ -171,7 +171,6 @@ class PromotionImport implements ToCollection, WithHeadingRow
         {
             \DB::rollBack();
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 }

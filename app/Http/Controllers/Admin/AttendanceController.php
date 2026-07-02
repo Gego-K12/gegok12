@@ -117,7 +117,6 @@ class AttendanceController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -198,7 +197,6 @@ class AttendanceController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -221,7 +219,6 @@ class AttendanceController extends Controller
                     ]);
         $count=$absentees->count();
         $standards=$absentees->distinct('standardLink_id')->pluck('standardLink_id')->toArray();
-        //dd($standards);
         $standardLink = StandardLink::where([['school_id',$school_id],['academic_year_id',$academic_year->id]])->whereIn('id',$standards)->get();
         $standardLinklist=StandardLinkResource::collection($standardLink);
 

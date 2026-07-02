@@ -48,7 +48,6 @@ class TelephoneDirectoryController extends Controller
         ->get();
 
     // $merged = $numberlist->merge($users);
-    // dd($merged);
         $numberlist = TelephoneDirectoryResource::collection($numberlist);
         $userData = UserPhoneResource::collection($users);
         $merged = collect($numberlist)->merge($userData);
@@ -105,7 +104,6 @@ class TelephoneDirectoryController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -186,7 +184,6 @@ class TelephoneDirectoryController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -221,7 +218,6 @@ class TelephoneDirectoryController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 }

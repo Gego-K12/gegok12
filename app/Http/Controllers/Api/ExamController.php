@@ -66,7 +66,7 @@ class ExamController extends Controller
          }
         catch(Exception $e)
         {
-            dd($e->getMessage());
+            \Log::error($e->getMessage());
         }
     }
 

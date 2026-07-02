@@ -29,7 +29,6 @@ class BirthdayReminderMailEventListener implements ShouldQueue
     public function handle(BirthdayReminderMailEvent $event)
     {
         //
-        //dump($event->to);
         Mail::to($event->reminder->to)->queue(new BirthdayReminderMail($event->reminder));
     }
 }

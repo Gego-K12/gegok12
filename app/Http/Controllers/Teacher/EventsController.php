@@ -80,7 +80,6 @@ class EventsController extends Controller
               'end'=>  date('Y-m-d', strtotime($event->end_date)).'T'.date('H:i:s', strtotime($event->end_date)),
               'allDay' => $event->allDay 
             ];
-            //dump($eventData);
           return $eventData;
       });
       $events = json_encode($events);

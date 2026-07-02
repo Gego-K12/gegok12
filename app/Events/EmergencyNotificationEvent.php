@@ -27,7 +27,6 @@ class EmergencyNotificationEvent
     public function __construct($datas,$school_id,$admin_email,$admin)
     {
         //
-        //dump($datas);
         $this->datas = $datas;
         $this->school_id = $school_id;
         $this->admin_email = $admin_email;

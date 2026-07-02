@@ -80,7 +80,6 @@ class CheckBirthday extends Command
             else
             {
                 $month_date=date('m-d',strtotime($argument));
-                //dd($month_date);
                 $birthdays=User::whereHas('userprofile', function($query) use ($argument)
                 { 
 
@@ -106,30 +105,26 @@ class CheckBirthday extends Command
                                 ->orWhere('usergroup_id',11);
                 })->get();
 
-            //dump($birthdays);
 
 
             if(count($birthdays)>0)
             {
                 foreach($birthdays as $birthday)
-                {//dump($birthday);
+                {
 
                     $date_of_birth = date('Y-m-d',strtotime($birthday->userprofile->date_of_birth));
                     $month = date('m-d',strtotime($birthday->userprofile->date_of_birth));
                     $current_year=date('Y');
                     $birth_date = $current_year.'-'.$month;
 
-                    //dd($birth_date);
 
                     $date=date('Y-m-d H:i:s');
-                    //dd($date);
 
                     $school_id=$birthday->userprofile->school_id;
 
                     // $image = $this->getFilePath('uploads/images/birthday.jpg');
                     $image = 'uploads/images/birthday.jpg';
 
-                    //dump($image);
 
                     $event = $this->CreateBirthday($birthday,$school_id,$birth_date,$date,$argument,$image);
                
@@ -141,7 +136,6 @@ class CheckBirthday extends Command
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     
     }

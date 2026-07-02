@@ -21,7 +21,7 @@ class AbsentReminderMailEvent
      * @return void
      */
     public function __construct($reminder)
-    {//dump('event');
+    {
         //
         $this->reminder = $reminder;
     }

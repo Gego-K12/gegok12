@@ -21,7 +21,6 @@ class TransportNotificationPushEvent {
     */
 
     public function __construct( $data ) {
-        //dump( $data );
         $this->data = $data;
     }
 

@@ -15,7 +15,6 @@ class MustBeStockKeeper
      */
      public function handle($request, Closure $next)
     {
-        //dd('kjjkh');
 
         if(\Auth::user()->isStockKeeper())
         {

@@ -96,7 +96,6 @@ trait SendMessageProcess
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         } 
     }
 }

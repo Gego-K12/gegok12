@@ -80,7 +80,6 @@ class TeacherListController extends Controller
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         } 
     }
 
@@ -90,7 +89,6 @@ class TeacherListController extends Controller
 
        $academic = SiteHelper::getAcademicYear(Auth::user()->school_id);
       $teachers    = TeacherUser::ByRole(5)->where('school_id',Auth::user()->school_id)->get();
-      // dd($teachers);
         // $teachers=SiteHelper::getteachers(Auth::user()->school_id,$academic->id,$standardLink->id);
 //          return view('admin.id-card.id-card-new',compact('standardLink','students','academic'));
 

@@ -42,8 +42,6 @@ class StudentAttendancePushListener implements ShouldQueue
     { 
         try{
         $users = RouteStudent::where([['school_id', $event->data['school_id']],['route_id', $event->data['route_id']],['user_id', $event->data['user_id']]])->with('students')->get();
-        //dd($event->data['user_id']);
-        //dd($users);
         foreach($users as $user)
         {   
             $parents = $user->students->parents;
@@ -51,7 +49,7 @@ class StudentAttendancePushListener implements ShouldQueue
             foreach($parents as $parent)
             {     
                 if(isset($parent->userParent->platform_token))
-                {//dd('test');
+                {
                     //$this->sendNotification($event->data,$parent->userParent->platform_token);
                       $user=User::find($parent->userParent->id);
                     $user->notify(new SendDeviceNotification($event->data,$user->platform_token));

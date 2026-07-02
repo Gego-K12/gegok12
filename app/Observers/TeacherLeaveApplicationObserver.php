@@ -25,7 +25,6 @@ class TeacherLeaveApplicationObserver
         catch(Exception $e)
         {
         	Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -44,7 +43,6 @@ class TeacherLeaveApplicationObserver
         catch(Exception $e)
         {
         	Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -64,7 +62,6 @@ class TeacherLeaveApplicationObserver
         catch(Exception $e)
         {
         	Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 

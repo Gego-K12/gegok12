@@ -70,7 +70,6 @@ class HolidaysImport implements ToCollection, WithHeadingRow
         }
         catch (Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 }

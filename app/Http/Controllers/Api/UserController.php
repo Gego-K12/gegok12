@@ -47,7 +47,6 @@ class UserController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         } 
     }
 
@@ -81,28 +80,8 @@ class UserController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
-
-    /*public function resetPassword(Request $request)
-    {
-        try
-        {
-            $user = User::where('mobile_no',$request->mobile_no)->first();
-            $token = $this->resetPasswordSms($user);
-        
-            return response()->json([
-                'success'   =>  true,
-                'message'   =>  'Check sms to reset the password'
-            ],200);
-        }
-        catch(Exception $e)
-        {
-            Log::info($e->getMessage());
-            dd($e->getMessage());
-        }     
-    }*/
 
     public function resetPassword(ResetPasswordRequest $request)
     {
@@ -126,7 +105,6 @@ class UserController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            dd($e->getMessage());
         }    
     }
 
@@ -183,7 +161,6 @@ $user = User::where([['mobile_no',$request->mobile_no],['usergroup_id', $request
         {
             \DB::rollBack();
             Log::info($e->getMessage());
-            dd($e->getMessage());
         }
     }
 
@@ -201,7 +178,6 @@ $user = User::where([['mobile_no',$request->mobile_no],['usergroup_id', $request
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            dd($e->getMessage());
         }    
     }
 
@@ -262,7 +238,6 @@ $user = User::where([['mobile_no',$request->mobile_no],['usergroup_id', $request
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            dd($e->getMessage());
         }
     }
 }

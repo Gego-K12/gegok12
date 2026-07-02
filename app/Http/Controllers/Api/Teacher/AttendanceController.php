@@ -71,7 +71,6 @@ class AttendanceController extends Controller
         catch(Exception $e)
         {
             //Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -177,7 +176,6 @@ class AttendanceController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 

@@ -187,7 +187,6 @@ trait RegisterUser
         {
             \DB::rollBack();
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         } 
     }
 
@@ -341,7 +340,6 @@ trait RegisterUser
         {
             \DB::rollBack();
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         } 
     }
 
@@ -466,7 +464,6 @@ trait RegisterUser
         {
             \DB::rollBack();
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         } 
     }
 
@@ -550,7 +547,6 @@ trait RegisterUser
         {
             \DB::rollBack();
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         } 
     }
 
@@ -733,7 +729,6 @@ trait RegisterUser
         {
             \DB::rollBack();
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         } 
     }
 
@@ -806,7 +801,6 @@ trait RegisterUser
         {
             \DB::rollBack();
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         } 
     }
 
@@ -882,7 +876,6 @@ trait RegisterUser
         {
             \DB::rollBack();
             Log::info($e->getMessage());
-            dd($e->getMessage());
         } 
     }
 
@@ -960,7 +953,6 @@ trait RegisterUser
         {
             \DB::rollBack();
             Log::info($e->getMessage());
-            dd($e->getMessage());
         } 
     }
 }

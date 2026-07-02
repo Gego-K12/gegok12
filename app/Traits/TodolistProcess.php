@@ -37,7 +37,6 @@ trait TodolistProcess
         \DB::beginTransaction();
         try
         {
-            // dd($data);
             $today = date('Y-m-d H:i:s');
 
             $task                       =   new Task;
@@ -86,7 +85,6 @@ trait TodolistProcess
                 foreach ($data->class_ids as $class_id) 
                 {
                     $students =StudentAcademic::where('standardLink_id',$class_id)->get();
-                    // dd($students);
                     foreach($students as $student)
                     {
                         $this->storeTaskAssignee($task->id,'class', $student->user_id, $class_id);
@@ -251,7 +249,6 @@ trait TodolistProcess
         {
             \DB::rollBack();
             Log::info($e->getMessage());
-            dd($e->getMessage());
         } 
     }
     public function storeTaskAssignee($taskId, $assignedType = 'user', $userId = null, $standardLinkId = null, $groupId = null)
@@ -506,7 +503,6 @@ trait TodolistProcess
         {
             \DB::rollBack();
             Log::info($e->getMessage());
-            dd($e->getMessage());
         } 
     }
 
@@ -585,7 +581,6 @@ trait TodolistProcess
         {
             \DB::rollBack();
             Log::info($e->getMessage());
-            dd($e->getMessage());
         } 
     }
     public function updatestatus($data)
@@ -605,7 +600,6 @@ trait TodolistProcess
                     'status' => 'completed',
                     // 'claimed_by' => Auth::id(),
                 ]);
-                // dd($assignee);
 
                 // Check all assignees completed
                 $pendingCount = TaskAssignee::where('task_id', $assignee->task_id)

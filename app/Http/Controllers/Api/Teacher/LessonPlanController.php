@@ -190,7 +190,6 @@ class LessonPlanController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -632,7 +631,6 @@ class LessonPlanController extends Controller
         catch(Exception $e)
         {
             \DB::rollBack();
-            //dd($e->getMessage());
         }
     }
 
@@ -682,7 +680,6 @@ class LessonPlanController extends Controller
         catch(Exception $e)
         {
             \DB::rollBack();
-            //dd($e->getMessage());
         }
     }
 }

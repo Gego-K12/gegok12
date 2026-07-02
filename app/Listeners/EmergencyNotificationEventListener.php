@@ -34,7 +34,6 @@ class EmergencyNotificationEventListener implements ShouldQueue
     public function handle(EmergencyNotificationEvent $event)
     {
         $users=User::where([['school_id',$event->school_id],['status','active']]);
-         //dump($event->datas->message_type);
         if($event->datas->message_type=='teacher')
         {
             $users=$users->ByRole(5);
@@ -47,7 +46,6 @@ class EmergencyNotificationEventListener implements ShouldQueue
         if($event->datas->message_type=='specific')
         {
             $search=$event->datas->standard_id;
-            //dump($event->datas->standard_id);
             $users=$users->ByRole(7)->whereHas('children', function($q) use ($search){
     
                 $q->whereHas('userStudent', function($q) use ($search)

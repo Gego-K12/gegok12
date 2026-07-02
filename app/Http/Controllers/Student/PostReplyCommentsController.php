@@ -124,7 +124,6 @@ class PostReplyCommentsController extends Controller
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 
@@ -207,7 +206,6 @@ class PostReplyCommentsController extends Controller
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 
@@ -284,7 +282,6 @@ class PostReplyCommentsController extends Controller
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 }

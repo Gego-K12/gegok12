@@ -224,7 +224,7 @@ class Homework extends Model
         if($this->attachment != null && $this->attachment !='')
         {
             $attachment = $this->getFilePath($this->attachment);
-            $extension=pathinfo( $attachment, PATHINFO_EXTENSION);//dd($extension);
+            $extension=pathinfo( $attachment, PATHINFO_EXTENSION);
             if(in_array($extension,['jpg','jpeg','png']))
             {
               $type='image';

@@ -78,7 +78,6 @@ class ClassRoomPageDetail extends Model
      */
     public function scopeByLike($query,$page_id)
     {
-        //dd($page_id);
         $count = $query->where('page_id',$page_id)->where('like',1)->get();
 
         return $count;

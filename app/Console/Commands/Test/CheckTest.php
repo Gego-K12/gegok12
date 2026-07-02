@@ -50,7 +50,7 @@ class CheckTest extends Command
         }
         catch(Exception $e)
         {
-            dd($e->getMessage());
+            $this->error($e->getMessage());
         }
     }
 }

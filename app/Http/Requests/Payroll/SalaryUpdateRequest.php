@@ -29,7 +29,6 @@ class SalaryUpdateRequest extends FormRequest
       Validator::extend('check_use', function ($attribute, $value, $parameters, $validator) 
         {
              $salary=Salary::find($value);
-             //dd($salary->payrolls);
 
             if(count($salary->payrolls)>0)
             { 

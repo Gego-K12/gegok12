@@ -71,7 +71,6 @@ class EventsController extends Controller
       $academic_year  =   $this->academic_year;
       
       $events         =   Events::where([['school_id',$school_id],['academic_year_id',$academic_year->id]])->get();
-      //dd($events);
       $count          =   Events::where([['school_id',$school_id],['academic_year_id',$academic_year->id],['category','!=','holidays']])->count();
       $subscription   =   Subscription::where('school_id',$school_id)->first();
 
@@ -86,7 +85,6 @@ class EventsController extends Controller
               'end'=>  date('Y-m-d', strtotime($event->end_date)).'T'.date('H:i:s', strtotime($event->end_date)),
               'allDay' => $event->allDay 
             ];
-            //dump($eventData);
           return $eventData;
       });
       $events = json_encode($events);

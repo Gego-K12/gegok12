@@ -23,7 +23,6 @@ class ReminderMailEvent
      */
     public function __construct($reminder)
     {
-        //dd($reminder);
         $this->reminder = $reminder;
     }
 

@@ -23,7 +23,7 @@ class MustBeSchoolSubAdmin
         }
 
         if(\Auth::user()->usergroup_id==1)
-        {//dd('schoolsubadmin');
+        {
             return redirect('/superadmin/dashboard');
         }
 

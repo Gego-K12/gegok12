@@ -80,7 +80,6 @@ class PostalRecordController extends Controller
             {
                 $folder=Auth::user()->school->slug.'/postalrecord';
                 $path = $this->uploadFile($folder,$file);
-                //dd($path);
                 $postalrecord->attachment = $path; 
             }
 
@@ -106,7 +105,6 @@ class PostalRecordController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -164,7 +162,6 @@ class PostalRecordController extends Controller
             {
                 $folder=Auth::user()->school->slug.'/postalrecord';
                 $path = $this->uploadFile($folder,$file);
-                //dd($path);
                 $postalrecord->attachment = $path; 
             }
 
@@ -190,7 +187,6 @@ class PostalRecordController extends Controller
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -225,7 +221,6 @@ class PostalRecordController extends Controller
         catch(Exception $e) 
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 }

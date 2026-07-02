@@ -42,7 +42,6 @@ class DisciplineRequest extends FormRequest
         // Validator::extend('check_incident_date', function ($attribute, $value, $parameters, $validator) {
 
         //     try {
-        //         dd();
         //         $incidentDate = Carbon::createFromFormat('d-m-Y H:i:s', $value);
         //         $currentDate  = Carbon::now();
 

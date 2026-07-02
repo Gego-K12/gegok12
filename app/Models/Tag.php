@@ -96,7 +96,7 @@ class Tag extends Model
      * @return int
      */
     public function getTag($tag_name)
-    {//dump($tag_name);
+    {
 
         $tag=Tag::where('tag_name',$tag_name)->first();
 

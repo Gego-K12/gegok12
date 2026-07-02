@@ -80,7 +80,6 @@ class LessonPlanController extends Controller
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
         }
     }
 

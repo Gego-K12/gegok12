@@ -38,7 +38,6 @@ trait SendEmergencyNotification
      */
     public function selectEmergencyNotification($data , $school_id , $admin_email , $parent , $admin , $student)
     { 
-       // dump($data);
         try
         {
             $academic_year = SiteHelper::getAcademicYear($school_id);
@@ -95,7 +94,6 @@ trait SendEmergencyNotification
         catch(Exception $e)
         {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         } 
     }
 }

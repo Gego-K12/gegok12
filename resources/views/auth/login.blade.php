@@ -11,7 +11,7 @@
     <div class="card">
       <div class="card-header   text-center text-2xl font-semibold tracking-wide">{{ __('Login') }}</div>
       <div class="card-body">
-        @if(\Config::get('settings.login_status')==0)
+        @if(\Config::get('settings.login_status', 1)==0)
         <div class="alert-box success">
           Login page under maintenance
         </div>

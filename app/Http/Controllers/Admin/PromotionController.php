@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
@@ -6,27 +7,24 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Requests\PromotionImportRequest;
-use App\Http\Resources\Exam as ExamResource;
-use App\Http\Requests\PromotionAddRequest;
-use Illuminate\Support\Facades\Auth;
-use Maatwebsite\Excel\Facades\Excel;
-use App\Http\Controllers\Controller;
-use App\Imports\PromotionImport;
-use App\Models\StudentAcademic;
-use Illuminate\Http\Request;
-use App\Models\AcademicYear;
-use App\Models\StandardLink;
-use App\Models\Standard;
-use App\Traits\LogActivity;
 use App\Helpers\SiteHelper;
-use League\Csv\Writer;
-use App\Traits\Common;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\PromotionAddRequest;
+use App\Http\Requests\PromotionImportRequest;
+use App\Imports\PromotionImport;
+use App\Models\AcademicYear;
 use App\Models\Exam;
+use App\Models\Standard;
+use App\Models\StandardLink;
+use App\Models\StudentAcademic;
 use App\Models\User;
-use SplFileObject;
+use App\Traits\Common;
+use App\Traits\LogActivity;
 use Exception;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 use Log;
+use Maatwebsite\Excel\Facades\Excel;
 
 /**
  * Class PromotionController
@@ -35,13 +33,11 @@ use Log;
  * - Promotion dashboard data
  * - CSV export of promotion list
  * - Importing promotion results
- *
- * @package App\Http\Controllers\Admin
  */
 class PromotionController extends Controller
 {
-    use LogActivity;
     use Common;
+    use LogActivity;
 
     /**
      * Display promotion dashboard data.
@@ -56,9 +52,9 @@ class PromotionController extends Controller
     public function index()
     {
         //
-        $standardLink = SiteHelper::getStandardLinkList(Auth::user()->school_id); 
+        $standardLink = SiteHelper::getStandardLinkList(Auth::user()->school_id);
 
-        $next_standardLink = []; 
+        $next_standardLink = [];
 
         $curr_academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
 
@@ -69,43 +65,39 @@ class PromotionController extends Controller
 
         $next_academic_year = AcademicYear::where([
             ['school_id', Auth::user()->school_id],
-            ['status', 2]
+            ['status', 2],
         ])->first();
 
-        if (count($standards) > 0)
-        {
+        if (count($standards) > 0) {
             $standard = implode(',', $standards);
 
             $standardLinks = StandardLink::where([
                 ['school_id', Auth::user()->school_id],
-                ['academic_year_id', $next_academic_year->id]
+                ['academic_year_id', $next_academic_year->id],
             ])
-            ->orderByRaw('FIELD(standard_id,' . $standard . ')')
-            ->orderBy('section_id')
-            ->groupBy(['standard_id', 'section_id'])
-            ->get();
+                ->orderByRaw('FIELD(standard_id,'.$standard.')')
+                ->orderBy('section_id')
+                ->groupBy(['standard_id', 'section_id'])
+                ->get();
 
-            foreach ($standardLinks as $key => $standard)
-            {
+            foreach ($standardLinks as $key => $standard) {
                 $next_standardLink[$key]['id'] = $standard->id;
                 $next_standardLink[$key]['standard_section'] = $standard->StandardSection;
             }
 
             $count = count($standardLinks);
 
-            if (class_exists('Gegok12\Alumni\Models\Alumniprofile'))
-            {
+            if (class_exists('Gegok12\Alumni\Models\Alumniprofile')) {
                 $next_standardLink[$count + 1]['id'] = 'alumni';
                 $next_standardLink[$count + 1]['standard_section'] = 'Alumni';
             }
         }
 
-        if (class_exists('Gegok12\Exam\Models\Exam'))
-        {
+        if (class_exists('Gegok12\Exam\Models\Exam')) {
             $exam = \Gegok12\Exam\Models\Exam::where([
                 ['school_id', Auth::user()->school_id],
                 ['academic_year_id', $curr_academic_year->id],
-                ['exam_type', 'final']
+                ['exam_type', 'final'],
             ])->get();
 
             $exam = \Gegok12\Exam\Http\Resources\Exam::collection($exam)
@@ -116,11 +108,10 @@ class PromotionController extends Controller
 
         $array['curr_academic_yearlist'] = $curr_academic_year;
         $array['next_academic_yearlist'] = $next_academic_year;
-        $array['next_standardLinklist']  = $next_standardLink;
-        $array['standardLinklist']       = $standardLink;
+        $array['next_standardLinklist'] = $next_standardLink;
+        $array['standardLinklist'] = $standardLink;
 
-        if (config('gexam.enabled', false))
-        {
+        if (config('gexam.enabled', false)) {
             $array['examlist'] = $exam;
         }
 
@@ -130,7 +121,7 @@ class PromotionController extends Controller
     /**
      * Show promotion creation page.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function create()
     {
@@ -147,18 +138,15 @@ class PromotionController extends Controller
      * - Academic status
      * - Comments
      *
-     * @param \App\Http\Requests\PromotionAddRequest $request
      * @return array
      */
     public function export(PromotionAddRequest $request)
     {
-        try
-        {
-            $standardLink  = StandardLink::find($request->curr_standardlink_id);
+        try {
+            $standardLink = StandardLink::find($request->curr_standardlink_id);
             $standard_name = $standardLink->StandardSection;
 
-            if (class_exists('Gegok12\Exam\Models\Exam'))
-            {
+            if (class_exists('Gegok12\Exam\Models\Exam')) {
                 $exam = \Gegok12\Exam\Models\Exam::where('id', $request->exam_id)
                     ->where('standard_id', $request->curr_standardlink_id)
                     ->first();
@@ -171,33 +159,31 @@ class PromotionController extends Controller
                 })
                 ->get();
 
-            if (count($users) == 0)
-            {
+            if (count($users) == 0) {
                 return ['success' => 'No Students Found'];
             }
 
-            $filename = 'promotion/promotionlist_' .
-                        $standard_name .
-                        date('d-m-Y_H_i_s') .
+            $filename = 'promotion/promotionlist_'.
+                        $standard_name.
+                        date('d-m-Y_H_i_s').
                         '.csv';
 
             $handle = fopen('php://temp', 'r+');
 
             fputcsv($handle, ['roll_number', 'student_name', 'academic_status', 'comments']);
 
-            foreach ($users as $user)
-            {
+            foreach ($users as $user) {
                 $studentAcademic = StudentAcademic::where([
                     ['user_id', $user->id],
                     ['school_id', Auth::user()->school_id],
-                    ['academic_year_id', $request->curr_academic_year_id]
+                    ['academic_year_id', $request->curr_academic_year_id],
                 ])->first();
 
                 $row = [
                     $studentAcademic->roll_number ?? '',
-                    $user->userprofile->firstname . ' ' . $user->userprofile->lastname,
+                    $user->userprofile->firstname.' '.$user->userprofile->lastname,
                     'P',
-                    ''
+                    '',
                 ];
 
                 fputcsv($handle, $row);
@@ -207,12 +193,12 @@ class PromotionController extends Controller
             $csvData = stream_get_contents($handle);
             fclose($handle);
 
-            $path = $this->fileUpload($filename, $csvData); 
+            $path = $this->fileUpload($filename, $csvData);
             $fileUrl = $this->getFilePath($filename);
 
             return [
                 'success' => true,
-                'path'    => $fileUrl
+                'path' => $fileUrl,
             ];
 
             $message = 'Student Promotionlist Exported Successfully';
@@ -224,10 +210,9 @@ class PromotionController extends Controller
                 LOGNAME_EXPORT_STUDENT_PROMOTION,
                 $message
             );
-        }
-        catch (Exception $e)
-        {
+        } catch (Exception $e) {
             Log::error($e->getMessage());
+
             return ['error' => $e->getMessage()];
         }
     }
@@ -238,26 +223,23 @@ class PromotionController extends Controller
      * Uses Excel import to process promotion data,
      * logs activity, and returns insert status.
      *
-     * @param \App\Http\Requests\PromotionImportRequest $request
      * @return array|null
      */
     public function import(PromotionImportRequest $request)
-    { 
-        try
-        {
+    {
+        try {
             \Session::put('exam_id', $request->exam_id);
             \Session::put('curr_academic_year_id', $request->curr_academic_year_id);
             \Session::put('next_academic_year_id', $request->next_academic_year_id);
             \Session::put('curr_standardlink_id', $request->curr_standardlink_id);
             \Session::put('next_standardlink_id', $request->next_standardlink_id);
 
-            $path = $request->file('promotion_file'); 
+            $path = $request->file('promotion_file');
             Excel::import(new PromotionImport, $path);
 
             $insertedcount = \Session::get('insertedcount');
 
-            if ($insertedcount > 0)
-            {
+            if ($insertedcount > 0) {
                 $message = 'Student Promotion Details Imported Successfully';
 
                 $ip = $this->getRequestIP();
@@ -269,10 +251,8 @@ class PromotionController extends Controller
                     $message
                 );
 
-                $res['success'] = $insertedcount . ' ' . trans('messages.insert_success_msg');
-            }
-            else
-            {
+                $res['success'] = $insertedcount.' '.trans('messages.insert_success_msg');
+            } else {
                 $res['success'] = trans('messages.insert_failure_msg');
             }
 
@@ -284,9 +264,7 @@ class PromotionController extends Controller
             \Session::forget('next_standardlink_id');
 
             return $res;
-        }
-        catch (Exception $e)
-        {
+        } catch (Exception $e) {
             Log::info($e->getMessage());
         }
     }

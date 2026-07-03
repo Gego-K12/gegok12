@@ -23,28 +23,28 @@ class SubjectAddRequest extends FormRequest
      */
     public function rules()
     {
-         $rules['subject_standard_id']='required';
-         $rules['subject_section_id']='required';
-           for ($i=0; $i < request('subjectscount') ; $i++)
-            { 
-              $rules['subject_name'.$i]='required';
-              $rules['subject_code'.$i]='required';
-              $rules['subject_type'.$i]='required';
-            }
-         return $rules;
+        $rules['subject_standard_id'] = 'required';
+        $rules['subject_section_id'] = 'required';
+        for ($i = 0; $i < request('subjectscount'); $i++) {
+            $rules['subject_name'.$i] = 'required';
+            $rules['subject_code'.$i] = 'required';
+            $rules['subject_type'.$i] = 'required';
+        }
+
+        return $rules;
     }
 
-     public function messages()
-  {
-    $messages['subject_standard_id.required']="Standar is required";
-    $messages['subject_section_id.required']="Subject is required";
-                     
-    for($i=0 ; $i < Request('subjectscount') ; $i++)
+    public function messages()
     {
-      $messages['subject_name'.$i.'.required']     = 'Subject is required';
-      $messages['subject_code'.$i.'.required']     = 'Code is required';
-      $messages['subject_type'.$i.'.required']     = 'Type is required';    
+        $messages['subject_standard_id.required'] = 'Standar is required';
+        $messages['subject_section_id.required'] = 'Subject is required';
+
+        for ($i = 0; $i < Request('subjectscount'); $i++) {
+            $messages['subject_name'.$i.'.required'] = 'Subject is required';
+            $messages['subject_code'.$i.'.required'] = 'Code is required';
+            $messages['subject_type'.$i.'.required'] = 'Type is required';
+        }
+
+        return $messages;
     }
-    return $messages;
-  }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
@@ -6,16 +7,18 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Resources\Subscription as SubscriptionResource;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Gate;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Subscription as SubscriptionResource;
+use App\Models\Plan;
+use App\Models\Subscription;
+use App\Traits\Common;
+use App\Traits\LogActivity;
 use App\Traits\PaymentProcess;
 use Illuminate\Http\Request;
-use App\Models\Subscription;
-use App\Traits\LogActivity;
-use App\Traits\Common;
-use App\Models\Plan;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\View\View;
 
 /**
  * Class PaymentController
@@ -23,14 +26,12 @@ use App\Models\Plan;
  * Handles subscription payment flow including payment initiation,
  * payment response handling, subscription status updates,
  * and activity logging.
- *
- * @package App\Http\Controllers\Admin
  */
 class PaymentController extends Controller
 {
-    use PaymentProcess;
-    use LogActivity;
     use Common;
+    use LogActivity;
+    use PaymentProcess;
 
     /**
      * Display the payment page or success page based on subscription status.
@@ -38,33 +39,31 @@ class PaymentController extends Controller
      * Initiates the payment process for a selected plan if the
      * subscription is pending, otherwise shows the success page.
      *
-     * @param int $id Plan ID
-     * @return \Illuminate\View\View
+     * @param  int  $id  Plan ID
+     * @return View
      */
     public function index($id)
     {
         //
-        if (Gate::allows('payment', $id))
-        {
+        if (Gate::allows('payment', $id)) {
             $subscription = Subscription::with('plan')
                 ->where('user_id', Auth::user()->id)
                 ->first();
 
-            if ($subscription->status == 'pending')
-            {
-                $plan       = Plan::where('id', $id)->first();
-                $key        = "dyTv15Mu";
-                $txnid      = "Txn12345678";
-                $amount     = $plan->amount;
-                $pinfo      = "Subscription_Amount";
-                $fname      = $subscription->user->name;
-                $email      = $subscription->user->email;
-                $mobile     = $subscription->user->mobile_no;
-                $udf5       = "BOLT_KIT_PHP7";
-                $udf1       = $plan->id;
-                $salt       = "kbwgdh7TaL";
-                $surl       = url('/admin/payment/response');
-                $url        = url('/admin/payment/index');
+            if ($subscription->status == 'pending') {
+                $plan = Plan::where('id', $id)->first();
+                $key = 'dyTv15Mu';
+                $txnid = 'Txn12345678';
+                $amount = $plan->amount;
+                $pinfo = 'Subscription_Amount';
+                $fname = $subscription->user->name;
+                $email = $subscription->user->email;
+                $mobile = $subscription->user->mobile_no;
+                $udf5 = 'BOLT_KIT_PHP7';
+                $udf1 = $plan->id;
+                $salt = 'kbwgdh7TaL';
+                $surl = url('/admin/payment/response');
+                $url = url('/admin/payment/index');
 
                 $hash = hash(
                     'sha512',
@@ -72,29 +71,25 @@ class PaymentController extends Controller
                 );
 
                 return view('/admin/payment/index', [
-                    'key'          => $key,
-                    'txnid'        => $txnid,
-                    'amount'       => $amount,
-                    'pinfo'        => $pinfo,
-                    'fname'        => $fname,
-                    'email'        => $email,
-                    'udf5'         => $udf5,
-                    'salt'         => $salt,
-                    'surl'         => $surl,
-                    'url'          => $url,
-                    'mobile'       => $mobile,
-                    'hash'         => $hash,
+                    'key' => $key,
+                    'txnid' => $txnid,
+                    'amount' => $amount,
+                    'pinfo' => $pinfo,
+                    'fname' => $fname,
+                    'email' => $email,
+                    'udf5' => $udf5,
+                    'salt' => $salt,
+                    'surl' => $surl,
+                    'url' => $url,
+                    'mobile' => $mobile,
+                    'hash' => $hash,
                     'subscription' => $subscription,
-                    'udf1'         => $udf1
+                    'udf1' => $udf1,
                 ]);
-            }
-            else
-            {
+            } else {
                 return view('/admin/payment/success', ['subscription' => $subscription]);
             }
-        }
-        else
-        {
+        } else {
             abort(403);
         }
     }
@@ -105,17 +100,16 @@ class PaymentController extends Controller
      * Processes the payment response, updates subscription status,
      * logs the payment activity, and displays the response page.
      *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function response(Request $request)
     {
-        $user_id   = Auth::id();
+        $user_id = Auth::id();
         $school_id = Auth::user()->school_id;
 
         $payment = Subscription::where([
             ['user_id', $user_id],
-            ['school_id', $school_id]
+            ['school_id', $school_id],
         ])->first();
 
         $this->PaymentProcess($request, $user_id, $school_id, $payment);
@@ -140,11 +134,11 @@ class PaymentController extends Controller
      * Returns a limited list of expired subscriptions
      * formatted using a resource collection.
      *
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @return AnonymousResourceCollection
      */
     public function Subscription()
     {
-        $subscription      = Subscription::where('status', 'expired')->get();
+        $subscription = Subscription::where('status', 'expired')->get();
         $subscription_list = $subscription->take(5);
 
         $subscriptions = SubscriptionResource::collection($subscription_list);

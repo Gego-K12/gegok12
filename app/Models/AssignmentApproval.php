@@ -1,4 +1,5 @@
 <?php
+
 // SPDX-License-Identifier: MIT
 // (c) 2025 GegoSoft Technologies and GegoK12 Contributors
 
@@ -14,23 +15,24 @@
  * @property int $approved_by
  * @property \Carbon\Carbon $approved_at
  * @property \Carbon\Carbon|null $deleted_at
- *
  * @property-read \App\Models\User $approvedBy
  * @property-read \App\Models\Assignment $assignment
  *
  * @mixin \Eloquent
  */
+
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class AssignmentApproval extends Model
 {
+    use HasFactory;
     //
     use SoftDeletes;
-    use HasFactory;
 
     /**
      * The table associated with the model.
@@ -39,14 +41,13 @@ class AssignmentApproval extends Model
      */
     protected $table = 'assignment_approvals';
 
-
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'assignment_id' , 'comments' , 'status' , 'approved_by' , 'approved_at'
+        'assignment_id', 'comments', 'status', 'approved_by', 'approved_at',
     ];
 
     /**
@@ -54,25 +55,25 @@ class AssignmentApproval extends Model
      *
      * @var array
      */
-    protected $dates = ['approved_at' , 'deleted_at'];
+    protected $dates = ['approved_at', 'deleted_at'];
 
     /**
      * Get the user who approved this assignment.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function approvedBy()
     {
-    	return $this->belongsTo('\App\Models\User','approved_by');
+        return $this->belongsTo('\App\Models\User', 'approved_by');
     }
 
     /**
      * Get the assignment for this approval.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function assignment()
     {
-    	return $this->belongsTo('\App\Models\Assignment','assignment_id');
+        return $this->belongsTo('\App\Models\Assignment', 'assignment_id');
     }
 }

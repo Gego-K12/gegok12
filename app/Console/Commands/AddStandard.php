@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use App\Traits\AcademicProcess;
 use App\Models\User;
+use App\Traits\AcademicProcess;
+use Illuminate\Console\Command;
 
 class AddStandard extends Command
 {
@@ -44,18 +44,15 @@ class AddStandard extends Command
         //
         $mobile = $this->ask('Enter Mobile Number Without Country Code');
 
-        $admin = User::where('mobile_no',$mobile)->first();
+        $admin = User::where('mobile_no', $mobile)->first();
 
-        if ($this->option('default')) 
-        {
+        if ($this->option('default')) {
             $request->standards = 'higher_secondary';
-            $this->addStandard($admin->school_id , $request);
-        } 
-        else 
-        {
-            $type = $this->choice('Select Highest Standard',['nursery','primary','secondary','higher_secondary']);
+            $this->addStandard($admin->school_id, $request);
+        } else {
+            $type = $this->choice('Select Highest Standard', ['nursery', 'primary', 'secondary', 'higher_secondary']);
             $request->standards = $type;
-            $this->addStandard($admin->school_id , $request);
+            $this->addStandard($admin->school_id, $request);
         }
 
         $this->info(trans('messages.standard_setup_success_msg'));

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
@@ -6,20 +7,20 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Requests\ImportMemberRequest;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Controller;
-use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\StudentFormatExport;
-use Illuminate\Http\Request;
-use App\Models\Subscription;
-use App\Models\Standard;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\ImportMemberRequest;
 use App\Imports\UsersImport;
-use App\Traits\LogActivity;
-use App\Traits\Common;
-use League\Csv\Writer;
+use App\Models\Standard;
 use App\Models\User;
+use App\Traits\Common;
+use App\Traits\LogActivity;
 use Exception;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
+use Maatwebsite\Excel\Facades\Excel;
 
 /**
  * Class ImportMemberController
@@ -32,18 +33,16 @@ use Exception;
  * - Validate import data
  * - Log import activities
  * - Provide downloadable CSV import format
- *
- * @package App\Http\Controllers\Admin
  */
 class ImportMemberController extends Controller
 {
-    use LogActivity;
     use Common;
+    use LogActivity;
 
     /**
      * Display the member import page.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function index()
     {
@@ -60,27 +59,23 @@ class ImportMemberController extends Controller
      * - Success and failure messaging
      * - Activity logging
      *
-     * @param  \App\Http\Requests\ImportMemberRequest  $request
-     * @return \Illuminate\Http\RedirectResponse|null
+     * @return RedirectResponse|null
      */
     public function importUsers(ImportMemberRequest $request)
     {
-        // 
-        try
-        {
+        //
+        try {
             Excel::import(new UsersImport, $request->file('import_file'));
 
             $count = \Session::get('count');
-            if ($count != 0)
-            {
-                return back()->with('failmessage', 'You can add only ' . $count . ' Members');
+            if ($count != 0) {
+                return back()->with('failmessage', 'You can add only '.$count.' Members');
             }
 
-            \Session::forget('count'); 
-             
+            \Session::forget('count');
+
             $insertedcount = \Session::get('insertedcount');
-            if ($insertedcount > 0)
-            {
+            if ($insertedcount > 0) {
                 $message = trans('messages.import_success_msg', ['module' => 'Student']);
 
                 $ip = $this->getRequestIP();
@@ -94,18 +89,14 @@ class ImportMemberController extends Controller
 
                 return back()->with(
                     'successmessage',
-                    $insertedcount . ' ' . trans('messages.insert_success_msg')
+                    $insertedcount.' '.trans('messages.insert_success_msg')
                 );
-            }
-            else
-            {
+            } else {
                 return back()->with('failmessage', trans('messages.insert_failure_msg'));
             }
 
-            \Session::forget('insertedcount'); 
-        }
-        catch (Exception $e)
-        {
+            \Session::forget('insertedcount');
+        } catch (Exception $e) {
         }
     }
 
@@ -118,14 +109,13 @@ class ImportMemberController extends Controller
      *
      * Also logs the download activity.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return void
      */
     public function downloadFormat(Request $request)
-    {      
+    {
         $classes = Standard::orderBy('name')
-                ->pluck('name')
-                ->toArray();
+            ->pluck('name')
+            ->toArray();
 
         return Excel::download(
             new StudentFormatExport($classes),

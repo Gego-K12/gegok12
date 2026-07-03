@@ -1,32 +1,34 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
  */
+
 namespace App\Http\Controllers\Teacher;
 
-use App\Http\Requests\BankDetailRequest;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\BankDetailRequest;
 use App\Models\TransactionAccount;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Exception;
+use Illuminate\Http\Response;
 
 class BankDetailController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index($name)
     {
-        $user = User::where('name',$name)->first();
-        $account = TransactionAccount::where('user_id',$user->id)->first();
+        $user = User::where('name', $name)->first();
+        $account = TransactionAccount::where('user_id', $user->id)->first();
 
-        //$documents = UserDocumentResource::collection($documents);
-        if (!$account) {
-            $account= []; 
+        // $documents = UserDocumentResource::collection($documents);
+        if (! $account) {
+            $account = [];
         }
 
         return $account;
@@ -35,7 +37,7 @@ class BankDetailController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create()
     {
@@ -45,36 +47,36 @@ class BankDetailController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param  Request  $request
+     * @return Response
      */
-    public function store(BankDetailRequest $request,$name)
+    public function store(BankDetailRequest $request, $name)
     {
-            $user = User::where('name',$name)->first();
-    
-            $account = new TransactionAccount;
+        $user = User::where('name', $name)->first();
 
-            $account->school_id      = $user->school_id;
-            $account->user_id        = $user->id;
-            $account->name           = $request->bank_name;
-            $account->key            = $request->key;
-            $account->account_number = $request->account_number;
-            $account->ifsc_code      = $request->ifsc_code;
+        $account = new TransactionAccount;
 
-            $account->save();
+        $account->school_id = $user->school_id;
+        $account->user_id = $user->id;
+        $account->name = $request->bank_name;
+        $account->key = $request->key;
+        $account->account_number = $request->account_number;
+        $account->ifsc_code = $request->ifsc_code;
 
+        $account->save();
 
-            $message="Bank Details Added";
+        $message = 'Bank Details Added';
 
-            $res['success'] = $message;
-            return $res;
+        $res['success'] = $message;
+
+        return $res;
     }
 
     /**
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function show($id)
     {
@@ -86,46 +88,47 @@ class BankDetailController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit($id)
     {
         //
-         $account =TransactionAccount::find($id);
-         return $account;
+        $account = TransactionAccount::find($id);
+
+        return $account;
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(BankDetailRequest $request, $id)
     {
         //
-            $account = TransactionAccount::find($id);
+        $account = TransactionAccount::find($id);
 
-            $account->name           = $request->bank_name;
-            $account->key            = $request->key;
-            $account->account_number = $request->account_number;
-            $account->ifsc_code      = $request->ifsc_code;
+        $account->name = $request->bank_name;
+        $account->key = $request->key;
+        $account->account_number = $request->account_number;
+        $account->ifsc_code = $request->ifsc_code;
 
-            $account->save();
+        $account->save();
 
+        $message = 'Bank Details Updated';
 
-            $message="Bank Details Updated";
+        $res['success'] = $message;
 
-            $res['success'] = $message;
-            return $res;
+        return $res;
     }
 
     /**
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy($id)
     {

@@ -2,20 +2,18 @@
 
 namespace App\Mail;
 
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Bus\Queueable;
-use Illuminate\Mail\Mailable;
 use App\Models\MailTemplate;
 use App\Models\User;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Mail\Mailable;
+use Illuminate\Queue\SerializesModels;
 
 /**
  * ChangePassword
  *
  * Mailable class for sending password change confirmation emails.
  * Notifies users when their password has been successfully changed.
- *
- * @package App\Mail
  */
 class ChangePassword extends Mailable implements ShouldQueue
 {
@@ -31,12 +29,12 @@ class ChangePassword extends Mailable implements ShouldQueue
     /**
      * Create a new message instance.
      *
-     * @param User $user The user whose password was changed
+     * @param  User  $user  The user whose password was changed
      * @return void
      */
     public function __construct(User $user)
     {
-        $this->queue='emails';
+        $this->queue = 'emails';
         $this->user = $user;
     }
 
@@ -50,16 +48,16 @@ class ChangePassword extends Mailable implements ShouldQueue
      */
     public function build()
     {
-        $mailtemplate = MailTemplate::where([['name','change_password'],['status','active']])->first();
-        
-        $subject =  $mailtemplate->subject;
+        $mailtemplate = MailTemplate::where([['name', 'change_password'], ['status', 'active']])->first();
+
+        $subject = $mailtemplate->subject;
         $mail_content = $mailtemplate->mail_content;
-        $mail_content = str_replace(":name",$this->user->FullName,$mail_content);
+        $mail_content = str_replace(':name', $this->user->FullName, $mail_content);
 
         return $this->markdown('emails.mailcontent')
-                  ->subject($subject)
-                  ->with([
-                       'content' => $mail_content,
-                      ]);
+            ->subject($subject)
+            ->with([
+                'content' => $mail_content,
+            ]);
     }
 }

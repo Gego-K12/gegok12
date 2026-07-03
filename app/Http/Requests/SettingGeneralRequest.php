@@ -25,27 +25,25 @@ class SettingGeneralRequest extends FormRequest
     {
         return [
 
-             'sitetitle'=>'required',
-             'sitename'=>'required',
-             //'sitelogo'=>'required|mimes:jpeg,png|max:2048',
+            'sitetitle' => 'required',
+            'sitename' => 'required',
+            // 'sitelogo'=>'required|mimes:jpeg,png|max:2048',
             // 'favicon'=>'required|mimes:jpeg,png|max:2048',
-
 
         ];
     }
 
-     public function messages()
-     {
-        return[
+    public function messages()
+    {
+        return [
 
-           'sitetitle.required'=> 'Site Title Required',
-           'sitename.required'=> 'Site Name Required',
-           //'sitelogo.required'=>__('sites.sitelogo'),
-           //'sitelogo.mimes'=>__('sites.sitelogo_mimes'),
-           //'favicon.required'=>__('sites.favicon'),
-           //'favicon.mimes'=>__('sites.favicon_mimes'),
-
+            'sitetitle.required' => 'Site Title Required',
+            'sitename.required' => 'Site Name Required',
+            // 'sitelogo.required'=>__('sites.sitelogo'),
+            // 'sitelogo.mimes'=>__('sites.sitelogo_mimes'),
+            // 'favicon.required'=>__('sites.favicon'),
+            // 'favicon.mimes'=>__('sites.favicon_mimes'),
 
         ];
-     }
+    }
 }

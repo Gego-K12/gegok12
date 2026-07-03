@@ -25,17 +25,17 @@ class BirthdayReminderRequest extends FormRequest
     {
         return [
             //
-            'to'         => 'required',
-            'message'    => 'required|max:150',
+            'to' => 'required',
+            'message' => 'required|max:150',
         ];
     }
 
     public function messages()
     {
-        return[
-            'to.required'       => 'To is required',
-            'message.required'  => 'Message is required',
-            'message.max:150'   => 'Message should be atmost 150 characters',     
+        return [
+            'to.required' => 'To is required',
+            'message.required' => 'Message is required',
+            'message.max:150' => 'Message should be atmost 150 characters',
         ];
     }
 }

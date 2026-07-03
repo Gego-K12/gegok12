@@ -26,9 +26,9 @@ class AdmissionFormRequest extends FormRequest
 
         // return [
         //     //
-        //     'section_id'       => 'required',           
-        //     'payment_status'   => 'required',           
-        //     'fee_group_id'     => 'required',           
+        //     'section_id'       => 'required',
+        //     'payment_status'   => 'required',
+        //     'fee_group_id'     => 'required',
         // ];
         $rules = [
             'section_id' => 'required',
@@ -42,15 +42,15 @@ class AdmissionFormRequest extends FormRequest
         return $rules;
     }
 
-     public function messages()
+    public function messages()
     {
         return
         [
-            'section_id.required'       => 'Section Is Required',
+            'section_id.required' => 'Section Is Required',
 
-            'fee_group_id.required'     => 'Fee Type Is Required',
-          
-            'payment_status.required'   => 'Payment Status Is Required',
+            'fee_group_id.required' => 'Fee Type Is Required',
+
+            'payment_status.required' => 'Payment Status Is Required',
         ];
     }
 }

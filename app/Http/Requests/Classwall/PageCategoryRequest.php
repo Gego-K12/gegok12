@@ -24,23 +24,22 @@ class PageCategoryRequest extends FormRequest
      */
     public function rules()
     {
-        Validator::extend('check_name',function ($attribute,$value,$parameters,$validator)
-        {
+        Validator::extend('check_name', function ($attribute, $value, $parameters, $validator) {
             return preg_match('/^[A-Za-z_~\-!@#\$%\^&*.,:(\)\s]+$/', request('name'));
         });
 
         return [
             //
-            'name'  =>  'required|check_name',
+            'name' => 'required|check_name',
         ];
     }
 
     public function messages()
     {
-        return[
+        return [
             //
-            'name.required'     =>  'Name Is Required',
-            'name.check_name'   =>  'Enter Valid Name',
+            'name.required' => 'Name Is Required',
+            'name.check_name' => 'Enter Valid Name',
         ];
     }
 }

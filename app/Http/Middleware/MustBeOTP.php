@@ -2,11 +2,11 @@
 
 namespace App\Http\Middleware;
 
-use App\Traits\AuthenticationProcess;
-use Illuminate\Support\Facades\Auth;
-use App\Models\Authentication;
 use App\Models\User;
+use App\Traits\AuthenticationProcess;
 use Closure;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class MustBeOTP
 {
@@ -15,30 +15,22 @@ class MustBeOTP
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
+     * @param  Request  $request
      * @return mixed
      */
     public function handle($request, Closure $next)
     {
-        if(auth()->user()->isAdmin())
-        {
-            $user = User::where('id',Auth::id())->first();
+        if (auth()->user()->isAdmin()) {
+            $user = User::where('id', Auth::id())->first();
 
-            if($user->mobile_verified != 1)
-            {
-                if( $this->checkAuthentication(Auth::id()) )
-                {
+            if ($user->mobile_verified != 1) {
+                if ($this->checkAuthentication(Auth::id())) {
                     return $next($request);
-                }
-                else
-                {
+                } else {
                     abort(403);
-                } 
+                }
             }
-        }
-        else
-        {
+        } else {
             abort(403);
         }
     }

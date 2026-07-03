@@ -1,12 +1,16 @@
 <?php
+
 // SPDX-License-Identifier: MIT
 // (c) 2025 GegoSoft Technologies and GegoK12 Contributors
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Tags\HasTags;
 
 /**
@@ -40,22 +44,23 @@ use Spatie\Tags\HasTags;
  * @property \DateTime $created_at
  * @property \DateTime $updated_at
  * @property \DateTime $deleted_at
- * @property-read \App\Models\School $school
- * @property-read \App\Models\AcademicYear $academicYear
- * @property-read \App\Models\User $user
- * @property-read \App\Models\StandardLink $standardLink
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Mark[] $markUser
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Mark[] $markStandard
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Mark[] $markAcademic
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Timetable[] $timetable
+ * @property-read School $school
+ * @property-read AcademicYear $academicYear
+ * @property-read User $user
+ * @property-read StandardLink $standardLink
+ * @property-read Collection|Mark[] $markUser
+ * @property-read Collection|Mark[] $markStandard
+ * @property-read Collection|Mark[] $markAcademic
+ * @property-read Collection|Timetable[] $timetable
+ *
  * @mixin \Eloquent
  */
 class StudentAcademic extends Model
 {
+    use HasFactory;
+    use HasTags;
     //
     use SoftDeletes;
-    use HasFactory;
-     use HasTags;
 
     /**
      * The table associated with the model.
@@ -64,14 +69,13 @@ class StudentAcademic extends Model
      */
     protected $table = 'student_academics';
 
-
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'school_id' , 'academic_year_id' , 'user_id' , 'standardLink_id' , 'roll_number' , 'id_card_number' , 'board_registration_number' , 'mode_of_transport' , 'transport_details' , 'siblings' , 'siblings_count' , 'sibling_details' , 'height' , 'weight' , 'medication_problems' , 'medication_needs' , 'medication_allergies' , 'food_allergies' , 'other_allergies' , 'other_medical_information' , 'academic_status','bus_pass'
+        'school_id', 'academic_year_id', 'user_id', 'standardLink_id', 'roll_number', 'id_card_number', 'board_registration_number', 'mode_of_transport', 'transport_details', 'siblings', 'siblings_count', 'sibling_details', 'height', 'weight', 'medication_problems', 'medication_needs', 'medication_allergies', 'food_allergies', 'other_allergies', 'other_medical_information', 'academic_status', 'bus_pass',
     ];
 
     /**
@@ -87,86 +91,86 @@ class StudentAcademic extends Model
      * @var array
      */
     protected $casts = [
-        'transport_details' => 'array' , 'sibling_details' => 'array',
+        'transport_details' => 'array', 'sibling_details' => 'array',
     ];
 
     /**
      * Get the school for this student.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function school()
     {
-    	return $this->belongsTo('\App\Models\School','school_id');
+        return $this->belongsTo('\App\Models\School', 'school_id');
     }
 
     /**
      * Get the academic year for this record.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function academicYear()
     {
-        return $this->belongsTo('\App\Models\AcademicYear','academic_year_id');
+        return $this->belongsTo('\App\Models\AcademicYear', 'academic_year_id');
     }
 
     /**
      * Get the student user.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function user()
     {
-    	return $this->belongsTo('\App\Models\User','user_id');
+        return $this->belongsTo('\App\Models\User', 'user_id');
     }
 
     /**
      * Get the standard/grade link for this student.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function standardLink()
     {
-    	return $this->belongsTo('\App\Models\StandardLink','standardLink_id');
+        return $this->belongsTo('\App\Models\StandardLink', 'standardLink_id');
     }
 
     /**
      * Get marks for this student.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function markUser()
     {
-        return $this->hasMany('\App\Models\Mark','user_id','id');
+        return $this->hasMany('\App\Models\Mark', 'user_id', 'id');
     }
 
     /**
      * Get marks for this standard.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function markStandard()
     {
-        return $this->hasMany('\App\Models\Mark','standard_id','id');
+        return $this->hasMany('\App\Models\Mark', 'standard_id', 'id');
     }
 
     /**
      * Get marks for this academic year.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function markAcademic()
     {
-        return $this->hasMany('\App\Models\Mark','academic_year_id','id');
+        return $this->hasMany('\App\Models\Mark', 'academic_year_id', 'id');
     }
 
     /**
      * Get timetable for this academic year.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function timetable()
     {
-        return $this->hasMany('\App\Models\Timetable','academic_year_id','id');
+        return $this->hasMany('\App\Models\Timetable', 'academic_year_id', 'id');
     }
 }

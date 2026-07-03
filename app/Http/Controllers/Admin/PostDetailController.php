@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
@@ -8,15 +9,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Events\Notification\SingleNotificationEvent;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
-use App\Traits\LogActivity;
-use App\Helpers\SiteHelper;
-use App\Models\PostDetail;
-use App\Traits\Common;
 use App\Models\Post;
+use App\Models\PostDetail;
 use App\Models\User;
+use App\Traits\Common;
+use App\Traits\LogActivity;
 use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Log;
 
 /**
@@ -25,14 +25,12 @@ use Log;
  * Handles user interactions with posts such as
  * like, dislike, save, and unsave actions.
  * Also triggers notifications and activity logs.
- *
- * @package App\Http\Controllers\Admin
  */
 class PostDetailController extends Controller
 {
+    use Common;
     //
     use LogActivity;
-    use Common;
 
     /**
      * Like or remove like from a post.
@@ -41,91 +39,73 @@ class PostDetailController extends Controller
      * sends notification to post owner,
      * and logs the activity.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param int $post_id
+     * @param  int  $post_id
      * @return array|null
      */
     public function like(Request $request, $post_id)
     {
         //
-        try
-        {
+        try {
             $post = Post::where('id', $post_id)->first();
             $post_reply = PostDetail::where([
                 ['user_id', Auth::id()],
-                ['post_id', $post_id]
+                ['post_id', $post_id],
             ])->first();
 
-            if ($post_reply != null)
-            {
-                $post_reply->like   = $request->like;
+            if ($post_reply != null) {
+                $post_reply->like = $request->like;
                 $post_reply->status = 1;
                 $post_reply->save();
-            }
-            else
-            {
+            } else {
                 $post_reply = new PostDetail;
 
                 $post_reply->user_id = Auth::id();
                 $post_reply->post_id = $post_id;
-                $post_reply->like    = $request->like;
-                $post_reply->status  = 1;
+                $post_reply->like = $request->like;
+                $post_reply->status = 1;
                 $post_reply->save();
             }
 
-            if ($post->entity_name == 'App\Models\User')
-            {
+            if ($post->entity_name == 'App\Models\User') {
                 $user = User::where('id', $post->entity_id)->first();
 
-                if ($request->like == 1)
-                {
+                if ($request->like == 1) {
                     $details = trans('notification.page_comment_like_success_msg', [
-                        'user'   => Auth::user()->FullName,
-                        'entity' => 'Post'
+                        'user' => Auth::user()->FullName,
+                        'entity' => 'Post',
                     ]);
-                }
-                else
-                {
+                } else {
                     $details = trans('notification.page_comment_remove_like_success_msg', [
-                        'user'   => Auth::user()->FullName,
-                        'entity' => 'Post'
+                        'user' => Auth::user()->FullName,
+                        'entity' => 'Post',
                     ]);
                 }
-            }
-            elseif ($post->entity_name == 'App\Models\Page')
-            {
+            } elseif ($post->entity_name == 'App\Models\Page') {
                 $page = ClassRoomPage::where('id', $post->entity_id)->first();
                 $user = User::where('id', $page->created_by)->first();
 
-                if ($request->like == 1)
-                {
+                if ($request->like == 1) {
                     $details = trans('notification.page_comment_like_success_msg', [
-                        'user'   => Auth::user()->FullName,
-                        'entity' => 'Page'
+                        'user' => Auth::user()->FullName,
+                        'entity' => 'Page',
                     ]);
-                }
-                else
-                {
+                } else {
                     $details = trans('notification.page_comment_remove_like_success_msg', [
-                        'user'   => Auth::user()->FullName,
-                        'entity' => 'Page'
+                        'user' => Auth::user()->FullName,
+                        'entity' => 'Page',
                     ]);
                 }
             }
 
-            if ($request->like == 1)
-            {
+            if ($request->like == 1) {
                 $message = trans('messages.like_success_msg', ['page' => 'post']);
-            }
-            else
-            {
+            } else {
                 $message = trans('messages.remove_like_success_msg', ['page' => 'post']);
             }
 
-            if ($user->id != Auth::id())
-            {
+            if ($user->id != Auth::id()) {
                 $data = [];
-                $data['user']    = $user;
+                $data['user'] = $user;
                 $data['details'] = $details;
 
                 event(new SingleNotificationEvent($data));
@@ -141,10 +121,9 @@ class PostDetailController extends Controller
             );
 
             $res['success'] = $message;
+
             return $res;
-        }
-        catch (Exception $e)
-        {
+        } catch (Exception $e) {
             Log::info($e->getMessage());
         }
     }
@@ -156,91 +135,73 @@ class PostDetailController extends Controller
      * sends notification to post owner,
      * and logs the activity.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param int $post_id
+     * @param  int  $post_id
      * @return array|null
      */
     public function dislike(Request $request, $post_id)
     {
         //
-        try
-        {
+        try {
             $post = Post::where('id', $post_id)->first();
             $post_reply = PostDetail::where([
                 ['user_id', Auth::id()],
-                ['post_id', $post_id]
+                ['post_id', $post_id],
             ])->first();
 
-            if ($post_reply != null)
-            {
+            if ($post_reply != null) {
                 $post_reply->unlike = $request->dislike;
                 $post_reply->status = 1;
                 $post_reply->save();
-            }
-            else
-            {
+            } else {
                 $post_reply = new PostDetail;
 
                 $post_reply->user_id = Auth::id();
                 $post_reply->post_id = $post_id;
-                $post_reply->unlike  = $request->dislike;
-                $post_reply->status  = 1;
+                $post_reply->unlike = $request->dislike;
+                $post_reply->status = 1;
                 $post_reply->save();
             }
 
-            if ($post->entity_name == 'App\Models\User')
-            {
+            if ($post->entity_name == 'App\Models\User') {
                 $user = User::where('id', $post->entity_id)->first();
 
-                if ($request->dislike == 1)
-                {
+                if ($request->dislike == 1) {
                     $details = trans('notification.page_comment_dislike_success_msg', [
-                        'user'   => Auth::user()->FullName,
-                        'entity' => 'Post'
+                        'user' => Auth::user()->FullName,
+                        'entity' => 'Post',
                     ]);
-                }
-                else
-                {
+                } else {
                     $details = trans('notification.page_comment_remove_dislike_success_msg', [
-                        'user'   => Auth::user()->FullName,
-                        'entity' => 'Post'
+                        'user' => Auth::user()->FullName,
+                        'entity' => 'Post',
                     ]);
                 }
-            }
-            elseif ($post->entity_name == 'App\Models\Page')
-            {
+            } elseif ($post->entity_name == 'App\Models\Page') {
                 $page = ClassRoomPage::where('id', $post->entity_id)->first();
                 $user = User::where('id', $page->created_by)->first();
 
-                if ($request->dislike == 1)
-                {
+                if ($request->dislike == 1) {
                     $details = trans('notification.page_comment_dislike_success_msg', [
-                        'user'   => Auth::user()->FullName,
-                        'entity' => 'Page'
+                        'user' => Auth::user()->FullName,
+                        'entity' => 'Page',
                     ]);
-                }
-                else
-                {
+                } else {
                     $details = trans('notification.page_comment_remove_dislike_success_msg', [
-                        'user'   => Auth::user()->FullName,
-                        'entity' => 'Page'
+                        'user' => Auth::user()->FullName,
+                        'entity' => 'Page',
                     ]);
                 }
             }
 
-            if ($request->dislike == 1)
-            {
+            if ($request->dislike == 1) {
                 $message = trans('messages.unlike_success_msg', ['page' => 'post']);
-            }
-            else
-            {
+            } else {
                 $message = trans('messages.remove_unlike_success_msg', ['page' => 'post']);
             }
 
-            if ($user->id != Auth::id())
-            {
+            if ($user->id != Auth::id()) {
                 $data = [];
-                $data['user']    = $user;
+                $data['user'] = $user;
                 $data['details'] = $details;
 
                 event(new SingleNotificationEvent($data));
@@ -256,10 +217,9 @@ class PostDetailController extends Controller
             );
 
             $res['success'] = $message;
+
             return $res;
-        }
-        catch (Exception $e)
-        {
+        } catch (Exception $e) {
             Log::info($e->getMessage());
         }
     }
@@ -270,35 +230,30 @@ class PostDetailController extends Controller
      * Marks the post as saved for the user
      * and logs the activity.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param int $post_id
+     * @param  int  $post_id
      * @return array|null
      */
     public function save(Request $request, $post_id)
     {
         //
-        try
-        {
+        try {
             $post = Post::where('id', $post_id)->first();
             $post_reply = PostDetail::where([
                 ['user_id', Auth::id()],
-                ['post_id', $post_id]
+                ['post_id', $post_id],
             ])->first();
 
-            if ($post_reply != null)
-            {
-                $post_reply->save   = $request->save;
+            if ($post_reply != null) {
+                $post_reply->save = $request->save;
                 $post_reply->status = 1;
                 $post_reply->save();
-            }
-            else
-            {
+            } else {
                 $post_reply = new PostDetail;
 
                 $post_reply->user_id = Auth::id();
                 $post_reply->post_id = $post_id;
-                $post_reply->save    = $request->save;
-                $post_reply->status  = 1;
+                $post_reply->save = $request->save;
+                $post_reply->status = 1;
                 $post_reply->save();
             }
 
@@ -314,10 +269,9 @@ class PostDetailController extends Controller
             );
 
             $res['success'] = $message;
+
             return $res;
-        }
-        catch (Exception $e)
-        {
+        } catch (Exception $e) {
             Log::info($e->getMessage());
         }
     }
@@ -328,35 +282,30 @@ class PostDetailController extends Controller
      * Removes the saved status for the post
      * and logs the activity.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param int $post_id
+     * @param  int  $post_id
      * @return array|null
      */
     public function unsave(Request $request, $post_id)
     {
         //
-        try
-        {
+        try {
             $post = Post::where('id', $post_id)->first();
             $post_reply = PostDetail::where([
                 ['user_id', Auth::id()],
-                ['post_id', $post_id]
+                ['post_id', $post_id],
             ])->first();
 
-            if ($post_reply != null)
-            {
-                $post_reply->save   = $request->save;
+            if ($post_reply != null) {
+                $post_reply->save = $request->save;
                 $post_reply->status = 1;
                 $post_reply->save();
-            }
-            else
-            {
+            } else {
                 $post_reply = new PostDetail;
 
                 $post_reply->user_id = Auth::id();
                 $post_reply->post_id = $post_id;
-                $post_reply->save    = $request->save;
-                $post_reply->status  = 1;
+                $post_reply->save = $request->save;
+                $post_reply->status = 1;
                 $post_reply->save();
             }
 
@@ -372,10 +321,9 @@ class PostDetailController extends Controller
             );
 
             $res['success'] = $message;
+
             return $res;
-        }
-        catch (Exception $e)
-        {
+        } catch (Exception $e) {
             Log::info($e->getMessage());
         }
     }

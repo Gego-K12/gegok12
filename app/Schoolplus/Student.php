@@ -16,9 +16,7 @@ use Illuminate\Support\Facades\Facade;
  * - Retrieving marks and exam data
  * - Comparing academic performance
  *
- * @see \App\Schoolplus\StudentService
- *
- * @package App\Schoolplus
+ * @see StudentService
  */
 class Student extends Facade
 {

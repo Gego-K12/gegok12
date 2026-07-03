@@ -7,7 +7,17 @@
 
 namespace App\Models\Users;
 
+use App\Models\Assignment;
+use App\Models\Attendance;
+use App\Models\Discipline;
+use App\Models\StandardLink;
+use App\Models\StudentAssignment;
+use App\Models\TeacherLeaveApplication;
+use App\Models\Teacherlink;
+use App\Models\TeacherProfile;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 
 /**
  * Class TeacherUser
@@ -15,16 +25,17 @@ use App\Models\User;
  * Specialized User model for teacher-specific functionality.
  * Extends the base User model with teacher-focused relationships and scopes.
  *
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\TeacherProfile[] $teacherprofile
- * @property-read \App\Models\TeacherProfile $latestTeacherProfile
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Teacherlink[] $teacherlink
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Attendance[] $attendanceAdmin
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Assignment[] $assignment
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\StudentAssignment[] $teacherAssignment
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\TeacherLeaveApplication[] $requestedUser
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\TeacherLeaveApplication[] $approvedUser
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Discipline[] $disciplineTeacher
- * @property-read \App\Models\StandardLink $standardLink
+ * @property-read Collection|TeacherProfile[] $teacherprofile
+ * @property-read TeacherProfile $latestTeacherProfile
+ * @property-read Collection|Teacherlink[] $teacherlink
+ * @property-read Collection|Attendance[] $attendanceAdmin
+ * @property-read Collection|Assignment[] $assignment
+ * @property-read Collection|StudentAssignment[] $teacherAssignment
+ * @property-read Collection|TeacherLeaveApplication[] $requestedUser
+ * @property-read Collection|TeacherLeaveApplication[] $approvedUser
+ * @property-read Collection|Discipline[] $disciplineTeacher
+ * @property-read StandardLink $standardLink
+ *
  * @mixin \Eloquent
  */
 class TeacherUser extends User
@@ -32,9 +43,9 @@ class TeacherUser extends User
     /**
      * Scope to filter teachers by qualification.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param int $qualification
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param  Builder  $query
+     * @param  int  $qualification
+     * @return Builder
      */
     public function scopeByQualification($query, $qualification)
     {
@@ -46,9 +57,9 @@ class TeacherUser extends User
     /**
      * Scope to filter teachers by designation.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string $designation
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param  Builder  $query
+     * @param  string  $designation
+     * @return Builder
      */
     public function scopeByDesignation($query, $designation)
     {
@@ -60,9 +71,9 @@ class TeacherUser extends User
     /**
      * Scope to filter teachers by job type.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string $job_type
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param  Builder  $query
+     * @param  string  $job_type
+     * @return Builder
      */
     public function scopeByJobType($query, $job_type)
     {
@@ -74,9 +85,9 @@ class TeacherUser extends User
     /**
      * Scope to filter users by employee ID.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string $employeeId
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param  Builder  $query
+     * @param  string  $employeeId
+     * @return Builder
      */
     public function scopeByEmployeeId($query, $employeeId)
     {
@@ -111,6 +122,7 @@ class TeacherUser extends User
             $array['qualification_name'][$i] = $teacher->qualification->display_name;
             $i++;
         }
+
         return $array;
     }
 

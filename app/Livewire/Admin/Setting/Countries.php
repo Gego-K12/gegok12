@@ -2,8 +2,9 @@
 
 namespace App\Livewire\Admin\Setting;
 
-use Livewire\Component;
 use App\Models\Country;
+use Illuminate\View\View;
+use Livewire\Component;
 use Livewire\WithPagination;
 
 /**
@@ -16,8 +17,6 @@ use Livewire\WithPagination;
  * Features:
  * - Search countries by name
  * - Paginated country listing
- *
- * @package App\Livewire\Admin\Setting
  */
 class Countries extends Component
 {
@@ -36,7 +35,7 @@ class Countries extends Component
      * Builds the country query with optional
      * search filtering and returns paginated results.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function render()
     {
@@ -44,14 +43,14 @@ class Countries extends Component
 
         if ($this->search) {
             $countries = $countries->where(function ($query) {
-                $query->where('name', 'like', '%' . $this->search . '%');
+                $query->where('name', 'like', '%'.$this->search.'%');
             });
         }
 
         $countries = $countries->paginate(10);
 
         return view('livewire.admin.setting.countries', [
-            'countries' => $countries
+            'countries' => $countries,
         ]);
     }
 

@@ -7,34 +7,33 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Resources\UserDocument as UserDocumentResource;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Traits\LogActivity;
+use App\Http\Resources\UserDocument as UserDocumentResource;
 use App\Models\Document;
-use App\Traits\Common;
 use App\Models\User;
+use App\Traits\Common;
+use App\Traits\LogActivity;
 use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 /**
  * Class DocumentsController
  *
  * Controller for managing user documents: listing, uploading,
  * updating (versioning) and deleting documents.
- *
- * @package App\Http\Controllers\Admin
  */
 class DocumentsController extends Controller
 {
-    use LogActivity;
     use Common;
+    use LogActivity;
 
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index($name)
     {
@@ -53,8 +52,7 @@ class DocumentsController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(Request $request, $name)
     {
@@ -64,17 +62,17 @@ class DocumentsController extends Controller
             $file = $request->file('attachment');
 
             if ($file) {
-                $bigfolder = Auth::user()->school->slug . '/files/large';
+                $bigfolder = Auth::user()->school->slug.'/files/large';
                 $path = $this->uploadFile($bigfolder, $file);
             }
 
             $document = new Document;
 
-            $document->school_id  = $user->school_id;
-            $document->user_id    = $user->id;
-            $document->type       = $request->type;
-            $document->name       = $request->title;
-            $document->file_path  = $path;
+            $document->school_id = $user->school_id;
+            $document->user_id = $user->id;
+            $document->type = $request->type;
+            $document->name = $request->title;
+            $document->file_path = $path;
 
             $document->save();
 
@@ -91,6 +89,7 @@ class DocumentsController extends Controller
                 $message
             );
             $res['success'] = $message;
+
             return $res;
         } catch (Exception $e) {
         }
@@ -100,7 +99,7 @@ class DocumentsController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit($id)
     {
@@ -118,9 +117,8 @@ class DocumentsController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(Request $request, $name, $id)
     {
@@ -129,7 +127,7 @@ class DocumentsController extends Controller
             $user = User::where('name', $name)->first();
             $file = $request->file('attachment');
             if ($file) {
-                $bigfolder = Auth::user()->school->slug . '/files/large';
+                $bigfolder = Auth::user()->school->slug.'/files/large';
                 $path = $this->uploadFile($bigfolder, $file);
             }
             $old_doc = Document::where('id', $id)->first();
@@ -140,12 +138,12 @@ class DocumentsController extends Controller
 
             $document = new Document;
 
-            $document->school_id  = $user->school_id;
-            $document->user_id    = $user->id;
-            $document->version    = $old_doc->version + 1;
-            $document->type       = $request->type;
-            $document->name       = $request->title;
-            $document->file_path  = $path;
+            $document->school_id = $user->school_id;
+            $document->user_id = $user->id;
+            $document->version = $old_doc->version + 1;
+            $document->type = $request->type;
+            $document->name = $request->title;
+            $document->file_path = $path;
 
             $document->save();
 
@@ -162,6 +160,7 @@ class DocumentsController extends Controller
                 $message
             );
             $res['success'] = $message;
+
             return $res;
         } catch (Exception $e) {
         }
@@ -171,7 +170,7 @@ class DocumentsController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy($id)
     {
@@ -183,7 +182,6 @@ class DocumentsController extends Controller
 
                 $message = trans('messages.delete_success_msg', ['module' => 'Document']);
 
-
                 $ip = $this->getRequestIP();
                 $this->doActivityLog(
                     $document,
@@ -193,6 +191,7 @@ class DocumentsController extends Controller
                     $message
                 );
                 $res['success'] = $message;
+
                 return $res;
             } else {
                 abort(403);

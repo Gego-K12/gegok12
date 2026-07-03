@@ -1,17 +1,23 @@
 <?php
+
 // SPDX-License-Identifier: MIT
 // (c) 2025 GegoSoft Technologies and GegoK12 Contributors
 
 namespace App\Models;
 
-use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
-use Illuminate\Database\Eloquent\SoftDeletes;
-//use Spatie\MediaLibrary\HasMedia\HasMedia;
-use Illuminate\Database\Eloquent\Model;
-//use Spatie\MediaLibrary\Models\Media;
 use App\Traits\Common;
-use Spatie\MediaLibrary\InteractsWithMedia;
+use Illuminate\Database\Eloquent\Collection;
+// use Spatie\MediaLibrary\HasMedia\HasMedia;
+use Illuminate\Database\Eloquent\Model;
+// use Spatie\MediaLibrary\Models\Media;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
 /**
  * Class Post
@@ -36,21 +42,22 @@ use Spatie\MediaLibrary\HasMedia;
  * @property \DateTime $deleted_at
  * @property string $attachment_path
  * @property string $postComments
- * @property-read \App\Models\School $school
- * @property-read \App\Models\AcademicYear $academicYear
- * @property-read \App\Models\StandardLink $standardLink
- * @property-read \App\Models\PostDetail $postDetail
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\PostComment[] $postComment
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Tag[] $tag
+ * @property-read School $school
+ * @property-read AcademicYear $academicYear
+ * @property-read StandardLink $standardLink
+ * @property-read PostDetail $postDetail
+ * @property-read Collection|PostComment[] $postComment
+ * @property-read Collection|Tag[] $tag
+ *
  * @mixin \Eloquent
  */
 class Post extends Model implements HasMedia
 {
+    use Common;
     //
-    //use HasMediaTrait;
+    // use HasMediaTrait;
     use InteractsWithMedia;
     use SoftDeletes;
-    use Common;
 
     /**
      * The table associated with the model.
@@ -59,14 +66,13 @@ class Post extends Model implements HasMedia
      */
     protected $table = 'posts';
 
-
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'school_id' , 'academic_year_id' , 'entity_id' , 'entity_name' , 'description' , 'attachment_file' , 'visibility' , 'visible_for' , 'post_created_at' , 'is_posted' , 'posted_at' , 'status'
+        'school_id', 'academic_year_id', 'entity_id', 'entity_name', 'description', 'attachment_file', 'visibility', 'visible_for', 'post_created_at', 'is_posted', 'posted_at', 'status',
     ];
 
     /**
@@ -84,57 +90,56 @@ class Post extends Model implements HasMedia
      *
      * @var array
      */
-    protected $dates = ['posted_at','deleted_at'];
-
+    protected $dates = ['posted_at', 'deleted_at'];
 
     /**
      * Get the school for this post.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function school()
     {
-    	return $this->belongsTo('\App\Models\School','school_id');
+        return $this->belongsTo('\App\Models\School', 'school_id');
     }
 
     /**
      * Get the academic year for this post.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function academicYear()
     {
-        return $this->belongsTo('\App\Models\AcademicYear','academic_year_id');
+        return $this->belongsTo('\App\Models\AcademicYear', 'academic_year_id');
     }
 
     /**
      * Get the standard link for visibility of this post.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function standardLink()
     {
-        return $this->belongsTo('\App\Models\StandardLink','visible_for');
+        return $this->belongsTo('\App\Models\StandardLink', 'visible_for');
     }
 
     /**
      * Get the post details for this post.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return HasOne
      */
     public function postDetail()
     {
-        return $this->hasOne('\App\Models\PostDetail','post_id','id');
+        return $this->hasOne('\App\Models\PostDetail', 'post_id', 'id');
     }
 
     /**
      * Get all comments on this post.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function postComment()
     {
-        return $this->hasMany('\App\Models\PostComment','entity_id','id');
+        return $this->hasMany('\App\Models\PostComment', 'entity_id', 'id');
     }
 
     /**
@@ -146,7 +151,7 @@ class Post extends Model implements HasMedia
     {
         $files = $this->attachment_file ?? [];
 
-        if (!is_array($files)) {
+        if (! is_array($files)) {
             $files = [];
         }
 
@@ -156,8 +161,8 @@ class Post extends Model implements HasMedia
 
             $attachment[] = [
                 'original_path' => $file,
-                'path'          => $this->getFilePath($file),
-                'id'            => $index,
+                'path' => $this->getFilePath($file),
+                'id' => $index,
             ];
         }
 
@@ -173,25 +178,23 @@ class Post extends Model implements HasMedia
     {
         $i = 0;
         $array = [];
-        foreach ($this->postComment as $postComment)
-        {
-            $array[$i]['comment_id']        = $postComment->id;
-            $array[$i]['post_id']           = $postComment->post_id;
-            $array[$i]['user_id']           = $postComment->user_id;
-            $array[$i]['comments']          = $postComment->comments;
-            $array[$i]['attachment_file']   = $postComment->attachment_file=='' ? null:$this->getFilePath($postComment->attachment_file);
-            $array[$i]['user_name']         = $postComment->user->name;
-            $array[$i]['user_fullname']     = ucwords($postComment->user->FullName);
-            $array[$i]['user_avatar']       = $postComment->user->userprofile->AvatarPath;
-            $array[$i]['commented_at']      = $postComment->updated_at->diffForHumans();
-            $array[$i]['comment_details']   = $postComment->PostCommentDetails;
-            $array[$i]['like_count']        = $postComment->CommentLikeCount;
-            $array[$i]['unlike_count']      = $postComment->CommentUnlikeCount;
-            $postCommentDetail = PostCommentDetail::where('post_comment_id',$postComment->id)->first();
-            if($postCommentDetail != null)
-            {
-                $array[$i]['like']              = $postCommentDetail->like;
-                $array[$i]['unlike']            = $postCommentDetail->unlike;
+        foreach ($this->postComment as $postComment) {
+            $array[$i]['comment_id'] = $postComment->id;
+            $array[$i]['post_id'] = $postComment->post_id;
+            $array[$i]['user_id'] = $postComment->user_id;
+            $array[$i]['comments'] = $postComment->comments;
+            $array[$i]['attachment_file'] = $postComment->attachment_file == '' ? null : $this->getFilePath($postComment->attachment_file);
+            $array[$i]['user_name'] = $postComment->user->name;
+            $array[$i]['user_fullname'] = ucwords($postComment->user->FullName);
+            $array[$i]['user_avatar'] = $postComment->user->userprofile->AvatarPath;
+            $array[$i]['commented_at'] = $postComment->updated_at->diffForHumans();
+            $array[$i]['comment_details'] = $postComment->PostCommentDetails;
+            $array[$i]['like_count'] = $postComment->CommentLikeCount;
+            $array[$i]['unlike_count'] = $postComment->CommentUnlikeCount;
+            $postCommentDetail = PostCommentDetail::where('post_comment_id', $postComment->id)->first();
+            if ($postCommentDetail != null) {
+                $array[$i]['like'] = $postCommentDetail->like;
+                $array[$i]['unlike'] = $postCommentDetail->unlike;
             }
             $i++;
         }
@@ -202,10 +205,10 @@ class Post extends Model implements HasMedia
     /**
      * Get the tags associated with this post.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
     public function tag()
     {
-        return $this->belongsToMany(Tag::class,'post_tags');
+        return $this->belongsToMany(Tag::class, 'post_tags');
     }
 }

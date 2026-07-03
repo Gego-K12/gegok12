@@ -14,9 +14,7 @@ use Illuminate\Support\Facades\Facade;
  * from the Laravel service container and allows
  * easy access to student-related operations.
  *
- * @see \App\Schoolplus\StudentService
- *
- * @package App\Schoolplus
+ * @see StudentService
  */
 class StudentFacade extends Facade
 {

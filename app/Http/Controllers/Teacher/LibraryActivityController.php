@@ -1,49 +1,46 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
  */
+
 namespace App\Http\Controllers\Teacher;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\API\BookLending as BookLendingResource;
 use App\Models\BookLending;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 
 class LibraryActivityController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index()
     {
-          
-       $lent=BookLending::with('book')->where('user_id',Auth::user()->id)->get();
-     
 
-       return view('/teacher/libraryactivity/index',['lent'=>$lent]);
+        $lent = BookLending::with('book')->where('user_id', Auth::user()->id)->get();
+
+        return view('/teacher/libraryactivity/index', ['lent' => $lent]);
     }
 
     /**
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function show()
     {
-   
-   
-        $lent = BookLending::with('book')->where('user_id',Auth::user()->id)->get();
- 
+
+        $lent = BookLending::with('book')->where('user_id', Auth::user()->id)->get();
 
         $lent = BookLendingResource::collection($lent);
-   
 
         return $lent;
     }
 }
-

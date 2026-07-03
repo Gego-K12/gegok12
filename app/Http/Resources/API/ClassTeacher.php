@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\API;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ClassTeacher extends JsonResource
@@ -9,19 +10,19 @@ class ClassTeacher extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return array
      */
     public function toArray($request)
     {
-        return 
+        return
         [
             //
-            'teacherAvatar'    =>  $this->teacher->userprofile->AvatarPath,
-            'teacherFullname'  =>  $this->teacher->FullName,
-            'teacherId'  =>  $this->teacher->id,
-            'subjectName'      =>  $this->subject->name,
-            'subjectId'      =>  $this->subject->id,
+            'teacherAvatar' => $this->teacher->userprofile->AvatarPath,
+            'teacherFullname' => $this->teacher->FullName,
+            'teacherId' => $this->teacher->id,
+            'subjectName' => $this->subject->name,
+            'subjectId' => $this->subject->id,
         ];
     }
 }

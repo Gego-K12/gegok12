@@ -2,8 +2,9 @@
 
 namespace App\Livewire\Admin\Setting;
 
-use Livewire\Component;
 use App\Models\State;
+use Illuminate\View\View;
+use Livewire\Component;
 use Livewire\WithPagination;
 
 /**
@@ -17,8 +18,6 @@ use Livewire\WithPagination;
  * - Search states by state name
  * - Search states by related country name
  * - Paginated state listing
- *
- * @package App\Livewire\Admin\Setting
  */
 class States extends Component
 {
@@ -39,7 +38,7 @@ class States extends Component
      * search filters and returns paginated results
      * to the Blade view.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function render()
     {
@@ -47,17 +46,17 @@ class States extends Component
 
         if ($this->search) {
             $states = $states->where(function ($query) {
-                $query->where('name', 'like', '%' . $this->search . '%')
-                      ->orWhereHas('country', function ($q) {
-                          $q->where('name', 'like', '%' . $this->search . '%');
-                      });
+                $query->where('name', 'like', '%'.$this->search.'%')
+                    ->orWhereHas('country', function ($q) {
+                        $q->where('name', 'like', '%'.$this->search.'%');
+                    });
             });
         }
 
         $states = $states->paginate(10);
 
         return view('livewire.admin.setting.states', [
-            'states' => $states
+            'states' => $states,
         ]);
     }
 

@@ -2,10 +2,10 @@
 
 namespace App\Livewire\Admin\Addon;
 
-use Livewire\Component;
 use App\Traits\HandlesGuzzleRequests;
-use GuzzleHttp\Client;
 use Exception;
+use Illuminate\View\View;
+use Livewire\Component;
 use Log;
 
 /**
@@ -16,8 +16,6 @@ use Log;
  *
  * Fetches add-on data from external API using Guzzle
  * and handles page navigation.
- *
- * @package App\Livewire\Admin\Addon
  */
 class AddOnList extends Component
 {
@@ -54,14 +52,14 @@ class AddOnList extends Component
      *
      * Passes add-on list and pagination data to the Blade view.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function render()
     {
         return view('livewire.admin.addon.add-on-list', [
             'addonsList' => $this->addon['data'],
             'pagination' => [
-                'meta'  => $this->addon['meta'] ?? [],
+                'meta' => $this->addon['meta'] ?? [],
                 'links' => $this->addon['links'] ?? [],
             ],
         ]);
@@ -70,18 +68,18 @@ class AddOnList extends Component
     /**
      * Fetch add-ons list from the external API.
      *
-     * @param int $page Current page number
+     * @param  int  $page  Current page number
      * @return array|null API response data
      */
     public function getAddons($page)
     {
-        $api_url = env('ADDON_API_URL') . '/api/addons';
+        $api_url = env('ADDON_API_URL').'/api/addons';
 
         try {
             $response = $this->guzzleGet($api_url, [
-                'email'       => auth()->user()->email,
+                'email' => auth()->user()->email,
                 'domain_name' => request()->getHost(),
-                'page'        => $page,
+                'page' => $page,
             ]);
 
             return $response;
@@ -97,7 +95,7 @@ class AddOnList extends Component
      * Ensures page number stays within valid limits
      * and refreshes the add-on list accordingly.
      *
-     * @param int $page
+     * @param  int  $page
      * @return void
      */
     public function goToPage($page)

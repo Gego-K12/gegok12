@@ -1,11 +1,13 @@
 <?php
+
 // SPDX-License-Identifier: MIT
 // (c) 2025 GegoSoft Technologies and GegoK12 Contributors
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class PostCommentDetail
@@ -21,8 +23,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property \DateTime $created_at
  * @property \DateTime $updated_at
  * @property \DateTime $deleted_at
- * @property-read \App\Models\User $user
- * @property-read \App\Models\PostComment $postComment
+ * @property-read User $user
+ * @property-read PostComment $postComment
+ *
  * @mixin \Eloquent
  */
 class PostCommentDetail extends Model
@@ -37,14 +40,13 @@ class PostCommentDetail extends Model
      */
     protected $table = 'post_comment_details';
 
-
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'user_id' , 'post_comment_id' ,  'like' , 'unlike' , 'status'
+        'user_id', 'post_comment_id',  'like', 'unlike', 'status',
     ];
 
     /**
@@ -57,20 +59,20 @@ class PostCommentDetail extends Model
     /**
      * Get the user who liked/unliked this comment.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function user()
     {
-    	return $this->belongsTo('\App\Models\User','user_id');
+        return $this->belongsTo('\App\Models\User', 'user_id');
     }
 
     /**
      * Get the comment this detail belongs to.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function postComment()
     {
-    	return $this->belongsTo('\App\Models\PostComment','post_comment_id');
+        return $this->belongsTo('\App\Models\PostComment', 'post_comment_id');
     }
 }

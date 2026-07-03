@@ -24,22 +24,21 @@ class AssignmentApprovalRequest extends FormRequest
      */
     public function rules()
     {
-        Validator::extend('check_comments',function($attribute,$value,$parameters,$validator)
-        {
-            return preg_match('/^[A-Za-z0-9\s]+$/', request('principal_comments')) ;
+        Validator::extend('check_comments', function ($attribute, $value, $parameters, $validator) {
+            return preg_match('/^[A-Za-z0-9\s]+$/', request('principal_comments'));
         });
 
         return [
             //
-            'principal_comments'    =>  'nullable|check_comments|max:100'
+            'principal_comments' => 'nullable|check_comments|max:100',
         ];
     }
 
     public function messages()
     {
         return [
-            'principal_comments.check_comments'   => 'Enter Valid Comments',
-            'principal_comments.max'              => 'Comments Cannot Be More Than 100 Characters',
+            'principal_comments.check_comments' => 'Enter Valid Comments',
+            'principal_comments.max' => 'Comments Cannot Be More Than 100 Characters',
         ];
     }
 }

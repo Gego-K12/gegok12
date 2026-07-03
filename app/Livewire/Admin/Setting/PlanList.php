@@ -2,18 +2,17 @@
 
 namespace App\Livewire\Admin\Setting;
 
-use Livewire\Component;
+use App\Models\Plan;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\CreateAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
-use Filament\Tables\Columns\ViewColumn;
-use Filament\Tables\Actions\CreateAction;
-use Filament\Tables\Actions\Action;
-use Filament\Forms\Components\TextInput;
-use App\Models\Plan;
+use Illuminate\View\View;
+use Livewire\Component;
 
 /**
  * Class PlanList
@@ -27,13 +26,11 @@ use App\Models\Plan;
  * - Searchable & sortable columns
  * - Create plan action
  * - Edit plan action
- *
- * @package App\Livewire\Admin\Setting
  */
 class PlanList extends Component implements HasForms, HasTable
 {
-    use InteractsWithTable;
     use InteractsWithForms;
+    use InteractsWithTable;
 
     /**
      * Configure the Filament table for plans.
@@ -44,9 +41,6 @@ class PlanList extends Component implements HasForms, HasTable
      * - Header actions
      * - Row actions
      * - Pagination options
-     *
-     * @param Table $table
-     * @return Table
      */
     public function table(Table $table): Table
     {
@@ -82,7 +76,7 @@ class PlanList extends Component implements HasForms, HasTable
      *
      * Displays the Filament-powered plan list table.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function render()
     {

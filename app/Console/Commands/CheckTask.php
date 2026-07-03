@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\Task;
 use Exception;
+use Illuminate\Console\Command;
 use Log;
 
 class CheckTask extends Command
@@ -41,32 +41,23 @@ class CheckTask extends Command
     public function handle()
     {
         //
-        $now=date('Y-m-d H:i:s');
-        try
-        {
+        $now = date('Y-m-d H:i:s');
+        try {
             $tasks = Task::get();
 
-            foreach($tasks as $task)
-            { 
-                $task=Task::where('id',$task->id)->first();
-                $task_date = date('Y-m-d H:i:s',strtotime($task->task_date));
-                if($task_date == $now)
-                {
+            foreach ($tasks as $task) {
+                $task = Task::where('id', $task->id)->first();
+                $task_date = date('Y-m-d H:i:s', strtotime($task->task_date));
+                if ($task_date == $now) {
                     $task->task_flag = 1;
-                }
-                elseif($task_date > $now)
-                {
+                } elseif ($task_date > $now) {
                     $task->task_flag = 2;
-                }
-                else
-                {
+                } else {
                     $task->task_flag = 0;
                 }
                 $task->save();
             }
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
             Log::info($e->getMesage());
         }
     }

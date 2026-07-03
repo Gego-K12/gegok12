@@ -1,12 +1,14 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
  */
+
 namespace App\Models;
 
-use Spatie\Tags\Tag as BaseTag;
 use Illuminate\Support\Str;
+use Spatie\Tags\Tag as BaseTag;
 
 class SpatieTag extends BaseTag
 {

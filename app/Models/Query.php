@@ -1,11 +1,12 @@
 <?php
+
 // SPDX-License-Identifier: MIT
 // (c) 2025 GegoSoft Technologies and GegoK12 Contributors
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Query
@@ -23,6 +24,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \DateTime $created_at
  * @property \DateTime $updated_at
  * @property \DateTime $deleted_at
+ *
  * @mixin \Eloquent
  */
 class Query extends Model
@@ -42,7 +44,7 @@ class Query extends Model
      * @var array
      */
     protected $fillable = [
-        'name' , 'email' , 'phone' ,'school_name', 'designation', 'channel','message'
+        'name', 'email', 'phone', 'school_name', 'designation', 'channel', 'message',
     ];
 
     /**

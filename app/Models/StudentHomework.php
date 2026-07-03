@@ -1,13 +1,16 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
  */
+
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Model;
 use App\Traits\Common;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class StudentHomework
@@ -27,16 +30,17 @@ use App\Traits\Common;
  * @property \DateTime $updated_at
  * @property \DateTime $deleted_at
  * @property array $attachment_path
- * @property-read \App\Models\Homework $homework
- * @property-read \App\Models\User $student
- * @property-read \App\Models\User|null $teacher
+ * @property-read Homework $homework
+ * @property-read User $student
+ * @property-read User|null $teacher
+ *
  * @mixin \Eloquent
  */
 class StudentHomework extends Model
 {
+    use Common;
     //
     use SoftDeletes;
-    use Common;
 
     /**
      * The table associated with the model.
@@ -45,14 +49,13 @@ class StudentHomework extends Model
      */
     protected $table = 'student_homework';
 
-
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'homework_id' , 'user_id' , 'attachment' , 'submitted_on' , 'checked_by' , 'checked_on' , 'status' , 'comments'
+        'homework_id', 'user_id', 'attachment', 'submitted_on', 'checked_by', 'checked_on', 'status', 'comments',
     ];
 
     /**
@@ -60,43 +63,43 @@ class StudentHomework extends Model
      *
      * @var array
      */
-    protected $dates = ['submitted_on' , 'checked_on' , 'deleted_at'];
+    protected $dates = ['submitted_on', 'checked_on', 'deleted_at'];
 
     /**
      * The attributes that should be cast to native types.
      *
      * @var array
      */
-    protected $casts=[ 'attachment' => 'array' ];
+    protected $casts = ['attachment' => 'array'];
 
     /**
      * Get the homework assignment for this submission.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function homework()
     {
-        return $this->belongsTo('App\Models\Homework','homework_id');
+        return $this->belongsTo('App\Models\Homework', 'homework_id');
     }
 
     /**
      * Get the student who submitted this homework.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function student()
     {
-    	return $this->belongsTo('\App\Models\User','user_id');
+        return $this->belongsTo('\App\Models\User', 'user_id');
     }
 
     /**
      * Get the teacher who checked this homework submission.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function teacher()
     {
-        return $this->belongsTo('\App\Models\User','checked_by');
+        return $this->belongsTo('\App\Models\User', 'checked_by');
     }
 
     /**
@@ -106,7 +109,7 @@ class StudentHomework extends Model
      */
     public function getAttachmentPathAttribute()
     {
-        if (!$this->attachment || !is_array($this->attachment)) {
+        if (! $this->attachment || ! is_array($this->attachment)) {
             return [];
         }
 

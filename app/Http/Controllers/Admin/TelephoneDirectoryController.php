@@ -1,32 +1,35 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
  */
+
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
+use App\Http\Requests\TelephoneDirectoryRequest;
 use App\Http\Resources\TelephoneDirectory as TelephoneDirectoryResource;
 use App\Http\Resources\UserPhoneResource;
-use App\Http\Requests\TelephoneDirectoryRequest;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Controller;
 use App\Models\TelephoneDirectory;
-use Illuminate\Http\Request;
-use App\Traits\LogActivity;
-use App\Traits\Common;
 use App\Models\User;
+use App\Traits\Common;
+use App\Traits\LogActivity;
 use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Log;
 
 class TelephoneDirectoryController extends Controller
 {
-    use LogActivity;
     use Common;
+    use LogActivity;
 
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index()
     {
@@ -36,31 +39,31 @@ class TelephoneDirectoryController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function list()
     {
         //
-        $numberlist = TelephoneDirectory::where('school_id',Auth::user()->school_id)->orderby('id','desc')->get();
+        $numberlist = TelephoneDirectory::where('school_id', Auth::user()->school_id)->orderby('id', 'desc')->get();
 
         $users = User::where('school_id', Auth::user()->school_id)
-        ->whereNotIn('usergroup_id', [1, 2, 3, 4])
-        ->get();
+            ->whereNotIn('usergroup_id', [1, 2, 3, 4])
+            ->get();
 
-    // $merged = $numberlist->merge($users);
+        // $merged = $numberlist->merge($users);
         $numberlist = TelephoneDirectoryResource::collection($numberlist);
         $userData = UserPhoneResource::collection($users);
         $merged = collect($numberlist)->merge($userData);
 
         return response()->json([
-            'data' => $merged
+            'data' => $merged,
         ]);
     }
 
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create()
     {
@@ -71,38 +74,35 @@ class TelephoneDirectoryController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param  Request  $request
+     * @return Response
      */
     public function store(TelephoneDirectoryRequest $request)
     {
         //
-        try
-        {
+        try {
             $telephonedirectory = new TelephoneDirectory;
 
-            $telephonedirectory->school_id         =   Auth::user()->school_id;
-            $telephonedirectory->name              =   $request->name;
-            $telephonedirectory->designation       =   $request->designation;
-            $telephonedirectory->phone_number      =   $request->phone_number;
+            $telephonedirectory->school_id = Auth::user()->school_id;
+            $telephonedirectory->name = $request->name;
+            $telephonedirectory->designation = $request->designation;
+            $telephonedirectory->phone_number = $request->phone_number;
 
             $telephonedirectory->save();
 
-            $ip= $this->getRequestIP();
+            $ip = $this->getRequestIP();
             $this->doActivityLog(
                 $telephonedirectory,
                 Auth::user(),
-                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT'] ],
+                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT']],
                 LOGNAME_ADD_telephonedirectory,
-                trans('messages.add_success_msg',['module' =>' Phone Number'])
-            ); 
+                trans('messages.add_success_msg', ['module' => ' Phone Number'])
+            );
 
-            $res['success'] = trans('messages.add_success_msg',['module' => 'Phone Number']);
+            $res['success'] = trans('messages.add_success_msg', ['module' => 'Phone Number']);
 
             return $res;
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
             Log::info($e->getMessage());
         }
     }
@@ -111,24 +111,24 @@ class TelephoneDirectoryController extends Controller
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function show($id)
     {
         //
-        $telephonedirectory = TelephoneDirectory::where('id',$id)->first();
+        $telephonedirectory = TelephoneDirectory::where('id', $id)->first();
 
-        return view('/admin/telephonedirectory/show',['telephonedirectory' => $telephonedirectory]);
+        return view('/admin/telephonedirectory/show', ['telephonedirectory' => $telephonedirectory]);
     }
 
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function editlist($id)
     {
-        $numberlist = TelephoneDirectory::where('id',$id)->get();
+        $numberlist = TelephoneDirectory::where('id', $id)->get();
         $numberlist = TelephoneDirectoryResource::collection($numberlist);
 
         return $numberlist;
@@ -138,51 +138,48 @@ class TelephoneDirectoryController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit($id)
     {
         //
-        $telephonedirectory = TelephoneDirectory::where('id',$id)->first();
+        $telephonedirectory = TelephoneDirectory::where('id', $id)->first();
 
-        return view('/admin/telephonedirectory/edit',['telephonedirectory' => $telephonedirectory]);
+        return view('/admin/telephonedirectory/edit', ['telephonedirectory' => $telephonedirectory]);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(TelephoneDirectoryRequest $request, $id)
     {
         //
-        try
-        {
-            $telephonedirectory = TelephoneDirectory::where('id',$id)->first();
+        try {
+            $telephonedirectory = TelephoneDirectory::where('id', $id)->first();
 
-            $telephonedirectory->name              =   $request->name;
-            $telephonedirectory->designation       =   $request->designation;
-            $telephonedirectory->phone_number      =   $request->phone_number;
+            $telephonedirectory->name = $request->name;
+            $telephonedirectory->designation = $request->designation;
+            $telephonedirectory->phone_number = $request->phone_number;
 
             $telephonedirectory->save();
 
-            $ip= $this->getRequestIP();
+            $ip = $this->getRequestIP();
             $this->doActivityLog(
                 $telephonedirectory,
                 Auth::user(),
-                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT'] ],
+                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT']],
                 LOGNAME_EDIT_telephonedirectory,
-                trans('messages.update_success_msg',['module' => 'Phone Number'])
-            ); 
+                trans('messages.update_success_msg', ['module' => 'Phone Number'])
+            );
 
-            $res['success'] = trans('messages.update_success_msg',['module' => 'Phone Number']);
+            $res['success'] = trans('messages.update_success_msg', ['module' => 'Phone Number']);
 
             return $res;
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
             Log::info($e->getMessage());
         }
     }
@@ -191,32 +188,30 @@ class TelephoneDirectoryController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy($id)
     {
         //
-        try
-        {
-            $telephonedirectory = TelephoneDirectory::where('id',$id)->first();
+        try {
+            $telephonedirectory = TelephoneDirectory::where('id', $id)->first();
             $telephonedirectory->delete();
 
-            $message= trans('messages.delete_success_msg',['module' => 'Telephone Directory']);
+            $message = trans('messages.delete_success_msg', ['module' => 'Telephone Directory']);
 
-            $ip= $this->getRequestIP();
+            $ip = $this->getRequestIP();
             $this->doActivityLog(
                 $telephonedirectory,
                 Auth::user(),
-                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT'] ],
+                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT']],
                 LOGNAME_DELETE_telephonedirectory,
                 $message
             );
 
             $res['success'] = $message;
+
             return $res;
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
             Log::info($e->getMessage());
         }
     }

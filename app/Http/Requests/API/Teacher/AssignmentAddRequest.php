@@ -2,11 +2,11 @@
 
 namespace App\Http\Requests\API\Teacher;
 
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Auth;
 use App\Helpers\SiteHelper;
 use App\Models\Assignment;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class AssignmentAddRequest extends FormRequest
 {
@@ -27,13 +27,13 @@ class AssignmentAddRequest extends FormRequest
      */
     // public function rules()
     // {
-    //     Validator::extend('check_title', function ($attribute, $value,$parameters,$validator) 
+    //     Validator::extend('check_title', function ($attribute, $value,$parameters,$validator)
     //     {
-    //         //return preg_match('/^[\pL\s]+$/u', request('title')); 
-    //         return preg_match('/\pL\pM*|./u', request('title')); 
+    //         //return preg_match('/^[\pL\s]+$/u', request('title'));
+    //         return preg_match('/\pL\pM*|./u', request('title'));
     //     });
 
-    //     Validator::extend('check_assigned_date', function ($attribute, $value, $parameters, $validator) 
+    //     Validator::extend('check_assigned_date', function ($attribute, $value, $parameters, $validator)
     //     {
     //         if( date('Y-m-d',strtotime(request('assigned_date'))) >date('Y-m-d',strtotime('-1 days',strtotime(date('Y-m-d')))))
     //         {
@@ -42,7 +42,7 @@ class AssignmentAddRequest extends FormRequest
     //         return false;
     //     });
 
-    //     Validator::extend('check_exists', function ($attribute, $value, $parameters, $validator) 
+    //     Validator::extend('check_exists', function ($attribute, $value, $parameters, $validator)
     //     {
     //         $assigned_date = date('Y-m-d',strtotime(request('assigned_date')));
     //         $school_id = Auth::user()->school_id;
@@ -63,7 +63,7 @@ class AssignmentAddRequest extends FormRequest
     //         return false;
     //     });
 
-    //     Validator::extend('check_marks', function ($attribute, $value, $parameters, $validator) 
+    //     Validator::extend('check_marks', function ($attribute, $value, $parameters, $validator)
     //     {
     //         if( request('marks') < 100)
     //         {
@@ -72,7 +72,7 @@ class AssignmentAddRequest extends FormRequest
     //         return false;
     //     });
 
-    //     Validator::extend('check_valid_marks', function ($attribute, $value, $parameters, $validator) 
+    //     Validator::extend('check_valid_marks', function ($attribute, $value, $parameters, $validator)
     //     {
     //         return preg_match('/^[0-9]+$/', request('marks')) ;
     //     });
@@ -84,47 +84,47 @@ class AssignmentAddRequest extends FormRequest
     //         'title'             =>  'required|max:50|check_title',
     //         'description'       =>  'required|max:255',
     //         'attachment'        =>  'nullable',
-    //         'marks'             =>  'nullable|numeric|check_marks|check_valid_marks',    
+    //         'marks'             =>  'nullable|numeric|check_marks|check_valid_marks',
     //         'assigned_date'     =>  'required|check_assigned_date|check_exists|before:submission_date',
     //         'submission_date'   =>  'required|after:assigned_date',
     //     ];
 
     //     return $rules;
     // }
-    
+
     public function rules()
     {
-        Validator::extend('check_title', function ($attribute, $value,$parameters,$validator) {
-            if (request('status') == 'pending') 
-            {
+        Validator::extend('check_title', function ($attribute, $value, $parameters, $validator) {
+            if (request('status') == 'pending') {
                 return true;
             }
-            return preg_match('/\pL\pM*|./u', request('title')); 
+
+            return preg_match('/\pL\pM*|./u', request('title'));
         });
 
         Validator::extend('check_assigned_date', function ($attribute, $value, $parameters, $validator) {
-            if (request('status') == 'pending') 
-            {
+            if (request('status') == 'pending') {
                 return true;
             }
 
-            if(date('Y-m-d',strtotime(request('assigned_date'))) > date('Y-m-d',strtotime('-1 days'))) {
+            if (date('Y-m-d', strtotime(request('assigned_date'))) > date('Y-m-d', strtotime('-1 days'))) {
                 return true;
             }
+
             return false;
         });
 
         Validator::extend('check_exists', function ($attribute, $value, $parameters, $validator) {
-            $assigned_date = date('Y-m-d',strtotime(request('assigned_date')));
+            $assigned_date = date('Y-m-d', strtotime(request('assigned_date')));
             $school_id = Auth::user()->school_id;
             $academic_year = SiteHelper::getAcademicYear($school_id);
 
             $assignment = Assignment::where([
-                ['school_id',$school_id],
-                ['academic_year_id',$academic_year->id],
-                ['standardLink_id',(int)request('standardLink_id')],
-                ['subject_id',(int)request('subject_id')],
-                ['assigned_date',$assigned_date]
+                ['school_id', $school_id],
+                ['academic_year_id', $academic_year->id],
+                ['standardLink_id', (int) request('standardLink_id')],
+                ['subject_id', (int) request('subject_id')],
+                ['assigned_date', $assigned_date],
             ])->first();
 
             return $assignment == null;
@@ -144,57 +144,58 @@ class AssignmentAddRequest extends FormRequest
             'status' => 'required|in:pending,ongoing,cancel,completed',
 
             'standardLink_id' => 'required',
-            'subject_id'      => 'required',
+            'subject_id' => 'required',
 
-            'title'        => 'nullable|max:50|check_title',
-            'description'  => 'nullable|max:255',
+            'title' => 'nullable|max:50|check_title',
+            'description' => 'nullable|max:255',
 
-            'attachment'   => 'nullable',
+            'attachment' => 'nullable',
 
-            'marks'        => 'nullable|numeric|check_marks|check_valid_marks',
+            'marks' => 'nullable|numeric|check_marks|check_valid_marks',
 
-            'assigned_date'   => 'nullable|check_assigned_date|check_exists',
+            'assigned_date' => 'nullable|check_assigned_date|check_exists',
             'submission_date' => 'nullable',
         ];
 
         if ($status === 'completed') {
 
-            $rules['title']           .= '|required';
-            $rules['description']     .= '|required';
+            $rules['title'] .= '|required';
+            $rules['description'] .= '|required';
 
-            $rules['assigned_date']   .= '|required|before:submission_date';
+            $rules['assigned_date'] .= '|required|before:submission_date';
             $rules['submission_date'] .= '|required|after:assigned_date';
         }
 
         return $rules;
     }
+
     public function messages()
     {
         return
-        [   
-            'standardLink_id.required'          =>  'Class is required', 
+        [
+            'standardLink_id.required' => 'Class is required',
 
-            'subject_id.required'               =>  'Subject is required',
+            'subject_id.required' => 'Subject is required',
 
-            'title.required'                    =>  'Title is required',
-            'title.max'                         =>  'Title cannot be more than 50 characters',
-            'title.check_title'                 =>  'Enter Valid Title',
+            'title.required' => 'Title is required',
+            'title.max' => 'Title cannot be more than 50 characters',
+            'title.check_title' => 'Enter Valid Title',
 
-            'description.required'              =>  'Description is required',
-            'description.max'                   =>  'Description cannot be more than 255 characters',
+            'description.required' => 'Description is required',
+            'description.max' => 'Description cannot be more than 255 characters',
 
-            'attachment.mimes'                  =>  'Choose a valid file', 
-            'attachment.max'                    =>  'Maximum file size to upload is 8MB',
+            'attachment.mimes' => 'Choose a valid file',
+            'attachment.max' => 'Maximum file size to upload is 8MB',
 
-            'marks.numeric'                     =>  'Enter Valid Mark',
-            'marks.check_marks'                 =>  'Mark cannot be more than 100',
-            'marks.check_valid_marks'           =>  'Enter Valid Mark',
+            'marks.numeric' => 'Enter Valid Mark',
+            'marks.check_marks' => 'Mark cannot be more than 100',
+            'marks.check_valid_marks' => 'Enter Valid Mark',
 
-            'assigned_date.required'            =>  'Assigned Date Required',
-            'assigned_date.check_assigned_date' =>  'Choose Valid Assigned Date',
-            'assigned_date.check_exists'        =>  'Assignment Already Exists For This Date',
-            
-            'submission_date.required'          =>  'Submission Date Required',
+            'assigned_date.required' => 'Assigned Date Required',
+            'assigned_date.check_assigned_date' => 'Choose Valid Assigned Date',
+            'assigned_date.check_exists' => 'Assignment Already Exists For This Date',
+
+            'submission_date.required' => 'Submission Date Required',
         ];
     }
 }

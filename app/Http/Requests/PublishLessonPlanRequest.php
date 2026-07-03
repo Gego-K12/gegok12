@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 class PublishLessonPlanRequest extends FormRequest
@@ -17,20 +17,20 @@ class PublishLessonPlanRequest extends FormRequest
     {
         return [
             'start_date' => 'required|date|after_or_equal:today',
-            'end_date'   => 'required|date|after_or_equal:start_date',
+            'end_date' => 'required|date|after_or_equal:start_date',
         ];
     }
 
     public function messages()
     {
         return [
-            'start_date.required'       => 'Start date is required',
-            'start_date.date'           => 'Start date should be valid date',
+            'start_date.required' => 'Start date is required',
+            'start_date.date' => 'Start date should be valid date',
             'start_date.after_or_equal' => 'Start date should not be before today',
 
-            'end_date.required'         => 'End date is required',
-            'end_date.date'             => 'End date should be valid date',
-            'end_date.after_or_equal'   => 'End date should be same as or after start date',
+            'end_date.required' => 'End date is required',
+            'end_date.date' => 'End date should be valid date',
+            'end_date.after_or_equal' => 'End date should be same as or after start date',
         ];
     }
 
@@ -39,7 +39,7 @@ class PublishLessonPlanRequest extends FormRequest
         throw new HttpResponseException(response()->json([
             'success' => false,
             'message' => $validator->errors()->first(),
-            'errors'  => $validator->errors(),
+            'errors' => $validator->errors(),
         ], 422));
     }
 }

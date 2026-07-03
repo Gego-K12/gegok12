@@ -24,37 +24,32 @@ class AdmissionAvatarRequest extends FormRequest
      */
     public function rules()
     {
-        Validator::extend('file_extension', function ($attribute, $value, $parameters, $validator)
-        {
-            $image_parts    = explode(";base64,",request('avatar'));
-            $image_type_aux = explode("image/",$image_parts[0]);
-            $image_type     = $image_type_aux[1];
+        Validator::extend('file_extension', function ($attribute, $value, $parameters, $validator) {
+            $image_parts = explode(';base64,', request('avatar'));
+            $image_type_aux = explode('image/', $image_parts[0]);
+            $image_type = $image_type_aux[1];
 
-            if($image_type == 'jpg')
-            {
+            if ($image_type == 'jpg') {
+                return true;
+            } elseif ($image_type == 'jpeg') {
+                return true;
+            } elseif ($image_type == 'png') {
                 return true;
             }
-            elseif($image_type == 'jpeg')
-            {
-                return true;
-            }
-            elseif($image_type == 'png')
-            {
-                return true;
-            }
+
             return false;
         });
 
         return [
             //
-            'avatar'    => 'required|file_extension',
+            'avatar' => 'required|file_extension',
         ];
     }
 
     public function messages()
     {
         return [
-            'avatar.required'       => 'Avatar is required',
+            'avatar.required' => 'Avatar is required',
             'avatar.file_extension' => 'Choose jpg,jpeg,png file',
         ];
     }

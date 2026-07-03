@@ -2,8 +2,9 @@
 
 namespace App\Livewire\Admin\Setting;
 
-use Livewire\Component;
 use App\Models\Plan;
+use Illuminate\View\View;
+use Livewire\Component;
 
 /**
  * Class PlanDetail
@@ -11,8 +12,6 @@ use App\Models\Plan;
  * Livewire component responsible for displaying
  * detailed information of a single plan
  * in the Admin Settings section.
- *
- * @package App\Livewire\Admin\Setting
  */
 class PlanDetail extends Component
 {
@@ -29,7 +28,7 @@ class PlanDetail extends Component
      * Assigns the plan identifier received from the route
      * to the component property.
      *
-     * @param int|string $id Plan ID
+     * @param  int|string  $id  Plan ID
      * @return void
      */
     public function mount($id)
@@ -43,7 +42,7 @@ class PlanDetail extends Component
      * Fetches plan details based on the provided ID
      * and passes the data to the Blade view.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function render()
     {

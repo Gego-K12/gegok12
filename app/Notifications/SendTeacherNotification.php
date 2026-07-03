@@ -6,23 +6,25 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Log;
+use Kreait\Firebase\Factory;
 use NotificationChannels\Fcm\FcmChannel;
 use NotificationChannels\Fcm\FcmMessage;
 use NotificationChannels\Fcm\Resources\Notification as FcmNotification;
-use Kreait\Firebase\Factory;
+
 class SendTeacherNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
     public array $data;
+
     public string $token;
 
     public function __construct(array $data, string $token)
     {
         $this->queue = 'notification';
-        $this->data  = $data;
+        $this->data = $data;
         $this->token = $token;
-       
+
     }
 
     public function via($notifiable): array
@@ -34,16 +36,17 @@ class SendTeacherNotification extends Notification implements ShouldQueue
     {
 
         try {
-            $type    = $this->data['type'] ?? 'Notification';
+            $type = $this->data['type'] ?? 'Notification';
             $message = $this->data['message'] ?? '';
-              $credentialsArray = config('firebase.projects.appteacher.credentials'); 
-              $factory = (new Factory)->withServiceAccount($credentialsArray);
-             $messaging = $factory->createMessaging();
+            $credentialsArray = config('firebase.projects.appteacher.credentials');
+            $factory = (new Factory)->withServiceAccount($credentialsArray);
+            $messaging = $factory->createMessaging();
+
             return FcmMessage::create()
-               ->usingClient($messaging)
+                ->usingClient($messaging)
                 ->token($this->token)
                 ->data([
-                    'type'    => $type,
+                    'type' => $type,
                     'message' => $message,
                 ])
                 ->notification(
@@ -75,16 +78,16 @@ class SendTeacherNotification extends Notification implements ShouldQueue
 
             Log::error('FCM Notification Error', [
                 'token' => $this->token,
-                'data'  => $this->data,
+                'data' => $this->data,
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             // Optional: prevent job from crashing
             return FcmMessage::create()
                 ->token($this->token)
                 ->data([
-                    'type'    => 'Error',
+                    'type' => 'Error',
                     'message' => 'Notification failed',
                 ]);
         }

@@ -1,66 +1,62 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
  */
+
 namespace App\Http\Controllers\Teacher\Approval;
 
-use App\Http\Resources\StandardLink as StandardLinkResource;
-use App\Http\Resources\Assignment as AssignmentResource;
 use App\Events\Notification\SingleNotificationEvent;
-use App\Http\Resources\Subject as SubjectResource;
-use App\Http\Requests\AssignmentUpdateRequest;
-use App\Http\Requests\AssignmentAddRequest;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Controller;
-use App\Models\AssignmentApproval;
 use App\Events\SinglePushEvent;
-use App\Models\TeacherProfile;
-use Illuminate\Http\Request;
-use App\Models\StandardLink;
-use App\Traits\LogActivity;
 use App\Helpers\SiteHelper;
-use App\Models\Teacherlink;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\AssignmentAddRequest;
+use App\Http\Requests\AssignmentUpdateRequest;
+use App\Http\Resources\Assignment as AssignmentResource;
 use App\Models\Assignment;
-use App\Traits\Common;
+use App\Models\AssignmentApproval;
+use App\Models\TeacherProfile;
 use App\Models\User;
+use App\Traits\Common;
+use App\Traits\LogActivity;
 use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Log;
 
 class AssignmentController extends Controller
 {
-    use LogActivity;
     use Common;
+    use LogActivity;
 
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function showList(Request $request, $status)
     {
         //
         $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
-        if(Auth::user()->hasRole('principal'))
-        {
+        if (Auth::user()->hasRole('principal')) {
             $assignment = Assignment::where([
-                    ['school_id',Auth::user()->school_id],
-                    ['academic_year_id',$academic_year->id],
-                    ['status',$status]
-                ]);
+                ['school_id', Auth::user()->school_id],
+                ['academic_year_id', $academic_year->id],
+                ['status', $status],
+            ]);
             // ->whereHas('assignmentApproval' , function($query) use($status) {
             //         $query->where('status',$status);
             //     });
-        }
-        else
-        {
+        } else {
             $assignment = Assignment::where([
-                    ['school_id',Auth::user()->school_id],
-                    ['academic_year_id',$academic_year->id],
-                    ['teacher_id',Auth::id()],
-                    ['status',$status]
-                ]);
+                ['school_id', Auth::user()->school_id],
+                ['academic_year_id', $academic_year->id],
+                ['teacher_id', Auth::id()],
+                ['status', $status],
+            ]);
 
             // $approve_status =$status;
             // if($status=='ongoing')
@@ -73,49 +69,44 @@ class AssignmentController extends Controller
             //         $query->where('status',$approve_status);
             //     });
         }
-       
-        if(count((array)\Request::getQueryString())>0)
-        {
-            if($request->standardLink_id != '')
-            { 
-                $assignment = $assignment->where('standardLink_id',$request->standardLink_id);
+
+        if (count((array) \Request::getQueryString()) > 0) {
+            if ($request->standardLink_id != '') {
+                $assignment = $assignment->where('standardLink_id', $request->standardLink_id);
             }
 
-            if($request->search != null)
-            {
-                $assignment = $assignment->where('title','LIKE','%'.$request->search.'%')->orWhere('description','LIKE','%'.$request->search.'%')->orWhere('marks','LIKE','%'.$request->search.'%')->orWhereHas('subject' , function ($query) use($request)
-                {
-                    $query->where('name','LIKE','%'.$request->search.'%');
+            if ($request->search != null) {
+                $assignment = $assignment->where('title', 'LIKE', '%'.$request->search.'%')->orWhere('description', 'LIKE', '%'.$request->search.'%')->orWhere('marks', 'LIKE', '%'.$request->search.'%')->orWhereHas('subject', function ($query) use ($request) {
+                    $query->where('name', 'LIKE', '%'.$request->search.'%');
                 });
             }
         }
-        $assignment=$assignment->orderBy('id','DESC')->paginate(10);
+        $assignment = $assignment->orderBy('id', 'DESC')->paginate(10);
         $assignmentlist = AssignmentResource::collection($assignment);
-        
+
         return $assignmentlist;
     }
 
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index()
     {
         //
-        if(Auth::user()->hasRole('principal'))
-        {
+        if (Auth::user()->hasRole('principal')) {
             $role = 'principal';
         }
         $query = \Request::getQueryString();
 
-        return view('/teacher/assignment/index' ,['role' => $role , 'query' => $query]);
+        return view('/teacher/assignment/index', ['role' => $role, 'query' => $query]);
     }
 
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function list()
     {
@@ -126,16 +117,16 @@ class AssignmentController extends Controller
         }
         else
         {*/
-            $array = SiteHelper::getStandardSubjectList(Auth::user()->school_id,Auth::id());
-        //}
-        
+        $array = SiteHelper::getStandardSubjectList(Auth::user()->school_id, Auth::id());
+        // }
+
         return $array;
     }
 
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create()
     {
@@ -146,41 +137,38 @@ class AssignmentController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param  Request  $request
+     * @return Response
      */
     public function store(AssignmentAddRequest $request)
     {
         //
-        try
-        {
-            $school_id  =   Auth::user()->school_id;
+        try {
+            $school_id = Auth::user()->school_id;
             $academic_year = SiteHelper::getAcademicYear($school_id);
 
-            $assignment     =   new Assignment;
+            $assignment = new Assignment;
 
-            $assignment->school_id          =   $school_id;
-            $assignment->academic_year_id   =   $academic_year->id;
-            $assignment->standardLink_id    =   $request->standardLink_id;
-            $assignment->subject_id         =   $request->subject_id;
-            $assignment->teacher_id         =   Auth::id();
-            $assignment->title              =   $request->title;
-            $assignment->description        =   $request->description;
+            $assignment->school_id = $school_id;
+            $assignment->academic_year_id = $academic_year->id;
+            $assignment->standardLink_id = $request->standardLink_id;
+            $assignment->subject_id = $request->subject_id;
+            $assignment->teacher_id = Auth::id();
+            $assignment->title = $request->title;
+            $assignment->description = $request->description;
 
-            $file   =   $request->file('attachment');
-            if($file)
-            {
-                $path = $this->uploadFile(Auth::user()->school->slug.'/uploads/teacher/assignment',$file);
-                $assignment->attachment = $path; 
+            $file = $request->file('attachment');
+            if ($file) {
+                $path = $this->uploadFile(Auth::user()->school->slug.'/uploads/teacher/assignment', $file);
+                $assignment->attachment = $path;
             }
 
-            $assignment->marks              =   $request->marks;
+            $assignment->marks = $request->marks;
             $assignment->assigned_date = $request->assigned_date ? date('Y-m-d', strtotime($request->assigned_date)) : null;
 
-            $assignment->submission_date = !empty($request->submission_date) ? date('Y-m-d', strtotime($request->submission_date)) : null;
-            
-            $assignment->status             =   $request->status;
+            $assignment->submission_date = ! empty($request->submission_date) ? date('Y-m-d', strtotime($request->submission_date)) : null;
 
+            $assignment->status = $request->status;
 
             // if($assignment->assigned_date == date('Y-m-d'))
             // {
@@ -190,49 +178,47 @@ class AssignmentController extends Controller
             // {
             //     $assignment->status             =   'pending';
             // }
-   
 
             $assignment->save();
 
             $assignmentapproval = new AssignmentApproval;
 
-            $assignmentapproval->assignment_id  = $assignment->id;
+            $assignmentapproval->assignment_id = $assignment->id;
 
-            $status_approval='approved';
-            if(config('settings.assignment_status') == 1)
-            {
-                $status_approval='pending';
+            $status_approval = 'approved';
+            if (config('settings.assignment_status') == 1) {
+                $status_approval = 'pending';
             }
 
-            $assignmentapproval->status         = $status_approval;
+            $assignmentapproval->status = $status_approval;
 
             $assignmentapproval->save();
 
             $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
-            $principal = TeacherProfile::with('user')->where([['school_id',Auth::user()->school_id],['academic_year_id',$academic_year->id],['designation','principal']])->first();
+            $principal = TeacherProfile::with('user')->where([['school_id', Auth::user()->school_id], ['academic_year_id', $academic_year->id], ['designation', 'principal']])->first();
 
             $data = [];
 
-            $data['user']       =   $principal->user;
-            $data['details']    =   trans('notification.teacher_assignment_add_msg');
+            $data['user'] = $principal->user;
+            $data['details'] = trans('notification.teacher_assignment_add_msg');
 
             event(new SingleNotificationEvent($data));
 
-            $array=[];
+            $array = [];
 
-            $array['school_id']  = $assignment->school_id;
-            $array['message']    = 'New Assignment Added';
-            $array['type']       = 'assignment';
-                    
+            $array['school_id'] = $assignment->school_id;
+            $array['message'] = 'New Assignment Added';
+            $array['type'] = 'assignment';
+
             event(new SinglePushEvent($array));
 
-            $message=trans('messages.add_success_msg',['module' => 'Assignment']);
+            $message = trans('messages.add_success_msg', ['module' => 'Assignment']);
 
-            $ip= $this->getRequestIP();
+            $ip = $this->getRequestIP();
             $this->doActivityLog(
                 $assignment,
                 Auth::user(),
-                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT'] ],
+                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT']],
                 LOGNAME_ADD_ASSIGNMENT,
                 $message
             );
@@ -240,9 +226,7 @@ class AssignmentController extends Controller
             $res['success'] = $message;
 
             return $res;
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
             Log::info($e->getMessage());
         }
     }
@@ -251,85 +235,79 @@ class AssignmentController extends Controller
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function show($id)
     {
         //
-        $assignment     =   Assignment::where('id',$id)->first();
+        $assignment = Assignment::where('id', $id)->first();
 
-        $array  =   [];
+        $array = [];
 
-        $array['title']             =   $assignment->title;
-        $array['description']       =   $assignment->description;
-        $array['marks']             =   $assignment->marks;
-        $array['assigned_date']     =   date('Y-m-d',strtotime($assignment->assigned_date));
-        $array['submission_date']   =   date('Y-m-d',strtotime($assignment->submission_date));
-        $array['attachment']        =   $assignment->attachment==null ? '':$assignment->attachment;
-        $array['status']        =   $assignment->status;
+        $array['title'] = $assignment->title;
+        $array['description'] = $assignment->description;
+        $array['marks'] = $assignment->marks;
+        $array['assigned_date'] = date('Y-m-d', strtotime($assignment->assigned_date));
+        $array['submission_date'] = date('Y-m-d', strtotime($assignment->submission_date));
+        $array['attachment'] = $assignment->attachment == null ? '' : $assignment->attachment;
+        $array['status'] = $assignment->status;
 
         return $array;
     }
 
     public function view($id)
     {
-        $assignment = Assignment::where('id',$id)->first();
-        $viewers=$assignment->viewers()->latest()->paginate(10);
+        $assignment = Assignment::where('id', $id)->first();
+        $viewers = $assignment->viewers()->latest()->paginate(10);
 
-        return view('/teacher/assignment/view',['assignment' => $assignment,'viewers' => $viewers]); 
+        return view('/teacher/assignment/view', ['assignment' => $assignment, 'viewers' => $viewers]);
     }
 
     /**
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit($id)
     {
         //
-        $assignment     =   Assignment::where('id',$id)->first();
-        if($assignment->status != 'completed')
-        {
-            return view('/teacher/assignment/edit' , ['assignment' => $assignment]);
+        $assignment = Assignment::where('id', $id)->first();
+        if ($assignment->status != 'completed') {
+            return view('/teacher/assignment/edit', ['assignment' => $assignment]);
         }
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(AssignmentUpdateRequest $request, $id)
     {
         //
-        try
-        {
-            $assignment     =   Assignment::where('id',$id)->first();
+        try {
+            $assignment = Assignment::where('id', $id)->first();
 
-            $assignment->title              =   $request->title;
-            $assignment->description        =   $request->description;
+            $assignment->title = $request->title;
+            $assignment->description = $request->description;
 
-            $file   =   $request->file('attachment');
-            if($file)
-            {
-                $path = $this->uploadFile(Auth::user()->school->slug.'/uploads/teacher/assignment',$file);
-                $assignment->attachment = $path; 
-            }
-            else
-            {
-                $assignment->attachment=$assignment->attachment; 
+            $file = $request->file('attachment');
+            if ($file) {
+                $path = $this->uploadFile(Auth::user()->school->slug.'/uploads/teacher/assignment', $file);
+                $assignment->attachment = $path;
+            } else {
+                $assignment->attachment = $assignment->attachment;
             }
 
-
-            $assignment->marks              =   $request->marks;
+            $assignment->marks = $request->marks;
             $assignment->assigned_date = $request->assigned_date ? date('Y-m-d', strtotime($request->assigned_date)) : null;
 
-            $assignment->submission_date = !empty($request->submission_date) ? date('Y-m-d', strtotime($request->submission_date)) : null;
-            
-            $assignment->status             =   $request->status;
+            $assignment->submission_date = ! empty($request->submission_date) ? date('Y-m-d', strtotime($request->submission_date)) : null;
+
+            $assignment->status = $request->status;
             // if($assigned_date == date('Y-m-d'))
             // {
             //     $assignment->status             =   'ongoing';
@@ -339,33 +317,33 @@ class AssignmentController extends Controller
             //     $assignment->status             =   'pending';
             // }
 
-            $assignment->save(); 
+            $assignment->save();
 
             $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
-            $principal = TeacherProfile::with('user')->where([['school_id',Auth::user()->school_id],['academic_year_id',$academic_year->id],['designation','principal']])->first();
+            $principal = TeacherProfile::with('user')->where([['school_id', Auth::user()->school_id], ['academic_year_id', $academic_year->id], ['designation', 'principal']])->first();
 
             $data = [];
 
-            $data['user']       =   $principal->user;
-            $data['details']    =   trans('notification.teacher_assignment_update_msg');
+            $data['user'] = $principal->user;
+            $data['details'] = trans('notification.teacher_assignment_update_msg');
 
             event(new SingleNotificationEvent($data));
 
-            $array=[];
+            $array = [];
 
-            $array['school_id']  =  Auth::user()->school_id;
-            $array['message']    = 'Assignment Updated';
-            $array['type']       = 'assignment';
-                    
-            event(new SinglePushEvent($array)); 
+            $array['school_id'] = Auth::user()->school_id;
+            $array['message'] = 'Assignment Updated';
+            $array['type'] = 'assignment';
 
-            $message=trans('messages.update_success_msg',['module' => 'Assignment']);
+            event(new SinglePushEvent($array));
 
-            $ip= $this->getRequestIP();
+            $message = trans('messages.update_success_msg', ['module' => 'Assignment']);
+
+            $ip = $this->getRequestIP();
             $this->doActivityLog(
                 $assignment,
                 Auth::user(),
-                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT'] ],
+                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT']],
                 LOGNAME_EDIT_ASSIGNMENT,
                 $message
             );
@@ -374,9 +352,7 @@ class AssignmentController extends Controller
 
             return $res;
 
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
             Log::info($e->getMessage());
         }
     }
@@ -385,59 +361,54 @@ class AssignmentController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy($id)
     {
         //
-        try
-        {
-            $assignment = Assignment::where('id',$id)->first();
-            if(Gate::allows('assignment',$assignment))
-            {
-                $assignment->status     =   'cancel';
+        try {
+            $assignment = Assignment::where('id', $id)->first();
+            if (Gate::allows('assignment', $assignment)) {
+                $assignment->status = 'cancel';
                 $assignment->save();
 
-                $assignment->delete();                
+                $assignment->delete();
 
                 $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
-                $principal = TeacherProfile::with('user')->where([['school_id',Auth::user()->school_id],['academic_year_id',$academic_year->id],['designation','principal']])->first();
+                $principal = TeacherProfile::with('user')->where([['school_id', Auth::user()->school_id], ['academic_year_id', $academic_year->id], ['designation', 'principal']])->first();
 
                 $data = [];
 
-                $data['user']       =   $principal->user;
-                $data['details']    =   trans('notification.teacher_assignment_delete_msg');
+                $data['user'] = $principal->user;
+                $data['details'] = trans('notification.teacher_assignment_delete_msg');
 
                 event(new SingleNotificationEvent($data));
 
-                $array=[];
+                $array = [];
 
-                $array['school_id']  =  Auth::user()->school_id;
-                $array['message']    = 'Assignment Deleted';
-                $array['type']       = 'assignment';
-                        
-                event(new SinglePushEvent($array)); 
- 
-                $message=trans('messages.delete_success_msg',['module' => 'Assignment']);
+                $array['school_id'] = Auth::user()->school_id;
+                $array['message'] = 'Assignment Deleted';
+                $array['type'] = 'assignment';
 
-                $ip= $this->getRequestIP();
+                event(new SinglePushEvent($array));
+
+                $message = trans('messages.delete_success_msg', ['module' => 'Assignment']);
+
+                $ip = $this->getRequestIP();
                 $this->doActivityLog(
                     $assignment,
                     Auth::user(),
-                    ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT'] ],
+                    ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT']],
                     LOGNAME_DELETE_ASSIGNMENT,
                     $message
                 );
                 $res['success'] = $message;
+
                 return $res;
-            }
-            else
-            {
+            } else {
                 abort(403);
             }
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
             Log::info($e->getMessage());
         }
     }

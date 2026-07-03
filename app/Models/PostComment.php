@@ -1,12 +1,16 @@
 <?php
+
 // SPDX-License-Identifier: MIT
 // (c) 2025 GegoSoft Technologies and GegoK12 Contributors
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Model;
 use App\Traits\Common;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class PostComment
@@ -27,17 +31,18 @@ use App\Traits\Common;
  * @property string $postCommentDetails
  * @property int $commentLikeCount
  * @property int $commentUnlikeCount
- * @property-read \App\Models\User $user
- * @property-read \App\Models\Post $post
- * @property-read \App\Models\PostComment $postComment
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\PostCommentDetail[] $postCommentDetail
+ * @property-read User $user
+ * @property-read Post $post
+ * @property-read PostComment $postComment
+ * @property-read Collection|PostCommentDetail[] $postCommentDetail
+ *
  * @mixin \Eloquent
  */
 class PostComment extends Model
 {
+    use Common;
     //
     use SoftDeletes;
-    use Common;
 
     /**
      * The table associated with the model.
@@ -46,14 +51,13 @@ class PostComment extends Model
      */
     protected $table = 'post_comments';
 
-
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'user_id' , 'entity_id' , 'entity_name' , 'comments' , 'attachment_file' , 'status'
+        'user_id', 'entity_id', 'entity_name', 'comments', 'attachment_file', 'status',
     ];
 
     /**
@@ -66,41 +70,41 @@ class PostComment extends Model
     /**
      * Get the user who made this comment.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function user()
     {
-    	return $this->belongsTo('\App\Models\User','user_id');
+        return $this->belongsTo('\App\Models\User', 'user_id');
     }
 
     /**
      * Get the post this comment belongs to.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function post()
     {
-        return $this->belongsTo('\App\Models\Post','entity_id');
+        return $this->belongsTo('\App\Models\Post', 'entity_id');
     }
 
     /**
      * Get the parent comment if this is a reply.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function postComment()
     {
-        return $this->belongsTo('\App\Models\PostComment','entity_id');
+        return $this->belongsTo('\App\Models\PostComment', 'entity_id');
     }
 
     /**
      * Get the details of this comment (likes/unlikes).
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function postCommentDetail()
     {
-        return $this->hasMany('\App\Models\PostCommentDetail','post_comment_id','id');
+        return $this->hasMany('\App\Models\PostCommentDetail', 'post_comment_id', 'id');
     }
 
     /**
@@ -122,13 +126,12 @@ class PostComment extends Model
     {
         $i = 0;
         $array = [];
-        foreach ($this->postCommentDetail as $postCommentDetail)
-        {
-            $array[$i]['detail_id']         = $postCommentDetail->id;
-            $array[$i]['user_id']           = $postCommentDetail->user_id;
-            $array[$i]['user_name']         = $postCommentDetail->user->name;
-            $array[$i]['user_fullname']     = ucwords($postCommentDetail->user->FullName);
-            $array[$i]['user_avatar']       = $postCommentDetail->user->userprofile->AvatarPath;
+        foreach ($this->postCommentDetail as $postCommentDetail) {
+            $array[$i]['detail_id'] = $postCommentDetail->id;
+            $array[$i]['user_id'] = $postCommentDetail->user_id;
+            $array[$i]['user_name'] = $postCommentDetail->user->name;
+            $array[$i]['user_fullname'] = ucwords($postCommentDetail->user->FullName);
+            $array[$i]['user_avatar'] = $postCommentDetail->user->userprofile->AvatarPath;
             $i++;
         }
 
@@ -142,10 +145,10 @@ class PostComment extends Model
      */
     public function getCommentLikeCountAttribute()
     {
-        if($this->postCommentDetail != null)
-        {
-            return $this->postCommentDetail->where('like',1)->count();
+        if ($this->postCommentDetail != null) {
+            return $this->postCommentDetail->where('like', 1)->count();
         }
+
         return 0;
     }
 
@@ -156,10 +159,10 @@ class PostComment extends Model
      */
     public function getCommentUnlikeCountAttribute()
     {
-        if($this->postCommentDetail != null)
-        {
-            return $this->postCommentDetail->where('unlike',1)->count();
+        if ($this->postCommentDetail != null) {
+            return $this->postCommentDetail->where('unlike', 1)->count();
         }
+
         return 0;
     }
 }

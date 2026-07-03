@@ -1,14 +1,19 @@
 <?php
+
 // SPDX-License-Identifier: MIT
 // (c) 2025 GegoSoft Technologies and GegoK12 Contributors
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Helpers\SiteHelper;
 use App\Traits\Common;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Homework
@@ -34,115 +39,116 @@ use App\Traits\Common;
  * @property string $attachment_type
  * @property int $finished_count
  * @property int $pending_count
- * @property-read \App\Models\School $school
- * @property-read \App\Models\AcademicYear $academicYear
- * @property-read \App\Models\StandardLink $standardLink
- * @property-read \App\Models\Subject $subject
- * @property-read \App\Models\User $createdBy
- * @property-read \App\Models\User $teacher
- * @property-read \App\Models\User $updatedBy
- * @property-read \App\Models\StudentHomework $studentHomework
- * @property-read \App\Models\HomeworkApproval $homeworkApproval
- * @property-read \Illuminate\Database\Eloquent\Collection $viewers
+ * @property-read School $school
+ * @property-read AcademicYear $academicYear
+ * @property-read StandardLink $standardLink
+ * @property-read Subject $subject
+ * @property-read User $createdBy
+ * @property-read User $teacher
+ * @property-read User $updatedBy
+ * @property-read StudentHomework $studentHomework
+ * @property-read HomeworkApproval $homeworkApproval
+ * @property-read Collection $viewers
+ *
  * @mixin \Eloquent
  */
 class Homework extends Model
 {
-    use SoftDeletes;
-    use HasFactory;
     use Common;
+    use HasFactory;
+    use SoftDeletes;
 
-    protected $table='homeworks';
+    protected $table = 'homeworks';
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-	protected $fillable = [
-	    'school_id' , 'academic_year_id' , 'standardLink_id' , 'section_id' , 'subject_id' , 'description' , 'attachment' , 'date' , 'created_by' , 'updated_by','teacher_id','status'
-	];
+    protected $fillable = [
+        'school_id', 'academic_year_id', 'standardLink_id', 'section_id', 'subject_id', 'description', 'attachment', 'date', 'created_by', 'updated_by', 'teacher_id', 'status',
+    ];
 
     /**
      * The attributes that should be mutated to dates.
      *
      * @var array
      */
-    //protected $dates = [ 'date' , 'deleted_at'];
+    // protected $dates = [ 'date' , 'deleted_at'];
 
     protected $casts = [
         'date' => 'datetime',
         'deleted_at' => 'datetime',
     ];
 
-	/**
-	 * Get the school associated with the homework.
-	 *
-	 * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-	 */
-	public function school()
+    /**
+     * Get the school associated with the homework.
+     *
+     * @return BelongsTo
+     */
+    public function school()
     {
-        return $this->belongsTo('\App\Models\School','school_id');
+        return $this->belongsTo('\App\Models\School', 'school_id');
     }
 
     /**
      * Get the academic year associated with the homework.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function academicYear()
     {
-        return $this->belongsTo('\App\Models\AcademicYear','academic_year_id');
+        return $this->belongsTo('\App\Models\AcademicYear', 'academic_year_id');
     }
 
     /**
      * Get the standard link associated with the homework.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function standardLink()
     {
-        return $this->belongsTo('\App\Models\StandardLink','standardLink_id');
+        return $this->belongsTo('\App\Models\StandardLink', 'standardLink_id');
     }
 
     /**
      * Get the subject associated with the homework.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function subject()
     {
-        return $this->belongsTo('\App\Models\Subject','subject_id');
+        return $this->belongsTo('\App\Models\Subject', 'subject_id');
     }
 
     /**
      * Get the user who created the homework.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function createdBy()
     {
-        return $this->belongsTo('\App\Models\User','created_by');
+        return $this->belongsTo('\App\Models\User', 'created_by');
     }
 
     /**
      * Get the teacher associated with the homework.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function teacher()
     {
-        return $this->belongsTo('\App\Models\User','teacher_id');
+        return $this->belongsTo('\App\Models\User', 'teacher_id');
     }
 
     /**
      * Get the user who last updated the homework.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function updatedBy()
     {
-        return $this->belongsTo('\App\Models\User','updated_by');
+        return $this->belongsTo('\App\Models\User', 'updated_by');
     }
 
     /**
@@ -158,27 +164,27 @@ class Homework extends Model
     /**
      * Get the student homework associated with this homework.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return HasOne
      */
     public function studentHomework()
     {
-        return $this->hasOne('\App\Models\StudentHomework','homework_id','id');
+        return $this->hasOne('\App\Models\StudentHomework', 'homework_id', 'id');
     }
 
     /**
      * Get the homework approval associated with this homework.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return HasOne
      */
     public function homeworkApproval()
     {
-        return $this->hasOne('\App\Models\HomeworkApproval','homework_id','id');
+        return $this->hasOne('\App\Models\HomeworkApproval', 'homework_id', 'id');
     }
 
     /**
      * Get the student history records for this homework.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     * @return MorphMany
      */
     public function viewers()
     {
@@ -192,9 +198,9 @@ class Homework extends Model
      */
     public function getFinishedCountAttribute()
     {
-        $students       = SiteHelper::getClassStudents($this->school_id,$this->academic_year_id,$this->standardLink_id);
-        $students_id    = $students->pluck('id')->toArray();
-        $finished       = \App\Models\StudentHomework::where('homework_id',$this->id)->whereIn('user_id',$students_id)->count();
+        $students = SiteHelper::getClassStudents($this->school_id, $this->academic_year_id, $this->standardLink_id);
+        $students_id = $students->pluck('id')->toArray();
+        $finished = StudentHomework::where('homework_id', $this->id)->whereIn('user_id', $students_id)->count();
 
         return $finished;
     }
@@ -206,10 +212,10 @@ class Homework extends Model
      */
     public function getPendingCountAttribute()
     {
-        $students       = SiteHelper::getClassStudents($this->school_id,$this->academic_year_id,$this->standardLink_id);
-        $students_id    = $students->pluck('id')->toArray();
-        $finished       = \App\Models\StudentHomework::where('homework_id',$this->id)->whereIn('user_id',$students_id)->count();
-        $pending        = count($students_id) - $finished;
+        $students = SiteHelper::getClassStudents($this->school_id, $this->academic_year_id, $this->standardLink_id);
+        $students_id = $students->pluck('id')->toArray();
+        $finished = StudentHomework::where('homework_id', $this->id)->whereIn('user_id', $students_id)->count();
+        $pending = count($students_id) - $finished;
 
         return $pending;
     }
@@ -221,34 +227,22 @@ class Homework extends Model
      */
     public function getAttachmentTypeAttribute()
     {
-        if($this->attachment != null && $this->attachment !='')
-        {
+        if ($this->attachment != null && $this->attachment != '') {
             $attachment = $this->getFilePath($this->attachment);
-            $extension=pathinfo( $attachment, PATHINFO_EXTENSION);
-            if(in_array($extension,['jpg','jpeg','png']))
-            {
-              $type='image';
+            $extension = pathinfo($attachment, PATHINFO_EXTENSION);
+            if (in_array($extension, ['jpg', 'jpeg', 'png'])) {
+                $type = 'image';
+            } elseif (in_array($extension, ['mp3'])) {
+                $type = 'audio';
+            } elseif (in_array($extension, ['mp4'])) {
+                $type = 'video';
+            } elseif (in_array($extension, ['pdf'])) {
+                $type = 'pdf';
+            } else {
+                $type = '';
             }
-            elseif(in_array($extension,['mp3']))
-            {
-                $type='audio';
-            }
-            elseif(in_array($extension,['mp4']))
-            {
-                $type='video';
-            }
-            elseif(in_array($extension,['pdf']))
-            {
-                $type='pdf';
-            }
-            else
-            {
-                 $type='';
-            }
-        }
-        else
-        {
-            $type='';
+        } else {
+            $type = '';
         }
 
         return $type;

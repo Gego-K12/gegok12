@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\Facades\Event;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Event;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -20,7 +20,7 @@ class EventServiceProvider extends ServiceProvider
         'Illuminate\Auth\Events\Login' => [
             'App\Listeners\LogSuccessfulLogin',
         ],
-        
+
         'App\Events\TestEvent' => [
             'App\Listeners\TestEventListener',
         ],
@@ -40,12 +40,12 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\ReminderEvent' => [
             'App\Listeners\ReminderEventListener',
         ],
-        
-         'App\Events\SendMessageEvent' => [
+
+        'App\Events\SendMessageEvent' => [
             'App\Listeners\SendMessageEventListener',
         ],
 
-         'App\Events\ReminderMailEvent' => [
+        'App\Events\ReminderMailEvent' => [
             'App\Listeners\ReminderMailListener',
         ],
 
@@ -104,11 +104,11 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\Notification\SchoolNotificationEvent' => [
             'App\Listeners\Notification\SchoolNotificationEventListener',
         ],
-        
+
         'App\Events\Notification\TeacherNotificationEvent' => [
             'App\Listeners\Notification\TeacherNotificationEventListener',
         ],
-        
+
         'App\Events\AdmissionApprovalEvent' => [
             'App\Listeners\AdmissionApprovalListener',
         ],
@@ -124,7 +124,7 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\TransportNotificationPushEvent' => [
             'App\Listeners\TransportNotificationPushListener',
         ],
-        
+
         'App\Events\StudentAttendancePushEvent' => [
             'App\Listeners\StudentAttendancePushListener',
         ],

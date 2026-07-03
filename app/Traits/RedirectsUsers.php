@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Provides post-authentication redirect helpers for controllers.
  */

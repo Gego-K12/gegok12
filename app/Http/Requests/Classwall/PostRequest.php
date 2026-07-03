@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests\Classwall;
 
+use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Validator;
-use Carbon\Carbon;
 
 class PostRequest extends FormRequest
 {
@@ -25,14 +25,12 @@ class PostRequest extends FormRequest
      */
     public function rules()
     {
-        Validator::extend('check_description',function ($attribute,$value,$parameters,$validatior)
-        {
+        Validator::extend('check_description', function ($attribute, $value, $parameters, $validatior) {
             return preg_match('/^[A-Za-z0-9_~\-!@#\$%\^&*.,:(\)\s]+$/', $attribute);
         });
 
-
         // Validator::extend('check_posted_at',function($attribute,$value,$parameters,$validator)
-        // { 
+        // {
         //     if ( request('posted_at') > date('d-m-Y H:i:s') )
         //     {
         //         return true;
@@ -40,8 +38,8 @@ class PostRequest extends FormRequest
         //     return false;
         // });
 
-         Validator::extend('check_posted_at', function ($attribute, $value, $parameters, $validator) {
-            if (!$value) {
+        Validator::extend('check_posted_at', function ($attribute, $value, $parameters, $validator) {
+            if (! $value) {
                 return false;
             }
 
@@ -57,18 +55,16 @@ class PostRequest extends FormRequest
 
         $rules = [
             //
-            //'description'   =>  'required|max:500|check_description',
-            'description'   =>  'required',
-            'visibility'    =>  'required',
+            // 'description'   =>  'required|max:500|check_description',
+            'description' => 'required',
+            'visibility' => 'required',
         ];
 
-        if(request('visibility') == 'select_class')
-        {
-            $rules['visible_for']   =   'required';
+        if (request('visibility') == 'select_class') {
+            $rules['visible_for'] = 'required';
         }
 
-        if(request('post_later') == 'true')
-        {
+        if (request('post_later') == 'true') {
             $rules['posted_at'] = 'check_posted_at';
         }
 
@@ -79,15 +75,15 @@ class PostRequest extends FormRequest
     {
         $messages = [
             //
-            'description.required'          =>  'Description is required',
-            'description.max'               =>  'Description cannot be more than 500 characters',
-            'description.check_description' =>  'Enter Valid Description',
+            'description.required' => 'Description is required',
+            'description.max' => 'Description cannot be more than 500 characters',
+            'description.check_description' => 'Enter Valid Description',
 
-            'visibility.required'           =>  'Visibility is required',
+            'visibility.required' => 'Visibility is required',
 
-            'visible_for.required'          =>  'Select Class is required',
+            'visible_for.required' => 'Select Class is required',
 
-            'posted_at.check_posted_at'     =>  'Enter Future Date Time',
+            'posted_at.check_posted_at' => 'Enter Future Date Time',
         ];
 
         return $messages;

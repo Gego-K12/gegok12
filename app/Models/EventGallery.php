@@ -1,11 +1,13 @@
 <?php
+
 // SPDX-License-Identifier: MIT
 // (c) 2025 GegoSoft Technologies and GegoK12 Contributors
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Traits\Common;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Class EventGallery
@@ -21,15 +23,17 @@ use App\Traits\Common;
  * @property \DateTime $created_at
  * @property \DateTime $updated_at
  * @property string $full_path
- * @property-read \App\Models\Events $event
+ * @property-read Events $event
+ *
  * @mixin \Eloquent
  */
 class EventGallery extends Model
 {
-	use Common;
-    protected $table='event_galleries';
+    use Common;
 
-     protected $fillable=['school_id','event_id','path','created_by','updated_by'];
+    protected $table = 'event_galleries';
+
+    protected $fillable = ['school_id', 'event_id', 'path', 'created_by', 'updated_by'];
 
     /**
      * Get the full path for this gallery image.
@@ -38,18 +42,16 @@ class EventGallery extends Model
      */
     public function getFullPathAttribute()
     {
-    	return $this->getFilePath($this->path);
+        return $this->getFilePath($this->path);
     }
 
     /**
      * Get the event for this gallery image.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function event()
     {
-        return $this->belongsTo('App\Models\Events','event_id');
+        return $this->belongsTo('App\Models\Events', 'event_id');
     }
-
-
 }

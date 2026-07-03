@@ -2,26 +2,25 @@
 
 namespace App\Http\Resources;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Auth;
-use App\Models\Userprofile;
 
 class Birthday extends JsonResource
 {
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return array
      */
     public function toArray($request)
     {
-        return 
+        return
         [
-          'age'        => $this->present()->getAge($this['date_of_birth']),
-          'name'       => $this->user->name,
-          'avatar'     => $this->AvatarPath,
-          'firstname'  => $this->user->FullName,
-       ];
+            'age' => $this->present()->getAge($this['date_of_birth']),
+            'name' => $this->user->name,
+            'avatar' => $this->AvatarPath,
+            'firstname' => $this->user->FullName,
+        ];
     }
 }

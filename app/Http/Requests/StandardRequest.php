@@ -2,10 +2,10 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Standard;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class StandardRequest extends FormRequest
 {
@@ -25,40 +25,36 @@ class StandardRequest extends FormRequest
      * @return array
      */
     public function rules()
-    { 
-        Validator::extend('check_unique_standard',function($attribute,$value,$parameters,$validator)
-        {
-            $standard = Standard::where([['school_id',Auth::user()->school_id],['name','=',request('standard')]])->exists();
-            if($standard)
-            {
+    {
+        Validator::extend('check_unique_standard', function ($attribute, $value, $parameters, $validator) {
+            $standard = Standard::where([['school_id', Auth::user()->school_id], ['name', '=', request('standard')]])->exists();
+            if ($standard) {
                 return false;
             }
+
             return true;
         });
 
-        Validator::extend('check_standard',function($attribute,$value,$parameters,$validator)
-        {
-            return preg_match('/^[A-Za-z0-9_~\-!@#\$%\^&*.,:(\)\s]+$/', request('standard')) ;
+        Validator::extend('check_standard', function ($attribute, $value, $parameters, $validator) {
+            return preg_match('/^[A-Za-z0-9_~\-!@#\$%\^&*.,:(\)\s]+$/', request('standard'));
         });
 
-        Validator::extend('check_standard_value',function($attribute,$value,$parameters,$validator)
-        { 
-            if( ( request('standard') < 13 ) || ( strtolower(request('standard')) == 'prekg' )  || ( strtolower(request('standard')) == 'lkg' )  || ( strtolower(request('standard')) == 'ukg' ) )
-            {
+        Validator::extend('check_standard_value', function ($attribute, $value, $parameters, $validator) {
+            if ((request('standard') < 13) || (strtolower(request('standard')) == 'prekg') || (strtolower(request('standard')) == 'lkg') || (strtolower(request('standard')) == 'ukg')) {
                 return true;
             }
+
             return false;
         });
 
         $rules = [
-            //       
-            'standard'  =>  'required|check_standard|check_standard_value|check_unique_standard',
+            //
+            'standard' => 'required|check_standard|check_standard_value|check_unique_standard',
         ];
 
-        if(count(request('standardlist')) > 0)
-        {
-            $rules['position']          = 'required';
-            $rules['ref_standard_id']   = 'required';
+        if (count(request('standardlist')) > 0) {
+            $rules['position'] = 'required';
+            $rules['ref_standard_id'] = 'required';
         }
 
         return $rules;
@@ -66,15 +62,15 @@ class StandardRequest extends FormRequest
 
     public function messages()
     {
-        return[
-            'standard.required'                 =>  'Standard Name Is Required',
-            'standard.check_standard'           =>  'Enter A Valid Standard Name',
-            'standard.check_standard_value'     =>  'Enter A Valid Standard Name',
-            'standard.check_unique_standard'    =>  'Standard Name Already Exists',
+        return [
+            'standard.required' => 'Standard Name Is Required',
+            'standard.check_standard' => 'Enter A Valid Standard Name',
+            'standard.check_standard_value' => 'Enter A Valid Standard Name',
+            'standard.check_unique_standard' => 'Standard Name Already Exists',
 
-            'position.required'                 =>  'Position Is Required',
+            'position.required' => 'Position Is Required',
 
-            'ref_standard_id.required'          =>  'Standard Is Required',
+            'ref_standard_id.required' => 'Standard Is Required',
         ];
     }
 }

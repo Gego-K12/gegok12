@@ -2,14 +2,14 @@
 
 namespace App\Console\Commands\Test;
 
-use Illuminate\Console\Command;
 use App\Traits\MSG91;
 use Exception;
+use Illuminate\Console\Command;
 
 class CheckSmsTest extends Command
 {
     use MSG91;
-  
+
     /**
      * The name and signature of the console command.
      *
@@ -29,8 +29,6 @@ class CheckSmsTest extends Command
      *
      * @return void
      */
-  
-    
     public function __construct()
     {
         parent::__construct();
@@ -43,21 +41,17 @@ class CheckSmsTest extends Command
      */
     public function handle()
     {
-        try
-        {
-            $mobileno = $this->ask('Enter mobile number)');  
-            $mobileno = $mobileno;            
+        try {
+            $mobileno = $this->ask('Enter mobile number)');
+            $mobileno = $mobileno;
 
-                    if(env('SMS_STATUS') == 'on')
-                    {
- 
-                       $msg=$this->sendSMS('hii',$mobileno);
-                       $this->info(is_scalar($msg) ? $msg : json_encode($msg));
-                    }
+            if (env('SMS_STATUS') == 'on') {
 
-        }
-        catch(Exception $e)
-        {
+                $msg = $this->sendSMS('hii', $mobileno);
+                $this->info(is_scalar($msg) ? $msg : json_encode($msg));
+            }
+
+        } catch (Exception $e) {
             $this->error($e->getMessage());
         }
     }

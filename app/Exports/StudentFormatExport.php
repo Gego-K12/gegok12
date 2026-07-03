@@ -7,7 +7,7 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class StudentFormatExport implements FromArray, WithStyles, ShouldAutoSize
+class StudentFormatExport implements FromArray, ShouldAutoSize, WithStyles
 {
     protected $classes;
 
@@ -70,7 +70,7 @@ class StudentFormatExport implements FromArray, WithStyles, ShouldAutoSize
                 'parent_organization_name',
                 'parent_official_address',
                 'parent_annual_income',
-                'relation'
+                'relation',
             ],
 
             // Example row
@@ -123,8 +123,8 @@ class StudentFormatExport implements FromArray, WithStyles, ShouldAutoSize
                 'enter if not home_maker',
                 'enter if not home_maker',
                 'enter if not home_maker',
-                '(father,mother,guardian)'
-            ]
+                '(father,mother,guardian)',
+            ],
 
         ];
     }
@@ -133,20 +133,20 @@ class StudentFormatExport implements FromArray, WithStyles, ShouldAutoSize
     {
         // Header row bold
         $sheet->getStyle('A1:AW1')
-              ->getFont()
-              ->setBold(true);
+            ->getFont()
+            ->setBold(true);
 
         // Freeze header
         $sheet->freezePane('A2');
 
         // Header row height
         $sheet->getRowDimension(1)
-              ->setRowHeight(25);
+            ->setRowHeight(25);
 
         // Wrap long text
         $sheet->getStyle('A1:AW2')
-              ->getAlignment()
-              ->setWrapText(true);
+            ->getAlignment()
+            ->setWrapText(true);
 
         return [];
     }

@@ -2,12 +2,15 @@
 
 namespace App\Livewire\Admin\Setting;
 
-use Livewire\Component;
+use App\Models\City;
 use App\Models\Country;
 use App\Models\State;
-use Livewire\Attributes\Rule;
-use App\Models\City;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Collection;
+use Illuminate\View\View;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
+use Livewire\Attributes\Rule;
+use Livewire\Component;
 
 /**
  * Class CityForm
@@ -21,8 +24,6 @@ use Jantinnerezo\LivewireAlert\LivewireAlert;
  * - Country & state selection
  * - Form validation
  * - Success alerts
- *
- * @package App\Livewire\Admin\Setting
  */
 class CityForm extends Component
 {
@@ -70,7 +71,7 @@ class CityForm extends Component
     /**
      * List of states filtered by selected country.
      *
-     * @var \Illuminate\Support\Collection|array|null
+     * @var Collection|array|null
      */
     public $statelist;
 
@@ -80,7 +81,7 @@ class CityForm extends Component
      * Loads city details for edit mode
      * and initializes state list if country is available.
      *
-     * @param int|string|null $id City ID
+     * @param  int|string|null  $id  City ID
      * @return void
      */
     public function mount($id)
@@ -90,9 +91,9 @@ class CityForm extends Component
         if ($this->cityEditId != '') {
             $city = City::where('id', $this->cityEditId)->first();
             $this->country = $city->country_id;
-            $this->state   = $city->state_id;
-            $this->name    = $city->name;
-            $this->status  = $city->status;
+            $this->state = $city->state_id;
+            $this->name = $city->name;
+            $this->status = $city->status;
         }
 
         if ($city->country_id != '') {
@@ -120,7 +121,7 @@ class CityForm extends Component
      * Displays success alerts and redirects
      * back to the cities listing page.
      *
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function submitCity()
     {
@@ -128,9 +129,9 @@ class CityForm extends Component
 
         $data = [
             'country_id' => $this->country,
-            'state_id'   => $this->state,
-            'name'       => $this->name,
-            'status'     => $this->status,
+            'state_id' => $this->state,
+            'name' => $this->name,
+            'status' => $this->status,
         ];
 
         if ($this->cityEditId == '') {
@@ -150,7 +151,7 @@ class CityForm extends Component
      * Loads country list and state list
      * for the city form.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function render()
     {
@@ -158,7 +159,7 @@ class CityForm extends Component
 
         return view('livewire.admin.setting.city-form', [
             'countries' => $countries,
-            'states'    => $this->statelist,
+            'states' => $this->statelist,
         ]);
     }
 }

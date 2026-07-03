@@ -1,11 +1,16 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
  */
+
 namespace App\Models\Users;
 
+use App\Models\BookLending;
+use App\Models\LibraryCard;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 
 /**
  * Class LibrarianUser
@@ -13,8 +18,9 @@ use App\Models\User;
  * Specialized User model for librarian-specific functionality.
  * Extends the base User model with library management features.
  *
- * @property-read \App\Models\LibraryCard $librarycard
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\BookLending[] $lending
+ * @property-read LibraryCard $librarycard
+ * @property-read Collection|BookLending[] $lending
+ *
  * @mixin \Eloquent
  */
 class LibrarianUser extends User
@@ -22,7 +28,7 @@ class LibrarianUser extends User
     /**
      * Get book lending records managed by this librarian.
      *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return Collection
      */
     public function getLibraryCirculation()
     {
@@ -32,7 +38,7 @@ class LibrarianUser extends User
     /**
      * Get all active book borrowings (not returned).
      *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return Collection
      */
     public function getActiveLending()
     {
@@ -44,7 +50,7 @@ class LibrarianUser extends User
     /**
      * Get overdue book borrowings.
      *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return Collection
      */
     public function getOverdueBooks()
     {
@@ -57,10 +63,10 @@ class LibrarianUser extends User
     /**
      * Get library card holders by school.
      *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return Collection
      */
     public function getLibraryMembers()
     {
-        return \App\Models\LibraryCard::where('school_id', $this->school_id)->get();
+        return LibraryCard::where('school_id', $this->school_id)->get();
     }
 }

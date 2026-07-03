@@ -1,15 +1,16 @@
 <?php
+
 // SPDX-License-Identifier: MIT
 // (c) 2025 GegoSoft Technologies and GegoK12 Contributors
 
 namespace App\Models;
 
-use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
+use App\Traits\Common;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia\HasMedia;
-use Illuminate\Database\Eloquent\Model;
-use Spatie\MediaLibrary\Models\Media;
-use App\Traits\Common;
+use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
 
 /**
  * Class ClassRoomPageAttachment
@@ -24,17 +25,17 @@ use App\Traits\Common;
  * @property \DateTime $updated_at
  * @property \DateTime $deleted_at
  * @property string $attachment_path
- * @property-read \App\Models\ClassRoomPage $classRoomPage
+ * @property-read ClassRoomPage $classRoomPage
+ *
  * @mixin \Eloquent
  */
 class ClassRoomPageAttachment extends Model implements HasMedia
 {
+    use Common;
     use HasMediaTrait;
     use SoftDeletes;
-    use Common;
 
     protected $table = 'class_room_page_attachments';
-
 
     /**
      * The attributes that are mass assignable.
@@ -42,7 +43,7 @@ class ClassRoomPageAttachment extends Model implements HasMedia
      * @var array
      */
     protected $fillable = [
-        'page_id' , 'attachment_file' , 'status'
+        'page_id', 'attachment_file', 'status',
     ];
 
     /**
@@ -55,11 +56,11 @@ class ClassRoomPageAttachment extends Model implements HasMedia
     /**
      * Get the classroom page for this attachment.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function classRoomPage()
     {
-    	return $this->belongsTo('\App\Models\ClassRoomPage','page_id');
+        return $this->belongsTo('\App\Models\ClassRoomPage', 'page_id');
     }
 
     /**

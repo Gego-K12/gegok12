@@ -14,14 +14,14 @@ class UserPhoneResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-    
+
         return [
             'id' => $this->id,
-            'school_id'   => $this->school_id,
+            'school_id' => $this->school_id,
             'name' => $this->FullName,
             'designation' => $this->usergroup->name,
             'phone_number' => $this->mobile_no,
-            'type'   => 'user',
+            'type' => 'user',
         ];
     }
 }

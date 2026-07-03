@@ -1,16 +1,17 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
  */
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StudentTagRequest;
-use Illuminate\Http\Request;
-use App\Models\StudentAcademic;
-use App\Models\Users\StudentUser;
 use App\Models\SpatieTag;
+use App\Models\Users\StudentUser;
+use Illuminate\Http\Request;
 
 class StudentTagController extends Controller
 {
@@ -49,6 +50,7 @@ class StudentTagController extends Controller
             'message' => 'Student tags updated successfully',
         ]);
     }
+
     public function addStudents(StudentTagRequest $request)
     {
 
@@ -61,14 +63,13 @@ class StudentTagController extends Controller
 
             $student = StudentUser::find($studentId);
 
-            if ($student && !$student->tags()->where('tags.id', $tag->id)->exists()) {
+            if ($student && ! $student->tags()->where('tags.id', $tag->id)->exists()) {
                 $student->attachTag($tag);
             }
         }
 
         return response()->json([
-            'message' => 'Tag assigned successfully'
+            'message' => 'Tag assigned successfully',
         ]);
     }
-
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\API\Teacher;
 
+use App\Http\Resources\API\ShowEventGallery as ShowEventGalleryResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -31,7 +32,7 @@ class ShowEvent extends JsonResource
             'photos' => $this->getphotocount($this->id, $this->school_id),
             'start_date' => date('d-m-Y H:i:s', strtotime($this->start_date)),
             'end_date' => date('d-m-Y H:i:s', strtotime($this->end_date)),
-            'eventgallery' => ShowEventGallery::collection($this->eventgallery),
+            'eventgallery' => ShowEventGalleryResource::collection($this->eventgallery),
         ];
     }
 }

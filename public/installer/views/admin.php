@@ -110,6 +110,18 @@ $baseUrl = str_replace('/installer', '', $baseUrl);
             </div>
         </div>
 
+        <div class="bg-gray-50 border border-gray-200 rounded-xl p-4">
+            <label class="flex items-start cursor-pointer">
+                <input type="checkbox" id="share_usage_data" name="share_usage_data" value="1"
+                    class="mt-1 h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500">
+                <span class="ml-3 text-sm text-gray-700">
+                    <span class="font-medium text-gray-800">Help improve Gego K12</span> — share anonymous
+                    installation data (your domain, app version, PHP version). No school data, admin email,
+                    or personal information is ever sent. Unchecked by default; you can leave this off.
+                </span>
+            </label>
+        </div>
+
         <div class="flex justify-between">
             <a href="?step=3" class="inline-flex items-center px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

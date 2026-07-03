@@ -4,6 +4,11 @@
  * Installation Helper Functions
  */
 
+// Bump this with each tagged release; used only for the optional telemetry ping.
+define('GEGOK12_VERSION', '1.1.1');
+
+define('GEGOK12_TELEMETRY_ENDPOINT', 'https://gegok12-telemetry.gegosoft.workers.dev/ping');
+
 /**
  * Check system requirements
  */
@@ -232,6 +237,7 @@ function saveAdminConfig($data)
         'timezone' => isset($data['timezone']) ? $data['timezone'] : 'UTC',
         'admin_email' => $email,
         'admin_password' => $password,
+        'share_usage_data' => ! empty($data['share_usage_data']),
     ];
 
     return ['success' => true, 'message' => 'Application configuration saved'];
@@ -489,6 +495,69 @@ function createStorageDirectories()
 }
 
 /**
+ * Get (or create) a random identifier for this installation.
+ * Persisted to disk so repeated pings (or a retried finalize step)
+ * update the same row instead of creating a new one.
+ */
+function getTelemetryUuid()
+{
+    $path = BASE_PATH.'/storage/telemetry_uuid';
+
+    if (file_exists($path)) {
+        $uuid = trim(file_get_contents($path));
+        if ($uuid !== '') {
+            return $uuid;
+        }
+    }
+
+    $data = random_bytes(16);
+    $data[6] = chr(ord($data[6]) & 0x0f | 0x40);
+    $data[8] = chr(ord($data[8]) & 0x3f | 0x80);
+    $uuid = vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+
+    file_put_contents($path, $uuid);
+
+    return $uuid;
+}
+
+/**
+ * Send an anonymous, opt-in install ping (domain + version info only).
+ * Never throws and never blocks installation on failure.
+ */
+function sendTelemetryPing()
+{
+    if (empty($_SESSION['admin_config']['share_usage_data'])) {
+        return;
+    }
+
+    try {
+        $domain = parse_url($_SESSION['admin_config']['app_url'] ?? '', PHP_URL_HOST) ?: ($_SERVER['HTTP_HOST'] ?? 'unknown');
+
+        $payload = json_encode([
+            'uuid' => getTelemetryUuid(),
+            'domain' => $domain,
+            'app_version' => GEGOK12_VERSION,
+            'php_version' => PHP_VERSION,
+            'laravel_version' => '12',
+        ]);
+
+        $ch = curl_init(GEGOK12_TELEMETRY_ENDPOINT);
+        curl_setopt_array($ch, [
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => $payload,
+            CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CONNECTTIMEOUT => 2,
+            CURLOPT_TIMEOUT => 3,
+        ]);
+        curl_exec($ch);
+        curl_close($ch);
+    } catch (Exception $e) {
+        // Telemetry is best-effort only; installation must never fail because of it.
+    }
+}
+
+/**
  * Get common timezones
  */
 function getTimezones()
@@ -684,6 +753,7 @@ function runInstallationStep($step)
             // Create installed marker
             file_put_contents(BASE_PATH.'/storage/installed', date('Y-m-d H:i:s'));
             $_SESSION['installer_finalized'] = true;
+            sendTelemetryPing();
             $result = ['success' => true, 'message' => 'Installation finalized', 'output' => ''];
             break;
 

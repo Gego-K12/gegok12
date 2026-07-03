@@ -7,16 +7,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Events\CalendarEvent;
-use App\Events\Notification\ClassNotificationEvent;
-use App\Events\Notification\SchoolNotificationEvent;
-use App\Events\PushEvent;
-use App\Events\StandardPushEvent;
 use App\Helpers\SiteHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\EventRequest;
 use App\Http\Requests\EventUpdateRequest;
-use App\Http\Resources\EditEvent as EditEventResource;
 use App\Http\Resources\ShowEvent as ShowEventResource;
 use App\Http\Resources\ShowEventGallery as ShowEventGalleryResource;
 use App\Models\EventGallery;
@@ -26,7 +20,8 @@ use App\Models\ExamSchedule;
 use App\Models\SchoolDetail;
 use App\Models\Subject;
 use App\Models\Subscription;
-use App\Models\User;
+use App\Services\EventReaderService;
+use App\Services\EventWriterService;
 use App\Traits\Common;
 use App\Traits\EventProcess;
 use App\Traits\LogActivity;
@@ -55,6 +50,11 @@ class EventsController extends Controller
     use LogActivity;
     use ReminderProcess;
     use SendPushNotification;
+
+    public function __construct(
+        protected EventReaderService $eventReader,
+        protected EventWriterService $eventWriter
+    ) {}
 
     /**
      * Display the event calendar page.
@@ -131,117 +131,13 @@ class EventsController extends Controller
      *
      * @return array|null
      */
-    public function store(EventRequest $request)// Event
+    public function store(EventRequest $request)
     {
         try {
             $school_id = Auth::user()->school_id;
             $academic_year = SiteHelper::getAcademicYear($school_id);
 
-            $events = new Events;
-
-            $events->school_id = $school_id;
-            $events->academic_year_id = $academic_year->id;
-
-            // $path = $this->imagePath($category,$image);
-            /* $file = $request->file('image');
-            if($file)
-            {
-                $name = $file->getClientOriginalName();
-                $path = $this->uploadFile(Auth::user()->school->slug.'/uploads/admin/event/image',$file,'public');
-            }
-            else
-            {
-                $path = '';
-            }*/
-
-            $events->select_type = $request->select_type;
-            $events->title = $request->title;
-            $events->description = $request->description;
-            $events->repeats = $request->repeats;
-            if ($request->select_type == 'class') {
-                $events->standard_id = $request->standard_id;
-            }
-
-            if ($request->select_type == 'alumni') {
-                $events->batch = $request->batch;
-            }
-            $events->freq = $request->freq;
-            // if( $request->freq_term!='')
-            // $events->freq_term    = $request->freq_term;
-            $events->location = $request->location;
-            $events->category = $request->category;
-            $events->organised_by = $request->organised_by;
-            // $events->image        = $path;
-            $events->start_date = date('Y-m-d H:i:s', strtotime($request->start_date));
-            $events->end_date = date('Y-m-d H:i:s', strtotime($request->end_date));
-
-            if ($events->select_type == 'class') {
-                $events->color = 'blue';
-            } else {
-                $events->color = 'green';
-            }
-
-            $events->save();
-
-            $executed_at = date('Y-m-d', strtotime('-2 days', strtotime($events->start_date)));
-
-            /*  $this->sendToReminderEvent($events,$executed_at,'first');
-            if(env('MAIL_STATUS') == 'on')
-            {
-                event(new CalendarEvent($events));
-            }*/
-
-            // if($request->select_type=='class')
-            // {
-            //     $data=[];
-
-            //     $data['school_id']=Auth::user()->school_id;
-            //     $data['standard_id']=$request->standard_id;
-            //     $data['message']='New Event created';
-            //     $data['type']='event';
-
-            //     event(new StandardPushEvent($data));
-
-            //     $array = [];
-
-            //     $array['school_id']         = Auth::user()->school_id;
-            //     $array['standardLink_id']   = $request->standard_id;
-            //     $array['details']           = trans('notification.event_add_success_msg');
-
-            //     event(new ClassNotificationEvent($array));
-            // }
-            // else
-            // {
-            //     $data=[];
-
-            //     $data['school_id']=Auth::user()->school_id;
-            //     $data['message']='New Event created';
-            //     $data['type']='event';
-
-            //     event(new PushEvent($data));
-
-            //     $array = [];
-
-            //     $array['school_id'] = Auth::user()->school_id;
-            //     $array['details'] = trans('notification.event_add_success_msg');
-
-            //     event(new SchoolNotificationEvent($array));
-            // }
-
-            $message = trans('messages.add_success_msg', ['module' => 'Event']);
-
-            $ip = $this->getRequestIP();
-            $this->doActivityLog(
-                $events,
-                Auth::user(),
-                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT']],
-                LOGNAME_ADD_EVENT,
-                $message
-            );
-
-            $res['success'] = $message;
-
-            return $res;
+            return $this->eventWriter->store($request, $school_id, $academic_year->id);
         } catch (Exception $e) {
             Log::info($e->getMessage());
         }
@@ -255,10 +151,7 @@ class EventsController extends Controller
      */
     public function edit($id)
     {
-        $event = Events::where([['id', $id], ['category', '!=', 'holidays']])->get();
-        $event = EditEventResource::collection($event);
-
-        return $event;
+        return $this->eventReader->findForEdit($id, Auth::user()->school_id);
     }
 
     public function validateedit(EventUpdateRequest $request)
@@ -274,96 +167,14 @@ class EventsController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $school_id = Auth::user()->school_id;
+
+        if (! $this->eventReader->find($id, $school_id)) {
+            abort(404);
+        }
+
         try {
-            $events = Events::where('id', $id)->first();
-
-            /*if(Input::hasFile('image'))
-            {
-                $file = $request->file('image');
-                //$name = $file->getClientOriginalName();
-                $path = $this->uploadFile(Auth::user()->school->slug.'/uploads/admin/event/image',$file);
-                $events->image = $path;
-            }
-            else
-            {
-                $events->image = $events->image;
-            }*/
-
-            $events->title = $request->title;
-            $events->description = $request->description;
-            $events->repeats = $request->repeats;
-            if ($request->select_type == 'class') {
-                $events->standard_id = $request->standard_id;
-            }
-
-            if ($request->select_type == 'alumni') {
-                $events->batch = $request->batch;
-            }
-
-            $events->freq = $request->freq;
-            $events->freq_term = $request->freq_term;
-            $events->location = $request->location;
-            $events->category = $request->category;
-            $events->organised_by = $request->organised_by;
-            $events->start_date = date('Y-m-d H:i:s', strtotime($request->start_date));
-            $events->end_date = date('Y-m-d H:i:s', strtotime($request->end_date));
-
-            if ($events->select_type == 'class') {
-                $events->color = 'blue';
-            } else {
-                $events->color = 'green';
-            }
-
-            $events->save();
-
-            if ($request->select_type == 'class') {
-                $data = [];
-
-                $data['school_id'] = Auth::user()->school_id;
-                $data['standard_id'] = $request->standard_id;
-                $data['message'] = 'Event updated';
-                $data['type'] = 'event';
-
-                event(new StandardPushEvent($data));
-
-                $array = [];
-
-                $array['school_id'] = Auth::user()->school_id;
-                $array['standardLink_id'] = $request->standard_id;
-                $array['details'] = trans('notification.event_update_success_msg');
-
-                event(new ClassNotificationEvent($array));
-            } else {
-                $data = [];
-
-                $data['school_id'] = Auth::user()->school_id;
-                $data['message'] = 'Event updated';
-                $data['type'] = 'event';
-
-                event(new PushEvent($data));
-
-                $array = [];
-
-                $array['school_id'] = Auth::user()->school_id;
-                $array['details'] = trans('notification.event_update_success_msg');
-
-                event(new SchoolNotificationEvent($array));
-            }
-
-            $message = trans('messages.update_success_msg', ['module' => 'Event']);
-
-            $ip = $this->getRequestIP();
-            $this->doActivityLog(
-                $events,
-                Auth::user(),
-                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT']],
-                LOGNAME_EDIT_EVENT,
-                $message
-            );
-
-            $res['success'] = $message;
-
-            return $res;
+            return $this->eventWriter->update($request, $id, $school_id);
         } catch (Exception $e) {
             Log::info($e->getMessage());
         }
@@ -377,50 +188,13 @@ class EventsController extends Controller
      */
     public function eventapprove($id)
     {
+        $event = $this->eventWriter->approve($id, Auth::user()->school_id);
 
-        $event = Events::findOrFail($id);
-
-        $event->status = 'active';
-
-        if ($event->save()) {
-            if ($event->select_type == 'class') {
-                $data = [];
-
-                $data['school_id'] = $event->school_id;
-                $data['standard_id'] = $event->standard_id;
-                $data['message'] = 'New Event created';
-                $data['type'] = 'event';
-
-                event(new StandardPushEvent($data));
-
-                $array = [];
-
-                $array['school_id'] = $event->school_id;
-                $array['standardLink_id'] = $event->standard_id;
-                $array['details'] = trans('notification.event_add_success_msg');
-
-                event(new ClassNotificationEvent($array));
-            } else {
-                $data = [];
-
-                $data['school_id'] = $event->school_id;
-                $data['message'] = 'New Event created';
-                $data['type'] = 'event';
-
-                event(new PushEvent($data));
-
-                $array = [];
-
-                $array['school_id'] = $event->school_id;
-                $array['details'] = trans('notification.event_add_success_msg');
-
-                event(new SchoolNotificationEvent($array));
-            }
-
-            return redirect('/admin/dashboard')->with('successmessage', 'Event has been approved successfully');
-
+        if (! $event) {
+            abort(404);
         }
 
+        return redirect('/admin/dashboard')->with('successmessage', 'Event has been approved successfully');
     }
 
     /**
@@ -431,18 +205,12 @@ class EventsController extends Controller
      */
     public function changeevent(Request $request, $id)
     {
-        $event = Events::findOrFail($id);
+        $event = $this->eventWriter->reschedule($request, $id, Auth::user()->school_id);
 
-        if ($request->end_date == 'undefined') {
-            $request['end_date'] = date('Y-m-d H:i:s', strtotime($request->start_date));
+        if (! $event) {
+            abort(404);
         }
 
-        if ($request->start_date == $request->end_date) {
-            $request['allDay'] = 1;
-        }
-
-        $event->fill($request->all());
-        $event->save();
         echo json_encode(['status' => 'Event has been update']);
     }
 
@@ -454,23 +222,16 @@ class EventsController extends Controller
      */
     public function destroy($id)
     {
+        $school_id = Auth::user()->school_id;
+
+        if (! $this->eventReader->find($id, $school_id)) {
+            abort(404);
+        }
+
         try {
-            $event = Events::where('id', $id)->first();
+            $result = $this->eventWriter->destroy($id, $school_id);
 
-            $event->delete();
-
-            $message = trans('messages.delete_success_msg', ['module' => 'Event']);
-
-            $ip = $this->getRequestIP();
-            $this->doActivityLog(
-                $event,
-                Auth::user(),
-                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT']],
-                LOGNAME_DELETE_EVENT,
-                $message
-            );
-
-            return redirect('/admin/events')->with('successmessage', $message);
+            return redirect('/admin/events')->with('successmessage', $result['success']);
         } catch (Exception $e) {
             Log::info($e->getMessage());
         }
@@ -704,7 +465,11 @@ class EventsController extends Controller
      */
     public function show($id)
     {
-        $event = Events::where('id', $id)->first();
+        $event = $this->eventReader->find($id, Auth::user()->school_id);
+
+        if (! $event) {
+            abort(404);
+        }
 
         $now = date('Y-m-d H:i:s');
 

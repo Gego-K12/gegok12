@@ -132,6 +132,9 @@ class AuthenticationAdvancedTest extends TestCase
 
     /**
      * Test wrong user group cannot access wrong dashboard
+     *
+     * MustBeSchoolAdmin redirects non-admins to their own role's dashboard
+     * rather than aborting with 403 - that's intentional UX, not a gap.
      */
     public function test_student_cannot_access_admin_dashboard(): void
     {
@@ -144,7 +147,7 @@ class AuthenticationAdvancedTest extends TestCase
 
         $this->actingAs($student)
             ->get('/admin/dashboard')
-            ->assertStatus(403); // Forbidden or redirected
+            ->assertRedirect('/student/dashboard');
     }
 
     /**

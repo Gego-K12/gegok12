@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
@@ -6,11 +7,11 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
-use App\Models\User;
 use App\Models\School;
+use App\Models\User;
 use App\Models\Userprofile;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 /**
  * SchoolStatusLifecycleTest
@@ -30,8 +31,11 @@ class SchoolStatusLifecycleTest extends TestCase
     use RefreshDatabase;
 
     private $school;
+
     private $admin;
+
     private $adminEmail = 'school.admin@test.com';
+
     private $adminPassword = 'password123';
 
     /**
@@ -139,7 +143,7 @@ class SchoolStatusLifecycleTest extends TestCase
 
         // Verify admin can still be retrieved
         $this->assertEquals($this->admin->id, $admin->id);
-        $this->assertEquals('SCHOOL ADMIN', strtoupper($admin->userprofile->firstname . ' ' . $admin->userprofile->lastname));
+        $this->assertEquals('SCHOOL ADMIN', strtoupper($admin->userprofile->firstname.' '.$admin->userprofile->lastname));
     }
 
     /**

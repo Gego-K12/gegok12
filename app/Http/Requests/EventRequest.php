@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Events;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -60,31 +59,6 @@ class EventRequest extends FormRequest
             return false;
         });
 
-        Validator::extend('check_start_time', function ($attribute, $value, $parameters, $validator) {
-            $start_date = date('Y-m-d H:i:s', strtotime(request('start_date')));
-            $end_date = date('Y-m-d H:i:s', strtotime(request('end_date')));
-            $events = Events::where('standard_id', request('standard_id'))->ByDate($start_date, $end_date)->exists();
-
-            if ($events) {
-                return false;
-            }
-
-            return true;
-        });
-
-        Validator::extend('check_end_time', function ($attribute, $value, $parameters, $validator) {
-            $start_date = date('Y-m-d H:i:s', strtotime(request('start_date')));
-            $end_date = date('Y-m-d H:i:s', strtotime(request('end_date')));
-
-            $events = Events::ByDate($start_date, $end_date)->exists();
-
-            if ($events) {
-                return false;
-            }
-
-            return true;
-        });
-
         $rules = [
             'title' => 'required|max:100|alpha_spaces',
             'description' => 'required|max:100',
@@ -98,15 +72,11 @@ class EventRequest extends FormRequest
         ];
 
         if (request('select_type') == 'class') {
-            $rules['standard_id'] = 'required|check_start_time';
+            $rules['standard_id'] = 'required';
         }
 
         if (request('select_type') == 'alumni') {
             $rules['batch'] = 'required';
-        }
-
-        if (request('select_type') == 'school') {
-            $rules['start_date'] = 'required|check_end_time';
         }
 
         if (request('repeats') == '1') {
@@ -129,7 +99,6 @@ class EventRequest extends FormRequest
             'repeats.required' => 'Select Repeats',
 
             'standard_id.required' => 'Class Is Required',
-            'standard_id.check_start_time' => 'Event Already Exists For This Class',
 
             'freq.required' => 'Freq Is Required',
             'freq.check_freq' => 'Freq Is Required',
@@ -150,7 +119,6 @@ class EventRequest extends FormRequest
             'start_date.after' => 'Please Select Upcoming Date',
             'start_date.required' => 'Start Date Is Required',
             'start_date.check_start_date' => 'Start Date Should Be After Yesterday',
-            'start_date.check_end_time' => 'Already Scheduled',
 
             'end_date.required' => 'End Date Is Required',
             'end_date.checkunique_end' => 'End Date Should Be After Start Date',

@@ -1,10 +1,13 @@
 <?php
+
 // SPDX-License-Identifier: MIT
 // (c) 2025 GegoSoft Technologies and GegoK12 Contributors
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -24,9 +27,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \DateTime $created_at
  * @property \DateTime $updated_at
  * @property \DateTime $deleted_at
- * @property-read \App\Models\School $school
- * @property-read \App\Models\User $user
- * @property-read \App\Models\Plan $plan
+ * @property-read School $school
+ * @property-read User $user
+ * @property-read Plan $plan
+ *
  * @mixin \Eloquent
  */
 class Subscription extends Model
@@ -47,7 +51,7 @@ class Subscription extends Model
      * @var array
      */
     protected $fillable = [
-        'school_id' , 'user_id' , 'plan_id' ,'end_date', 'status', 'payment_details', 'plan_details'
+        'school_id', 'user_id', 'plan_id', 'end_date', 'status', 'payment_details', 'plan_details',
     ];
 
     /**
@@ -57,53 +61,52 @@ class Subscription extends Model
      */
     protected $dates = ['deleted_at'];
 
-    protected $casts=['payment_details'=>'array' , 'card_details'=>'array' , 'plan_details'=>'array'];
+    protected $casts = ['payment_details' => 'array', 'card_details' => 'array', 'plan_details' => 'array'];
 
     /**
      * Get the school for this subscription.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function school()
     {
-        return $this->belongsTo('App\Models\School','school_id');
+        return $this->belongsTo('App\Models\School', 'school_id');
     }
 
     /**
      * Get the user who owns this subscription.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function user()
     {
-    	return $this->belongsTo('App\Models\User','user_id','id');
+        return $this->belongsTo('App\Models\User', 'user_id', 'id');
     }
 
     /**
      * Get the plan for this subscription.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function plan()
     {
-    	return $this->belongsTo('App\Models\Plan','plan_id');
+        return $this->belongsTo('App\Models\Plan', 'plan_id');
     }
 
     /**
      * Scope to filter subscriptions by date range.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param \DateTime $start
-     * @param \DateTime $end
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param  Builder  $query
+     * @param  \DateTime  $start
+     * @param  \DateTime  $end
+     * @return Builder
      */
-    public function scopeDate($query,$start,$end)
+    public function scopeDate($query, $start, $end)
     {
 
-        $query->whereDate('created_at','>=',$start)
-              ->whereDate('created_at','<=',$end);
+        $query->whereDate('created_at', '>=', $start)
+            ->whereDate('created_at', '<=', $end);
 
         return $query;
     }
-
 }

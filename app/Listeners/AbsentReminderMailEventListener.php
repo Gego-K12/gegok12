@@ -3,10 +3,9 @@
 namespace App\Listeners;
 
 use App\Events\AbsentReminderMailEvent;
-use Illuminate\Queue\InteractsWithQueue;
+use App\Mail\AbsentReminderMail;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\AbsentReminderMail;
 
 class AbsentReminderMailEventListener implements ShouldQueue
 {
@@ -23,7 +22,6 @@ class AbsentReminderMailEventListener implements ShouldQueue
     /**
      * Handle the event.
      *
-     * @param  AbsentReminderMailEvent  $event
      * @return void
      */
     public function handle(AbsentReminderMailEvent $event)

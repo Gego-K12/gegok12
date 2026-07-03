@@ -1,18 +1,21 @@
 <?php
+
 /**
  * Handles user authentication workflow including validation, throttling, and responses.
  */
 
 namespace App\Traits;
 
-use Illuminate\Validation\ValidationException;
-use Illuminate\Support\Facades\Auth;
-use App\Traits\ThrottlesLogins;
-use App\Traits\RedirectsUsers;
-use Illuminate\Http\Request;
 use App\Models\School;
 use App\Models\User;
+use Illuminate\Contracts\Auth\StatefulGuard;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 trait AuthenticatesUsers
 {
@@ -21,10 +24,9 @@ trait AuthenticatesUsers
     /**
      * Handle a login request to the application.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+     * @return RedirectResponse|Response|JsonResponse
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws ValidationException
      */
     public function login(Request $request)
     {
@@ -60,7 +62,6 @@ trait AuthenticatesUsers
      * - checkactive: Validates that the user is not suspended (inactive status)
      * - checkexit: Validates that the user has not exited (exit status)
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return void
      */
     protected function validateLogin(Request $request)
@@ -70,10 +71,10 @@ trait AuthenticatesUsers
          * Ensures the user's school is active (status = 1).
          * SuperAdmins (usergroup_id == 1) bypass school checks.
          *
-         * @param string $attribute The attribute being validated
-         * @param string $value The value being validated
-         * @param array $parameters Additional parameters
-         * @param \Illuminate\Validation\Validator $validator The validator instance
+         * @param  string  $attribute  The attribute being validated
+         * @param  string  $value  The value being validated
+         * @param  array  $parameters  Additional parameters
+         * @param  \Illuminate\Validation\Validator  $validator  The validator instance
          * @return bool True if school is active or user is superadmin
          */
         Validator::extend('checkschool', function ($attribute, $value, $parameters, $validator) {
@@ -84,25 +85,27 @@ trait AuthenticatesUsers
                 ->first();
 
             if ($users->usergroup_id == 1) {
-                return TRUE;
+                return true;
             }
 
             $school = School::IsActive($users->school_id)->exists();
-            return $school == TRUE;
+
+            return $school == true;
         }, 'Invalid Credentials. You are not in this school');
 
         /**
          * Validator: checkusers
          * Validates that the user exists in the system.
          *
-         * @param string $attribute The attribute being validated
-         * @param string $value The value being validated
-         * @param array $parameters Additional parameters
-         * @param \Illuminate\Validation\Validator $validator The validator instance
+         * @param  string  $attribute  The attribute being validated
+         * @param  string  $value  The value being validated
+         * @param  array  $parameters  Additional parameters
+         * @param  \Illuminate\Validation\Validator  $validator  The validator instance
          * @return bool True if user exists
          */
         Validator::extend('checkusers', function ($attribute, $value, $parameters, $validator) {
             $users = User::where('email', request('email'))->with('userprofile')->first();
+
             return $users != null;
         }, 'Invalid Credentials');
 
@@ -110,14 +113,15 @@ trait AuthenticatesUsers
          * Validator: checkactive
          * Validates that the user's profile status is not 'inactive' (suspended).
          *
-         * @param string $attribute The attribute being validated
-         * @param string $value The value being validated
-         * @param array $parameters Additional parameters
-         * @param \Illuminate\Validation\Validator $validator The validator instance
+         * @param  string  $attribute  The attribute being validated
+         * @param  string  $value  The value being validated
+         * @param  array  $parameters  Additional parameters
+         * @param  \Illuminate\Validation\Validator  $validator  The validator instance
          * @return bool True if user is active
          */
         Validator::extend('checkactive', function ($attribute, $value, $parameters, $validator) {
             $users = User::where('email', request('email'))->with('userprofile')->first();
+
             return $users->userprofile->status != 'inactive';
         }, 'You are suspended by site admin');
 
@@ -125,14 +129,15 @@ trait AuthenticatesUsers
          * Validator: checkexit
          * Validates that the user's profile status is not 'exit' (no longer works in school).
          *
-         * @param string $attribute The attribute being validated
-         * @param string $value The value being validated
-         * @param array $parameters Additional parameters
-         * @param \Illuminate\Validation\Validator $validator The validator instance
+         * @param  string  $attribute  The attribute being validated
+         * @param  string  $value  The value being validated
+         * @param  array  $parameters  Additional parameters
+         * @param  \Illuminate\Validation\Validator  $validator  The validator instance
          * @return bool True if user status is not 'exit'
          */
         Validator::extend('checkexit', function ($attribute, $value, $parameters, $validator) {
             $users = User::where('email', request('email'))->with('userprofile')->first();
+
             return $users->userprofile->status != 'exit';
         }, 'You have exited this school');
 
@@ -145,7 +150,6 @@ trait AuthenticatesUsers
     /**
      * Attempt to log the user into the application.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return bool
      */
     protected function attemptLogin(Request $request)
@@ -158,7 +162,6 @@ trait AuthenticatesUsers
     /**
      * Get the needed authorization credentials from the request.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return array
      */
     protected function credentials(Request $request)
@@ -169,8 +172,7 @@ trait AuthenticatesUsers
     /**
      * Send the response after the user was authenticated.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     protected function sendLoginResponse(Request $request)
     {
@@ -185,7 +187,6 @@ trait AuthenticatesUsers
     /**
      * The user has been authenticated.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  mixed  $user
      * @return mixed
      */
@@ -197,10 +198,9 @@ trait AuthenticatesUsers
     /**
      * Get the failed login response instance.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Symfony\Component\HttpFoundation\Response
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws ValidationException
      */
     protected function sendFailedLoginResponse(Request $request)
     {
@@ -219,17 +219,17 @@ trait AuthenticatesUsers
      */
     public function username()
     {
-       $login = request()->input('email');
-       $field = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'registration_number';
-       request()->merge([$field => $login]);
-       return $field;
+        $login = request()->input('email');
+        $field = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'registration_number';
+        request()->merge([$field => $login]);
+
+        return $field;
     }
 
     /**
      * Log the user out of the application.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function logout(Request $request)
     {
@@ -243,7 +243,6 @@ trait AuthenticatesUsers
     /**
      * The user has logged out of the application.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     protected function loggedOut(Request $request)
@@ -254,7 +253,7 @@ trait AuthenticatesUsers
     /**
      * Get the guard to be used during authentication.
      *
-     * @return \Illuminate\Contracts\Auth\StatefulGuard
+     * @return StatefulGuard
      */
     protected function guard()
     {

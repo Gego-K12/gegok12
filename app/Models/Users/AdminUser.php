@@ -1,11 +1,20 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
  */
+
 namespace App\Models\Users;
 
+use App\Models\Attendance;
+use App\Models\LessonPlanApproval;
+use App\Models\School;
+use App\Models\TeacherLeaveApplication;
 use App\Models\User;
+use App\Models\Userprofile;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 
 /**
  * Class AdminUser
@@ -13,11 +22,12 @@ use App\Models\User;
  * Specialized User model for school admin functionality.
  * School/Premium admins (usergroups 3, 4) have access to school-level administrative features.
  *
- * @property-read \App\Models\School $school
- * @property-read \App\Models\Userprofile $userprofile
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Attendance[] $attendanceAdmin
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\TeacherLeaveApplication[] $approvedUser
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\LessonPlanApproval[] $approvedLessonPlan
+ * @property-read School $school
+ * @property-read Userprofile $userprofile
+ * @property-read Collection|Attendance[] $attendanceAdmin
+ * @property-read Collection|TeacherLeaveApplication[] $approvedUser
+ * @property-read Collection|LessonPlanApproval[] $approvedLessonPlan
+ *
  * @mixin \Eloquent
  */
 class AdminUser extends User
@@ -25,37 +35,35 @@ class AdminUser extends User
     /**
      * Scope to filter school admins only.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param  Builder  $query
+     * @return Builder
      */
     public function scopeSchoolAdminsOnly($query)
     {
         return $query->whereIn('usergroup_id', [
             self::SCHOOLADMIN_USERGROUP_ID,
-            self::SCHOOLSUBADMIN_USERGROUP_ID
+            self::SCHOOLSUBADMIN_USERGROUP_ID,
         ]);
     }
 
     /**
      * Scope to filter admins by school.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param int $school_id
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param  Builder  $query
+     * @param  int  $school_id
+     * @return Builder
      */
     public function scopeForSchool($query, $school_id)
     {
         return $query->where('school_id', $school_id)
             ->whereIn('usergroup_id', [
                 self::SCHOOLADMIN_USERGROUP_ID,
-                self::SCHOOLSUBADMIN_USERGROUP_ID
+                self::SCHOOLSUBADMIN_USERGROUP_ID,
             ]);
     }
 
     /**
      * Check if this admin is primary school admin.
-     *
-     * @return bool
      */
     public function isPrimaryAdmin(): bool
     {
@@ -64,8 +72,6 @@ class AdminUser extends User
 
     /**
      * Check if this admin is sub admin.
-     *
-     * @return bool
      */
     public function isSubAdmin(): bool
     {
@@ -75,7 +81,7 @@ class AdminUser extends User
     /**
      * Get all staff members under this school admin.
      *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return Collection
      */
     public function getSchoolStaff()
     {
@@ -85,7 +91,7 @@ class AdminUser extends User
             User::RECEPTIONIST_USERGROUP_ID,
             User::ACCOUNTANT_USERGROUP_ID,
             User::STOCK_KEEPER_USERGROUP_ID,
-            User::NON_TEACHING_USERGROUP_ID
+            User::NON_TEACHING_USERGROUP_ID,
         ];
 
         return User::where('school_id', $this->school_id)
@@ -96,7 +102,7 @@ class AdminUser extends User
     /**
      * Get all students in this school.
      *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return Collection
      */
     public function getSchoolStudents()
     {
@@ -108,7 +114,7 @@ class AdminUser extends User
     /**
      * Get all parents in this school.
      *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return Collection
      */
     public function getSchoolParents()
     {
@@ -120,7 +126,7 @@ class AdminUser extends User
     /**
      * Get all teachers in this school.
      *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return Collection
      */
     public function getSchoolTeachers()
     {

@@ -2,10 +2,12 @@
 
 namespace App\Livewire\Admin\Setting;
 
-use Livewire\Component;
 use App\Models\Plan;
-use Livewire\Attributes\Rule;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
+use Livewire\Attributes\Rule;
+use Livewire\Component;
 
 /**
  * Class PlanForm
@@ -19,8 +21,6 @@ use Jantinnerezo\LivewireAlert\LivewireAlert;
  * - Plan editing
  * - Validation of plan limits
  * - Success alerts
- *
- * @package App\Livewire\Admin\Setting
  */
 class PlanForm extends Component
 {
@@ -143,7 +143,7 @@ class PlanForm extends Component
      * Loads plan details when editing an existing plan
      * and populates the form fields.
      *
-     * @param int|string|null $id Plan ID
+     * @param  int|string|null  $id  Plan ID
      * @return void
      */
     public function mount($id)
@@ -152,19 +152,19 @@ class PlanForm extends Component
 
         if ($this->planEditId != '') {
             $planEdit = Plan::where('id', $this->planEditId)->first();
-            $this->cycle           = $planEdit->cycle;
-            $this->name            = $planEdit->name;
-            $this->order           = $planEdit->order;
-            $this->status          = $planEdit->is_active;
-            $this->amount          = $planEdit->amount;
-            $this->no_of_members   = $planEdit->no_of_members;
-            $this->no_of_events    = $planEdit->no_of_events;
-            $this->no_of_folders   = $planEdit->no_of_folders;
-            $this->no_of_files     = $planEdit->no_of_files;
-            $this->no_of_videos    = $planEdit->no_of_videos;
-            $this->no_of_audios    = $planEdit->no_of_audios;
+            $this->cycle = $planEdit->cycle;
+            $this->name = $planEdit->name;
+            $this->order = $planEdit->order;
+            $this->status = $planEdit->is_active;
+            $this->amount = $planEdit->amount;
+            $this->no_of_members = $planEdit->no_of_members;
+            $this->no_of_events = $planEdit->no_of_events;
+            $this->no_of_folders = $planEdit->no_of_folders;
+            $this->no_of_files = $planEdit->no_of_files;
+            $this->no_of_videos = $planEdit->no_of_videos;
+            $this->no_of_audios = $planEdit->no_of_audios;
             $this->no_of_bulletins = $planEdit->no_of_bulletins;
-            $this->no_of_groups    = $planEdit->no_of_groups;
+            $this->no_of_groups = $planEdit->no_of_groups;
         }
     }
 
@@ -178,26 +178,26 @@ class PlanForm extends Component
      * Displays success alerts and redirects
      * to the plan detail page.
      *
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function submitPlan()
     {
         $this->validate();
 
         $data = [
-            'cycle'            => $this->cycle,
-            'name'             => $this->name,
-            'order'            => $this->order,
-            'is_active'        => $this->status,
-            'amount'           => $this->amount,
-            'no_of_members'    => $this->no_of_members,
-            'no_of_events'     => $this->no_of_events,
-            'no_of_folders'    => $this->no_of_folders,
-            'no_of_files'      => $this->no_of_files,
-            'no_of_videos'     => $this->no_of_videos,
-            'no_of_audios'     => $this->no_of_audios,
-            'no_of_bulletins'  => $this->no_of_bulletins,
-            'no_of_groups'     => $this->no_of_groups,
+            'cycle' => $this->cycle,
+            'name' => $this->name,
+            'order' => $this->order,
+            'is_active' => $this->status,
+            'amount' => $this->amount,
+            'no_of_members' => $this->no_of_members,
+            'no_of_events' => $this->no_of_events,
+            'no_of_folders' => $this->no_of_folders,
+            'no_of_files' => $this->no_of_files,
+            'no_of_videos' => $this->no_of_videos,
+            'no_of_audios' => $this->no_of_audios,
+            'no_of_bulletins' => $this->no_of_bulletins,
+            'no_of_groups' => $this->no_of_groups,
         ];
 
         if ($this->planEditId == '') {
@@ -208,7 +208,7 @@ class PlanForm extends Component
             $this->alert('success', 'Plan updated successfully');
         }
 
-        return redirect(url('/admin/setting/plan/detail/' . $this->planEditId));
+        return redirect(url('/admin/setting/plan/detail/'.$this->planEditId));
     }
 
     /**
@@ -216,7 +216,7 @@ class PlanForm extends Component
      *
      * Displays the plan create/edit form.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function render()
     {

@@ -1,39 +1,42 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
  */
+
 namespace App\Http\Controllers\Teacher;
 
 // use App\Http\Resources\Studentlist as StudentlistResource;
-use App\Http\Resources\AttendanceStudentList as StudentlistResource;
-use App\Http\Requests\AttendanceAddRequest;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Controller;
-use App\Traits\AcademicProcess;
-use App\Models\StudentAcademic;
-use Illuminate\Http\Request;
-use App\Models\StandardLink;
-use App\Models\AbsentReason;
-use App\Traits\LogActivity;
 use App\Helpers\SiteHelper;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\AttendanceAddRequest;
+use App\Http\Resources\AttendanceStudentList as StudentlistResource;
+use App\Models\AbsentReason;
 use App\Models\Attendance;
-use League\Csv\Writer;
+use App\Models\StandardLink;
+use App\Models\StudentAcademic;
+use App\Traits\AcademicProcess;
 use App\Traits\Common;
+use App\Traits\LogActivity;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
+use League\Csv\Writer;
 
 class AttendanceController extends Controller
 {
     //
     use AcademicProcess;
-    use LogActivity;
     use Common;
+    use LogActivity;
 
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function list()
     {
@@ -45,17 +48,17 @@ class AttendanceController extends Controller
 
         $standardLinklist = SiteHelper::getStandardLinkList($school_id);
 
-        $studentAcademic = StudentAcademic::with('user')->where([['school_id',$school_id],['academic_year_id',$academic_year->id]])->whereHas('user', function($q){
-                        $q->where([['status','active'],['deleted_at',null]]);
-                    })->get();
-        
+        $studentAcademic = StudentAcademic::with('user')->where([['school_id', $school_id], ['academic_year_id', $academic_year->id]])->whereHas('user', function ($q) {
+            $q->where([['status', 'active'], ['deleted_at', null]]);
+        })->get();
+
         $studentlist = StudentlistResource::collection($studentAcademic)->groupBy('standardLink_id');
 
-        $absentReasonlist   = AbsentReason::where('status',1)->get();
+        $absentReasonlist = AbsentReason::where('status', 1)->get();
 
-        $array['standardlist']      = $standardLinklist;
-        $array['studentlist']       = $studentlist;
-        $array['absentReasonlist']  = $absentReasonlist;
+        $array['standardlist'] = $standardLinklist;
+        $array['studentlist'] = $studentlist;
+        $array['absentReasonlist'] = $absentReasonlist;
 
         return $array;
     }
@@ -63,40 +66,39 @@ class AttendanceController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create()
     {
         //
-        $standard = \Request::get('standardLink_id') ? \Request::get('standardLink_id'):'';
+        $standard = \Request::get('standardLink_id') ? \Request::get('standardLink_id') : '';
 
-        return view('/teacher/attendance/create' ,['standard' => $standard]);
+        return view('/teacher/attendance/create', ['standard' => $standard]);
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param  Request  $request
+     * @return Response
      */
     public function store(AttendanceAddRequest $request)
-    { 
+    {
         //
-        try
-        {
-            $school_id      = Auth::user()->school_id;
-            $academic_year  = SiteHelper::getAcademicYear($school_id);
-            $admin          = Auth::id();
+        try {
+            $school_id = Auth::user()->school_id;
+            $academic_year = SiteHelper::getAcademicYear($school_id);
+            $admin = Auth::id();
 
-            $attendance = $this->createAttendance($school_id , $academic_year->id , $admin , $request);
+            $attendance = $this->createAttendance($school_id, $academic_year->id, $admin, $request);
 
-            $message = trans('messages.add_success_msg',['module' => 'Attendance']);
+            $message = trans('messages.add_success_msg', ['module' => 'Attendance']);
 
-            $ip= $this->getRequestIP();
+            $ip = $this->getRequestIP();
             $this->doActivityLog(
                 $attendance,
                 Auth::user(),
-                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT'] ],
+                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT']],
                 LOGNAME_ADD_ATTENDANCE,
                 $message
             );
@@ -104,74 +106,61 @@ class AttendanceController extends Controller
             $res['success'] = $message;
 
             return $res;
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
         }
     }
 
     public function export($standardLink_id)
     {
-        try
-        {
+        try {
             //
-            $school_id      = Auth::user()->school_id;
+            $school_id = Auth::user()->school_id;
             $academic_year = SiteHelper::getAcademicYear($school_id);
-            $standardLink = StandardLink::where('id',$standardLink_id)->first();
+            $standardLink = StandardLink::where('id', $standardLink_id)->first();
             $standard = $standardLink->StandardName;
             $section = $standardLink->section->name;
             $csv_name = 'SP Student Attendance Export_'.$standard.'_'.$section.'_'.date('_d-m-Y_H:i').'.csv';
-            $attendances  = Attendance::where([
-                ['school_id',$school_id],
-                ['academic_year_id',$academic_year->id],
-                ['standardLink_id',$standardLink_id],
-                ['status',0]
-            ])->orderBy('date','DESC')->get()->groupBy([function($attendance) {
-                    return Carbon::parse($attendance->date)->format('d-m-Y'); 
-                },'session']);
-            $csv = Writer::createFromFileObject(new \SplTempFileObject());
+            $attendances = Attendance::where([
+                ['school_id', $school_id],
+                ['academic_year_id', $academic_year->id],
+                ['standardLink_id', $standardLink_id],
+                ['status', 0],
+            ])->orderBy('date', 'DESC')->get()->groupBy([function ($attendance) {
+                return Carbon::parse($attendance->date)->format('d-m-Y');
+            }, 'session']);
+            $csv = Writer::createFromFileObject(new \SplTempFileObject);
 
-            if(count($attendances) > 0)
-            {
-                $csv->insertOne(['Date','Forenoon_Absent_Count','Afternoon_Absent_Count']);
-          
+            if (count($attendances) > 0) {
+                $csv->insertOne(['Date', 'Forenoon_Absent_Count', 'Afternoon_Absent_Count']);
+
                 $i = 0;
-                foreach ($attendances as $key => $attendance) 
-                {
-                    foreach ($attendance as $key1 => $student) 
-                    { 
-                        if($key1 == 'forenoon')
-                        {
+                foreach ($attendances as $key => $attendance) {
+                    foreach ($attendance as $key1 => $student) {
+                        if ($key1 == 'forenoon') {
                             $forenoon_count[$i] = count($student);
-                        }
-                        else
-                        {
+                        } else {
                             $afternoon_count[$i] = count($student);
                         }
                     }
-                    $csv->insertOne([ $key, $forenoon_count[$i] , $afternoon_count[$i] ]);
+                    $csv->insertOne([$key, $forenoon_count[$i], $afternoon_count[$i]]);
                     $i++;
                 }
-            }
-            else
-            {
-               $csv->insertOne(['No Records Found']);
-               $csv->output($csv_name);
+            } else {
+                $csv->insertOne(['No Records Found']);
+                $csv->output($csv_name);
             }
             $csv->output($csv_name);
-            $message= trans('messages.export_success_msg',['module' => 'Student Attendance']);
+            $message = trans('messages.export_success_msg', ['module' => 'Student Attendance']);
 
-            $ip= $this->getRequestIP();
+            $ip = $this->getRequestIP();
             $this->doActivityLog(
                 Auth::user(),
                 Auth::user(),
-                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT'] ],
+                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT']],
                 LOGNAME_EXPORT_STUDENT_ATTENDANCE,
                 $message
             );
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
         }
     }
 }

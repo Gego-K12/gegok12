@@ -2,8 +2,8 @@
 
 namespace App\Livewire\Admin\Groups;
 
-use Livewire\Component;
 use App\Models\GroupMember;
+use Livewire\Component;
 use Livewire\WithPagination;
 
 class GroupMembers extends Component
@@ -16,12 +16,13 @@ class GroupMembers extends Component
     {
         $this->group_id = $id;
     }
+
     public function render()
     {
-        $groups = GroupMember::where('group_id',$this->group_id)->paginate(10);
+        $groups = GroupMember::where('group_id', $this->group_id)->paginate(10);
 
-        return view('livewire.admin.groups.group-members',[
-            'groups' => $groups
+        return view('livewire.admin.groups.group-members', [
+            'groups' => $groups,
         ]);
     }
 }

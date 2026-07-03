@@ -2,11 +2,11 @@
 
 namespace App\Traits;
 
-use Illuminate\Support\Str;
-use Illuminate\Http\Request;
-use Illuminate\Cache\RateLimiter;
 use Illuminate\Auth\Events\Lockout;
+use Illuminate\Cache\RateLimiter;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 trait ThrottlesLogins
@@ -14,7 +14,6 @@ trait ThrottlesLogins
     /**
      * Determine if the user has too many failed login attempts.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return bool
      */
     protected function hasTooManyLoginAttempts(Request $request)
@@ -27,7 +26,6 @@ trait ThrottlesLogins
     /**
      * Increment the login attempts for the user.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return void
      */
     protected function incrementLoginAttempts(Request $request)
@@ -40,9 +38,9 @@ trait ThrottlesLogins
     /**
      * Redirect the user after determining they are locked out.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return void
-     * @throws \Illuminate\Validation\ValidationException
+     *
+     * @throws ValidationException
      */
     protected function sendLockoutResponse(Request $request)
     {
@@ -58,7 +56,6 @@ trait ThrottlesLogins
     /**
      * Clear the login locks for the given user credentials.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return void
      */
     protected function clearLoginAttempts(Request $request)
@@ -69,7 +66,6 @@ trait ThrottlesLogins
     /**
      * Fire an event when a lockout occurs.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return void
      */
     protected function fireLockoutEvent(Request $request)
@@ -80,7 +76,6 @@ trait ThrottlesLogins
     /**
      * Get the throttle key for the given request.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return string
      */
     protected function throttleKey(Request $request)
@@ -91,7 +86,7 @@ trait ThrottlesLogins
     /**
      * Get the rate limiter instance.
      *
-     * @return \Illuminate\Cache\RateLimiter
+     * @return RateLimiter
      */
     protected function limiter()
     {

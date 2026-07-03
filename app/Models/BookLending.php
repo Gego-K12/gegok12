@@ -1,11 +1,15 @@
 <?php
+
 // SPDX-License-Identifier: MIT
 // (c) 2025 GegoSoft Technologies and GegoK12 Contributors
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class BookLending
@@ -23,9 +27,10 @@ use Illuminate\Database\Eloquent\Model;
  * @property \DateTime $created_at
  * @property \DateTime $updated_at
  * @property \DateTime $deleted_at
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\User[] $user
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Book[] $book
- * @property-read \App\Models\User $userlent
+ * @property-read Collection|User[] $user
+ * @property-read Collection|Book[] $book
+ * @property-read User $userlent
+ *
  * @mixin \Eloquent
  */
 class BookLending extends Model
@@ -34,37 +39,37 @@ class BookLending extends Model
 
     protected $table = 'books_lending';
 
-     protected $fillable = [
-        'user_id' , 'book_code_no', 'library_card_no','issue_date','return_date','issued_by','status'
+    protected $fillable = [
+        'user_id', 'book_code_no', 'library_card_no', 'issue_date', 'return_date', 'issued_by', 'status',
     ];
 
     /**
      * Get the users associated with this lending record.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function user()
     {
-    	return $this->hasMany('\App\Models\User','id','user_id');
+        return $this->hasMany('\App\Models\User', 'id', 'user_id');
     }
 
     /**
      * Get the books associated with this lending record.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function book()
     {
-    	return $this->hasMany('\App\Models\Book','book_code','book_code_no');
+        return $this->hasMany('\App\Models\Book', 'book_code', 'book_code_no');
     }
 
     /**
      * Get the user who borrowed this book.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function userlent()
     {
-        return $this->belongsTo('App\Models\User','user_id');
+        return $this->belongsTo('App\Models\User', 'user_id');
     }
 }

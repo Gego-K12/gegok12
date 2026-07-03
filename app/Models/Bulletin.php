@@ -1,12 +1,14 @@
 <?php
+
 // SPDX-License-Identifier: MIT
 // (c) 2025 GegoSoft Technologies and GegoK12 Contributors
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Model;
 use App\Traits\Common;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Bulletin
@@ -25,14 +27,16 @@ use App\Traits\Common;
  * @property \DateTime $deleted_at
  * @property string $file_path
  * @property string $image_path
- * @property-read \App\Models\School $school
- * @property-read \App\Models\AcademicYear $academicYear
+ * @property-read School $school
+ * @property-read AcademicYear $academicYear
+ *
  * @mixin \Eloquent
  */
 class Bulletin extends Model
 {
-    use SoftDeletes;
     use Common;
+    use SoftDeletes;
+
     protected $table = 'magazines';
 
     /**
@@ -41,27 +45,27 @@ class Bulletin extends Model
      * @var array
      */
     protected $fillable = [
-        'school_id' , 'academic_year_id' , 'name' , 'year' , 'bulletin_file'
+        'school_id', 'academic_year_id', 'name', 'year', 'bulletin_file',
     ];
 
     /**
      * Get the school for this bulletin.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function school()
     {
-        return $this->belongsTo('App\Models\School','school_id');
+        return $this->belongsTo('App\Models\School', 'school_id');
     }
 
     /**
      * Get the academic year for this bulletin.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function academicYear()
     {
-        return $this->belongsTo('\App\Models\AcademicYear','academic_year_id');
+        return $this->belongsTo('\App\Models\AcademicYear', 'academic_year_id');
     }
 
     /**

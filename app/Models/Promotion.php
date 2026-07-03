@@ -1,12 +1,15 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
  */
+
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Promotion
@@ -28,14 +31,15 @@ use Illuminate\Database\Eloquent\Model;
  * @property \DateTime $created_at
  * @property \DateTime $updated_at
  * @property \DateTime $deleted_at
- * @property-read \App\Models\School $school
- * @property-read \App\Models\User $user
- * @property-read \App\Models\AcademicYear $currentAcademicYear
- * @property-read \App\Models\AcademicYear $nextAcademicYear
- * @property-read \App\Models\Standard $currentStandard
- * @property-read \App\Models\Standard $nextStandard
- * @property-read \App\Models\Section $currentSection
- * @property-read \App\Models\Section $nextSection
+ * @property-read School $school
+ * @property-read User $user
+ * @property-read AcademicYear $currentAcademicYear
+ * @property-read AcademicYear $nextAcademicYear
+ * @property-read Standard $currentStandard
+ * @property-read Standard $nextStandard
+ * @property-read Section $currentSection
+ * @property-read Section $nextSection
+ *
  * @mixin \Eloquent
  */
 class Promotion extends Model
@@ -56,7 +60,7 @@ class Promotion extends Model
      * @var array
      */
     protected $fillable = [
-        'school_id' , 'user_id' , 'current_academic_year_id' ,'current_standard_id', 'current_section_id', 'exam_id','next_academic_year_id','next_standard_id', 'next_section_id' , 'comments' , 'status'
+        'school_id', 'user_id', 'current_academic_year_id', 'current_standard_id', 'current_section_id', 'exam_id', 'next_academic_year_id', 'next_standard_id', 'next_section_id', 'comments', 'status',
     ];
 
     /**
@@ -74,80 +78,80 @@ class Promotion extends Model
     /**
      * Get the school for this promotion.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function school()
     {
-        return $this->belongsTo('App\Models\School','school_id');
+        return $this->belongsTo('App\Models\School', 'school_id');
     }
 
     /**
      * Get the student being promoted.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function user()
     {
-        return $this->belongsTo('App\Models\User','user_id');
+        return $this->belongsTo('App\Models\User', 'user_id');
     }
 
     /**
      * Get the current academic year.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function currentAcademicYear()
     {
-        return $this->belongsTo('App\Models\AcademicYear','current_academic_year_id');
+        return $this->belongsTo('App\Models\AcademicYear', 'current_academic_year_id');
     }
 
     /**
      * Get the next academic year.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function nextAcademicYear()
     {
-        return $this->belongsTo('App\Models\AcademicYear','next_academic_year_id');
+        return $this->belongsTo('App\Models\AcademicYear', 'next_academic_year_id');
     }
 
     /**
      * Get the current standard (grade).
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function currentStandard()
     {
-        return $this->belongsTo('App\Models\Standard','current_standard_id');
+        return $this->belongsTo('App\Models\Standard', 'current_standard_id');
     }
 
     /**
      * Get the next standard (grade).
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function nextStandard()
     {
-        return $this->belongsTo('App\Models\Standard','next_standard_id');
+        return $this->belongsTo('App\Models\Standard', 'next_standard_id');
     }
 
     /**
      * Get the current section.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function currentSection()
     {
-        return $this->belongsTo('App\Models\Section','current_section_id');
+        return $this->belongsTo('App\Models\Section', 'current_section_id');
     }
 
     /**
      * Get the next section.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function nextSection()
     {
-        return $this->belongsTo('App\Models\Section','next_section_id');
+        return $this->belongsTo('App\Models\Section', 'next_section_id');
     }
 }

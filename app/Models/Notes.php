@@ -1,10 +1,12 @@
 <?php
+
 // SPDX-License-Identifier: MIT
 // (c) 2025 GegoSoft Technologies and GegoK12 Contributors
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Class Notes
@@ -18,8 +20,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $notes
  * @property \DateTime $created_at
  * @property \DateTime $updated_at
- * @property-read \App\Models\User $user
- * @property-read \App\Models\Events $event
+ * @property-read User $user
+ * @property-read Events $event
+ *
  * @mixin \Eloquent
  */
 class Notes extends Model
@@ -29,20 +32,20 @@ class Notes extends Model
     /**
      * Get the user who created this note.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function user()
     {
-        return $this->belongsTo('App\\Models\\User','user_id');
+        return $this->belongsTo('App\\Models\\User', 'user_id');
     }
 
     /**
      * Get the event this note is attached to.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function event()
     {
-        return $this->belongsTo('App\\Models\\Events','entity_id');
+        return $this->belongsTo('App\\Models\\Events', 'entity_id');
     }
 }

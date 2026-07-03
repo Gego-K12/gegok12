@@ -3,9 +3,9 @@
 namespace App\Livewire\Admin\Standard;
 
 use App\Models\Standard;
-use Livewire\Component;
 use Illuminate\Support\Str;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
+use Livewire\Component;
 
 class StandardForm extends Component
 {
@@ -43,7 +43,7 @@ class StandardForm extends Component
     public function save()
     {
         $this->validate([
-            'name' => 'required|unique:standards,slug,' . $this->standard_id,
+            'name' => 'required|unique:standards,slug,'.$this->standard_id,
 
             'order' => 'required|numeric|min:1',
 
@@ -83,11 +83,10 @@ class StandardForm extends Component
 
             'order',
 
-            'status'
+            'status',
 
         ]);
 
         $this->status = 1;
     }
 }
-

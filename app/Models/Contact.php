@@ -1,4 +1,5 @@
 <?php
+
 // SPDX-License-Identifier: MIT
 // (c) 2025 GegoSoft Technologies and GegoK12 Contributors
 
@@ -14,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id
  * @property \DateTime $created_at
  * @property \DateTime $updated_at
+ *
  * @mixin \Eloquent
  */
 class Contact extends Model

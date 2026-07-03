@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Validator;
 
 class SettingSeoDetailRequest extends FormRequest
 {
@@ -25,29 +24,29 @@ class SettingSeoDetailRequest extends FormRequest
     public function rules()
     {
         return [
-            'sitetitle'=>'required',
-            'site_description'=>'required',
-            'site_keyword'=>'required',
-            'twitter_handle'=>'required',
-            'twitter_description'=>'required',
-            'twitter_card_image'=>'required',
-            'facebook_site_url'=>'required',  
-            'facebook_card_image'=>'required',  
+            'sitetitle' => 'required',
+            'site_description' => 'required',
+            'site_keyword' => 'required',
+            'twitter_handle' => 'required',
+            'twitter_description' => 'required',
+            'twitter_card_image' => 'required',
+            'facebook_site_url' => 'required',
+            'facebook_card_image' => 'required',
         ];
     }
 
     public function messages()
-     {
-        return[
+    {
+        return [
 
-           'sitetitle.required'=>__('sites.sitetitle'),
-           'site_description.required'=>__('sites.site_description'),
-           'site_keyword.required'=>__('sites.site_keyword'),
-           'twitter_handle.required'=>__('sites.twitter_handle'),
-           'twitter_description.required'=>__('sites.twitter_description'),
-           'twitter_card_image.required'=>__('sites.twitter_card'),
-           'facebook_site_url.required'=>__('sites.facebook_site_url'),
-           'facebook_card_image.required'=>__('sites.facebook_card'),
+            'sitetitle.required' => __('sites.sitetitle'),
+            'site_description.required' => __('sites.site_description'),
+            'site_keyword.required' => __('sites.site_keyword'),
+            'twitter_handle.required' => __('sites.twitter_handle'),
+            'twitter_description.required' => __('sites.twitter_description'),
+            'twitter_card_image.required' => __('sites.twitter_card'),
+            'facebook_site_url.required' => __('sites.facebook_site_url'),
+            'facebook_card_image.required' => __('sites.facebook_card'),
         ];
-     }
+    }
 }

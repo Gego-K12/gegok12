@@ -1,17 +1,20 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
  */
+
 namespace App\Http\Controllers\Receptionist;
 
-use App\Http\Resources\Receptionist\Task as TaskResource;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Helpers\SiteHelper;
-use App\Traits\Dashboard;
+use App\Http\Resources\Receptionist\Task as TaskResource;
 use App\Models\Task;
+use App\Traits\Dashboard;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
@@ -20,7 +23,7 @@ class DashboardController extends Controller
     /**
      * Display the receptionist dashboard view.
      *
-     * @return \Illuminate\Contracts\View\View
+     * @return View
      */
     public function index()
     {
@@ -35,9 +38,8 @@ class DashboardController extends Controller
     /**
      * Return a list of tasks for the given flag.
      *
-     * @param  Request  $request
      * @param  mixed  $task_flag
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @return AnonymousResourceCollection
      */
     public function list(Request $request, $task_flag)
     {
@@ -48,7 +50,7 @@ class DashboardController extends Controller
         ])->ByType('to_me', Auth::id());
 
         if ($request->q != null) {
-            $tasks = $tasks->where('title', 'LIKE', '%' . $request->q . '%');
+            $tasks = $tasks->where('title', 'LIKE', '%'.$request->q.'%');
         }
 
         $tasks = $tasks->get();

@@ -1,15 +1,17 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
  */
+
 namespace App\Http\Controllers\Auth;
 
-use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Email verification controller.
@@ -27,22 +29,24 @@ class EmailVerificationController extends Controller
      * Redirects to `/home` if an authenticated user is present, otherwise to `login`.
      *
      * @param  string  $token  Verification token from the email
-     * @return \Illuminate\Http\RedirectResponse|null  Redirect on success, null if token not found
+     * @return RedirectResponse|null Redirect on success, null if token not found
      */
     public function emailverification($token)
     {
         $check = User::where('email_verification_code', $token)->first();
 
-        if (!is_null($check)) {
+        if (! is_null($check)) {
             $user = User::where('id', $check->id)->first();
 
             if ($user->email_verified == 1) {
-                if (!is_null(Auth::id())) {
+                if (! is_null(Auth::id())) {
                     \Session::put('successmessage', 'E-mail Verified Successfully,Login Now');
+
                     return redirect()->to('/home');
                 }
 
                 \Session::put('successmessage', 'E-mail Verified Successfully,Login Now');
+
                 return redirect()->to('login');
             }
 

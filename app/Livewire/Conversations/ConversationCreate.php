@@ -2,10 +2,13 @@
 
 namespace App\Livewire\Conversations;
 
-use Livewire\Component;
-use Illuminate\Support\Str;
 use App\Events\Conversations\ConversationCreated;
 use App\Models\Conversation;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use Illuminate\View\View;
+use Livewire\Component;
 
 /**
  * Class ConversationCreate
@@ -19,8 +22,6 @@ use App\Models\Conversation;
  * - Creating the initial message
  * - Attaching users to the conversation
  * - Broadcasting the conversation creation event
- *
- * @package App\Livewire\Conversations
  */
 class ConversationCreate extends Component
 {
@@ -41,7 +42,7 @@ class ConversationCreate extends Component
     /**
      * Add a user to the conversation participant list.
      *
-     * @param mixed $user User model or user data
+     * @param  mixed  $user  User model or user data
      * @return void
      */
     public function addUser($user)
@@ -56,12 +57,12 @@ class ConversationCreate extends Component
      * sends the initial message, attaches users, broadcasts
      * the creation event, and redirects to the conversation view.
      *
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function create()
     {
         $this->validate([
-            'body'  => 'required',
+            'body' => 'required',
             'users' => 'required',
         ]);
 
@@ -71,7 +72,7 @@ class ConversationCreate extends Component
 
         $conversation->messages()->create([
             'user_id' => auth()->id(),
-            'body'    => $this->body,
+            'body' => $this->body,
         ]);
 
         $conversation->users()->sync($this->collectUserIds());
@@ -87,7 +88,7 @@ class ConversationCreate extends Component
      * Merges selected users with the authenticated user
      * and returns a unique list of user IDs.
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     public function collectUserIds()
     {
@@ -102,7 +103,7 @@ class ConversationCreate extends Component
      *
      * Displays the conversation creation form.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function render()
     {

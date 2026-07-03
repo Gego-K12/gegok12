@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
@@ -6,17 +7,18 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Resources\Holiday as HolidayResource;
-use App\Http\Requests\HolidayUpdateRequest;
-use App\Http\Requests\HolidayAddRequest;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
 use App\Helpers\SiteHelper;
-use App\Traits\LogActivity;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\HolidayAddRequest;
+use App\Http\Requests\HolidayUpdateRequest;
+use App\Http\Resources\Holiday as HolidayResource;
 use App\Models\Events;
 use App\Traits\Common;
+use App\Traits\LogActivity;
 use Exception;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 /**
  * Class HolidaysController
@@ -28,20 +30,18 @@ use Exception;
  * - Updating holidays
  * - Deleting holidays
  * - Logging holiday-related activities
- *
- * @package App\Http\Controllers\Admin
  */
 class HolidaysController extends Controller
 {
-    use LogActivity;
     use Common;
+    use LogActivity;
 
     /**
      * Get a paginated list of holidays for the current school and academic year.
      *
      * Returned as an API resource collection.
      *
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @return AnonymousResourceCollection
      */
     public function list()
     {
@@ -65,7 +65,7 @@ class HolidaysController extends Controller
     /**
      * Display the holidays index page.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function index()
     {
@@ -95,7 +95,7 @@ class HolidaysController extends Controller
     /**
      * Show the holiday creation form.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function create()
     {
@@ -108,7 +108,6 @@ class HolidaysController extends Controller
      *
      * Supports bulk holiday creation.
      *
-     * @param  \App\Http\Requests\HolidayAddRequest  $request
      * @return array<string, string>|null
      */
     public function store(HolidayAddRequest $request)
@@ -116,21 +115,21 @@ class HolidaysController extends Controller
         //
         try {
             for ($i = 0; $i < $request->count; $i++) {
-                $date = 'date' . $i;
-                $title = 'title' . $i;
+                $date = 'date'.$i;
+                $title = 'title'.$i;
 
                 $school_id = Auth::user()->school_id;
                 $academic_year = SiteHelper::getAcademicYear($school_id);
 
                 $holiday = new Events;
 
-                $holiday->school_id        = $school_id;
+                $holiday->school_id = $school_id;
                 $holiday->academic_year_id = $academic_year->id;
-                $holiday->select_type      = 'school';
-                $holiday->title            = $request->$title;
-                $holiday->category         = 'holidays';
-                $holiday->start_date       = date('Y-m-d', strtotime($request->$date));
-                $holiday->end_date         = date('Y-m-d', strtotime($request->$date));
+                $holiday->select_type = 'school';
+                $holiday->title = $request->$title;
+                $holiday->category = 'holidays';
+                $holiday->start_date = date('Y-m-d', strtotime($request->$date));
+                $holiday->end_date = date('Y-m-d', strtotime($request->$date));
 
                 $holiday->save();
 
@@ -147,6 +146,7 @@ class HolidaysController extends Controller
             }
 
             $res['success'] = $message;
+
             return $res;
         } catch (Exception $e) {
         }
@@ -164,7 +164,7 @@ class HolidaysController extends Controller
         $holiday = Events::where('id', $id)->first();
 
         $array = [];
-        $array['date']  = date('Y-m-d', strtotime($holiday->start_date));
+        $array['date'] = date('Y-m-d', strtotime($holiday->start_date));
         $array['title'] = $holiday->title;
 
         return $array;
@@ -173,7 +173,6 @@ class HolidaysController extends Controller
     /**
      * Update the specified holiday.
      *
-     * @param  \App\Http\Requests\HolidayUpdateRequest  $request
      * @param  int  $id
      * @return array<string, string>|null
      */
@@ -183,9 +182,9 @@ class HolidaysController extends Controller
         try {
             $holiday = Events::where('id', $id)->first();
 
-            $holiday->title      = $request->title;
+            $holiday->title = $request->title;
             $holiday->start_date = date('Y-m-d', strtotime($request->date));
-            $holiday->end_date   = date('Y-m-d', strtotime($request->date));
+            $holiday->end_date = date('Y-m-d', strtotime($request->date));
 
             $holiday->save();
 
@@ -201,6 +200,7 @@ class HolidaysController extends Controller
             );
 
             $res['success'] = $message;
+
             return $res;
         } catch (Exception $e) {
         }
@@ -231,6 +231,7 @@ class HolidaysController extends Controller
             );
 
             $res['success'] = $message;
+
             return $res;
         } catch (Exception $e) {
         }

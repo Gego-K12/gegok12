@@ -3,8 +3,8 @@
 namespace App\Http\Requests\Classwall;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class PostAttachmentRequest extends FormRequest
 {
@@ -25,34 +25,30 @@ class PostAttachmentRequest extends FormRequest
      */
     public function rules(Request $request)
     {
-        Validator::extend('check_count',function($attribute,$value,$parameters,$validator) 
-        {
-            if(request('count') > 0)
-            {
-                $count = (int)request('count');
+        Validator::extend('check_count', function ($attribute, $value, $parameters, $validator) {
+            if (request('count') > 0) {
+                $count = (int) request('count');
                 $file_count = count(request('file'));
-                $total_count = $count+$file_count;
-                
-                if($total_count > 6)
-                {
+                $total_count = $count + $file_count;
+
+                if ($total_count > 6) {
                     return false;
                 }
             }
+
             return true;
         });
 
-        if(request('count') != null)
-        {
+        if (request('count') != null) {
             $rules = [
-                'count'    =>  'nullable|check_count',
+                'count' => 'nullable|check_count',
             ];
-        }
-        else
-        {
+        } else {
             $rules = [
                 //
             ];
         }
+
         return $rules;
     }
 
@@ -60,7 +56,7 @@ class PostAttachmentRequest extends FormRequest
     {
         $messages = [
             //
-            'count.check_count'   =>  'Attachment images cannot be more than 6',
+            'count.check_count' => 'Attachment images cannot be more than 6',
         ];
 
         return $messages;

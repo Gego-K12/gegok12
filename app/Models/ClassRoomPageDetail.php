@@ -1,11 +1,15 @@
 <?php
+
 // SPDX-License-Identifier: MIT
 // (c) 2025 GegoSoft Technologies and GegoK12 Contributors
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class ClassRoomPageDetail
@@ -22,8 +26,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property \DateTime $created_at
  * @property \DateTime $updated_at
  * @property \DateTime $deleted_at
- * @property-read \App\Models\User $user
- * @property-read \App\Models\ClassRoomPage $classRoomPage
+ * @property-read User $user
+ * @property-read ClassRoomPage $classRoomPage
+ *
  * @mixin \Eloquent
  */
 class ClassRoomPageDetail extends Model
@@ -32,14 +37,13 @@ class ClassRoomPageDetail extends Model
 
     protected $table = 'class_room_page_details';
 
-
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'user_id' , 'page_id' , 'is_following' , 'like' , 'dislike' , 'status'
+        'user_id', 'page_id', 'is_following', 'like', 'dislike', 'status',
     ];
 
     /**
@@ -52,33 +56,33 @@ class ClassRoomPageDetail extends Model
     /**
      * Get the user for this page detail record.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function user()
     {
-    	return $this->belongsTo('\App\Models\User','user_id');
+        return $this->belongsTo('\App\Models\User', 'user_id');
     }
 
     /**
      * Get the classroom page for this detail record.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function classRoomPage()
     {
-    	return $this->belongsTo('\App\Models\ClassRoomPage','page_id');
+        return $this->belongsTo('\App\Models\ClassRoomPage', 'page_id');
     }
 
     /**
      * Scope to get records with likes for a specific page.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param int $page_id
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @param  Builder  $query
+     * @param  int  $page_id
+     * @return Collection
      */
-    public function scopeByLike($query,$page_id)
+    public function scopeByLike($query, $page_id)
     {
-        $count = $query->where('page_id',$page_id)->where('like',1)->get();
+        $count = $query->where('page_id', $page_id)->where('like', 1)->get();
 
         return $count;
     }
@@ -86,13 +90,13 @@ class ClassRoomPageDetail extends Model
     /**
      * Scope to count records with dislikes for a specific page.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param int $page_id
+     * @param  Builder  $query
+     * @param  int  $page_id
      * @return int
      */
-    public function scopeByUnlike($query,$page_id)
+    public function scopeByUnlike($query, $page_id)
     {
-        $count = $query->where('page_id',$page_id)->where('dislike',1)->count();
+        $count = $query->where('page_id', $page_id)->where('dislike', 1)->count();
 
         return $count;
     }

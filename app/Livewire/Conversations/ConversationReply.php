@@ -2,9 +2,10 @@
 
 namespace App\Livewire\Conversations;
 
-use Livewire\Component;
-use App\Models\Conversation;
 use App\Events\Conversations\MessageAdded;
+use App\Models\Conversation;
+use Illuminate\View\View;
+use Livewire\Component;
 
 /**
  * Class ConversationReply
@@ -18,15 +19,13 @@ use App\Events\Conversations\MessageAdded;
  * - Updating conversation metadata
  * - Resetting read status for other participants
  * - Broadcasting message events in real-time
- *
- * @package App\Livewire\Conversations
  */
 class ConversationReply extends Component
 {
     /**
      * Conversation instance to which the reply belongs.
      *
-     * @var \App\Models\Conversation
+     * @var Conversation
      */
     public $conversation;
 
@@ -43,7 +42,6 @@ class ConversationReply extends Component
      * Assigns the conversation model instance
      * to the component.
      *
-     * @param \App\Models\Conversation $conversation
      * @return void
      */
     public function mount(Conversation $conversation)
@@ -69,7 +67,7 @@ class ConversationReply extends Component
 
         $message = $this->conversation->messages()->create([
             'user_id' => auth()->id(),
-            'body'    => $this->body,
+            'body' => $this->body,
         ]);
 
         $this->conversation->update([
@@ -95,7 +93,7 @@ class ConversationReply extends Component
      *
      * Displays the conversation reply input UI.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function render()
     {

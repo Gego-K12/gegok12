@@ -2,11 +2,10 @@
 
 namespace App\Listeners;
 
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
 use App\Events\AdmissionApprovalEvent;
-use Illuminate\Support\Facades\Mail;
 use App\Mail\AdmissionApprovalMail;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Mail;
 
 class AdmissionApprovalListener implements ShouldQueue
 {
@@ -23,7 +22,6 @@ class AdmissionApprovalListener implements ShouldQueue
     /**
      * Handle the event.
      *
-     * @param  AdmissionApprovalEvent  $event
      * @return void
      */
     public function handle(AdmissionApprovalEvent $event)

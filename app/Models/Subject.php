@@ -1,11 +1,15 @@
 <?php
+
 // SPDX-License-Identifier: MIT
 // (c) 2025 GegoSoft Technologies and GegoK12 Contributors
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Subject
@@ -23,13 +27,14 @@ use Illuminate\Database\Eloquent\Model;
  * @property \DateTime $created_at
  * @property \DateTime $updated_at
  * @property \DateTime $deleted_at
- * @property-read \App\Models\School $school
- * @property-read \App\Models\AcademicYear $academicYear
- * @property-read \App\Models\Standard $standard
- * @property-read \App\Models\Section $section
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Teacherlink[] $teacherlink
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Mark[] $mark
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ExamSchedule[] $schedule
+ * @property-read School $school
+ * @property-read AcademicYear $academicYear
+ * @property-read Standard $standard
+ * @property-read Section $section
+ * @property-read Collection|Teacherlink[] $teacherlink
+ * @property-read Collection|Mark[] $mark
+ * @property-read Collection|ExamSchedule[] $schedule
+ *
  * @mixin \Eloquent
  */
 class Subject extends Model
@@ -42,17 +47,17 @@ class Subject extends Model
      *
      * @var string
      */
-    protected $table='subjects';
+    protected $table = 'subjects';
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-	protected $fillable = [
+    protected $fillable = [
 
-	    'school_id' , 'academic_year_id' , 'standard_id' , 'section_id' , 'name' , 'code' , 'type'
-	];
+        'school_id', 'academic_year_id', 'standard_id', 'section_id', 'name', 'code', 'type',
+    ];
 
     /**
      * Get the uppercase name for this subject.
@@ -67,70 +72,70 @@ class Subject extends Model
     /**
      * Get the school for this subject.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function school()
     {
-        return $this->belongsTo('\App\Models\School','school_id');
+        return $this->belongsTo('\App\Models\School', 'school_id');
     }
 
     /**
      * Get the academic year for this subject.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function academicYear()
     {
-        return $this->belongsTo('\App\Models\AcademicYear','academic_year_id');
+        return $this->belongsTo('\App\Models\AcademicYear', 'academic_year_id');
     }
 
     /**
      * Get the standard for this subject.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function standard()
     {
-        return $this->belongsTo('\App\Models\Standard','standard_id');
+        return $this->belongsTo('\App\Models\Standard', 'standard_id');
     }
 
     /**
      * Get the section for this subject.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function section()
     {
-        return $this->belongsTo('\App\Models\Section','section_id');
+        return $this->belongsTo('\App\Models\Section', 'section_id');
     }
 
-	/**
-	 * Get teacher links for this subject.
-	 *
-	 * @return \Illuminate\Database\Eloquent\Relations\HasMany
-	 */
-	public function teacherlink()
+    /**
+     * Get teacher links for this subject.
+     *
+     * @return HasMany
+     */
+    public function teacherlink()
     {
-        return $this->hasMany('\App\Models\Teacherlink','subject_id','id');
+        return $this->hasMany('\App\Models\Teacherlink', 'subject_id', 'id');
     }
 
     /**
      * Get marks for this subject.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function mark()
     {
-        return $this->hasMany('App\Models\Mark','subject_id','id');
+        return $this->hasMany('App\Models\Mark', 'subject_id', 'id');
     }
 
     /**
      * Get exam schedules for this subject.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function schedule()
     {
-        return $this->hasMany('App\Models\ExamSchedule','subject_id','id');
+        return $this->hasMany('App\Models\ExamSchedule', 'subject_id', 'id');
     }
 }

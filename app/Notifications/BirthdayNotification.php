@@ -3,7 +3,6 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -12,6 +11,7 @@ class BirthdayNotification extends Notification
     use Queueable;
 
     public $message;
+
     public $user_id;
 
     /**
@@ -19,7 +19,7 @@ class BirthdayNotification extends Notification
      *
      * @return void
      */
-    public function __construct($message,$user_id)
+    public function __construct($message, $user_id)
     {
         //
         $this->message = $message;
@@ -41,14 +41,14 @@ class BirthdayNotification extends Notification
      * Get the mail representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
+     * @return MailMessage
      */
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->line('The introduction to the notification.')
-                    ->action('Notification Action', url('/'))
-                    ->line('Thank you for using our application!');
+            ->line('The introduction to the notification.')
+            ->action('Notification Action', url('/'))
+            ->line('Thank you for using our application!');
     }
 
     /**
@@ -61,9 +61,9 @@ class BirthdayNotification extends Notification
     {
         return [
             //
-            'type'  =>  'birthday',
-            'id'    =>  $this->user_id,
-            'data'  =>  $this->message,
+            'type' => 'birthday',
+            'id' => $this->user_id,
+            'data' => $this->message,
         ];
     }
 }

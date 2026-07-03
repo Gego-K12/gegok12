@@ -6,20 +6,21 @@
 
 namespace App\Traits;
 
+use App\Http\Resources\Alumni as AlumniResource;
 use App\Http\Resources\ParentDetail as ParentDetailResource;
 use App\Http\Resources\Teacher as TeacherResource;
-use App\Http\Resources\Alumni as AlumniResource;
 use App\Http\Resources\User as UserResource;
-use App\Models\Users\TeacherUser;
-use App\Models\Users\StudentUser;
-use App\Models\Users\AlumniUser;
-use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Users\AlumniUser;
+use App\Models\Users\StudentUser;
+use App\Models\Users\TeacherUser;
 use Exception;
+use Gegok12\Alumni\Http\Resources\Alumni;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Log;
 
 /**
- *
  * @class trait
  * Trait for MemberProcess Processes
  */
@@ -28,11 +29,11 @@ trait MemberProcess
     /**
      * Filter members (students) by role, status, and optional profile criteria.
      *
-     * @param \Illuminate\Http\Request $request Incoming request with filter params
-     * @param int $school_id School identifier
-     * @param int $usergroup_id User group to filter by
-     * @param string $status Default status filter
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @param  Request  $request  Incoming request with filter params
+     * @param  int  $school_id  School identifier
+     * @param  int  $usergroup_id  User group to filter by
+     * @param  string  $status  Default status filter
+     * @return AnonymousResourceCollection
      */
     public function MemberFilter($request, $school_id, $usergroup_id, $status)
     {
@@ -42,7 +43,6 @@ trait MemberProcess
             } else {
                 $users = StudentUser::BySchool($school_id)->ByRole($usergroup_id);
             }
-
 
             $alphabet = $request->alphabet ? $request->alphabet : '';
             if ($alphabet) {
@@ -68,7 +68,7 @@ trait MemberProcess
                 $users = $users->where('status', '!=', 'exit');
             }
 
-            if (count((array)\Request::getQueryString()) > 0) {
+            if (count((array) \Request::getQueryString()) > 0) {
                 $firstname = $request->firstname;
                 if ($firstname != '') {
                     $users = $users->ByFirstName($firstname);
@@ -126,6 +126,7 @@ trait MemberProcess
             }
             $users = $users->get()->sortBy('userprofile.firstname');
             $users = UserResource::collection($users);
+
             return $users;
         } catch (Exception $e) {
             Log::info($e->getMessage());
@@ -135,10 +136,10 @@ trait MemberProcess
     /**
      * Filter teacher users by role and profile attributes.
      *
-     * @param \Illuminate\Http\Request $request Incoming request with filter params
-     * @param int $school_id School identifier
-     * @param int $usergroup_id Teacher role id
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @param  Request  $request  Incoming request with filter params
+     * @param  int  $school_id  School identifier
+     * @param  int  $usergroup_id  Teacher role id
+     * @return AnonymousResourceCollection
      */
     public function TeacherFilter($request, $school_id, $usergroup_id)
     {
@@ -151,7 +152,7 @@ trait MemberProcess
             if ($alphabet) {
                 $users = $users->ByFirstName($alphabet);
             }
-            if (count((array)\Request::getQueryString()) > 0) {
+            if (count((array) \Request::getQueryString()) > 0) {
                 $firstname = $request->firstname;
                 if ($firstname != '') {
                     $users = $users->ByFirstName($firstname);
@@ -211,6 +212,7 @@ trait MemberProcess
             }
             $users = $users->get();
             $users = TeacherResource::collection($users);
+
             return $users;
         } catch (Exception $e) {
             Log::info($e->getMessage());
@@ -220,10 +222,10 @@ trait MemberProcess
     /**
      * Filter non-teaching staff users by group and optional attributes.
      *
-     * @param \Illuminate\Http\Request $request Incoming request with filter params
-     * @param int $school_id School identifier
-     * @param array $usergroup_id One or more staff role ids
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @param  Request  $request  Incoming request with filter params
+     * @param  int  $school_id  School identifier
+     * @param  array  $usergroup_id  One or more staff role ids
+     * @return AnonymousResourceCollection
      */
     public function StaffFilter($request, $school_id, $usergroup_id)
     {
@@ -236,7 +238,7 @@ trait MemberProcess
             if ($alphabet) {
                 $users = $users->ByFirstName($alphabet);
             }
-            if (count((array)\Request::getQueryString()) > 0) {
+            if (count((array) \Request::getQueryString()) > 0) {
                 $firstname = $request->firstname;
                 if ($firstname != '') {
                     $users = $users->ByFirstName($firstname);
@@ -296,6 +298,7 @@ trait MemberProcess
             }
             $users = $users->get();
             $users = TeacherResource::collection($users);
+
             return $users;
         } catch (Exception $e) {
             Log::info($e->getMessage());
@@ -305,15 +308,15 @@ trait MemberProcess
     /**
      * Filter parents with active children and optional profile attributes.
      *
-     * @param \Illuminate\Http\Request $request Incoming request with filter params
-     * @param int $school_id School identifier
-     * @param int $usergroup_id Parent role id
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @param  Request  $request  Incoming request with filter params
+     * @param  int  $school_id  School identifier
+     * @param  int  $usergroup_id  Parent role id
+     * @return AnonymousResourceCollection
      */
     public function ParentFilter($request, $school_id, $usergroup_id)
     {
         try {
-            $users = User::where('school_id', $school_id)->ByRole($usergroup_id)->whereHas('children', function ($q) use ($search) {
+            $users = User::where('school_id', $school_id)->ByRole($usergroup_id)->whereHas('children', function ($q) {
 
                 $q->whereHas('userStudent', function ($q) {
                     $q->where([['status', '!=', 'exit']]);
@@ -322,7 +325,7 @@ trait MemberProcess
                 $q->where('status', 'active')->orWhere('status', 'inactive');
             });
 
-            if (count((array)\Request::getQueryString()) > 0) {
+            if (count((array) \Request::getQueryString()) > 0) {
                 $firstname = $request->firstname;
                 if ($firstname != '') {
                     $users = $users->ByFirstNameParent($firstname);
@@ -370,6 +373,7 @@ trait MemberProcess
             }
             $users = $users->paginate(10);
             $users = ParentDetailResource::collection($users);
+
             return $users;
         } catch (Exception $e) {
             Log::info($e->getMessage());
@@ -379,10 +383,10 @@ trait MemberProcess
     /**
      * Filter alumni users by name alphabet and batch.
      *
-     * @param \Illuminate\Http\Request $request Incoming request with filter params
-     * @param int $school_id School identifier
-     * @param int $usergroup_id Alumni role id
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @param  Request  $request  Incoming request with filter params
+     * @param  int  $school_id  School identifier
+     * @param  int  $usergroup_id  Alumni role id
+     * @return AnonymousResourceCollection
      */
     public function AlumniFilter($request, $school_id, $usergroup_id)
     {
@@ -401,9 +405,8 @@ trait MemberProcess
 
             $users = $users->get();
 
-            if (class_exists('Gegok12\Alumni\Http\Resources\Alumni')) //new
-            {
-                $users = \Gegok12\Alumni\Http\Resources\Alumni::collection($users);
+            if (class_exists('Gegok12\Alumni\Http\Resources\Alumni')) { // new
+                $users = Alumni::collection($users);
             } else {
                 $users = AlumniResource::collection($users);
             }
@@ -417,11 +420,11 @@ trait MemberProcess
     /**
      * Filter alumni profiles excluding the current user.
      *
-     * @param \Illuminate\Http\Request $request Incoming request with filter params
-     * @param int $school_id School identifier
-     * @param int $usergroup_id Alumni role id
-     * @param int $user_id Current user id to exclude
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @param  Request  $request  Incoming request with filter params
+     * @param  int  $school_id  School identifier
+     * @param  int  $usergroup_id  Alumni role id
+     * @param  int  $user_id  Current user id to exclude
+     * @return AnonymousResourceCollection
      */
     public function AlumniProfileFilter($request, $school_id, $usergroup_id, $user_id)
     {
@@ -440,9 +443,8 @@ trait MemberProcess
 
             $users = $users->get();
 
-            if (class_exists('Gegok12\Alumni\Http\Resources\Alumni')) //new
-            {
-                $users = \Gegok12\Alumni\Http\Resources\Alumni::collection($users);
+            if (class_exists('Gegok12\Alumni\Http\Resources\Alumni')) { // new
+                $users = Alumni::collection($users);
             } else {
                 $users = AlumniResource::collection($users);
             }
@@ -452,15 +454,16 @@ trait MemberProcess
             Log::info($e->getMessage());
         }
     }
-    //new
+
+    // new
     /**
      * Filter library member records (students) using profile and library data.
      *
-     * @param \Illuminate\Http\Request $request Incoming request with filter params
-     * @param int $school_id School identifier
-     * @param int $usergroup_id User group to filter by
-     * @param string $status Default status filter
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @param  Request  $request  Incoming request with filter params
+     * @param  int  $school_id  School identifier
+     * @param  int  $usergroup_id  User group to filter by
+     * @param  string  $status  Default status filter
+     * @return AnonymousResourceCollection
      */
     public function LibraryMemberFilter($request, $school_id, $usergroup_id, $status)
     {
@@ -471,7 +474,6 @@ trait MemberProcess
             } else {
                 $users = StudentUser::BySchool($school_id)->ByRole($usergroup_id);
             }
-
 
             $alphabet = $request->alphabet ? $request->alphabet : '';
             if ($alphabet) {
@@ -492,7 +494,7 @@ trait MemberProcess
                 $users = $users->where('status', '!=', 'exit');
             }
 
-            if (count((array)\Request::getQueryString()) > 0) {
+            if (count((array) \Request::getQueryString()) > 0) {
                 $firstname = $request->firstname;
 
                 if ($firstname != '') {
@@ -507,7 +509,6 @@ trait MemberProcess
                 //     $users = User::whereHas('libraryCard', function ($query) {
                 //   $query->where('library_card_no', 'LC12345');})->get();
 
-
                 //  $users = User::where('school_id',$school_id)->ByRole($usergroup_id)->whereHas('librarycard', function($q){
                 //         $q->where('library_card_no','LC12345')->get();
                 //     });
@@ -519,14 +520,14 @@ trait MemberProcess
                 }
                 $issue_date = $request->issue_date;
 
-                if (!empty($issue_date)) {
+                if (! empty($issue_date)) {
                     $users = $users->whereHas('lending', function ($query) use ($issue_date) {
                         $query->whereDate('issue_date', $issue_date);  // use whereDate for date comparison
                     });
                 }
 
                 $return_date = $request->return_date;
-                if (!empty($return_date)) {
+                if (! empty($return_date)) {
                     $users = $users->whereHas('lending', function ($query) use ($return_date) {
                         $query->whereDate('return_date', $return_date);
                     });
@@ -549,10 +550,10 @@ trait MemberProcess
     /**
      * Filter library teachers by profile and library card/lending data.
      *
-     * @param \Illuminate\Http\Request $request Incoming request with filter params
-     * @param int $school_id School identifier
-     * @param int $usergroup_id Teacher role id
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @param  Request  $request  Incoming request with filter params
+     * @param  int  $school_id  School identifier
+     * @param  int  $usergroup_id  Teacher role id
+     * @return AnonymousResourceCollection
      */
     public function LibraryTeacherFilter($request, $school_id, $usergroup_id)
     {
@@ -566,7 +567,7 @@ trait MemberProcess
             if ($alphabet) {
                 $users = $users->ByFirstName($alphabet);
             }
-            if (count((array)\Request::getQueryString()) > 0) {
+            if (count((array) \Request::getQueryString()) > 0) {
                 $firstname = $request->firstname;
                 if ($firstname != '') {
                     $users = $users->ByFirstName($firstname);
@@ -590,7 +591,7 @@ trait MemberProcess
                 }
                 $issue_date = $request->issue_date;
 
-                if (!empty($issue_date)) {
+                if (! empty($issue_date)) {
                     $users = $users->whereHas('lending', function ($query) use ($issue_date) {
                         $query->whereDate('issue_date', $issue_date);
                     });
@@ -598,12 +599,11 @@ trait MemberProcess
 
                 $return_date = $request->return_date;
 
-                if (!empty($return_date)) {
+                if (! empty($return_date)) {
                     $users = $users->whereHas('lending', function ($query) use ($return_date) {
                         $query->whereDate('return_date', $return_date);
                     });
                 }
-
 
                 $email = $request->email;
                 if ($email != '') {
@@ -613,6 +613,7 @@ trait MemberProcess
 
             $users = $users->get();
             $users = TeacherResource::collection($users);
+
             return $users;
         } catch (Exception $e) {
             Log::info($e->getMessage());
@@ -622,10 +623,10 @@ trait MemberProcess
     /**
      * Filter library staff by profile and library card/lending data.
      *
-     * @param \Illuminate\Http\Request $request Incoming request with filter params
-     * @param int $school_id School identifier
-     * @param array $usergroup_id Staff role ids
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @param  Request  $request  Incoming request with filter params
+     * @param  int  $school_id  School identifier
+     * @param  array  $usergroup_id  Staff role ids
+     * @return AnonymousResourceCollection
      */
     public function LibraryStaffFilter($request, $school_id, $usergroup_id)
     {
@@ -638,7 +639,7 @@ trait MemberProcess
             if ($alphabet) {
                 $users = $users->ByFirstName($alphabet);
             }
-            if (count((array)\Request::getQueryString()) > 0) {
+            if (count((array) \Request::getQueryString()) > 0) {
                 $firstname = $request->firstname;
                 if ($firstname != '') {
                     $users = $users->ByFirstName($firstname);
@@ -662,14 +663,14 @@ trait MemberProcess
                 }
                 $issue_date = $request->issue_date;
 
-                if (!empty($issue_date)) {
+                if (! empty($issue_date)) {
                     $users = $users->whereHas('lending', function ($query) use ($issue_date) {
                         $query->whereDate('issue_date', $issue_date);
                     });
                 }
 
                 $return_date = $request->return_date;
-                if (!empty($return_date)) {
+                if (! empty($return_date)) {
                     $users = $users->whereHas('lending', function ($query) use ($return_date) {
                         $query->whereDate('return_date', $return_date);
                     });
@@ -678,6 +679,7 @@ trait MemberProcess
 
             $users = $users->get();
             $users = TeacherResource::collection($users);
+
             return $users;
         } catch (Exception $e) {
             Log::info($e->getMessage());

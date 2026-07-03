@@ -1,32 +1,34 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
  */
+
 namespace App\Http\Controllers\Receptionist;
 
-use App\Http\Resources\CallLog as CallLogResource;
-use App\Http\Resources\User as UserResource;;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Http\Requests\LogRequest;
 use App\Helpers\SiteHelper;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\LogRequest;
+use App\Http\Resources\CallLog as CallLogResource;
 use App\Models\CallLog;
-use App\Models\User;
 use App\Traits\Common;
 use App\Traits\LogActivity;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Auth;
 use Log;
 
 class CallLogController extends Controller
 {
     use Common;
     use LogActivity;
+
     /**
      * Return a collection of call logs for current school and academic year.
      *
-     * @param  Request  $request
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @return AnonymousResourceCollection
      */
     public function showlist(Request $request)
     {
@@ -39,23 +41,21 @@ class CallLogController extends Controller
 
         return CallLogResource::collection($calllog);
     }
-    
 
     /**
      * Show the call log index view.
      *
-     * @return \Illuminate\Contracts\View\View
+     * @return View
      */
     public function index()
     {
         return view('/reception/calllog/index');
     }
 
-
     /**
      * Show the form for creating a new call log.
      *
-     * @return \Illuminate\Contracts\View\View
+     * @return View
      */
     public function create()
     {
@@ -67,8 +67,7 @@ class CallLogController extends Controller
     /**
      * Store a newly created call log in storage.
      *
-     * @param  LogRequest  $request
-     * @return array|null  Success response array or null on failure
+     * @return array|null Success response array or null on failure
      */
     public function store(LogRequest $request)
     {
@@ -77,7 +76,7 @@ class CallLogController extends Controller
 
             $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
 
-            $calllog = new CallLog();
+            $calllog = new CallLog;
 
             $calllog->school_id = $school_id;
             $calllog->academic_year_id = $academic_year->id;
@@ -120,6 +119,7 @@ class CallLogController extends Controller
             return ['success' => $message];
         } catch (Exception $e) {
             Log::info($e->getMessage());
+
             return null;
         }
     }
@@ -128,7 +128,7 @@ class CallLogController extends Controller
      * Display the specified call log resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @return AnonymousResourceCollection
      */
     public function show($id)
     {
@@ -141,7 +141,7 @@ class CallLogController extends Controller
      * Show the form for editing the specified call log.
      *
      * @param  int  $id
-     * @return \Illuminate\Contracts\View\View
+     * @return View
      */
     public function edit($id)
     {
@@ -156,7 +156,6 @@ class CallLogController extends Controller
     /**
      * Update the specified call log in storage.
      *
-     * @param  Request  $request
      * @param  int  $id
      * @return array|null
      */
@@ -199,6 +198,7 @@ class CallLogController extends Controller
             return ['success' => $message];
         } catch (Exception $e) {
             Log::info($e->getMessage());
+
             return null;
         }
     }
@@ -235,6 +235,7 @@ class CallLogController extends Controller
         } catch (Exception $e) {
             \DB::rollBack();
             Log::info($e->getMessage());
+
             return null;
         }
     }

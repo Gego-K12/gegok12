@@ -1,25 +1,28 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
  */
+
 namespace App\Http\Controllers\Receptionist;
 
-use App\Http\Resources\WorkAnniversary as WorkAnniversaryResource;
-use App\Http\Resources\Birthday as BirthdayResource;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Resources\Birthday as BirthdayResource;
+use App\Http\Resources\WorkAnniversary as WorkAnniversaryResource;
 use App\Models\Smstemplate;
 use App\Models\Userprofile;
-use App\Models\User;
+use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Auth;
 
 class BirthdayController extends Controller
 {
     /**
      * Return today's student birthdays as a collection resource.
      *
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @return AnonymousResourceCollection
      */
     public function showBirthday()
     {
@@ -38,8 +41,8 @@ class BirthdayController extends Controller
      * Return birthday list and available SMS templates for students.
      *
      * @return array{
-     *     birthdaylist: \Illuminate\Database\Eloquent\Collection,
-     *     templatelist: \Illuminate\Database\Eloquent\Collection
+     *     birthdaylist: Collection,
+     *     templatelist: Collection
      * }
      */
     public function birthdayUser()
@@ -61,7 +64,7 @@ class BirthdayController extends Controller
     /**
      * Show the receptionist birthday dashboard view.
      *
-     * @return \Illuminate\Contracts\View\View
+     * @return View
      */
     public function birthday()
     {
@@ -71,7 +74,7 @@ class BirthdayController extends Controller
     /**
      * Return today's teacher birthdays as a collection resource.
      *
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @return AnonymousResourceCollection
      */
     public function showBirthdayTeacher()
     {
@@ -90,8 +93,8 @@ class BirthdayController extends Controller
      * Return teacher birthday list and available SMS templates.
      *
      * @return array{
-     *     birthdaylist: \Illuminate\Database\Eloquent\Collection,
-     *     templatelist: \Illuminate\Database\Eloquent\Collection
+     *     birthdaylist: Collection,
+     *     templatelist: Collection
      * }
      */
     public function birthdayTeacher()
@@ -113,7 +116,7 @@ class BirthdayController extends Controller
     /**
      * Show the receptionist teacher birthday creation view.
      *
-     * @return \Illuminate\Contracts\View\View
+     * @return View
      */
     public function birthdayCreate()
     {
@@ -123,7 +126,7 @@ class BirthdayController extends Controller
     /**
      * Return today's work anniversaries as a collection resource.
      *
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @return AnonymousResourceCollection
      */
     public function showWorkAnniversary()
     {
@@ -142,8 +145,8 @@ class BirthdayController extends Controller
      * Return work anniversary list and templates for display.
      *
      * @return array{
-     *     workanniversarylist: \Illuminate\Database\Eloquent\Collection,
-     *     templatelist: \Illuminate\Database\Eloquent\Collection
+     *     workanniversarylist: Collection,
+     *     templatelist: Collection
      * }
      */
     public function workAnniversary()
@@ -165,7 +168,7 @@ class BirthdayController extends Controller
     /**
      * Show the receptionist work anniversary view.
      *
-     * @return \Illuminate\Contracts\View\View
+     * @return View
      */
     public function workAnniversaryCreate()
     {

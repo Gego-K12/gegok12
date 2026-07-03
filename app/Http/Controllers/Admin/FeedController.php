@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
@@ -6,18 +7,15 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Requests\Classwall\PostRequest;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
-use App\Traits\LogActivity;
-use App\Helpers\SiteHelper;
-use App\Traits\Common;
 use App\Models\Post;
 use App\Models\PostTag;
 use App\Models\Tag;
-use App\Models\User;
-use Exception;
+use App\Traits\Common;
+use App\Traits\LogActivity;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * FeedController
@@ -26,19 +24,16 @@ use Exception;
  * - Displaying feeds
  * - Filtering feeds by visibility or tags
  * - Preparing data required for the feed view
- *
- * @package App\Http\Controllers\Admin
  */
 class FeedController extends Controller
 {
-    use LogActivity;
     use Common;
+    use LogActivity;
 
     /**
      * Show the feed listing.
      *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request)
     {
@@ -88,8 +83,7 @@ class FeedController extends Controller
     /**
      * Show feed create page.
      *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create(Request $request)
     {
@@ -114,8 +108,7 @@ class FeedController extends Controller
     /**
      * Filter feed posts.
      *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function filter(Request $request)
     {

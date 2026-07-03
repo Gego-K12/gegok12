@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests;
 
+use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Validator;
-use Carbon\Carbon;
 
 class DisciplineRequest extends FormRequest
 {
@@ -25,9 +25,8 @@ class DisciplineRequest extends FormRequest
      */
     public function rules()
     {
-        Validator::extend('check_incident_detail',function($attribute,$value,$parameters,$validator)
-        {
-            return preg_match('/^[A-Za-z_~\-!@#\$%\^&*.,:(\)\s]+$/', request('incident_detail')) ;
+        Validator::extend('check_incident_detail', function ($attribute, $value, $parameters, $validator) {
+            return preg_match('/^[A-Za-z_~\-!@#\$%\^&*.,:(\)\s]+$/', request('incident_detail'));
         });
 
         // Validator::extend('check_incident_date',function($attribute,$value,$parameters,$validator)
@@ -54,13 +53,13 @@ class DisciplineRequest extends FormRequest
 
         return [
             //
-            //'student_id'        =>  'required',
-            'incident_date'     =>  'required|date|before_or_equal:now',
-            'teacher_id'        =>  'required',
-            'incident_detail'   =>  'required|check_incident_detail',
-            'action_taken'      =>  'required',
-            'notify_parents'    =>  'required',
-            'attachments'       =>  'nullable|mimes:pdf|max:8092',
+            // 'student_id'        =>  'required',
+            'incident_date' => 'required|date|before_or_equal:now',
+            'teacher_id' => 'required',
+            'incident_detail' => 'required|check_incident_detail',
+            'action_taken' => 'required',
+            'notify_parents' => 'required',
+            'attachments' => 'nullable|mimes:pdf|max:8092',
         ];
     }
 
@@ -68,22 +67,22 @@ class DisciplineRequest extends FormRequest
     {
         return [
             //
-            //'student_id.required'                   =>  'Select Student',
+            // 'student_id.required'                   =>  'Select Student',
 
-            'incident_date.required'                =>  'Select Incident Date',
-            'incident_date.check_incident_date'     =>  'Select Valid Incident Date',
+            'incident_date.required' => 'Select Incident Date',
+            'incident_date.check_incident_date' => 'Select Valid Incident Date',
 
-            'teacher_id.required'                   =>  'Select Teacher',
+            'teacher_id.required' => 'Select Teacher',
 
-            'incident_detail.required'              =>  'Incident Detail is required',
-            'incident_detail.check_incident_detail' =>  'Enter a Valid Incident Detail',
+            'incident_detail.required' => 'Incident Detail is required',
+            'incident_detail.check_incident_detail' => 'Enter a Valid Incident Detail',
 
-            'action_taken.required'                 =>  'Action Taken is required',
+            'action_taken.required' => 'Action Taken is required',
 
-            'notify_parents.required'               =>  'Notify Parents in required',
+            'notify_parents.required' => 'Notify Parents in required',
 
-            'attachments.mimes'                     =>  'Choose a PDF File',
-            'attachments.max'                       =>  'Maximum file size to upload is 8MB',
+            'attachments.mimes' => 'Choose a PDF File',
+            'attachments.max' => 'Maximum file size to upload is 8MB',
         ];
     }
 }

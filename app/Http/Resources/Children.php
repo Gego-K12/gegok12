@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class Children extends JsonResource
@@ -9,18 +10,18 @@ class Children extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return array
      */
     public function toArray($request)
     {
-        return 
+        return
         [
             //
-            'name'      =>  $this->userStudent->name,
-            'fullname'  =>  $this->userStudent->FullName,
-            'class'     =>  $this->userStudent->studentAcademicLatest->standardLink->StandardSection,
-            'avatar'    =>  $this->userStudent->userprofile->AvatarPath,
+            'name' => $this->userStudent->name,
+            'fullname' => $this->userStudent->FullName,
+            'class' => $this->userStudent->studentAcademicLatest->standardLink->StandardSection,
+            'avatar' => $this->userStudent->userprofile->AvatarPath,
         ];
     }
 }

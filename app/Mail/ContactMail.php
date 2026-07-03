@@ -2,19 +2,17 @@
 
 namespace App\Mail;
 
+use App\Models\MailTemplate;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use App\Models\MailTemplate;
 
 /**
  * ContactMail
  *
  * Mailable class for sending contact form submission emails.
  * Contains contact details including phone, email, role, and inquiry information.
- *
- * @package App\Mail
  */
 class ContactMail extends Mailable implements ShouldQueue
 {
@@ -30,12 +28,12 @@ class ContactMail extends Mailable implements ShouldQueue
     /**
      * Create a new message instance.
      *
-     * @param mixed $contact The contact form submission data
+     * @param  mixed  $contact  The contact form submission data
      * @return void
      */
     public function __construct($contact)
     {
-        $this->queue='emails';
+        $this->queue = 'emails';
         $this->contact = $contact;
     }
 
@@ -49,21 +47,21 @@ class ContactMail extends Mailable implements ShouldQueue
      */
     public function build()
     {
-         $template = MailTemplate::where([['name','contact'],['status','active']])->first();
-        $subject =  $template->subject;
+        $template = MailTemplate::where([['name', 'contact'], ['status', 'active']])->first();
+        $subject = $template->subject;
         $mail_content = $template->mail_content;
 
-        $mail_content = str_replace(":contact_no",$this->contact->contact_no,$mail_content);
-        $mail_content = str_replace(":email",$this->contact->email,$mail_content);
-        $mail_content = str_replace(":select",$this->contact->select,$mail_content);
-        $mail_content = str_replace(":fullname",$this->contact->fullname,$mail_content);
-        $mail_content = str_replace(":role",$this->contact->role,$mail_content);
-        $mail_content = str_replace(":serve_at",$this->contact->serve_at,$mail_content);
-     
+        $mail_content = str_replace(':contact_no', $this->contact->contact_no, $mail_content);
+        $mail_content = str_replace(':email', $this->contact->email, $mail_content);
+        $mail_content = str_replace(':select', $this->contact->select, $mail_content);
+        $mail_content = str_replace(':fullname', $this->contact->fullname, $mail_content);
+        $mail_content = str_replace(':role', $this->contact->role, $mail_content);
+        $mail_content = str_replace(':serve_at', $this->contact->serve_at, $mail_content);
+
         return $this->markdown('emails.mailcontent')
-                    ->subject($subject)
-                    ->with([
-                        'content' => $mail_content,
-                        ]);
+            ->subject($subject)
+            ->with([
+                'content' => $mail_content,
+            ]);
     }
 }

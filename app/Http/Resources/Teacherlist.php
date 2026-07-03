@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class Teacherlist extends JsonResource
@@ -9,15 +10,15 @@ class Teacherlist extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return array
      */
     public function toArray($request)
     {
-        return 
+        return
         [
-            'teacher_id'    =>  $this->id,
-            'teacher_name'  =>  $this->FullName,
+            'teacher_id' => $this->id,
+            'teacher_name' => $this->FullName,
         ];
     }
 }

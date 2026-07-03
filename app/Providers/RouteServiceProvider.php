@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Route;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -15,19 +15,29 @@ class RouteServiceProvider extends ServiceProvider
      * @var string
      */
     protected $namespace = 'App\Http\Controllers';
+
     protected $adminNamespace = 'App\Http\Controllers\Admin';
+
     protected $inventoryNamespace = 'App\Http\Controllers\Staff';
+
     protected $stockNamespace = 'App\Http\Controllers\Stock';
+
     protected $librarianNamespace = 'App\Http\Controllers\Librarian';
+
     protected $studentNamespace = 'App\Http\Controllers\Student';
+
     protected $teacherNamespace = 'App\Http\Controllers\Teacher';
+
     protected $receptionistNamespace = 'App\Http\Controllers\Receptionist';
+
     protected $accountantNamespace = 'App\Http\Controllers\Accountant';
+
     protected $payrollNamespace = 'App\Http\Controllers\Payroll';
+
     // protected $alumniNamespace = 'App\Http\Controllers\Alumni'; // Moved to add-on module
     protected $superadminNamespace = 'App\Http\Controllers\Superadmin';
 
-    //public const HOME = '/dashboard';
+    // public const HOME = '/dashboard';
 
     /**
      * Define your route model bindings, pattern filters, etc.
@@ -50,7 +60,7 @@ class RouteServiceProvider extends ServiceProvider
     {
         $this->mapApiRoutes();
         $this->mapWebRoutes();
-        //$this->mapStaticRoutes(); //static routes hidden
+        // $this->mapStaticRoutes(); //static routes hidden
         $this->mapAdminRoutes();
         $this->mapSettingsRoutes();
         $this->mapInventoryRoutes();
@@ -98,7 +108,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapAdminRoutes()
     {
         Route::prefix('admin')
-            ->middleware(['web','auth', 'schooladmin', 'privilegeconditions']) //, 'verifyotp'
+            ->middleware(['web', 'auth', 'schooladmin', 'privilegeconditions']) // , 'verifyotp'
             ->namespace($this->adminNamespace)
             ->group(base_path('routes/admin.php'));
     }
@@ -106,7 +116,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapSettingsRoutes()
     {
         Route::prefix('admin')
-            ->middleware(['web','auth', 'schooladmin'])
+            ->middleware(['web', 'auth', 'schooladmin'])
             ->namespace($this->adminNamespace)
             ->group(base_path('routes/setting.php'));
     }
@@ -114,7 +124,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapInventoryRoutes()
     {
         Route::prefix('admin')
-            ->middleware(['web','auth', 'schooladmin', 'privilegeconditions'])  //, 'verifyotp'
+            ->middleware(['web', 'auth', 'schooladmin', 'privilegeconditions'])  // , 'verifyotp'
             ->namespace($this->inventoryNamespace)
             ->group(base_path('routes/inventory.php'));
     }
@@ -122,7 +132,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapStockRoutes()
     {
         Route::prefix('stock')
-            ->middleware(['web','auth', 'stockkeeper'])
+            ->middleware(['web', 'auth', 'stockkeeper'])
             ->namespace($this->stockNamespace)
             ->group(base_path('routes/stock.php'));
     }
@@ -130,7 +140,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapLibrarianRoutes()
     {
         Route::prefix('library')
-            ->middleware(['web','auth', 'librarian'])
+            ->middleware(['web', 'auth', 'librarian'])
             ->namespace($this->librarianNamespace)
             ->group(base_path('routes/librarian.php'));
     }
@@ -138,7 +148,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapStudentRoutes()
     {
         Route::prefix('student')
-            ->middleware(['web','auth', 'student'])
+            ->middleware(['web', 'auth', 'student'])
             ->namespace($this->studentNamespace)
             ->group(base_path('routes/student.php'));
     }
@@ -153,7 +163,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapTeacherRoutes()
     {
         Route::prefix('teacher')
-            ->middleware(['web','auth', 'teacher'])
+            ->middleware(['web', 'auth', 'teacher'])
             ->namespace($this->teacherNamespace)
             ->group(base_path('routes/teacher.php'));
     }
@@ -161,7 +171,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapReceptionistRoutes()
     {
         Route::prefix('receptionist')
-            ->middleware(['web','auth', 'receptionist'])
+            ->middleware(['web', 'auth', 'receptionist'])
             ->namespace($this->receptionistNamespace)
             ->group(base_path('routes/receptionist.php'));
     }
@@ -169,7 +179,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapAccountantRoutes()
     {
         Route::prefix('accountant')
-            ->middleware(['web','auth', 'accountant'])
+            ->middleware(['web', 'auth', 'accountant'])
             ->namespace($this->accountantNamespace)
             ->group(base_path('routes/accountant.php'));
     }
@@ -177,7 +187,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapPayrollRoutes()
     {
         Route::prefix('accountant')
-            ->middleware(['web','auth','adminaccountant'])
+            ->middleware(['web', 'auth', 'adminaccountant'])
             ->namespace($this->payrollNamespace)
             ->group(base_path('routes/payroll.php'));
     }
@@ -194,7 +204,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapSuperadminRoutes()
     {
         Route::prefix('superadmin')
-            ->middleware(['web','auth', 'superadmin'])
+            ->middleware(['web', 'auth', 'superadmin'])
             ->namespace($this->superadminNamespace)
             ->group(base_path('routes/superadmin.php'));
     }

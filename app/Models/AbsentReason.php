@@ -1,4 +1,5 @@
 <?php
+
 // SPDX-License-Identifier: MIT
 // (c) 2025 GegoSoft Technologies and GegoK12 Contributors
 
@@ -21,10 +22,13 @@
  *
  * @mixin \Eloquent
  */
+
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class AbsentReason extends Model
 {
@@ -44,7 +48,7 @@ class AbsentReason extends Model
      * @var array
      */
     protected $fillable = [
-        'title' , 'status'
+        'title', 'status',
     ];
 
     /**
@@ -57,20 +61,20 @@ class AbsentReason extends Model
     /**
      * Get the attendance records for this reason.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function attendance()
     {
-        return $this->belongsTo('App\Models\Attendance','reason_id','id');
+        return $this->belongsTo('App\Models\Attendance', 'reason_id', 'id');
     }
 
     /**
      * Get the teacher leave applications for this reason.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function teacherLeaveApplication()
     {
-        return $this->hasMany('\App\Models\TeacherLeaveApplication','reason_id','id');
+        return $this->hasMany('\App\Models\TeacherLeaveApplication', 'reason_id', 'id');
     }
 }

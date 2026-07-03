@@ -2,10 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Models\BookCategory;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Input;
-use App\Models\BookCategory;
 
 class BookCategoryRequest extends FormRequest
 {
@@ -28,35 +27,32 @@ class BookCategoryRequest extends FormRequest
     {
 
         Validator::extend('check_name', function ($attribute, $value, $parameters, $validator) {
-            
 
-            $category=BookCategory::where('category',request('category'))->exists();
-                       
-            if($category)
-            {
-              
-              return FALSE;
+            $category = BookCategory::where('category', request('category'))->exists();
+
+            if ($category) {
+
+                return false;
             }
-           
-            return TRUE;               
 
-      });
-        
+            return true;
+
+        });
 
         return [
-            
-            'category'   => 'required|check_name|max:100',
-           
+
+            'category' => 'required|check_name|max:100',
+
         ];
     }
 
     public function messages()
     {
-        return[
-            
-            'category.required'     =>  'Category is required',
-            'category.check_name'   =>  'Already Exists',
-           
+        return [
+
+            'category.required' => 'Category is required',
+            'category.check_name' => 'Already Exists',
+
         ];
     }
 }

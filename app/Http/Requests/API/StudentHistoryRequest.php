@@ -24,10 +24,10 @@ class StudentHistoryRequest extends FormRequest
     public function rules()
     {
         return [
-            'student_id'         =>  'required',
-            'parent_id'          =>  'required',
-            'module_id'          =>  'required',
-            'type'               =>  'required',
+            'student_id' => 'required',
+            'parent_id' => 'required',
+            'module_id' => 'required',
+            'type' => 'required',
         ];
     }
 }

@@ -3,10 +3,9 @@
 namespace App\Listeners;
 
 use App\Events\ReminderMailEvent;
-use Illuminate\Queue\InteractsWithQueue;
+use App\Mail\ReminderMail;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\ReminderMail;
 
 class ReminderMailListener implements ShouldQueue
 {
@@ -23,7 +22,6 @@ class ReminderMailListener implements ShouldQueue
     /**
      * Handle the event.
      *
-     * @param  ReminderMailEvent  $event
      * @return void
      */
     public function handle(ReminderMailEvent $event)

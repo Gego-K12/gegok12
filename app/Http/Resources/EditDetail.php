@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class EditDetail extends JsonResource
@@ -9,7 +10,7 @@ class EditDetail extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return array
      */
     public function toArray($request)
@@ -22,9 +23,9 @@ class EditDetail extends JsonResource
         {
             $value = $this->meta_value;
         }*/
-        return 
+        return
         [
-            $this->meta_key     => $this->meta_value,
+            $this->meta_key => $this->meta_value,
         ];
     }
 }

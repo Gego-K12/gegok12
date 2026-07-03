@@ -2,10 +2,12 @@
 
 namespace App\Livewire\Admin\Setting;
 
-use Livewire\Component;
 use App\Models\Country;
-use Livewire\Attributes\Rule;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
+use Livewire\Attributes\Rule;
+use Livewire\Component;
 
 /**
  * Class CountryForm
@@ -19,8 +21,6 @@ use Jantinnerezo\LivewireAlert\LivewireAlert;
  * - Country editing
  * - Form validation
  * - Success alerts
- *
- * @package App\Livewire\Admin\Setting
  */
 class CountryForm extends Component
 {
@@ -79,7 +79,7 @@ class CountryForm extends Component
      * Loads country details for edit mode and
      * populates form fields accordingly.
      *
-     * @param int|string|null $id Country ID
+     * @param  int|string|null  $id  Country ID
      * @return void
      */
     public function mount($id)
@@ -87,11 +87,11 @@ class CountryForm extends Component
         $this->countryEditId = $id;
 
         $countryEdit = Country::where('id', $this->countryEditId)->first();
-        $this->name        = $countryEdit->name;
+        $this->name = $countryEdit->name;
         $this->short_name = $countryEdit->short_name;
-        $this->iso_code   = $countryEdit->iso_code;
+        $this->iso_code = $countryEdit->iso_code;
         $this->tel_prefix = $countryEdit->tel_prefix;
-        $this->status     = $countryEdit->status;
+        $this->status = $countryEdit->status;
     }
 
     /**
@@ -104,18 +104,18 @@ class CountryForm extends Component
      * Displays success alerts and redirects
      * back to the countries listing page.
      *
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function submitCountry()
     {
         $this->validate();
 
         $data = [
-            'name'        => $this->name,
+            'name' => $this->name,
             'short_name' => $this->short_name,
-            'iso_code'   => $this->iso_code,
+            'iso_code' => $this->iso_code,
             'tel_prefix' => $this->tel_prefix,
-            'status'     => $this->status,
+            'status' => $this->status,
         ];
 
         if ($this->countryEditId != null) {
@@ -134,7 +134,7 @@ class CountryForm extends Component
      *
      * Displays the country create/edit form.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function render()
     {

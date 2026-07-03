@@ -1,25 +1,26 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
  */
+
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Resources\WorkAnniversary as WorkAnniversaryResource;
-use App\Http\Resources\Birthday as BirthdayResource;
 use App\Events\Notification\SingleNotificationEvent;
-use App\Http\Requests\BirthdayReminderRequest;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Controller;
-use App\Traits\SendPushNotification;
-use App\Traits\SendMessageProcess;
 use App\Events\SinglePushEvent;
-use App\Traits\EventProcess;
-use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\BirthdayReminderRequest;
+use App\Http\Resources\Birthday as BirthdayResource;
+use App\Http\Resources\WorkAnniversary as WorkAnniversaryResource;
 use App\Models\Smstemplate;
-use App\Models\Userprofile;
 use App\Models\User;
+use App\Models\Userprofile;
+use App\Traits\EventProcess;
+use App\Traits\SendMessageProcess;
+use App\Traits\SendPushNotification;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 use Log;
 
 /**
@@ -27,14 +28,12 @@ use Log;
  *
  * Controller handling birthday and work-anniversary reminders,
  * message dispatching and related dashboard views for users.
- *
- * @package App\Http\Controllers\Admin
  */
 class BirthdayController extends Controller
 {
-    use SendPushNotification;
     use EventProcess;
     use SendMessageProcess;
+    use SendPushNotification;
     //
 
     public function showBirthday()
@@ -45,9 +44,9 @@ class BirthdayController extends Controller
                     ->where('school_id',Auth::user()->school_id)
                     ->ByRole(6)
                     ->get();*/
-        $birthday=$this->getTodayBirthday(6);                    
+        $birthday = $this->getTodayBirthday(6);
         $users = BirthdayResource::collection($birthday);
-         
+
         return $users;
     }
 
@@ -55,15 +54,15 @@ class BirthdayController extends Controller
     {
         $array = [];
 
-       /* $birthday = Userprofile::with('user')->whereHas('user', function($q){
-                        $q->where('deleted_at',null);
-                    })->whereRaw("DATE_FORMAT(date_of_birth, '%m-%d') = DATE_FORMAT(now(),'%m-%d')")
-                    ->where('school_id',Auth::user()->school_id)
-                    ->ByRole(6)
-                    ->get();*/
-        $birthday=$this->getTodayBirthday(6);
-        $templates = Smstemplate::where('name','birthday_message')->get();
-  
+        /* $birthday = Userprofile::with('user')->whereHas('user', function($q){
+                         $q->where('deleted_at',null);
+                     })->whereRaw("DATE_FORMAT(date_of_birth, '%m-%d') = DATE_FORMAT(now(),'%m-%d')")
+                     ->where('school_id',Auth::user()->school_id)
+                     ->ByRole(6)
+                     ->get();*/
+        $birthday = $this->getTodayBirthday(6);
+        $templates = Smstemplate::where('name', 'birthday_message')->get();
+
         $array['birthdaylist'] = $birthday;
         $array['templatelist'] = $templates;
 
@@ -76,57 +75,53 @@ class BirthdayController extends Controller
     }
 
     public function birthdayMessage(BirthdayReminderRequest $request)
-    {  
-        try
-        {
+    {
+        try {
             $school_id = Auth::user()->school_id;
-            $data = array('subject'=>'Birthday Wishes' , 'message'=>$request->message , 'type'=>'birthday');
+            $data = ['subject' => 'Birthday Wishes', 'message' => $request->message, 'type' => 'birthday'];
 
-            $datas=[];
-            $datas['subject']='Birthday Wishes';
-            $datas['message']=$request->message;
-            $datas=(object)$datas;
-       
-            foreach($request->to as $to)
-            {
-                foreach($to['user']['parents'] as $parentStudent)
-                { 
-                    $parent = User::where('id',$parentStudent['parent_id'])->first();
-                    $student = User::where('id',$parentStudent['student_id'])->first();
+            $datas = [];
+            $datas['subject'] = 'Birthday Wishes';
+            $datas['message'] = $request->message;
+            $datas = (object) $datas;
+
+            foreach ($request->to as $to) {
+                foreach ($to['user']['parents'] as $parentStudent) {
+                    $parent = User::where('id', $parentStudent['parent_id'])->first();
+                    $student = User::where('id', $parentStudent['student_id'])->first();
                     $mobile_no = $parent->mobile_no;
                     $mail = $parent->email;
                     $entity_id = $parent->id;
-                    $month = date('m-d',strtotime($to['date_of_birth']));
-                    $current_year=date('Y');
+                    $month = date('m-d', strtotime($to['date_of_birth']));
+                    $current_year = date('Y');
                     $date_of_birth = $current_year.'-'.$month;
 
-                    $send = $this->selectSendMessage($datas , $school_id ,  Auth::user()->email , $parent , Auth::user() , $student);
+                    $send = $this->selectSendMessage($datas, $school_id, Auth::user()->email, $parent, Auth::user(), $student);
 
-                    $this->sendToBirthdayReminder($school_id,$entity_id,$date_of_birth,$data,$mobile_no,$mail,'birthday');
-                    
-                    $array=[];
+                    $this->sendToBirthdayReminder($school_id, $entity_id, $date_of_birth, $data, $mobile_no, $mail, 'birthday');
 
-                    $array['school_id']  =   Auth::user()->school_id;
-                    $array['user_id']    =   $parent->id;
-                    $array['message']    =   $request->message;
-                    $array['type']       =   'birthday';
+                    $array = [];
+
+                    $array['school_id'] = Auth::user()->school_id;
+                    $array['user_id'] = $parent->id;
+                    $array['message'] = $request->message;
+                    $array['type'] = 'birthday';
 
                     event(new SinglePushEvent($array));
 
                     $data = [];
-                    $student = User::where('id',$to['user_id'])->first();
-                    $data['user']       =   $student;
-                    //$data['type']       =   'birthday';
-                    $data['details']    =   trans('notification.notification_msg',['module' => 'Birthday']);
+                    $student = User::where('id', $to['user_id'])->first();
+                    $data['user'] = $student;
+                    // $data['type']       =   'birthday';
+                    $data['details'] = trans('notification.notification_msg', ['module' => 'Birthday']);
                     event(new SingleNotificationEvent($data));
                 }
             }
 
-            $res['success']= trans('birthday.success_msg');
+            $res['success'] = trans('birthday.success_msg');
+
             return $res;
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
             Log::info($e->getMessage());
         }
     }
@@ -134,14 +129,14 @@ class BirthdayController extends Controller
     public function showBirthdayTeacher()
     {
         //
-       /* $birthday = Userprofile::with('user')
-                    ->whereRaw("DATE_FORMAT(date_of_birth, '%m-%d') = DATE_FORMAT(now(),'%m-%d')")
-                    ->where('school_id',Auth::user()->school_id)
-                    ->ByRole(5)
-                    ->get();*/
-        $birthday=$this->getTodayBirthday(5);                    
+        /* $birthday = Userprofile::with('user')
+                     ->whereRaw("DATE_FORMAT(date_of_birth, '%m-%d') = DATE_FORMAT(now(),'%m-%d')")
+                     ->where('school_id',Auth::user()->school_id)
+                     ->ByRole(5)
+                     ->get();*/
+        $birthday = $this->getTodayBirthday(5);
         $users = BirthdayResource::collection($birthday);
-         
+
         return $users;
     }
 
@@ -149,13 +144,13 @@ class BirthdayController extends Controller
     {
         $array = [];
 
-       /* $birthday = Userprofile::with('user')
-                    ->whereRaw("DATE_FORMAT(date_of_birth, '%m-%d') = DATE_FORMAT(now(),'%m-%d')")
-                    ->where('school_id',Auth::user()->school_id)
-                    ->ByRole(5)
-                    ->get();*/
-        $birthday=$this->getTodayBirthday(5);             
-        $templates = Smstemplate::where('name','birthday_message')->get();
+        /* $birthday = Userprofile::with('user')
+                     ->whereRaw("DATE_FORMAT(date_of_birth, '%m-%d') = DATE_FORMAT(now(),'%m-%d')")
+                     ->where('school_id',Auth::user()->school_id)
+                     ->ByRole(5)
+                     ->get();*/
+        $birthday = $this->getTodayBirthday(5);
+        $templates = Smstemplate::where('name', 'birthday_message')->get();
 
         $array['birthdaylist'] = $birthday;
         $array['templatelist'] = $templates;
@@ -169,45 +164,42 @@ class BirthdayController extends Controller
     }
 
     public function birthdayMessageTeacher(BirthdayReminderRequest $request)
-    {  
-        try
-        {
+    {
+        try {
             $school_id = Auth::user()->school_id;
-            $data = array('subject'=>'Birthday Wishes' , 'message'=>$request->message , 'type'=>'birthday');
-       
-            foreach($request->to as $to)
-            {
+            $data = ['subject' => 'Birthday Wishes', 'message' => $request->message, 'type' => 'birthday'];
+
+            foreach ($request->to as $to) {
                 $mobile_no = $to['user']['mobile_no'];
                 $mail = $to['user']['email'];
                 $entity_id = $to['user']['id'];
                 $send = $to['user'];
-                $month = date('m-d',strtotime($to['date_of_birth']));
-                $current_year=date('Y');
+                $month = date('m-d', strtotime($to['date_of_birth']));
+                $current_year = date('Y');
                 $date_of_birth = $current_year.'-'.$month;
 
-                $this->sendToBirthdayReminder($school_id,$entity_id,$date_of_birth,$data,$mobile_no,$mail,'birthday');
-                
-                $array=[];
+                $this->sendToBirthdayReminder($school_id, $entity_id, $date_of_birth, $data, $mobile_no, $mail, 'birthday');
 
-                $array['school_id']  =   Auth::user()->school_id;
-                $array['user_id']    =   $to['user']['members'][0]['id'];
-                $array['message']    =   $request->message;
-                $array['type']       =   'birthday';
+                $array = [];
+
+                $array['school_id'] = Auth::user()->school_id;
+                $array['user_id'] = $to['user']['members'][0]['id'];
+                $array['message'] = $request->message;
+                $array['type'] = 'birthday';
 
                 event(new SinglePushEvent($array));
 
                 $data = [];
-                $teacher = User::where('id',$to['user_id'])->first();
-                $data['user']       =   $teacher;
-                $data['details']    =   trans('notification.notification_msg',['module' => 'Birthday']);
+                $teacher = User::where('id', $to['user_id'])->first();
+                $data['user'] = $teacher;
+                $data['details'] = trans('notification.notification_msg', ['module' => 'Birthday']);
                 event(new SingleNotificationEvent($data));
             }
 
-            $res['success']= trans('birthday.success_msg');
+            $res['success'] = trans('birthday.success_msg');
+
             return $res;
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
             Log::info($e->getMessage());
         }
     }
@@ -216,13 +208,13 @@ class BirthdayController extends Controller
     {
         //
         $workanniversary = Userprofile::with('user')
-                    ->whereRaw("DATE_FORMAT(joining_date, '%m-%d') = DATE_FORMAT(now(),'%m-%d')")
-                    ->where('school_id',Auth::user()->school_id)
-                    ->ByRole(5)
-                    ->get();
-                            
+            ->whereRaw("DATE_FORMAT(joining_date, '%m-%d') = DATE_FORMAT(now(),'%m-%d')")
+            ->where('school_id', Auth::user()->school_id)
+            ->ByRole(5)
+            ->get();
+
         $workanniversary = WorkAnniversaryResource::collection($workanniversary);
-         
+
         return $workanniversary;
     }
 
@@ -231,11 +223,11 @@ class BirthdayController extends Controller
         $array = [];
 
         $workanniversary = Userprofile::with('user')
-                    ->whereRaw("DATE_FORMAT(joining_date, '%m-%d') = DATE_FORMAT(now(),'%m-%d')")
-                    ->where('school_id',Auth::user()->school_id)
-                    ->ByRole(5)
-                    ->get();
-        $templates = Smstemplate::where('name','work_anniversary_message')->get();
+            ->whereRaw("DATE_FORMAT(joining_date, '%m-%d') = DATE_FORMAT(now(),'%m-%d')")
+            ->where('school_id', Auth::user()->school_id)
+            ->ByRole(5)
+            ->get();
+        $templates = Smstemplate::where('name', 'work_anniversary_message')->get();
 
         $array['workanniversarylist'] = $workanniversary;
         $array['templatelist'] = $templates;
@@ -249,45 +241,42 @@ class BirthdayController extends Controller
     }
 
     public function workAnniversaryMessage(BirthdayReminderRequest $request)
-    {  
-        try
-        {
+    {
+        try {
             $school_id = Auth::user()->school_id;
-            $data = array('subject'=>'Work Anniversary Wishes' , 'message'=>$request->message , 'type'=>'birthday');
-       
-            foreach($request->to as $to)
-            {
+            $data = ['subject' => 'Work Anniversary Wishes', 'message' => $request->message, 'type' => 'birthday'];
+
+            foreach ($request->to as $to) {
                 $mobile_no = $to['user']['mobile_no'];
                 $mail = $to['user']['email'];
                 $entity_id = $to['user']['id'];
                 $send = $to['user'];
-                $month = date('m-d',strtotime($to['date_of_birth']));
-                $current_year=date('Y');
+                $month = date('m-d', strtotime($to['date_of_birth']));
+                $current_year = date('Y');
                 $date_of_birth = $current_year.'-'.$month;
 
-                $this->sendToBirthdayReminder($school_id,$entity_id,$date_of_birth,$data,$mobile_no,$mail,'work_anniversary');
-                
-                $array=[];
+                $this->sendToBirthdayReminder($school_id, $entity_id, $date_of_birth, $data, $mobile_no, $mail, 'work_anniversary');
 
-                $array['school_id']  =   Auth::user()->school_id;
-                $array['user_id']    =   $to['user']['members'][0]['id'];
-                $array['message']    =   $request->message;
-                $array['type']       =   'birthday';
+                $array = [];
+
+                $array['school_id'] = Auth::user()->school_id;
+                $array['user_id'] = $to['user']['members'][0]['id'];
+                $array['message'] = $request->message;
+                $array['type'] = 'birthday';
 
                 event(new SinglePushEvent($array));
 
                 $data = [];
-                $teacher = User::where('id',$to['user_id'])->first();
-                $data['user']       =   $teacher;
-                $data['details']    =   trans('notification.notification_msg',['module' => 'Work Anniversary']);
+                $teacher = User::where('id', $to['user_id'])->first();
+                $data['user'] = $teacher;
+                $data['details'] = trans('notification.notification_msg', ['module' => 'Work Anniversary']);
                 event(new SingleNotificationEvent($data));
             }
 
-            $res['success']= trans('birthday.work_anniversary_success_msg');
+            $res['success'] = trans('birthday.work_anniversary_success_msg');
+
             return $res;
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
             Log::info($e->getMessage());
         }
     }
@@ -295,14 +284,14 @@ class BirthdayController extends Controller
     public function getTodayBirthday($usergroup_id)
     {
 
-          $birthday = Userprofile::with('user')->whereHas('user', function($q){
-                        $q->where('deleted_at',null);
-                    })->whereRaw("DATE_FORMAT(date_of_birth, '%m-%d') = DATE_FORMAT(now(),'%m-%d')")
-                    ->where('school_id',Auth::user()->school_id)
-                    ->ByRole($usergroup_id)
-                    ->get();
+        $birthday = Userprofile::with('user')->whereHas('user', function ($q) {
+            $q->where('deleted_at', null);
+        })->whereRaw("DATE_FORMAT(date_of_birth, '%m-%d') = DATE_FORMAT(now(),'%m-%d')")
+            ->where('school_id',Auth::user()->school_id)
+            ->ByRole($usergroup_id)
+            ->get();
 
-          return $birthday;          
+        return $birthday;
 
     }
 }

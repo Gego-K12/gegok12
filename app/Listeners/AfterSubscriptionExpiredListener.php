@@ -3,10 +3,9 @@
 namespace App\Listeners;
 
 use App\Events\AfterSubscriptionExpiredEvent;
-use Illuminate\Queue\InteractsWithQueue;
+use App\Mail\AfterSubscriptionExpiredMail;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\AfterSubscriptionExpiredMail;
 
 class AfterSubscriptionExpiredListener implements ShouldQueue
 {
@@ -23,7 +22,6 @@ class AfterSubscriptionExpiredListener implements ShouldQueue
     /**
      * Handle the event.
      *
-     * @param  AfterSubscriptionExpiredEvent  $event
      * @return void
      */
     public function handle(AfterSubscriptionExpiredEvent $event)

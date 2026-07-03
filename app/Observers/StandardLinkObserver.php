@@ -2,16 +2,15 @@
 
 namespace App\Observers;
 
-use Illuminate\Support\Facades\Cache;
-use App\Models\StandardLink;
 use App\Helpers\SiteHelper;
+use App\Models\StandardLink;
+use Illuminate\Support\Facades\Cache;
 
 class StandardLinkObserver
 {
     /**
      * Handle the standard link "created" event.
      *
-     * @param  \App\Models\StandardLink  $standardLink
      * @return void
      */
     public function created(StandardLink $standardLink)
@@ -25,7 +24,6 @@ class StandardLinkObserver
     /**
      * Handle the standard link "updated" event.
      *
-     * @param  \App\Models\StandardLink  $standardLink
      * @return void
      */
     public function updated(StandardLink $standardLink)
@@ -39,7 +37,6 @@ class StandardLinkObserver
     /**
      * Handle the standard link "deleted" event.
      *
-     * @param  \App\Models\StandardLink  $standardLink
      * @return void
      */
     public function deleted(StandardLink $standardLink)
@@ -50,7 +47,6 @@ class StandardLinkObserver
     /**
      * Handle the standard link "restored" event.
      *
-     * @param  \App\Models\StandardLink  $standardLink
      * @return void
      */
     public function restored(StandardLink $standardLink)
@@ -61,7 +57,6 @@ class StandardLinkObserver
     /**
      * Handle the standard link "force deleted" event.
      *
-     * @param  \App\Models\StandardLink  $standardLink
      * @return void
      */
     public function forceDeleted(StandardLink $standardLink)

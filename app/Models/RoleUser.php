@@ -1,12 +1,14 @@
 <?php
+
 // SPDX-License-Identifier: MIT
 // (c) 2025 GegoSoft Technologies and GegoK12 Contributors
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class RoleUser
@@ -20,15 +22,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property \DateTime $created_at
  * @property \DateTime $updated_at
  * @property \DateTime $deleted_at
- * @property-read \App\Models\Role $role
- * @property-read \App\Models\User $user
+ * @property-read Role $role
+ * @property-read User $user
+ *
  * @mixin \Eloquent
  */
 class RoleUser extends Model
 {
+    use HasFactory;
     //
     use SoftDeletes;
-    use HasFactory;
 
     /**
      * The table associated with the model.
@@ -43,7 +46,7 @@ class RoleUser extends Model
      * @var array
      */
     protected $fillable = [
-        'role_id' , 'user_id' , 'user_type'
+        'role_id', 'user_id', 'user_type',
     ];
 
     /**
@@ -56,20 +59,20 @@ class RoleUser extends Model
     /**
      * Get the role for this user.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function role()
     {
-        return $this->belongsTo('App\Models\Role','role_id');
+        return $this->belongsTo('App\Models\Role', 'role_id');
     }
 
     /**
      * Get the user for this role.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function user()
     {
-        return $this->belongsTo('App\Models\User','user_id');
+        return $this->belongsTo('App\Models\User', 'user_id');
     }
 }

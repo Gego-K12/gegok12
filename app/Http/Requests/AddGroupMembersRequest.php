@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
 use App\Models\GroupMember;
 use App\Models\Userprofile;
+use Illuminate\Foundation\Http\FormRequest;
 
 class AddGroupMembersRequest extends FormRequest
 {
@@ -38,27 +38,26 @@ class AddGroupMembersRequest extends FormRequest
                 'group_id',
                 $this->group_id
             )
-            ->whereIn('member_id', $this->selectedUsers)
-            ->pluck('member_id')
-            ->toArray();
+                ->whereIn('member_id', $this->selectedUsers)
+                ->pluck('member_id')
+                ->toArray();
 
-            if(count($existingMembers) > 0)
-            {
+            if (count($existingMembers) > 0) {
                 $studentNames = Userprofile::whereIn(
                     'user_id',
                     $existingMembers
                 )
-                ->get(['firstname', 'lastname'])
-                ->map(function ($user) {
+                    ->get(['firstname', 'lastname'])
+                    ->map(function ($user) {
 
-                    return $user->firstname . ' ' . $user->lastname;
+                        return $user->firstname.' '.$user->lastname;
 
-                })
-                ->toArray();
+                    })
+                    ->toArray();
 
                 $validator->errors()->add(
                     'selectedUsers',
-                    implode(', ', $studentNames) . ' already exist in this group.'
+                    implode(', ', $studentNames).' already exist in this group.'
                 );
             }
         });
@@ -71,7 +70,7 @@ class AddGroupMembersRequest extends FormRequest
     {
         return [
             'group_id.required' => 'Please select group',
-            'group_id.exists'   => 'Selected group invalid',
+            'group_id.exists' => 'Selected group invalid',
             'selectedUsers.required' => 'Please select students',
         ];
     }

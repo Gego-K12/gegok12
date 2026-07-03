@@ -2,11 +2,13 @@
 
 namespace App\Livewire\Admin\Setting;
 
-use Livewire\Component;
 use App\Models\Country;
 use App\Models\State;
-use Livewire\Attributes\Rule;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
+use Livewire\Attributes\Rule;
+use Livewire\Component;
 
 /**
  * Class StateForm
@@ -21,8 +23,6 @@ use Jantinnerezo\LivewireAlert\LivewireAlert;
  * - Country selection
  * - Form validation
  * - Success alerts
- *
- * @package App\Livewire\Admin\Setting
  */
 class StateForm extends Component
 {
@@ -65,7 +65,7 @@ class StateForm extends Component
      * Loads state details for edit mode and
      * populates form fields accordingly.
      *
-     * @param int|string|null $id State ID
+     * @param  int|string|null  $id  State ID
      * @return void
      */
     public function mount($id)
@@ -74,8 +74,8 @@ class StateForm extends Component
 
         $stateEdit = State::where('id', $this->stateEditId)->first();
         $this->country = $stateEdit->country_id;
-        $this->name    = $stateEdit->name;
-        $this->status  = $stateEdit->status;
+        $this->name = $stateEdit->name;
+        $this->status = $stateEdit->status;
     }
 
     /**
@@ -88,7 +88,7 @@ class StateForm extends Component
      * Displays success alerts and redirects
      * back to the states listing page.
      *
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function submitState()
     {
@@ -96,8 +96,8 @@ class StateForm extends Component
 
         $data = [
             'country_id' => $this->country,
-            'name'       => $this->name,
-            'status'     => $this->status,
+            'name' => $this->name,
+            'status' => $this->status,
         ];
 
         if ($this->stateEditId != null) {
@@ -117,7 +117,7 @@ class StateForm extends Component
      * Loads country list for state form
      * and displays the create/edit form.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function render()
     {

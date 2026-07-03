@@ -1,11 +1,16 @@
 <?php
+
 // SPDX-License-Identifier: MIT
 // (c) 2025 GegoSoft Technologies and GegoK12 Contributors
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Feedback
@@ -21,11 +26,12 @@ use Illuminate\Database\Eloquent\Model;
  * @property \DateTime $created_at
  * @property \DateTime $updated_at
  * @property \DateTime $deleted_at
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\FeedbackMessage[] $feedbackMessage
- * @property-read \App\Models\FeedbackMessage $latestMessage
- * @property-read \App\Models\User $parent
- * @property-read \App\Models\User $student
- * @property-read \App\Models\User $admin
+ * @property-read Collection|FeedbackMessage[] $feedbackMessage
+ * @property-read FeedbackMessage $latestMessage
+ * @property-read User $parent
+ * @property-read User $student
+ * @property-read User $admin
+ *
  * @mixin \Eloquent
  */
 class Feedback extends Model
@@ -40,7 +46,7 @@ class Feedback extends Model
      * @var array
      */
     protected $fillable = [
-        'school_id', 'parent_id' , 'student_id' , 'admin_id' , 'status'
+        'school_id', 'parent_id', 'student_id', 'admin_id', 'status',
     ];
 
     /**
@@ -53,27 +59,27 @@ class Feedback extends Model
     /**
      * Get feedback messages for this feedback.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function feedbackMessage()
     {
-        return $this->hasMany('App\Models\FeedbackMessage','feedback_id','id');
+        return $this->hasMany('App\Models\FeedbackMessage', 'feedback_id', 'id');
     }
 
     /**
      * Get the latest message for this feedback.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return HasOne
      */
     public function latestMessage()
     {
-        return $this->hasOne('App\Models\FeedbackMessage','feedback_id','id')->orderByDesc('id')->limit(1);
+        return $this->hasOne('App\Models\FeedbackMessage', 'feedback_id', 'id')->orderByDesc('id')->limit(1);
     }
 
     /**
      * Get the parent who initiated this feedback.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function parent()
     {
@@ -83,7 +89,7 @@ class Feedback extends Model
     /**
      * Get the student related to this feedback.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function student()
     {
@@ -93,7 +99,7 @@ class Feedback extends Model
     /**
      * Get the admin handling this feedback.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function admin()
     {

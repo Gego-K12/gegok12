@@ -7,38 +7,32 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Resources\StandardLink as StandardLinkResource;
-use App\Http\Resources\Teacher as TeacherResource;
-use App\Http\Requests\StandardDetailUpdateRequest;
-use App\Http\Requests\StandardDetailRequest;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Auth;
+use App\Helpers\SiteHelper;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StandardDetailRequest;
+use App\Http\Requests\StandardDetailUpdateRequest;
+use App\Http\Resources\Teacher as TeacherResource;
+use App\Models\Section;
+use App\Models\Standard;
+use App\Models\StandardLink;
+use App\Models\Subject;
+use App\Models\Teacherlink;
+use App\Models\User;
 use App\Models\Users\TeacherUser;
 use App\Traits\AcademicProcess;
-use Illuminate\Http\Request;
-use App\Models\ExamSchedule;
-use App\Models\AcademicYear;
-use App\Models\StandardLink;
-use App\Traits\LogActivity;
-use App\Models\Teacherlink;
-use App\Models\TempTimetable;
-use App\Helpers\SiteHelper;
-use App\Models\Attendance;
-use App\Models\FeePayment;
-use App\Models\Timetable;
-use App\Models\Standard;
-use App\Models\Subject;
-use App\Models\Section;
-use App\Models\Events;
 use App\Traits\Common;
-use App\Models\User;
-use App\Models\Fee;
-use Carbon\Carbon;
-use Exception;
-use PDF;
-use Log;
+use App\Traits\LogActivity;
 use DB;
+use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
+use Log;
+use PDF;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * Class StandardsLinkController
@@ -47,14 +41,12 @@ use DB;
  * class configuration, subject assignment,
  * teacher mapping, student ID cards, and
  * lifecycle operations for academic standards.
- *
- * @package App\Http\Controllers\Admin
  */
 class StandardsLinkController extends Controller
 {
     use AcademicProcess;
-    use LogActivity;
     use Common;
+    use LogActivity;
 
     /**
      * Display a listing of standard links.
@@ -63,7 +55,7 @@ class StandardsLinkController extends Controller
      * current academic year ordered by standard
      * and section.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index()
     {
@@ -75,17 +67,16 @@ class StandardsLinkController extends Controller
             ->pluck('id')
             ->toArray();
 
-        if (count($standards) > 0)
-        {
+        if (count($standards) > 0) {
             $standard = implode(' ,', $standards);
 
             $standardLinks = StandardLink::where([
                 ['school_id', $school_id],
-                ['academic_year_id', $academic_year->id]
+                ['academic_year_id', $academic_year->id],
             ])
-            ->orderByRaw('FIELD(standard_id,' . $standard . ')')
-            ->orderBy('section_id')
-            ->get();
+                ->orderByRaw('FIELD(standard_id,'.$standard.')')
+                ->orderBy('section_id')
+                ->get();
         }
 
         $teacher_count = User::where('school_id', $school_id)
@@ -94,7 +85,7 @@ class StandardsLinkController extends Controller
 
         return view('/admin/school/standardlinks/index', [
             'standardLinks' => $standardLinks,
-            'teacher_count' => $teacher_count
+            'teacher_count' => $teacher_count,
         ]);
     }
 
@@ -115,7 +106,7 @@ class StandardsLinkController extends Controller
         $subjectlist = Subject::where([
             ['school_id', Auth::user()->school_id],
             ['academic_year_id', $academic_year->id],
-            ['type', '!=', 'exam']
+            ['type', '!=', 'exam'],
         ])->get()->groupBy(['standard_id', 'section_id']);
 
         // $standardlist = DB::table('standards')
@@ -136,17 +127,17 @@ class StandardsLinkController extends Controller
         $teacher = TeacherUser::with('userprofile')->where([
             ['school_id', Auth::user()->school_id],
             ['usergroup_id', 5],
-            ['status', 'active']
+            ['status', 'active'],
         ])->get()->sortBy('userprofile.firstname');
 
         $teacherlist = TeacherResource::collection($teacher);
 
         $array['academic_year_id'] = $academic_year->id;
-        $array['standardlink']     = $standardLinks;
-        $array['standardlist']     = $standardlist;
-        $array['sectionlist']      = $sectionlist;
-        $array['subjectlist']      = $subjectlist;
-        $array['teacherlist']      = $teacherlist;
+        $array['standardlink'] = $standardLinks;
+        $array['standardlist'] = $standardlist;
+        $array['sectionlist'] = $sectionlist;
+        $array['subjectlist'] = $subjectlist;
+        $array['teacherlist'] = $teacherlist;
 
         return $array;
     }
@@ -154,19 +145,19 @@ class StandardsLinkController extends Controller
     /**
      * Fetch standard details by standard ID.
      *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function getStandard(Request $request)
     {
         $standard = Standard::where('id', request('standard_id'))->first();
+
         return response()->json($standard);
     }
 
     /**
      * Show standard link creation view.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create()
     {
@@ -179,13 +170,11 @@ class StandardsLinkController extends Controller
      * Assigns subjects, sections, teachers,
      * and logs the activity.
      *
-     * @param StandardDetailRequest $request
      * @return array
      */
     public function store(StandardDetailRequest $request)
     {
-        try
-        {
+        try {
             $school_id = Auth::user()->school_id;
             $academic_year = SiteHelper::getAcademicYear($school_id);
 
@@ -207,9 +196,7 @@ class StandardsLinkController extends Controller
             );
 
             return ['success' => $message];
-        }
-        catch (Exception $e)
-        {
+        } catch (Exception $e) {
             Log::info($e->getMessage());
         }
     }
@@ -217,7 +204,7 @@ class StandardsLinkController extends Controller
     /**
      * Fetch standard link details for edit API.
      *
-     * @param int $id
+     * @param  int  $id
      * @return array
      */
     public function editList($id)
@@ -232,27 +219,27 @@ class StandardsLinkController extends Controller
             ['academic_year_id', $academic_year->id],
             ['standard_id', $standardLink->standard_id],
             ['section_id', $standardLink->section_id],
-            ['type', '!=', 'exam']
+            ['type', '!=', 'exam'],
         ])->get();
 
         $teacher = TeacherUser::with('userprofile')->where([
             ['school_id', Auth::user()->school_id],
             ['usergroup_id', 5],
-            ['status', 'active']
+            ['status', 'active'],
         ])->get()->sortBy('userprofile.firstname');
 
         $teacherlist = TeacherResource::collection($teacher);
         $teacherLink = $standardLink->getTeacherLinkDetails();
 
-        $array['subjectlist']     = $subjectlist;
-        $array['teacherlist']     = $teacherlist;
-        $array['standard']        = $standardLink->standard_id;
-        $array['standard_id']     = $standardLink->StandardName;
-        $array['section_id']      = $standardLink->section->name;
-        $array['stream']          = $standardLink->stream;
-        $array['class_teacher_id']= $standardLink->class_teacher_id;
-        $array['no_of_students']  = $standardLink->no_of_students;
-        $array['inputs']          = $teacherLink['inputs'];
+        $array['subjectlist'] = $subjectlist;
+        $array['teacherlist'] = $teacherlist;
+        $array['standard'] = $standardLink->standard_id;
+        $array['standard_id'] = $standardLink->StandardName;
+        $array['section_id'] = $standardLink->section->name;
+        $array['stream'] = $standardLink->stream;
+        $array['class_teacher_id'] = $standardLink->class_teacher_id;
+        $array['no_of_students'] = $standardLink->no_of_students;
+        $array['inputs'] = $teacherLink['inputs'];
 
         return $array;
     }
@@ -260,26 +247,25 @@ class StandardsLinkController extends Controller
     /**
      * Show standard link edit view.
      *
-     * @param int $id
-     * @return \Illuminate\Http\Response
+     * @param  int  $id
+     * @return Response
      */
     public function edit($id)
     {
         $standardLink = StandardLink::where('id', $id)->first();
+
         return view('/admin/school/standardlinks/edit', ['standardLink' => $standardLink]);
     }
 
     /**
      * Update standard link details.
      *
-     * @param StandardDetailUpdateRequest $request
-     * @param int $id
+     * @param  int  $id
      * @return array
      */
     public function update(StandardDetailUpdateRequest $request, $id)
     {
-        try
-        {
+        try {
             $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
             $school_id = Auth::user()->school_id;
 
@@ -304,9 +290,7 @@ class StandardsLinkController extends Controller
             );
 
             return ['success' => $message];
-        }
-        catch (Exception $e)
-        {
+        } catch (Exception $e) {
             Log::info($e->getMessage());
         }
     }
@@ -314,14 +298,12 @@ class StandardsLinkController extends Controller
     /**
      * Update standard link status.
      *
-     * @param Request $request
-     * @param int $id
-     * @return \Illuminate\Http\Response
+     * @param  int  $id
+     * @return Response
      */
     public function updateStatus(Request $request, $id)
     {
-        try
-        {
+        try {
             $standard = StandardLink::where('id', $id)->first();
             $standard->status = $request->status;
             $standard->save();
@@ -338,9 +320,7 @@ class StandardsLinkController extends Controller
             );
 
             return redirect('/admin/standardlinks')->with('successmessage', $message);
-        }
-        catch (Exception $e)
-        {
+        } catch (Exception $e) {
             Log::info($e->getMessage());
         }
     }
@@ -348,8 +328,8 @@ class StandardsLinkController extends Controller
     /**
      * Generate student ID card view for a class.
      *
-     * @param int $id
-     * @return \Illuminate\Http\Response
+     * @param  int  $id
+     * @return Response
      */
     public function idcard($id)
     {
@@ -363,65 +343,60 @@ class StandardsLinkController extends Controller
 
         return view('admin.id-card.id-card-new', compact('standardLink', 'students', 'academic'));
     }
+
     /**
- * Generate and stream student ID cards as a PDF.
- *
- * This method retrieves the current academic year for the authenticated user's school,
- * fetches the selected class/standard link, loads all students of that class,
- * and generates an ID card PDF using a Blade view.
- *
- * @param int $id
- *        The ID of the StandardLink (class/section) for which ID cards are generated.
- *
- * @return \Symfony\Component\HttpFoundation\StreamedResponse
- *         Streams the generated PDF file directly to the browser.
- *
- * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
- *         If the given StandardLink ID does not exist.
- */
-public function printidcard($id)
-{
-    $academic = SiteHelper::getAcademicYear(Auth::user()->school_id);
+     * Generate and stream student ID cards as a PDF.
+     *
+     * This method retrieves the current academic year for the authenticated user's school,
+     * fetches the selected class/standard link, loads all students of that class,
+     * and generates an ID card PDF using a Blade view.
+     *
+     * @param  int  $id
+     *                   The ID of the StandardLink (class/section) for which ID cards are generated.
+     * @return StreamedResponse
+     *                          Streams the generated PDF file directly to the browser.
+     *
+     * @throws ModelNotFoundException
+     *                                If the given StandardLink ID does not exist.
+     */
+    public function printidcard($id)
+    {
+        $academic = SiteHelper::getAcademicYear(Auth::user()->school_id);
 
-    $standardLink = StandardLink::where('id', $id)->first();
+        $standardLink = StandardLink::where('id', $id)->first();
 
-    $students = SiteHelper::getClassStudents(
-        Auth::user()->school_id,
-        $academic_year->id,
-        $standardLink->id
-    );
+        $students = SiteHelper::getClassStudents(
+            Auth::user()->school_id,
+            $academic_year->id,
+            $standardLink->id
+        );
 
-    $pdf = PDF::loadView(
-        'admin/id-card/idcard-print',
-        compact('exam', 'students', 'academic')
-    );
+        $pdf = PDF::loadView(
+            'admin/id-card/idcard-print',
+            compact('exam', 'students', 'academic')
+        );
 
-    return $pdf->stream('result.pdf', ['Attachment' => 0]);
-}
-
+        return $pdf->stream('result.pdf', ['Attachment' => 0]);
+    }
 
     /**
      * Delete a standard link and its dependencies.
      *
-     * @param int $id
+     * @param  int  $id
      * @return mixed
      */
     public function destroy($id)
     {
-        try
-        {
+        try {
             $standard = StandardLink::where('id', $id)->first();
             $teacherlinks = Teacherlink::where('standardLink_id', $id);
 
-            if (class_exists('Gegok12\Timetable\Models\TempTimetable'))
-            {
+            if (class_exists('Gegok12\Timetable\Models\TempTimetable')) {
                 $temptimetable = Gegok12\Timetable\Models\TempTimetable::where('standardLink_id', $id);
             }
 
-            if (Gate::allows('standardlink', $standard))
-            {
-                if (class_exists('Gegok12\Timetable\Models\TempTimetable'))
-                {
+            if (Gate::allows('standardlink', $standard)) {
+                if (class_exists('Gegok12\Timetable\Models\TempTimetable')) {
                     $temptimetable->delete();
                 }
 
@@ -440,14 +415,10 @@ public function printidcard($id)
                 );
 
                 return $message;
-            }
-            else
-            {
+            } else {
                 abort(403);
             }
-        }
-        catch (Exception $e)
-        {
+        } catch (Exception $e) {
             Log::info($e->getMessage());
         }
     }

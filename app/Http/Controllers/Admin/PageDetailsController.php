@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
@@ -8,15 +9,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Events\Notification\SingleNotificationEvent;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use App\Models\ClassRoomPageDetail;
 use App\Models\ClassRoomPage;
-use Illuminate\Http\Request;
-use App\Traits\LogActivity;
-use App\Helpers\SiteHelper;
-use App\Traits\Common;
+use App\Models\ClassRoomPageDetail;
 use App\Models\User;
+use App\Traits\Common;
+use App\Traits\LogActivity;
 use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Class PageDetailsController
@@ -24,13 +24,11 @@ use Exception;
  * Handles user interactions with classroom pages such as
  * following, liking, and disliking pages. Also triggers
  * notifications and activity logs for these actions.
- *
- * @package App\Http\Controllers\Admin
  */
 class PageDetailsController extends Controller
 {
-    use LogActivity;
     use Common;
+    use LogActivity;
 
     /**
      * Follow or unfollow a classroom page.
@@ -38,33 +36,28 @@ class PageDetailsController extends Controller
      * Creates or updates follow status for the authenticated user
      * and triggers notifications and activity logs.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param int $page_id
+     * @param  int  $page_id
      * @return array|null
      */
     public function follow(Request $request, $page_id)
     {
         //
-        try
-        {
+        try {
             $page = ClassRoomPage::where('id', $page_id)->first();
 
             $page_detail = ClassRoomPageDetail::where([
                 ['user_id', Auth::id()],
-                ['page_id', $page_id]
+                ['page_id', $page_id],
             ])->first();
 
-            if ($page_detail != null)
-            {
+            if ($page_detail != null) {
                 $page_detail->is_following = $request->is_following;
                 $page_detail->save();
-            }
-            else
-            {
+            } else {
                 $page_detail = new ClassRoomPageDetail;
 
-                $page_detail->user_id      = Auth::id();
-                $page_detail->page_id      = $page_id;
+                $page_detail->user_id = Auth::id();
+                $page_detail->page_id = $page_id;
                 $page_detail->is_following = $request->is_following;
 
                 $page_detail->save();
@@ -72,27 +65,23 @@ class PageDetailsController extends Controller
 
             $user = User::where('id', $page->created_by)->first();
 
-            if ($request->is_following == 1)
-            {
+            if ($request->is_following == 1) {
                 $message = trans('messages.follow_success_msg', ['page' => $page->page_name]);
                 $details = trans('notification.page_follow_success_msg', [
                     'user' => Auth::user()->FullName,
-                    'page' => $page->page_name
+                    'page' => $page->page_name,
                 ]);
-            }
-            else
-            {
+            } else {
                 $message = trans('messages.unfollow_success_msg', ['page' => $page->page_name]);
                 $details = trans('notification.page_unfollow_success_msg', [
                     'user' => Auth::user()->FullName,
-                    'page' => $page->page_name
+                    'page' => $page->page_name,
                 ]);
             }
 
-            if ($user->id != Auth::id())
-            {
+            if ($user->id != Auth::id()) {
                 $data = [];
-                $data['user']    = $user;
+                $data['user'] = $user;
                 $data['details'] = $details;
 
                 event(new SingleNotificationEvent($data));
@@ -108,10 +97,9 @@ class PageDetailsController extends Controller
             );
 
             $res['success'] = $message;
+
             return $res;
-        }
-        catch (Exception $e)
-        {
+        } catch (Exception $e) {
         }
     }
 
@@ -121,61 +109,52 @@ class PageDetailsController extends Controller
      * Updates the like status for the authenticated user
      * and triggers notifications and activity logs.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param int $page_id
+     * @param  int  $page_id
      * @return array|null
      */
     public function like(Request $request, $page_id)
     {
         //
-        try
-        {
+        try {
             $page = ClassRoomPage::where('id', $page_id)->first();
 
             $page_detail = ClassRoomPageDetail::where([
                 ['user_id', Auth::id()],
-                ['page_id', $page_id]
+                ['page_id', $page_id],
             ])->first();
 
-            if ($page_detail != null)
-            {
+            if ($page_detail != null) {
                 $page_detail->like = $request->like;
                 $page_detail->save();
-            }
-            else
-            {
+            } else {
                 $page_detail = new ClassRoomPageDetail;
 
                 $page_detail->user_id = Auth::id();
                 $page_detail->page_id = $page_id;
-                $page_detail->like    = $request->like;
+                $page_detail->like = $request->like;
 
                 $page_detail->save();
             }
 
             $user = User::where('id', $page->created_by)->first();
 
-            if ($request->like == 1)
-            {
+            if ($request->like == 1) {
                 $message = trans('messages.like_success_msg', ['page' => $page->page_name]);
                 $details = trans('notification.page_like_success_msg', [
                     'user' => Auth::user()->FullName,
-                    'page' => $page->page_name
+                    'page' => $page->page_name,
                 ]);
-            }
-            else
-            {
+            } else {
                 $message = trans('messages.remove_like_success_msg', ['page' => $page->page_name]);
                 $details = trans('notification.page_remove_like_success_msg', [
                     'user' => Auth::user()->FullName,
-                    'page' => $page->page_name
+                    'page' => $page->page_name,
                 ]);
             }
 
-            if ($user->id != Auth::id())
-            {
+            if ($user->id != Auth::id()) {
                 $data = [];
-                $data['user']    = $user;
+                $data['user'] = $user;
                 $data['details'] = $details;
 
                 event(new SingleNotificationEvent($data));
@@ -191,10 +170,9 @@ class PageDetailsController extends Controller
             );
 
             $res['success'] = $message;
+
             return $res;
-        }
-        catch (Exception $e)
-        {
+        } catch (Exception $e) {
         }
     }
 
@@ -204,61 +182,52 @@ class PageDetailsController extends Controller
      * Updates the dislike status for the authenticated user
      * and triggers notifications and activity logs.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param int $page_id
+     * @param  int  $page_id
      * @return array|null
      */
     public function dislike(Request $request, $page_id)
     {
         //
-        try
-        {
+        try {
             $page = ClassRoomPage::where('id', $page_id)->first();
 
             $page_detail = ClassRoomPageDetail::where([
                 ['user_id', Auth::id()],
-                ['page_id', $page_id]
+                ['page_id', $page_id],
             ])->first();
 
-            if ($page_detail != null)
-            {
+            if ($page_detail != null) {
                 $page_detail->dislike = $request->dislike;
                 $page_detail->save();
-            }
-            else
-            {
+            } else {
                 $page_detail = new ClassRoomPageDetail;
 
-                $page_detail->user_id  = Auth::id();
-                $page_detail->page_id  = $page_id;
-                $page_detail->dislike  = $request->dislike;
+                $page_detail->user_id = Auth::id();
+                $page_detail->page_id = $page_id;
+                $page_detail->dislike = $request->dislike;
 
                 $page_detail->save();
             }
 
             $user = User::where('id', $page->created_by)->first();
 
-            if ($request->dislike == 1)
-            {
+            if ($request->dislike == 1) {
                 $message = trans('messages.unlike_success_msg', ['page' => $page->page_name]);
                 $details = trans('notification.page_unlike_success_msg', [
                     'user' => Auth::user()->FullName,
-                    'page' => $page->page_name
+                    'page' => $page->page_name,
                 ]);
-            }
-            else
-            {
+            } else {
                 $message = trans('messages.remove_unlike_success_msg', ['page' => $page->page_name]);
                 $details = trans('notification.page_remove_unlike_success_msg', [
                     'user' => Auth::user()->FullName,
-                    'page' => $page->page_name
+                    'page' => $page->page_name,
                 ]);
             }
 
-            if ($user->id != Auth::id())
-            {
+            if ($user->id != Auth::id()) {
                 $data = [];
-                $data['user']    = $user;
+                $data['user'] = $user;
                 $data['details'] = $details;
 
                 event(new SingleNotificationEvent($data));
@@ -274,10 +243,9 @@ class PageDetailsController extends Controller
             );
 
             $res['success'] = $message;
+
             return $res;
-        }
-        catch (Exception $e)
-        {
+        } catch (Exception $e) {
         }
     }
 }

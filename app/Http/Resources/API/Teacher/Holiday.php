@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\API\Teacher;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class Holiday extends JsonResource
@@ -9,17 +10,17 @@ class Holiday extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request $request
+     * @param  Request  $request
      * @return array
      */
     public function toArray($request)
     {
-        return 
+        return
         [
             //
-            'id'    =>  $this->id,
-            'date'  =>  date('d-m-Y',strtotime($this->start_date)),
-            'title' =>  $this->title,
+            'id' => $this->id,
+            'date' => date('d-m-Y', strtotime($this->start_date)),
+            'title' => $this->title,
         ];
     }
 }

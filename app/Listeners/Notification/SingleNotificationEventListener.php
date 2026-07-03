@@ -3,10 +3,9 @@
 namespace App\Listeners\Notification;
 
 use App\Events\Notification\SingleNotificationEvent;
-use App\Notifications\NewMessageNotification;
 use App\Notifications\BirthdayNotification;
+use App\Notifications\NewMessageNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
 use Notification;
 
 class SingleNotificationEventListener implements ShouldQueue
@@ -24,15 +23,13 @@ class SingleNotificationEventListener implements ShouldQueue
     /**
      * Handle the event.
      *
-     * @param  SingleNotificationEvent  $event
      * @return void
      */
     public function handle(SingleNotificationEvent $event)
     {
         //
-        if($event->data['type'] == 'birthday')
-        {
-            Notification::send($event->data['user'], new BirthdayNotification($event->data['details'],$event->data['user']['id']));
+        if ($event->data['type'] == 'birthday') {
+            Notification::send($event->data['user'], new BirthdayNotification($event->data['details'], $event->data['user']['id']));
         }
         Notification::send($event->data['user'], new NewMessageNotification($event->data['details']));
     }

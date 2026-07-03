@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+
 // payroll
 Route::get('/payroll/template',
     'PayrollTemplateController@index');

@@ -1,6 +1,8 @@
 <?php
 
 @include 'teacherapi.php';
+use Illuminate\Support\Facades\Route;
+
 
 Route::post('/parent/login', 'Api\TokenController@issueToken');
 

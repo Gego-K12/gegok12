@@ -1,5 +1,8 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+
+
 Route::get('/dashboard', 'DashboardController@index');
 Route::get('/dashboard/tasklist/{task_flag}', 'DashboardController@list');
 Route::get('/dashboard/task/count', 'DashboardController@listCount');

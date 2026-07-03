@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+
 // navigation drop-down
 Route::get('/list/academicyear', 'NavigationController@list');
 Route::post('/academicyear/index', 'NavigationController@index');

@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+
 Route::get('/dashboard', 'DashboardController@index')->name('dashboard');
 Route::get('/dashboard/event', 'DashboardController@event');
 Route::get('/dashboard/structuralList', 'DashboardController@structuralList');

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Installation Helper Functions
  */
@@ -6,98 +7,99 @@
 /**
  * Check system requirements
  */
-function checkRequirements() {
+function checkRequirements()
+{
     $requirements = [
         'php' => [
             'name' => 'PHP Version',
             'required' => '8.4.0',
             'current' => PHP_VERSION,
             'status' => version_compare(PHP_VERSION, '8.4.0', '>='),
-            'type' => 'php'
+            'type' => 'php',
         ],
         'pdo' => [
             'name' => 'PDO Extension',
             'required' => 'Enabled',
             'current' => extension_loaded('pdo') ? 'Enabled' : 'Disabled',
             'status' => extension_loaded('pdo'),
-            'type' => 'extension'
+            'type' => 'extension',
         ],
         'pdo_mysql' => [
             'name' => 'PDO MySQL Extension',
             'required' => 'Enabled',
             'current' => extension_loaded('pdo_mysql') ? 'Enabled' : 'Disabled',
             'status' => extension_loaded('pdo_mysql'),
-            'type' => 'extension'
+            'type' => 'extension',
         ],
         'mbstring' => [
             'name' => 'Mbstring Extension',
             'required' => 'Enabled',
             'current' => extension_loaded('mbstring') ? 'Enabled' : 'Disabled',
             'status' => extension_loaded('mbstring'),
-            'type' => 'extension'
+            'type' => 'extension',
         ],
         'openssl' => [
             'name' => 'OpenSSL Extension',
             'required' => 'Enabled',
             'current' => extension_loaded('openssl') ? 'Enabled' : 'Disabled',
             'status' => extension_loaded('openssl'),
-            'type' => 'extension'
+            'type' => 'extension',
         ],
         'tokenizer' => [
             'name' => 'Tokenizer Extension',
             'required' => 'Enabled',
             'current' => extension_loaded('tokenizer') ? 'Enabled' : 'Disabled',
             'status' => extension_loaded('tokenizer'),
-            'type' => 'extension'
+            'type' => 'extension',
         ],
         'json' => [
             'name' => 'JSON Extension',
             'required' => 'Enabled',
             'current' => extension_loaded('json') ? 'Enabled' : 'Disabled',
             'status' => extension_loaded('json'),
-            'type' => 'extension'
+            'type' => 'extension',
         ],
         'curl' => [
             'name' => 'cURL Extension',
             'required' => 'Enabled',
             'current' => extension_loaded('curl') ? 'Enabled' : 'Disabled',
             'status' => extension_loaded('curl'),
-            'type' => 'extension'
+            'type' => 'extension',
         ],
         'fileinfo' => [
             'name' => 'Fileinfo Extension',
             'required' => 'Enabled',
             'current' => extension_loaded('fileinfo') ? 'Enabled' : 'Disabled',
             'status' => extension_loaded('fileinfo'),
-            'type' => 'extension'
+            'type' => 'extension',
         ],
         'gd' => [
             'name' => 'GD Extension',
             'required' => 'Enabled',
             'current' => extension_loaded('gd') ? 'Enabled' : 'Disabled',
             'status' => extension_loaded('gd'),
-            'type' => 'extension'
+            'type' => 'extension',
         ],
         'bcmath' => [
             'name' => 'BCMath Extension',
             'required' => 'Enabled',
             'current' => extension_loaded('bcmath') ? 'Enabled' : 'Disabled',
             'status' => extension_loaded('bcmath'),
-            'type' => 'extension'
+            'type' => 'extension',
         ],
         'xml' => [
             'name' => 'XML Extension',
             'required' => 'Enabled',
             'current' => extension_loaded('xml') ? 'Enabled' : 'Disabled',
             'status' => extension_loaded('xml'),
-            'type' => 'extension'
+            'type' => 'extension',
         ],
         'zip' => [
             'name' => 'Zip Extension',
             'required' => 'Enabled',
             'current' => extension_loaded('zip') ? 'Enabled' : 'Disabled',
             'status' => extension_loaded('zip'),
-            'type' => 'extension'
+            'type' => 'extension',
         ],
     ];
 
@@ -107,17 +109,18 @@ function checkRequirements() {
 /**
  * Check folder permissions
  */
-function checkPermissions() {
+function checkPermissions()
+{
     $folders = [
-        'storage' => BASE_PATH . '/storage',
-        'storage/app' => BASE_PATH . '/storage/app',
-        'storage/framework' => BASE_PATH . '/storage/framework',
-        'storage/framework/cache' => BASE_PATH . '/storage/framework/cache',
-        'storage/framework/sessions' => BASE_PATH . '/storage/framework/sessions',
-        'storage/framework/views' => BASE_PATH . '/storage/framework/views',
-        'storage/logs' => BASE_PATH . '/storage/logs',
-        'bootstrap/cache' => BASE_PATH . '/bootstrap/cache',
-        'public/uploads' => PUBLIC_PATH . '/uploads',
+        'storage' => BASE_PATH.'/storage',
+        'storage/app' => BASE_PATH.'/storage/app',
+        'storage/framework' => BASE_PATH.'/storage/framework',
+        'storage/framework/cache' => BASE_PATH.'/storage/framework/cache',
+        'storage/framework/sessions' => BASE_PATH.'/storage/framework/sessions',
+        'storage/framework/views' => BASE_PATH.'/storage/framework/views',
+        'storage/logs' => BASE_PATH.'/storage/logs',
+        'bootstrap/cache' => BASE_PATH.'/bootstrap/cache',
+        'public/uploads' => PUBLIC_PATH.'/uploads',
     ];
 
     $permissions = [];
@@ -127,7 +130,7 @@ function checkPermissions() {
             'path' => $path,
             'required' => '775',
             'status' => is_writable($path),
-            'current' => is_writable($path) ? 'Writable' : 'Not Writable'
+            'current' => is_writable($path) ? 'Writable' : 'Not Writable',
         ];
     }
 
@@ -137,7 +140,8 @@ function checkPermissions() {
 /**
  * Test database connection
  */
-function testDatabaseConnection($host, $port, $database, $username, $password) {
+function testDatabaseConnection($host, $port, $database, $username, $password)
+{
     try {
         $dsn = "mysql:host={$host};port={$port}";
         $pdo = new PDO($dsn, $username, $password);
@@ -159,7 +163,8 @@ function testDatabaseConnection($host, $port, $database, $username, $password) {
 /**
  * Save database configuration to .env file
  */
-function saveDatabaseConfig($data) {
+function saveDatabaseConfig($data)
+{
     // Validate inputs
     $required = ['db_host', 'db_port', 'db_name', 'db_user'];
     foreach ($required as $field) {
@@ -176,8 +181,8 @@ function saveDatabaseConfig($data) {
 
     // Test connection
     $test = testDatabaseConnection($host, $port, $database, $username, $password);
-    if (!$test['success']) {
-        return ['success' => false, 'message' => 'Database connection failed: ' . $test['message']];
+    if (! $test['success']) {
+        return ['success' => false, 'message' => 'Database connection failed: '.$test['message']];
     }
 
     // Store in session for later use
@@ -186,7 +191,7 @@ function saveDatabaseConfig($data) {
         'port' => $port,
         'database' => $database,
         'username' => $username,
-        'password' => $password
+        'password' => $password,
     ];
 
     return ['success' => true, 'message' => 'Database configuration saved'];
@@ -195,17 +200,18 @@ function saveDatabaseConfig($data) {
 /**
  * Save admin configuration
  */
-function saveAdminConfig($data) {
+function saveAdminConfig($data)
+{
     $required = ['app_name', 'app_url', 'admin_email', 'admin_password', 'admin_password_confirm'];
     foreach ($required as $field) {
         if (empty($data[$field])) {
-            return ['success' => false, 'message' => ucfirst(str_replace('_', ' ', $field)) . ' is required'];
+            return ['success' => false, 'message' => ucfirst(str_replace('_', ' ', $field)).' is required'];
         }
     }
 
     // Validate email format
     $email = trim($data['admin_email']);
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
         return ['success' => false, 'message' => 'Please enter a valid email address'];
     }
 
@@ -225,7 +231,7 @@ function saveAdminConfig($data) {
         'app_url' => rtrim(trim($data['app_url']), '/'),
         'timezone' => isset($data['timezone']) ? $data['timezone'] : 'UTC',
         'admin_email' => $email,
-        'admin_password' => $password
+        'admin_password' => $password,
     ];
 
     return ['success' => true, 'message' => 'Application configuration saved'];
@@ -235,12 +241,13 @@ function saveAdminConfig($data) {
  * Update school and admin user credentials after seeding
  * For single-school version: updates School info and SchoolAdmin (usergroup_id=3)
  */
-function updateAdminCredentials() {
-    if (!isset($_SESSION['admin_config']['admin_email']) || !isset($_SESSION['admin_config']['admin_password'])) {
+function updateAdminCredentials()
+{
+    if (! isset($_SESSION['admin_config']['admin_email']) || ! isset($_SESSION['admin_config']['admin_password'])) {
         return ['success' => false, 'message' => 'Admin credentials not found in session'];
     }
 
-    if (!isset($_SESSION['db_config'])) {
+    if (! isset($_SESSION['db_config'])) {
         return ['success' => false, 'message' => 'Database configuration not found'];
     }
 
@@ -258,11 +265,11 @@ function updateAdminCredentials() {
         $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $schoolName)));
 
         // 1. Update school with ID 1 (the seeded default school)
-        $stmt = $pdo->prepare("UPDATE schools SET name = ?, email = ?, slug = ?, updated_at = NOW() WHERE id = 1");
+        $stmt = $pdo->prepare('UPDATE schools SET name = ?, email = ?, slug = ?, updated_at = NOW() WHERE id = 1');
         $stmt->execute([$schoolName, $email, $slug]);
 
         // 2. Update SchoolAdmin user (usergroup_id = 3, school_id = 1)
-        $stmt = $pdo->prepare("UPDATE users SET email = ?, password = ?, name = ?, updated_at = NOW() WHERE school_id = 1 AND usergroup_id = 3");
+        $stmt = $pdo->prepare('UPDATE users SET email = ?, password = ?, name = ?, updated_at = NOW() WHERE school_id = 1 AND usergroup_id = 3');
         $stmt->execute([$email, $password, 'Admin']);
 
         if ($stmt->rowCount() > 0) {
@@ -279,15 +286,17 @@ function updateAdminCredentials() {
 /**
  * Generate random key for Laravel
  */
-function generateAppKey() {
-    return 'base64:' . base64_encode(random_bytes(32));
+function generateAppKey()
+{
+    return 'base64:'.base64_encode(random_bytes(32));
 }
 
 /**
  * Run the full installation
  */
-function runInstallation() {
-    if (!isset($_SESSION['db_config']) || !isset($_SESSION['admin_config'])) {
+function runInstallation()
+{
+    if (! isset($_SESSION['db_config']) || ! isset($_SESSION['admin_config'])) {
         return ['success' => false, 'message' => 'Configuration missing. Please start over.'];
     }
 
@@ -297,7 +306,7 @@ function runInstallation() {
     try {
         // 1. Create .env file
         $envContent = createEnvContent($db, $admin);
-        if (file_put_contents(BASE_PATH . '/.env', $envContent) === false) {
+        if (file_put_contents(BASE_PATH.'/.env', $envContent) === false) {
             return ['success' => false, 'message' => 'Could not write .env file'];
         }
 
@@ -305,7 +314,7 @@ function runInstallation() {
         createStorageDirectories();
 
         // 3. Create installed marker file
-        file_put_contents(BASE_PATH . '/storage/installed', date('Y-m-d H:i:s'));
+        file_put_contents(BASE_PATH.'/storage/installed', date('Y-m-d H:i:s'));
 
         // Clear session
         unset($_SESSION['db_config']);
@@ -314,15 +323,16 @@ function runInstallation() {
         return ['success' => true, 'message' => 'Installation completed successfully'];
 
     } catch (Exception $e) {
-        return ['success' => false, 'message' => 'Installation failed: ' . $e->getMessage()];
+        return ['success' => false, 'message' => 'Installation failed: '.$e->getMessage()];
     }
 }
 
 /**
  * Create .env file only (for step 5, before automated install)
  */
-function createEnvFile() {
-    if (!isset($_SESSION['db_config']) || !isset($_SESSION['admin_config'])) {
+function createEnvFile()
+{
+    if (! isset($_SESSION['db_config']) || ! isset($_SESSION['admin_config'])) {
         return ['success' => false, 'message' => 'Configuration missing. Please start over.'];
     }
 
@@ -331,13 +341,13 @@ function createEnvFile() {
 
     try {
         // Check if .env already exists
-        if (file_exists(BASE_PATH . '/.env')) {
+        if (file_exists(BASE_PATH.'/.env')) {
             return ['success' => true, 'message' => '.env file already exists'];
         }
 
         // Create .env file
         $envContent = createEnvContent($db, $admin);
-        if (file_put_contents(BASE_PATH . '/.env', $envContent) === false) {
+        if (file_put_contents(BASE_PATH.'/.env', $envContent) === false) {
             return ['success' => false, 'message' => 'Could not write .env file. Check directory permissions.'];
         }
 
@@ -347,14 +357,15 @@ function createEnvFile() {
         return ['success' => true, 'message' => '.env file created successfully'];
 
     } catch (Exception $e) {
-        return ['success' => false, 'message' => 'Failed to create .env: ' . $e->getMessage()];
+        return ['success' => false, 'message' => 'Failed to create .env: '.$e->getMessage()];
     }
 }
 
 /**
  * Create .env file content
  */
-function createEnvContent($db, $admin) {
+function createEnvContent($db, $admin)
+{
     $appKey = generateAppKey();
 
     $env = <<<ENV
@@ -455,22 +466,23 @@ ENV;
 /**
  * Create necessary storage directories
  */
-function createStorageDirectories() {
+function createStorageDirectories()
+{
     $directories = [
-        BASE_PATH . '/storage',
-        BASE_PATH . '/storage/app',
-        BASE_PATH . '/storage/app/public',
-        BASE_PATH . '/storage/framework',
-        BASE_PATH . '/storage/framework/cache',
-        BASE_PATH . '/storage/framework/cache/data',
-        BASE_PATH . '/storage/framework/sessions',
-        BASE_PATH . '/storage/framework/views',
-        BASE_PATH . '/storage/logs',
-        BASE_PATH . '/bootstrap/cache',
+        BASE_PATH.'/storage',
+        BASE_PATH.'/storage/app',
+        BASE_PATH.'/storage/app/public',
+        BASE_PATH.'/storage/framework',
+        BASE_PATH.'/storage/framework/cache',
+        BASE_PATH.'/storage/framework/cache/data',
+        BASE_PATH.'/storage/framework/sessions',
+        BASE_PATH.'/storage/framework/views',
+        BASE_PATH.'/storage/logs',
+        BASE_PATH.'/bootstrap/cache',
     ];
 
     foreach ($directories as $dir) {
-        if (!is_dir($dir)) {
+        if (! is_dir($dir)) {
             mkdir($dir, 0775, true);
         }
     }
@@ -479,7 +491,8 @@ function createStorageDirectories() {
 /**
  * Get common timezones
  */
-function getTimezones() {
+function getTimezones()
+{
     return [
         'UTC' => 'UTC',
         'Asia/Kolkata' => 'Asia/Kolkata (IST)',
@@ -502,7 +515,8 @@ function getTimezones() {
 /**
  * Check if a command exists
  */
-function commandExists($command) {
+function commandExists($command)
+{
     $whereIsCommand = PHP_OS_FAMILY === 'Windows' ? 'where' : 'which';
     $process = proc_open(
         "$whereIsCommand $command",
@@ -519,43 +533,47 @@ function commandExists($command) {
         fclose($pipes[1]);
         fclose($pipes[2]);
         proc_close($process);
-        return !empty(trim($stdout));
+
+        return ! empty(trim($stdout));
     }
+
     return false;
 }
 
 /**
  * Check installation tools availability
  */
-function checkInstallationTools() {
+function checkInstallationTools()
+{
     return [
         'composer' => [
             'name' => 'Composer',
             'available' => commandExists('composer'),
-            'required' => true
+            'required' => true,
         ],
         'node' => [
             'name' => 'Node.js',
             'available' => commandExists('node'),
-            'required' => false
+            'required' => false,
         ],
         'npm' => [
             'name' => 'NPM',
             'available' => commandExists('npm'),
-            'required' => false
+            'required' => false,
         ],
         'php' => [
             'name' => 'PHP CLI',
             'available' => commandExists('php'),
-            'required' => true
-        ]
+            'required' => true,
+        ],
     ];
 }
 
 /**
  * Run a shell command and return the output
  */
-function runCommand($command, $cwd = null) {
+function runCommand($command, $cwd = null)
+{
     $cwd = $cwd ?: BASE_PATH;
 
     $descriptors = [
@@ -584,14 +602,15 @@ function runCommand($command, $cwd = null) {
         'success' => $exitCode === 0,
         'output' => $output,
         'error' => $error,
-        'exit_code' => $exitCode
+        'exit_code' => $exitCode,
     ];
 }
 
 /**
  * Run installation step
  */
-function runInstallationStep($step) {
+function runInstallationStep($step)
+{
     $result = ['success' => false, 'message' => '', 'output' => ''];
 
     switch ($step) {
@@ -610,10 +629,10 @@ function runInstallationStep($step) {
             break;
 
         case 'npm_build':
-            if (commandExists('npm') && file_exists(BASE_PATH . '/node_modules')) {
+            if (commandExists('npm') && file_exists(BASE_PATH.'/node_modules')) {
                 // Use full path to cross-env to avoid PATH issues
                 // $result = runCommand('node_modules/.bin/cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --no-progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js 2>&1');
-                //new
+                // new
                 $result = runCommand('node_modules/.bin/cross-env NODE_ENV=production npm run production 2>&1');
 
                 $result['message'] = $result['success'] ? 'Assets compiled successfully' : 'Failed to compile assets';
@@ -644,8 +663,8 @@ function runInstallationStep($step) {
             if ($result['success']) {
                 // Update admin user credentials after seeding
                 $adminUpdate = updateAdminCredentials();
-                if (!$adminUpdate['success']) {
-                    $result['message'] = 'Database seeded but failed to update admin: ' . $adminUpdate['message'];
+                if (! $adminUpdate['success']) {
+                    $result['message'] = 'Database seeded but failed to update admin: '.$adminUpdate['message'];
                 } else {
                     $result['message'] = 'Database seeded and admin account updated successfully';
                 }
@@ -663,7 +682,7 @@ function runInstallationStep($step) {
 
         case 'finalize':
             // Create installed marker
-            file_put_contents(BASE_PATH . '/storage/installed', date('Y-m-d H:i:s'));
+            file_put_contents(BASE_PATH.'/storage/installed', date('Y-m-d H:i:s'));
             $_SESSION['installer_finalized'] = true;
             $result = ['success' => true, 'message' => 'Installation finalized', 'output' => ''];
             break;
@@ -678,43 +697,44 @@ function runInstallationStep($step) {
 /**
  * Get all installation steps
  */
-function getInstallationSteps() {
+function getInstallationSteps()
+{
     return [
         'composer' => [
             'name' => 'Installing Composer Dependencies',
-            'description' => 'Installing PHP packages via Composer'
+            'description' => 'Installing PHP packages via Composer',
         ],
         'key_generate' => [
             'name' => 'Generating Application Key',
-            'description' => 'Creating secure encryption key'
+            'description' => 'Creating secure encryption key',
         ],
         'storage_link' => [
             'name' => 'Creating Storage Link',
-            'description' => 'Linking storage to public directory'
+            'description' => 'Linking storage to public directory',
         ],
         'migrate' => [
             'name' => 'Running Database Migrations',
-            'description' => 'Creating database tables'
+            'description' => 'Creating database tables',
         ],
         'seed' => [
             'name' => 'Seeding Database',
-            'description' => 'Adding initial data and admin account'
+            'description' => 'Adding initial data and admin account',
         ],
         'npm' => [
             'name' => 'Installing NPM Dependencies',
-            'description' => 'Installing Node.js packages (optional)'
+            'description' => 'Installing Node.js packages (optional)',
         ],
         'npm_build' => [
             'name' => 'Compiling Assets',
-            'description' => 'Building CSS and JavaScript (optional)'
+            'description' => 'Building CSS and JavaScript (optional)',
         ],
         'cache' => [
             'name' => 'Optimizing Application',
-            'description' => 'Caching configuration and routes'
+            'description' => 'Caching configuration and routes',
         ],
         'finalize' => [
             'name' => 'Finalizing Installation',
-            'description' => 'Completing setup process'
-        ]
+            'description' => 'Completing setup process',
+        ],
     ];
 }

@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../includes/functions.php';
+require_once __DIR__.'/../includes/functions.php';
 $tools = checkInstallationTools();
 $steps = getInstallationSteps();
 $allToolsAvailable = $tools['composer']['available'] && $tools['php']['available'];
@@ -43,27 +43,27 @@ $allToolsAvailable = $tools['composer']['available'] && $tools['php']['available
     <div class="mb-8">
         <h3 class="text-lg font-semibold text-gray-800 mb-4">Installation Tools</h3>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <?php foreach ($tools as $key => $tool): ?>
+            <?php foreach ($tools as $key => $tool) { ?>
             <div class="bg-gray-50 rounded-xl p-4 text-center">
                 <div class="w-10 h-10 mx-auto mb-2 rounded-full flex items-center justify-center <?php echo $tool['available'] ? 'bg-green-100' : 'bg-red-100'; ?>">
-                    <?php if ($tool['available']): ?>
+                    <?php if ($tool['available']) { ?>
                     <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                     </svg>
-                    <?php else: ?>
+                    <?php } else { ?>
                     <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
-                    <?php endif; ?>
+                    <?php } ?>
                 </div>
                 <span class="text-sm font-medium text-gray-700"><?php echo $tool['name']; ?></span>
-                <?php if ($tool['required'] && !$tool['available']): ?>
+                <?php if ($tool['required'] && ! $tool['available']) { ?>
                 <span class="text-xs text-red-500 block">Required</span>
-                <?php elseif (!$tool['required'] && !$tool['available']): ?>
+                <?php } elseif (! $tool['required'] && ! $tool['available']) { ?>
                 <span class="text-xs text-gray-400 block">Optional</span>
-                <?php endif; ?>
+                <?php } ?>
             </div>
-            <?php endforeach; ?>
+            <?php } ?>
         </div>
     </div>
 
@@ -71,7 +71,7 @@ $allToolsAvailable = $tools['composer']['available'] && $tools['php']['available
     <div id="installationProgress" class="hidden mb-8">
         <h3 class="text-lg font-semibold text-gray-800 mb-4">Installation Progress</h3>
         <div class="space-y-3" id="stepsContainer">
-            <?php foreach ($steps as $key => $step): ?>
+            <?php foreach ($steps as $key => $step) { ?>
             <div id="step-<?php echo $key; ?>" class="flex items-center p-4 bg-gray-50 rounded-xl">
                 <div class="step-icon w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-4">
                     <svg class="w-4 h-4 text-gray-400 pending-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -94,7 +94,7 @@ $allToolsAvailable = $tools['composer']['available'] && $tools['php']['available
                 </div>
                 <div class="step-status text-sm text-gray-400">Pending</div>
             </div>
-            <?php endforeach; ?>
+            <?php } ?>
         </div>
     </div>
 
@@ -112,7 +112,7 @@ $allToolsAvailable = $tools['composer']['available'] && $tools['php']['available
         </div>
     </div>
 
-    <?php if (!$allToolsAvailable): ?>
+    <?php if (! $allToolsAvailable) { ?>
     <div class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
         <div class="flex items-start">
             <svg class="w-5 h-5 text-red-500 mt-0.5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -126,7 +126,7 @@ $allToolsAvailable = $tools['composer']['available'] && $tools['php']['available
             </div>
         </div>
     </div>
-    <?php endif; ?>
+    <?php } ?>
 
     <div class="flex justify-between" id="buttonContainer">
         <a href="?step=4" class="inline-flex items-center px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors" id="backButton">
@@ -136,21 +136,21 @@ $allToolsAvailable = $tools['composer']['available'] && $tools['php']['available
             Back
         </a>
 
-        <?php if ($allToolsAvailable): ?>
+        <?php if ($allToolsAvailable) { ?>
         <button type="button" id="installButton" onclick="startInstallation()" class="inline-flex items-center px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all">
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
             </svg>
             <span id="installButtonText">Start Installation</span>
         </button>
-        <?php else: ?>
+        <?php } else { ?>
         <button disabled class="inline-flex items-center px-8 py-3 bg-gray-300 text-gray-500 font-semibold rounded-xl cursor-not-allowed">
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
             </svg>
             Cannot Install
         </button>
-        <?php endif; ?>
+        <?php } ?>
     </div>
 </div>
 

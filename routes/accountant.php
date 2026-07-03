@@ -2,88 +2,84 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get( '/dashboard', 'DashboardController@index' );
-Route::get( '/dashboard/structuralList', 'DashboardController@structuralList' );
-Route::post( '/dashboard/structuralList', 'DashboardController@showStructuralList' );
+Route::get('/dashboard', 'DashboardController@index');
+Route::get('/dashboard/structuralList', 'DashboardController@structuralList');
+Route::post('/dashboard/structuralList', 'DashboardController@showStructuralList');
 
+Route::get('/dashboard/tasklist/{task_flag}', 'DashboardController@list');
+Route::get('/dashboard/task/count', 'DashboardController@listCount');
 
-
-Route::get( '/dashboard/tasklist/{task_flag}','DashboardController@list' );
-Route::get( '/dashboard/task/count','DashboardController@listCount' );
-
-//feed
+// feed
 Route::get('/feeds', 'FeedController@index');
 
-//birthday
-Route::get( '/dashboard/birthdayUser', 'BirthdayController@birthdayUser' );
-Route::get( '/dashboard/showBirthday', 'BirthdayController@showBirthday' );
-Route::get( '/dashboard/birthday', 'BirthdayController@birthday' );
-Route::post( '/dashboard/birthday', 'BirthdayController@birthdayMessage' );
-Route::get( '/dashboard/birthdayTeacher', 'BirthdayController@birthdayTeacher' );
-Route::get( '/dashboard/showBirthdayTeacher', 'BirthdayController@showBirthdayTeacher' );
-Route::get( '/dashboard/birthday/teacher', 'BirthdayController@birthdayCreate' );
-Route::post( '/dashboard/birthday/teacher', 'BirthdayController@birthdayMessageTeacher' );
-Route::get( '/dashboard/showWorkAnniversary', 'BirthdayController@showWorkAnniversary' );
-Route::get( '/dashboard/workAnniversary/list', 'BirthdayController@workAnniversary' );
-Route::get( '/dashboard/workAnniversary', 'BirthdayController@workAnniversaryCreate' );
-Route::post( '/dashboard/workAnniversary', 'BirthdayController@workAnniversaryMessage' );
+// birthday
+Route::get('/dashboard/birthdayUser', 'BirthdayController@birthdayUser');
+Route::get('/dashboard/showBirthday', 'BirthdayController@showBirthday');
+Route::get('/dashboard/birthday', 'BirthdayController@birthday');
+Route::post('/dashboard/birthday', 'BirthdayController@birthdayMessage');
+Route::get('/dashboard/birthdayTeacher', 'BirthdayController@birthdayTeacher');
+Route::get('/dashboard/showBirthdayTeacher', 'BirthdayController@showBirthdayTeacher');
+Route::get('/dashboard/birthday/teacher', 'BirthdayController@birthdayCreate');
+Route::post('/dashboard/birthday/teacher', 'BirthdayController@birthdayMessageTeacher');
+Route::get('/dashboard/showWorkAnniversary', 'BirthdayController@showWorkAnniversary');
+Route::get('/dashboard/workAnniversary/list', 'BirthdayController@workAnniversary');
+Route::get('/dashboard/workAnniversary', 'BirthdayController@workAnniversaryCreate');
+Route::post('/dashboard/workAnniversary', 'BirthdayController@workAnniversaryMessage');
 
-//calendar
-Route::get('/events','EventsController@index');
-Route::get( '/events/show', 'EventsController@events' );
-Route::get( '/events/details/{id}', 'EventsController@details' );
-Route::get( '/events/show/details/{id}', 'EventsController@show' );
-Route::get( '/events/showdetails/{id}', 'EventsController@showdetails' );
+// calendar
+Route::get('/events', 'EventsController@index');
+Route::get('/events/show', 'EventsController@events');
+Route::get('/events/details/{id}', 'EventsController@details');
+Route::get('/events/show/details/{id}', 'EventsController@show');
+Route::get('/events/showdetails/{id}', 'EventsController@showdetails');
 
+// holiday
+Route::get('/holidays/list', 'HolidaysController@list');
+Route::get('/holidays', 'HolidaysController@index');
 
+// noticeboard
+Route::get('/notices', 'NoticeBoardController@index');
+Route::get('/notice/list', 'NoticeBoardController@list');
+Route::get('/notice/show/list', 'NoticeBoardController@showList');
 
-//holiday
-Route::get( '/holidays/list', 'HolidaysController@list' );
-Route::get('/holidays','HolidaysController@index');
+// task
+// add
+Route::get('/task/add/list', 'TaskController@list');
+Route::get('/tasks', 'TaskController@index');
+Route::get('/task/add', 'TaskController@create');
+Route::post('/task/add', 'TaskController@store');
 
-//noticeboard
-Route::get( '/notices', 'NoticeBoardController@index' );
-Route::get( '/notice/list', 'NoticeBoardController@list' );
-Route::get( '/notice/show/list', 'NoticeBoardController@showList' );
+// index
+Route::get('/task/list', 'TaskController@showlist');
+Route::post('/task/completed', 'TaskController@changestatus');
 
-//task
-	//add
-	Route::get('/task/add/list','TaskController@list');
-	Route::get('/tasks','TaskController@index');
-	Route::get('/task/add','TaskController@create');
-	Route::post('/task/add','TaskController@store');
+// show
+Route::get('/task/show/{id}', 'TaskController@show');
 
-	//index
-	Route::get('/task/list', 'TaskController@showlist');
-	Route::post('/task/completed','TaskController@changestatus');
+// edit
+Route::get('/task/edit/list/{id}', 'TaskController@editList');
+Route::get('/task/edit/{id}', 'TaskController@edit');
+Route::post('/task/edit/{id}', 'TaskController@update');
 
-	//show
-	Route::get('/task/show/{id}', 'TaskController@show');
+// snooze
+Route::post('/task/snooze/{id}', 'TaskController@snooze');
 
-	//edit
-	Route::get('/task/edit/list/{id}', 'TaskController@editList');
-	Route::get('/task/edit/{id}', 'TaskController@edit');
-	Route::post('/task/edit/{id}', 'TaskController@update');
+// delete
+Route::get('/task/{id}/delete', 'TaskController@destroy');
 
-	//snooze
-	Route::post('/task/snooze/{id}', 'TaskController@snooze');
+// activity log
+Route::get('/activity', 'ActivityLogController@index');
 
-	//delete
-	Route::get('/task/{id}/delete', 'TaskController@destroy');
+// change password
+Route::get('/changepassword', 'UserProfileController@ChangePassword');
+Route::post('/changepassword', 'UserProfileController@updateChangePassword');
 
-//activity log
-Route::get( '/activity', 'ActivityLogController@index' );
+// change avatar
+Route::get('/changeavatar', 'UserProfileController@changeavatar');
+Route::post('/changeavatar', 'UserProfileController@updatechangeavatar');
+Route::get('/getavatar', 'UserProfileController@getavatar');
 
-//change password
-Route::get( '/changepassword', 'UserProfileController@ChangePassword' );
-Route::post( '/changepassword', 'UserProfileController@updateChangePassword' );
-
-//change avatar
-Route::get( '/changeavatar', 'UserProfileController@changeavatar' );
-Route::post( '/changeavatar', 'UserProfileController@updatechangeavatar' );
-Route::get( '/getavatar', 'UserProfileController@getavatar' );
-
-//notification
+// notification
 Route::get('/notification/list', 'NotificationController@indexList');
 Route::get('/notifications', 'NotificationController@index');
 Route::post('/notification/read', 'NotificationController@store');

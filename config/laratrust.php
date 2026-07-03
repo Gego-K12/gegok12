@@ -1,5 +1,10 @@
 <?php
 
+use App\Models\Permission;
+use App\Models\Role;
+use App\Models\Team;
+use App\Models\User;
+
 return [
     /*
     |--------------------------------------------------------------------------
@@ -99,7 +104,7 @@ return [
     |
     */
     'user_models' => [
-        'users' => \App\Models\User::class,
+        'users' => User::class,
     ],
 
     /*
@@ -114,14 +119,14 @@ return [
     */
     'models' => [
 
-        'role' => \App\Models\Role::class,
+        'role' => Role::class,
 
-        'permission' => \App\Models\Permission::class,
+        'permission' => Permission::class,
 
         /**
          * Will be used only if the teams functionality is enabled.
          */
-        'team' => \App\Models\Team::class,
+        'team' => Team::class,
     ],
 
     /*

@@ -17,6 +17,7 @@ use App\Http\Resources\User as UserResource;
 use App\Models\Task;
 use App\Models\TaskAssignee;
 use App\Models\User;
+use App\Services\TaskReaderService;
 use App\Traits\Common;
 use App\Traits\LogActivity;
 use App\Traits\TodolistProcess;
@@ -31,6 +32,8 @@ class TaskController extends Controller
     use Common;
     use LogActivity;
     use TodolistProcess;
+
+    public function __construct(protected TaskReaderService $taskReader) {}
 
     /**
      * Display a listing of the resource.
@@ -178,8 +181,12 @@ class TaskController extends Controller
      */
     public function show($id)
     {
-        //
-        $task = Task::where('id', $id)->first();
+        $task = $this->taskReader->find($id, Auth::user()->school_id);
+
+        if (! $task) {
+            abort(404);
+        }
+
         $task_assignees = TaskAssignee::where('task_id', $id)->get();
 
         foreach ($task_assignees as $key => $task_assignee) {
@@ -227,8 +234,12 @@ class TaskController extends Controller
      */
     public function editList(Request $request, $id)
     {
-        //
-        $task = Task::where('id', $id)->first();
+        $task = $this->taskReader->find($id, Auth::user()->school_id);
+
+        if (! $task) {
+            abort(404);
+        }
+
         $task_assignees = TaskAssignee::where('task_id', $id)->get();
 
         foreach ($task_assignees as $key => $task_assignee) {
@@ -280,8 +291,11 @@ class TaskController extends Controller
      */
     public function edit($id)
     {
-        //
-        $task = Task::where('id', $id)->first();
+        $task = $this->taskReader->find($id, Auth::user()->school_id);
+
+        if (! $task) {
+            abort(404);
+        }
 
         return view('/admin/todolist/edit', ['task' => $task]);
     }
@@ -295,12 +309,17 @@ class TaskController extends Controller
      */
     public function update(TaskRequest $request, $id)
     {
+        $school_id = Auth::user()->school_id;
+
+        if (! $this->taskReader->find($id, $school_id)) {
+            abort(404);
+        }
+
         try {
-            $school_id = Auth::user()->school_id;
             $academic_year = SiteHelper::getAcademicYear($school_id);
             $auth_id = Auth::id();
 
-            $task = $this->editTaskAssignee($request, $auth_id, $id);
+            $task = $this->editTaskAssignee($request, $auth_id, $id, $school_id);
 
             $message = trans('messages.update_success_msg', ['module' => 'Task']);
 
@@ -329,13 +348,18 @@ class TaskController extends Controller
      */
     public function snooze(Request $request, $id)
     {
+        $school_id = Auth::user()->school_id;
+        $task = $this->taskReader->find($id, $school_id);
+
+        if (! $task) {
+            abort(404);
+        }
+
         try {
-            $school_id = Auth::user()->school_id;
             $academic_year = SiteHelper::getAcademicYear($school_id);
             $auth_id = Auth::id();
-            $task = Task::where('id', $id)->first();
             if ($task->snooze == 0) {
-                $task = $this->snoozeTask($request, $auth_id, $id);
+                $task = $this->snoozeTask($request, $auth_id, $id, $school_id);
 
                 $mins = env('SNOOZE_TIME') / 60;
                 $message = trans('messages.task_snooze_msg', ['mins' => $mins]);
@@ -368,9 +392,13 @@ class TaskController extends Controller
      */
     public function destroy($id)
     {
-        try {
-            $task = Task::where('id', $id)->first();
+        $task = $this->taskReader->find($id, Auth::user()->school_id);
 
+        if (! $task) {
+            abort(404);
+        }
+
+        try {
             $task_assignees = TaskAssignee::where('task_id', $task->id)->get();
             foreach ($task_assignees as $task_assignee) {
                 $task_assignee->delete();

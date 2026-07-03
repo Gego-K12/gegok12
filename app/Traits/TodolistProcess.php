@@ -17,6 +17,7 @@ use App\Models\Task;
 use App\Models\TaskAssignee;
 use App\Models\User;
 use App\Models\Users\StudentUser;
+use App\Services\TaskReaderService;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Auth;
@@ -253,13 +254,21 @@ trait TodolistProcess
         }
     }
 
-    public function editTaskAssignee($data, $auth_id, $id)
+    /**
+     * Returns null if no task with this id exists for this school - the
+     * caller should treat that as a 404, not proceed.
+     */
+    public function editTaskAssignee($data, $auth_id, $id, $schoolId)
     {
+        $task = app(TaskReaderService::class)->find($id, $schoolId);
+
+        if (! $task) {
+            return null;
+        }
+
         \DB::beginTransaction();
         try {
             $today = date('Y-m-d H:i:s');
-
-            $task = Task::where('id', $id)->first();
 
             $task->type = $data->assignee;
             $task->title = $data->title;
@@ -445,12 +454,21 @@ trait TodolistProcess
         }
     }
 
-    public function snoozeTask($data, $auth_id, $id)
+    /**
+     * Returns null if no task with this id exists for this school - the
+     * caller should treat that as a 404, not proceed.
+     */
+    public function snoozeTask($data, $auth_id, $id, $schoolId)
     {
+        $task = app(TaskReaderService::class)->find($id, $schoolId);
+
+        if (! $task) {
+            return null;
+        }
+
         \DB::beginTransaction();
         try {
             $today = date('Y-m-d H:i:s');
-            $task = Task::where('id', $id)->first();
             $task_date = date('Y-m-d H:i:s', strtotime($task->task_date));
             $snooze_time = Carbon::now()->addSeconds(env('SNOOZE_TIME'))->format('Y-m-d H:i:s');
 

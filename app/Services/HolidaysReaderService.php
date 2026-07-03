@@ -8,6 +8,7 @@
 namespace App\Services;
 
 use App\Models\Events;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
@@ -41,5 +42,16 @@ class HolidaysReaderService
             ->where('school_id', $schoolId)
             ->where('category', 'holidays')
             ->first();
+    }
+
+    /**
+     * Unpaginated listing for the mobile apps' holidaylist() endpoints.
+     */
+    public function list(int $schoolId, int $academicYearId): Collection
+    {
+        return Events::where('school_id', $schoolId)
+            ->where('academic_year_id', $academicYearId)
+            ->where('category', 'holidays')
+            ->get();
     }
 }

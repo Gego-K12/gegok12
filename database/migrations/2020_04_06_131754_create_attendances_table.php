@@ -24,7 +24,7 @@ class CreateAttendancesTable extends Migration
             $table->integer('user_id')->unsigned();
             $table->foreign('user_id')->references('id')->on('users');
             $table->dateTime('date');
-            $table->enum('session',['afternoon','forenoon']);
+            $table->enum('session', ['afternoon', 'forenoon']);
             $table->boolean('status')->default(true);
             $table->integer('reason_id')->unsigned()->nullable();
             $table->foreign('reason_id')->references('id')->on('absent_reasons');

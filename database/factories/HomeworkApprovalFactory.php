@@ -2,10 +2,11 @@
 
 namespace Database\Factories;
 
+use App\Models\HomeworkApproval;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\HomeworkApproval>
+ * @extends Factory<HomeworkApproval>
  */
 class HomeworkApprovalFactory extends Factory
 {
@@ -17,7 +18,7 @@ class HomeworkApprovalFactory extends Factory
     public function definition(): array
     {
         return [
-            'status'        => $this->faker->randomElement(['pending','approved','rejected']), 
+            'status' => $this->faker->randomElement(['pending', 'approved', 'rejected']),
         ];
     }
 }

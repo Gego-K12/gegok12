@@ -2,11 +2,12 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\PayCategory;
+use App\Models\TemplateItem;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\TemplateItem>
+ * @extends Factory<TemplateItem>
  */
 class TemplateItemFactory extends Factory
 {

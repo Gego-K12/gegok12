@@ -16,12 +16,12 @@ class CreateParentProfilesTable extends Migration
         Schema::create('parent_profiles', function (Blueprint $table) {
             $table->increments('id');
             $table->bigInteger('school_id')->unsigned()->nullable();
-            $table->foreign('school_id')->references('id')->on('schools'); 
+            $table->foreign('school_id')->references('id')->on('schools');
             $table->integer('user_id')->unsigned();
             $table->foreign('user_id')->references('id')->on('users');
             $table->integer('qualification_id')->unsigned()->nullable();
             $table->foreign('qualification_id')->references('id')->on('qualifications');
-            $table->enum('profession',['admin','business','central_government_employee','private','home_maker','state_government_employee','teacher','librarian','others'])->nullable(); //change in userprofile controller - API,importmember controller,create component,edit component
+            $table->enum('profession', ['admin', 'business', 'central_government_employee', 'private', 'home_maker', 'state_government_employee', 'teacher', 'librarian', 'others'])->nullable(); // change in userprofile controller - API,importmember controller,create component,edit component
             $table->string('sub_occupation')->nullable();
             $table->string('designation')->nullable();
             $table->string('organization_name')->nullable();

@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use DB;
-use Illuminate\Database\Seeder;
-use App\Models\User;
+use App\Models\TeacherProfile;
+use App\Models\Userprofile;
 use Carbon\Carbon;
+use Illuminate\Database\Seeder;
 
 class UsersTableSeeder extends Seeder
 {
@@ -160,36 +160,34 @@ class UsersTableSeeder extends Seeder
         //         ]);
         // }
 
+        $librarian = factory(App\Models\User::class)->create([
+            'school_id' => '1',
+            'name' => 'librarian',
+            'email' => 'librarian@mailinator.com',
+            'mobile_no' => '2230456701',
+            'usergroup_id' => '8',
+        ]);
 
-        $librarian =  factory(App\Models\User::class)->create([
-            'school_id'    =>   '1',
-            'name'         =>   'librarian',
-            'email'        =>   'librarian@mailinator.com',
-            'mobile_no'    =>   '2230456701',
-            'usergroup_id' =>   "8"
-          ]);
+        factory(Userprofile::class)->create([
+            'school_id' => $librarian->school_id,
+            'user_id' => $librarian->id,
+            'usergroup_id' => $librarian->usergroup_id,
+            'firstname' => 'librarian',
+            'lastname' => 'librarian',
+            'profession' => 'librarian',
+            'address' => 'Namakkal,Tamilnadu,India',
+            'country_id' => '7',
+            'city_id' => '31',
+            'state_id' => '24',
+            'pincode' => '625001',
+        ]);
 
-        factory(\App\Models\Userprofile::class)->create([
-                'school_id'     =>  $librarian->school_id,
-                'user_id'       =>  $librarian->id,
-                'usergroup_id'  =>  $librarian->usergroup_id,
-                'firstname'     =>  'librarian',
-                'lastname'      =>  'librarian',
-                'profession'    =>  'librarian',
-                'address'       =>  'Namakkal,Tamilnadu,India',
-                'country_id'    =>  '7',
-                'city_id'       =>  '31',
-                'state_id'      =>  '24',
-                'pincode'       =>  '625001'
-                ]);
-
-            factory(\App\Models\TeacherProfile::class)->create([
-                    'school_id'         =>  $librarian->school_id,
-                    'academic_year_id'  =>  1,
-                    'user_id'           =>  $librarian->id,
-                    'status'            =>  1,
-                ]);
-
+        factory(TeacherProfile::class)->create([
+            'school_id' => $librarian->school_id,
+            'academic_year_id' => 1,
+            'user_id' => $librarian->id,
+            'status' => 1,
+        ]);
 
     }
 }

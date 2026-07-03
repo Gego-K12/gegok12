@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors

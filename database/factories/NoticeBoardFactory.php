@@ -2,12 +2,9 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
-use App\Models\School;
-use App\Models\AcademicYear;
-use App\Models\StandardLink;
 use App\Models\BackgroundImage;
 use App\Models\NoticeBoard;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class NoticeBoardFactory extends Factory
 {
@@ -18,12 +15,12 @@ class NoticeBoardFactory extends Factory
 
         return [
 
-            'background_id'     => BackgroundImage::inRandomOrder()->value('id'),
-            'title'             => $this->faker->sentence,
-            'publish_date'      => $this->faker->dateTimeBetween('-10 days', 'now'),
-            'expire_date'       => $this->faker->dateTimeBetween('now', '+10 days'),
-            'description'       => $this->faker->paragraph,
-            'attachment_file'   => null,
+            'background_id' => BackgroundImage::inRandomOrder()->value('id'),
+            'title' => $this->faker->sentence,
+            'publish_date' => $this->faker->dateTimeBetween('-10 days', 'now'),
+            'expire_date' => $this->faker->dateTimeBetween('now', '+10 days'),
+            'description' => $this->faker->paragraph,
+            'attachment_file' => null,
         ];
     }
 }

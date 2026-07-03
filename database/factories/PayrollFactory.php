@@ -2,10 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Models\Payroll;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Payroll>
+ * @extends Factory<Payroll>
  */
 class PayrollFactory extends Factory
 {
@@ -18,13 +20,13 @@ class PayrollFactory extends Factory
     {
         return [
             // 'school_id'  => School::pluck('id')->random(),
-            'payrollno'  => 'PR-' . $this->faker->unique()->numberBetween(10000, 99999),
+            'payrollno' => 'PR-'.$this->faker->unique()->numberBetween(10000, 99999),
             // 'staff_id'   => User::pluck('id')->random(),
             // 'salary_id'  => Salary::pluck('id')->random(),
-            'start_date'=> \Carbon\Carbon::now()->startOfMonth(),
-            'end_date'  => \Carbon\Carbon::now()->endOfMonth(),
-            'status'    => $this->faker->randomElement(['paid', 'unpaid']),
-            'comments'  => $this->faker->sentence(6),
+            'start_date' => Carbon::now()->startOfMonth(),
+            'end_date' => Carbon::now()->endOfMonth(),
+            'status' => $this->faker->randomElement(['paid', 'unpaid']),
+            'comments' => $this->faker->sentence(6),
         ];
     }
 }

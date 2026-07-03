@@ -25,38 +25,38 @@ class ParentProfileFactory extends Factory
             'private',
             'home_maker',
             'state_government_employee',
-            'others'
+            'others',
         ]);
 
         // default values for home_maker
-        $sub_occupation   = null;
-        $designation      = null;
+        $sub_occupation = null;
+        $designation = null;
         $organization_name = null;
         $official_address = null;
-        $annual_income    = null;
+        $annual_income = null;
 
         // if not home_maker, fill work details
         if ($profession !== 'home_maker') {
-            $sub_occupation    = $this->faker->jobTitle;
-            $designation       = $this->faker->jobTitle;
+            $sub_occupation = $this->faker->jobTitle;
+            $designation = $this->faker->jobTitle;
             $organization_name = $this->faker->company;
-            $official_address  = $this->faker->randomElement([
-                'Bangalore', 'Chennai', 'Hyderabad', 'Mumbai', 'Thiruvananthapuram'
+            $official_address = $this->faker->randomElement([
+                'Bangalore', 'Chennai', 'Hyderabad', 'Mumbai', 'Thiruvananthapuram',
             ]);
-            $annual_income     = $this->faker->numerify('#######');
+            $annual_income = $this->faker->numerify('#######');
         }
 
         $relation = $this->faker->randomElement(['father', 'mother', 'guardian']);
 
         return [
-            'qualification_id'  => $qualification_id,
-            'profession'        => $profession,
-            'sub_occupation'    => $sub_occupation,
-            'designation'       => $designation,
+            'qualification_id' => $qualification_id,
+            'profession' => $profession,
+            'sub_occupation' => $sub_occupation,
+            'designation' => $designation,
             'organization_name' => $organization_name,
-            'official_address'  => $official_address,
-            'relation'          => $relation,
-            'annual_income'     => $annual_income
+            'official_address' => $official_address,
+            'relation' => $relation,
+            'annual_income' => $annual_income,
         ];
     }
 }

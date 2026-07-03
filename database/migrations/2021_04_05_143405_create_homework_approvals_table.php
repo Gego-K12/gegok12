@@ -18,7 +18,7 @@ class CreateHomeworkApprovalsTable extends Migration
             $table->bigInteger('homework_id')->unsigned();
             $table->foreign('homework_id')->references('id')->on('homeworks');
             $table->string('comments')->nullable();
-            $table->enum('status',['approved','pending','rejected'])->default('pending');
+            $table->enum('status', ['approved', 'pending', 'rejected'])->default('pending');
             $table->integer('approved_by')->unsigned()->nullable();
             $table->foreign('approved_by')->references('id')->on('users');
             $table->timestamp('approved_at')->nullable();

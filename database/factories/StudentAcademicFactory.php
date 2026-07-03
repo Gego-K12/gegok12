@@ -2,9 +2,9 @@
 
 namespace Database\Factories;
 
-use App\Models\StudentAcademic;
 use App\Models\AcademicYear;
 use App\Models\StandardLink;
+use App\Models\StudentAcademic;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class StudentAcademicFactory extends Factory
@@ -13,11 +13,11 @@ class StudentAcademicFactory extends Factory
 
     public function definition()
     {
-        $academicYear = AcademicYear::where('status',1)->first();
+        $academicYear = AcademicYear::where('status', 1)->first();
 
         $standardLink = StandardLink::where([
-            ['academic_year_id',$academicYear->id],
-            ['status',1]
+            ['academic_year_id', $academicYear->id],
+            ['status', 1],
         ])->pluck('id')->toArray();
 
         $standardLink_id = $this->faker->randomElement($standardLink);
@@ -35,31 +35,31 @@ class StudentAcademicFactory extends Factory
         $roll_number = $this->faker->numberBetween(1, 25);
         $id_card_number = $this->faker->numberBetween(1, 25);
 
-        if (in_array($selected_standard->standard->name, ['10','12'])) {
+        if (in_array($selected_standard->standard->name, ['10', '12'])) {
             $board_registration_number = $this->faker->numerify('########');
         }
 
         $mode_of_transport = $this->faker->randomElement([
-            'auto','car','city_bus','cycle','rickshaw','school_bus','taxi','walking'
+            'auto', 'car', 'city_bus', 'cycle', 'rickshaw', 'school_bus', 'taxi', 'walking',
         ]);
 
-        if (in_array($mode_of_transport, ['auto','rickshaw','taxi'])) {
+        if (in_array($mode_of_transport, ['auto', 'rickshaw', 'taxi'])) {
             $transport_details = [
                 'driver_name' => $this->faker->name,
                 'driver_contact_number' => $this->faker->numerify('#########'),
             ];
         }
 
-        $siblings = $this->faker->randomElement(['yes','no']);
+        $siblings = $this->faker->randomElement(['yes', 'no']);
 
         if ($siblings === 'yes') {
-            $siblings_count = $this->faker->randomElement([1,2]);
+            $siblings_count = $this->faker->randomElement([1, 2]);
             $sibling_details = [];
 
-            for ($i=0; $i < $siblings_count; $i++) {
+            for ($i = 0; $i < $siblings_count; $i++) {
                 $sibling_details[$i] = [
-                    'sibling_relation' => $this->faker->randomElement(['brother','sister']),
-                    'sibling_name'     => $this->faker->name,
+                    'sibling_relation' => $this->faker->randomElement(['brother', 'sister']),
+                    'sibling_name' => $this->faker->name,
                     'sibling_date_of_birth' => $this->faker->dateTimeBetween('-18 years', '-5 years'),
                     'sibling_standard' => $this->faker->randomElement($standardLink),
                 ];

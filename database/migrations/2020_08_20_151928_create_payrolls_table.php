@@ -28,7 +28,7 @@ class CreatePayrollsTable extends Migration
             $table->integer('leave');
             $table->integer('late')->nullable();
             $table->integer('leave_deduction');
-            $table->enum('status',['paid','unpaid'])->default('unpaid');
+            $table->enum('status', ['paid', 'unpaid'])->default('unpaid');
             $table->string('comments')->nullable();
             $table->timestamps();
             $table->softDeletes();

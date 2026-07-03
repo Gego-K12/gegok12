@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
@@ -16,7 +17,7 @@ class SchoolFactory extends Factory
     public function definition()
     {
         return [
-            'name' => $this->faker->unique()->word() . ' School',
+            'name' => $this->faker->unique()->word().' School',
             'email' => $this->faker->unique()->safeEmail(),
             'phone' => $this->faker->phoneNumber(),
             'address' => $this->faker->address(),

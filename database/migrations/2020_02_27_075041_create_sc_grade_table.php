@@ -20,7 +20,7 @@ class CreateScGradeTable extends Migration
             $table->integer('academic_year_id')->unsigned();
             $table->foreign('academic_year_id')->references('id')->on('academic_years');
             $table->string('grade_name');
-            $table->enum('grading_method',['cbse','passfail']);
+            $table->enum('grading_method', ['cbse', 'passfail']);
             $table->timestamps();
         });
     }

@@ -34,8 +34,8 @@ class CreateTeacherLeaveApplicationsTable extends Migration
             $table->foreign('approved_by')->references('id')->on('users');
             $table->date('approved_on')->nullable();
             $table->text('comments')->nullable();
-            $table->enum('session',['forenoon','afternoon','day'])->nullable();
-            $table->enum('status',['pending','approved','cancelled','completed']);
+            $table->enum('session', ['forenoon', 'afternoon', 'day'])->nullable();
+            $table->enum('status', ['pending', 'approved', 'cancelled', 'completed']);
             $table->timestamps();
             $table->softDeletes();
         });

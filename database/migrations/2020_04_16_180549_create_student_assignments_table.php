@@ -26,7 +26,7 @@ class CreateStudentAssignmentsTable extends Migration
             $table->integer('marks_given_by')->unsigned()->nullable();
             $table->foreign('marks_given_by')->references('id')->on('users');
             $table->date('marks_given_on')->nullable();
-            $table->enum('status',['pending','submitted','cancel','completed']);
+            $table->enum('status', ['pending', 'submitted', 'cancel', 'completed']);
             $table->timestamps();
             $table->softDeletes();
         });

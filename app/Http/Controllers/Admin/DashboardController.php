@@ -21,8 +21,8 @@ use App\Models\Fee;
 use App\Models\FeeGroup;
 use App\Models\FeePayment;
 use App\Models\StandardLink;
-use App\Models\Task;
 use App\Models\User;
+use App\Services\DashboardReaderService;
 use App\Traits\Common;
 use App\Traits\Dashboard;
 use App\Traits\LogActivity;
@@ -45,6 +45,8 @@ class DashboardController extends Controller
     use Dashboard;
     use LogActivity;
 
+    public function __construct(protected DashboardReaderService $dashboardReader) {}
+
     /**
      * Show the application dashboard.
      *
@@ -52,11 +54,6 @@ class DashboardController extends Controller
      */
     public function index(Request $request)
     {
-
-        \Artisan::call('cache:clear');
-        \Artisan::call('view:clear');
-        \Artisan::call('config:clear');
-
         $admin_id = Auth::id();
         $school_id = Auth::user()->school_id;
 
@@ -77,17 +74,9 @@ class DashboardController extends Controller
      */
     public function list(Request $request, $task_flag)
     {
-        //
-        $tasks = Task::where([['school_id', Auth::user()->school_id], ['user_id', Auth::id()], ['task_status', 0], ['task_flag', $task_flag]])->ByType('to_me', Auth::id());
+        $tasks = $this->dashboardReader->taskWidgetList(Auth::user()->school_id, Auth::id(), $task_flag, $request->q);
 
-        if ($request->q != null) {
-            $tasks = $tasks->where('title', 'LIKE', '%'.$request->q.'%');
-        }
-        $tasks = $tasks->get();
-
-        $tasks = TaskResource::collection($tasks);
-
-        return $tasks;
+        return TaskResource::collection($tasks);
     }
 
     /**
@@ -97,14 +86,7 @@ class DashboardController extends Controller
      */
     public function listCount()
     {
-        //
-        $tasks = Task::where([['school_id', Auth::user()->school_id], ['user_id', Auth::id()], ['task_status', 0]])->ByType('to_me', Auth::id())->get()->groupBy('Flag');
-
-        foreach ($tasks as $key => $value) {
-            $tasks[$key] = count($value);
-        }
-
-        return $tasks;
+        return $this->dashboardReader->taskWidgetCounts(Auth::user()->school_id, Auth::id());
     }
 
     /**

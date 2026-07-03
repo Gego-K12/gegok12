@@ -42,12 +42,11 @@ trait Dashboard
      */
     public function adminDashboard($school_id, $admin_id)
     {
-        $seconds = 300;
         $array = [];
 
         $academic_year = SiteHelper::getAcademicYear($school_id);
 
-        $array['studentCount'] = Cache::remember('studentCount_'.$school_id, env('CACHE_TIME'), function () use ($school_id) {
+        $array['studentCount'] = Cache::remember('admin_studentCount_'.$school_id, env('CACHE_TIME'), function () use ($school_id) {
             return User::where([['status', '!=', 'exit']])->BySchool($school_id)->ByRole(6)->count();
         });
 
@@ -60,7 +59,7 @@ trait Dashboard
             })->count();
         });
 
-        $array['teacherCount'] = Cache::remember('teacherCount_'.$school_id, env('CACHE_TIME'), function () use ($school_id) {
+        $array['teacherCount'] = Cache::remember('admin_teacherCount_'.$school_id, env('CACHE_TIME'), function () use ($school_id) {
             return User::where([['status', '!=', 'exit']])->BySchool($school_id)->ByRole(5)->count();
         });
 
@@ -302,18 +301,17 @@ trait Dashboard
      */
     public function receptionDashboard($school_id, $receptionist_id)
     {
-        $seconds = 300;
         $array = [];
 
         $date = date('Y-m-d H:i:s');
 
         $academic_year = SiteHelper::getAcademicYear($school_id);
 
-        $array['studentCount'] = Cache::remember('studentCount_'.$school_id, env('CACHE_TIME'), function () use ($school_id) {
+        $array['studentCount'] = Cache::remember('reception_studentCount_'.$school_id, env('CACHE_TIME'), function () use ($school_id) {
             return User::BySchool($school_id)->ByRole(6)->count();
         });
 
-        $array['teacherCount'] = Cache::remember('teacherCount_'.$school_id, env('CACHE_TIME'), function () use ($school_id) {
+        $array['teacherCount'] = Cache::remember('reception_teacherCount_'.$school_id, env('CACHE_TIME'), function () use ($school_id) {
             return User::BySchool($school_id)->ByRole(5)->count();
         });
 
@@ -337,7 +335,6 @@ trait Dashboard
      */
     public function librarianDashboard($school_id, $librarian_id)
     {
-        $seconds = 300;
         $array = [];
 
         $date = date('Y-m-d H:i:s');
@@ -382,30 +379,11 @@ trait Dashboard
      */
     public function accountantDashboard($school_id, $accountant_id)
     {
-        $seconds = 300;
         $array = [];
 
         $date = date('Y-m-d H:i:s');
 
         $academic_year = SiteHelper::getAcademicYear($school_id);
-
-        $array['bookCount'] = Cache::remember('bookCount_'.$school_id, env('CACHE_TIME'), function () use ($school_id) {
-            return Book::where('school_id', $school_id)->count();
-        });
-
-        $array['booklendingCount'] = Cache::remember('booklendingCount_'.$school_id, env('CACHE_TIME'), function () use ($school_id) {
-            return BookLending::whereHas('book', function ($query) use ($school_id) {
-                $query->where('school_id', $school_id);
-            })->count();
-        });
-
-        $array['cardHolderCount'] = Cache::remember('cardHolderCount_'.$school_id, env('CACHE_TIME'), function () use ($school_id) {
-            return LibraryCard::where('school_id', $school_id)->count();
-        });
-
-        $array['categoryCount'] = Cache::remember('categoryCount_'.$school_id, env('CACHE_TIME'), function () use ($school_id) {
-            return BookCategory::where('school_id', $school_id)->count();
-        });
 
         $array['noticeboard'] = NoticeBoard::where([['school_id', $school_id], ['academic_year_id', $academic_year->id]])->orderBy('created_at', 'DESC')->take(5)->get();
 

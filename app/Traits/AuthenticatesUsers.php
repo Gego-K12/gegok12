@@ -30,6 +30,8 @@ trait AuthenticatesUsers
      */
     public function login(Request $request)
     {
+        $this->normalizeEmailCase($request);
+
         $this->validateLogin($request);
 
         // If the class is using the ThrottlesLogins trait, we can automatically throttle
@@ -51,6 +53,31 @@ trait AuthenticatesUsers
         $this->incrementLoginAttempts($request);
 
         return $this->sendFailedLoginResponse($request);
+    }
+
+    /**
+     * Match the submitted email case-insensitively against the stored value
+     * and substitute the stored casing into the request.
+     *
+     * Runs before validateLogin() so every downstream check (checkactive,
+     * checkexit, checkschool, the credential attempt) sees a consistent,
+     * correctly-cased email regardless of the database's collation - MySQL's
+     * default collation matches case-insensitively already, but relying on
+     * that implicitly is fragile and doesn't hold on every database.
+     *
+     * @return void
+     */
+    protected function normalizeEmailCase(Request $request)
+    {
+        $email = $request->input('email');
+
+        if ($email && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $user = User::whereRaw('LOWER(email) = ?', [strtolower($email)])->first();
+
+            if ($user) {
+                $request->merge(['email' => $user->email]);
+            }
+        }
     }
 
     /**
@@ -111,7 +138,10 @@ trait AuthenticatesUsers
 
         /**
          * Validator: checkactive
-         * Validates that the user's profile status is not 'inactive' (suspended).
+         * Validates that neither the user's own status nor their profile's
+         * status is 'inactive' (suspended). Admin\UserController::updateStatus()
+         * keeps both in sync in normal operation, but this checks both so a
+         * user is blocked regardless of which one was actually updated.
          *
          * @param  string  $attribute  The attribute being validated
          * @param  string  $value  The value being validated
@@ -122,12 +152,21 @@ trait AuthenticatesUsers
         Validator::extend('checkactive', function ($attribute, $value, $parameters, $validator) {
             $users = User::where('email', request('email'))->with('userprofile')->first();
 
-            return $users->userprofile->status != 'inactive';
+            if (! $users) {
+                return false;
+            }
+
+            if ($users->status == 'inactive') {
+                return false;
+            }
+
+            return ! $users->userprofile || $users->userprofile->status != 'inactive';
         }, 'You are suspended by site admin');
 
         /**
          * Validator: checkexit
-         * Validates that the user's profile status is not 'exit' (no longer works in school).
+         * Validates that neither the user's own status nor their profile's
+         * status is 'exit' (no longer works in school).
          *
          * @param  string  $attribute  The attribute being validated
          * @param  string  $value  The value being validated
@@ -138,11 +177,19 @@ trait AuthenticatesUsers
         Validator::extend('checkexit', function ($attribute, $value, $parameters, $validator) {
             $users = User::where('email', request('email'))->with('userprofile')->first();
 
-            return $users->userprofile->status != 'exit';
+            if (! $users) {
+                return false;
+            }
+
+            if ($users->status == 'exit') {
+                return false;
+            }
+
+            return ! $users->userprofile || $users->userprofile->status != 'exit';
         }, 'You have exited this school');
 
         $this->validate($request, [
-            $this->username() => 'required|string|checkactive|checkexit',
+            'email' => 'required|string|checkactive|checkexit',
             'password' => 'bail|required|string|checkschool',
         ]);
     }

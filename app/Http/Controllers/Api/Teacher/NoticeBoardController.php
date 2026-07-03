@@ -10,13 +10,15 @@ namespace App\Http\Controllers\Api\Teacher;
 use App\Helpers\SiteHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\API\Teacher\Notice as NoticeSchoolResource;
-use App\Models\NoticeBoard;
 use App\Models\User;
+use App\Services\NoticeBoardReaderService;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 
 class NoticeBoardController extends Controller
 {
+    public function __construct(protected NoticeBoardReaderService $noticeBoardReader) {}
+
     /**
      * Display a listing of the resource.
      *
@@ -24,39 +26,56 @@ class NoticeBoardController extends Controller
      */
     public function indexSchool()
     {
-        //
-        $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
-        $notice = NoticeBoard::where([['school_id', Auth::user()->school_id], ['standardLink_id', null]])->where('expire_date', '>=', date('Y-m-d'))->where('status', 1)->get();
-        $noticelist = NoticeSchoolResource::collection($notice);
+        $school_id = Auth::user()->school_id;
+        $academic_year = SiteHelper::getAcademicYear($school_id);
+
+        $notice = $this->noticeBoardReader->list(
+            schoolId: $school_id,
+            academicYearId: $academic_year->id,
+            standardLinkIds: [],
+            includeNullScope: true,
+            excludeTeacherType: false,
+        );
 
         return response()->json([
             'success' => true,
             'message' => 'Notice List',
             'type' => 'school',
-            'data' => $noticelist,
+            'data' => NoticeSchoolResource::collection($notice),
         ], 200);
     }
 
+    /**
+     * Notices for the classes a teacher is linked to (class teacher or
+     * subject teacher). Previously only checked subject-teacher
+     * assignments and had no school/academic-year scoping - now shares
+     * the same resolution the web dashboard uses.
+     */
     public function showNotices($teacher_id)
     {
-        //
-        $standardLinks = [];
+        $school_id = Auth::user()->school_id;
+        $academic_year = SiteHelper::getAcademicYear($school_id);
         $teacher = User::where('id', $teacher_id)->first();
 
-        if (count($teacher->teacherlink) > 0) {
-            $standardLinks = $teacher->teacherlink->pluck('standardLink_id')->toArray();
-        }
+        $standardLinks = $this->noticeBoardReader->standardLinksForTeacher(
+            $school_id,
+            $academic_year->id,
+            $teacher->id
+        );
 
-        $notice = NoticeBoard::whereIn('standardLink_id', $standardLinks)->where('expire_date', '>=', date('Y-m-d'))->where('status', 1)->get();
-
-        // $notice = NoticeBoard::where([['school_id',Auth::user()->school_id],['standardLink_id',null]])->where('expire_date','>=',date('Y-m-d'))->where('status',1)->get();
-        $noticelist = NoticeSchoolResource::collection($notice);
+        $notice = $this->noticeBoardReader->list(
+            schoolId: $school_id,
+            academicYearId: $academic_year->id,
+            standardLinkIds: $standardLinks,
+            includeNullScope: false,
+            excludeTeacherType: false,
+        );
 
         return response()->json([
             'success' => true,
             'message' => 'Notice List',
             'type' => 'school',
-            'data' => $noticelist,
+            'data' => NoticeSchoolResource::collection($notice),
         ], 200);
     }
 
@@ -67,16 +86,23 @@ class NoticeBoardController extends Controller
      */
     public function expiredSchool()
     {
-        //
-        $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
-        $notice = NoticeBoard::where([['school_id', Auth::user()->school_id], ['standardLink_id', null]])->where('expire_date', '<=', date('Y-m-d'))->where('status', 0)->get();
-        $noticelist = NoticeSchoolResource::collection($notice);
+        $school_id = Auth::user()->school_id;
+        $academic_year = SiteHelper::getAcademicYear($school_id);
+
+        $notice = $this->noticeBoardReader->list(
+            schoolId: $school_id,
+            academicYearId: $academic_year->id,
+            standardLinkIds: [],
+            includeNullScope: true,
+            excludeTeacherType: false,
+            expired: true,
+        );
 
         return response()->json([
             'success' => true,
             'message' => 'Expired Notice List',
             'type' => 'school',
-            'data' => $noticelist,
+            'data' => NoticeSchoolResource::collection($notice),
         ], 200);
     }
 
@@ -88,14 +114,12 @@ class NoticeBoardController extends Controller
      */
     public function show($id)
     {
-        //
-        $notice = NoticeBoard::where('id', $id)->where('type', '==', 'teacher')->get();
-        $noticelist = NoticeSchoolResource::collection($notice);
+        $notice = $this->noticeBoardReader->find($id, Auth::user()->school_id, requireType: 'teacher');
 
         return response()->json([
             'success' => true,
             'message' => 'Show Notice',
-            'data' => $noticelist,
+            'data' => $notice ? NoticeSchoolResource::collection([$notice]) : [],
         ], 200);
     }
 }

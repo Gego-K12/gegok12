@@ -24,6 +24,7 @@ use App\Http\Resources\StandardLink as StandardLinkResource;
 use App\Models\BackgroundImage;
 use App\Models\NoticeBoard;
 use App\Models\StandardLink;
+use App\Services\NoticeBoardReaderService;
 use App\Traits\Common;
 use App\Traits\LogActivity;
 use Carbon\Carbon;
@@ -46,6 +47,8 @@ class NoticeBoardController extends Controller
     use Common;
     use LogActivity;
 
+    public function __construct(protected NoticeBoardReaderService $noticeBoardReader) {}
+
     /**
      * Get notice list based on filters.
      *
@@ -55,26 +58,21 @@ class NoticeBoardController extends Controller
      */
     public function showList(Request $request)
     {
-        //
-        $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
-        $notice = NoticeBoard::where([['school_id', Auth::user()->school_id], ['academic_year_id', $academic_year->id]])->where('expire_date', '>=', date('Y-m-d'))->where('status', 1);
-        if (count((array) \Request::getQueryString()) > 0) {
-            if ($request->showExpired == 'true') {
-                $notice = $notice->orWhere('status', 0)->orWhere('expire_date', '<=', date('Y-m-d'));
-            }
+        $school_id = Auth::user()->school_id;
+        $academic_year = SiteHelper::getAcademicYear($school_id);
 
-            if ($request->standardLink_id != '') {
-                $notice = $notice->where('standardLink_id', $request->standardLink_id);
-            }
+        $notice = $this->noticeBoardReader->paginatedList(
+            schoolId: $school_id,
+            academicYearId: $academic_year->id,
+            standardLinkIds: null,
+            includeNullScope: false,
+            excludeTeacherType: false,
+            includeExpired: $request->showExpired == 'true',
+            standardLinkFilter: $request->standardLink_id ?: null,
+            search: $request->search ?: null,
+        );
 
-            if ($request->search != '') {
-                $notice = $notice->where('title', 'LIKE', '%'.$request->search.'%')->orWhere('description', 'LIKE', '%'.$request->search.'%');
-            }
-        }
-        $notice = $notice->paginate(10);
-        $noticelist = NoticeResource::collection($notice);
-
-        return $noticelist;
+        return NoticeResource::collection($notice);
     }
 
     /**
@@ -96,18 +94,7 @@ class NoticeBoardController extends Controller
      */
     public function list()
     {
-        //
-        $standardLink = StandardLink::with('standard', 'section')->where('school_id', Auth::user()->school_id)->get();
-        $backgroundimages = BackgroundImage::where('school_id', Auth::user()->school_id)->latest()->get();
-        $backgroundimages = backgroundImagesResource::collection($backgroundimages);
-        $standardLink = StandardLinkResource::collection($standardLink);
-
-        $array = [];
-
-        $array['standardLinklist'] = $standardLink;
-        $array['backgroundimages'] = $backgroundimages;
-
-        return $array;
+        return $this->noticeBoardReader->filterOptions(Auth::user()->school_id);
     }
 
     /**

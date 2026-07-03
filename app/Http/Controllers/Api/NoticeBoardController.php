@@ -10,13 +10,15 @@ namespace App\Http\Controllers\Api;
 use App\Helpers\SiteHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\API\Notice as NoticeSchoolResource;
-use App\Models\NoticeBoard;
 use App\Models\User;
+use App\Services\NoticeBoardReaderService;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 
 class NoticeBoardController extends Controller
 {
+    public function __construct(protected NoticeBoardReaderService $noticeBoardReader) {}
+
     /**
      * Display a listing of the resource.
      *
@@ -24,16 +26,22 @@ class NoticeBoardController extends Controller
      */
     public function indexSchool()
     {
-        //
-        $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
-        $notice = NoticeBoard::where([['school_id', Auth::user()->school_id], ['academic_year_id', $academic_year->id], ['standardLink_id', null], ['type', '!=', 'teacher']])->where('expire_date', '>=', date('Y-m-d'))->where('status', 1)->get();
-        $noticelist = NoticeSchoolResource::collection($notice);
+        $school_id = Auth::user()->school_id;
+        $academic_year = SiteHelper::getAcademicYear($school_id);
+
+        $notice = $this->noticeBoardReader->list(
+            schoolId: $school_id,
+            academicYearId: $academic_year->id,
+            standardLinkIds: [],
+            includeNullScope: true,
+            excludeTeacherType: true,
+        );
 
         return response()->json([
             'success' => true,
             'message' => 'Notice List',
             'type' => 'school',
-            'data' => $noticelist,
+            'data' => NoticeSchoolResource::collection($notice),
         ], 200);
     }
 
@@ -44,16 +52,23 @@ class NoticeBoardController extends Controller
      */
     public function expiredSchool()
     {
-        //
-        $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
-        $notice = NoticeBoard::where([['school_id', Auth::user()->school_id], ['academic_year_id', $academic_year->id], ['standardLink_id', null], ['type', '!=', 'teacher']])->where('expire_date', '<=', date('Y-m-d'))->where('status', 0)->get();
-        $noticelist = NoticeSchoolResource::collection($notice);
+        $school_id = Auth::user()->school_id;
+        $academic_year = SiteHelper::getAcademicYear($school_id);
+
+        $notice = $this->noticeBoardReader->list(
+            schoolId: $school_id,
+            academicYearId: $academic_year->id,
+            standardLinkIds: [],
+            includeNullScope: true,
+            excludeTeacherType: true,
+            expired: true,
+        );
 
         return response()->json([
             'success' => true,
             'message' => 'Expired Notice List',
             'type' => 'school',
-            'data' => $noticelist,
+            'data' => NoticeSchoolResource::collection($notice),
         ], 200);
     }
 
@@ -64,17 +79,23 @@ class NoticeBoardController extends Controller
      */
     public function indexClass($student_id)
     {
-        //
-        $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
+        $school_id = Auth::user()->school_id;
+        $academic_year = SiteHelper::getAcademicYear($school_id);
         $student = User::where('id', $student_id)->first();
-        $notice = NoticeBoard::where([['school_id', Auth::user()->school_id], ['academic_year_id', $academic_year->id], ['standardLink_id', $student->studentAcademicLatest->standardLink_id], ['type', '!=', 'teacher']])->where('expire_date', '>=', date('Y-m-d'))->where('status', 1)->get();
-        $noticelist = NoticeSchoolResource::collection($notice);
+
+        $notice = $this->noticeBoardReader->list(
+            schoolId: $school_id,
+            academicYearId: $academic_year->id,
+            standardLinkIds: [$student->studentAcademicLatest->standardLink_id],
+            includeNullScope: false,
+            excludeTeacherType: true,
+        );
 
         return response()->json([
             'success' => true,
             'message' => 'Notice List',
             'type' => 'class',
-            'data' => $noticelist,
+            'data' => NoticeSchoolResource::collection($notice),
         ], 200);
     }
 
@@ -85,17 +106,24 @@ class NoticeBoardController extends Controller
      */
     public function expiredClass($student_id)
     {
-        //
-        $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
+        $school_id = Auth::user()->school_id;
+        $academic_year = SiteHelper::getAcademicYear($school_id);
         $student = User::where('id', $student_id)->first();
-        $notice = NoticeBoard::where([['school_id', Auth::user()->school_id], ['academic_year_id', $academic_year->id], ['standardLink_id', $student->studentAcademicLatest->standardLink_id], ['type', '!=', 'teacher']])->where('expire_date', '<=', date('Y-m-d'))->where('status', 0)->get();
-        $noticelist = NoticeSchoolResource::collection($notice);
+
+        $notice = $this->noticeBoardReader->list(
+            schoolId: $school_id,
+            academicYearId: $academic_year->id,
+            standardLinkIds: [$student->studentAcademicLatest->standardLink_id],
+            includeNullScope: false,
+            excludeTeacherType: true,
+            expired: true,
+        );
 
         return response()->json([
             'success' => true,
             'message' => 'Expired Notice List',
             'type' => 'class',
-            'data' => $noticelist,
+            'data' => NoticeSchoolResource::collection($notice),
         ], 200);
     }
 
@@ -107,14 +135,12 @@ class NoticeBoardController extends Controller
      */
     public function show($id)
     {
-        //
-        $notice = NoticeBoard::where('id', $id)->where('type', '!=', 'teacher')->get();
-        $noticelist = NoticeSchoolResource::collection($notice);
+        $notice = $this->noticeBoardReader->find($id, Auth::user()->school_id, excludeType: 'teacher');
 
         return response()->json([
             'success' => true,
             'message' => 'Show Notice',
-            'data' => $noticelist,
+            'data' => $notice ? NoticeSchoolResource::collection([$notice]) : [],
         ], 200);
     }
 }

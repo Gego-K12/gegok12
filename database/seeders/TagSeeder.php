@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\SpatieTag;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
 class TagSeeder extends Seeder

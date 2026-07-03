@@ -16,13 +16,12 @@ class AbsentReasonsTableSeeder extends Seeder
     {
         $absentReasons = ['Health Issue', 'Family Functions', 'Personal Work', 'Others'];
 
-        foreach ($absentReasons as $reason) 
-        {
+        foreach ($absentReasons as $reason) {
             DB::table('absent_reasons')->Insert([
-                'title'         =>  $reason,
-                'status'        =>  '1',
-                'created_at'    =>   date("Y-m-d H:i:s"),
-                'updated_at'    =>   date("Y-m-d H:i:s"),
+                'title' => $reason,
+                'status' => '1',
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s'),
             ]);
         }
     }

@@ -24,7 +24,7 @@ class CreateStudentHistoryTable extends Migration
             $table->timestamp('read_at')->nullable();
             $table->text('entity_id')->nullable();
             $table->text('entity_type')->nullable();
-            $table->enum('type',['image','video','assignment','homework'])->nullable();//
+            $table->enum('type', ['image', 'video', 'assignment', 'homework'])->nullable(); //
             $table->timestamps();
             $table->softDeletes();
         });

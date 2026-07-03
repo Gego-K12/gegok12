@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreatePromotionsTable extends Migration
 {
@@ -26,7 +26,7 @@ class CreatePromotionsTable extends Migration
             $table->integer('current_section_id')->unsigned()->nullable();
             $table->foreign('current_section_id')->references('id')->on('sections');
             $table->integer('exam_id')->unsigned()->nullable();
-           // $table->foreign('exam_id')->references('id')->on('exams');//imp
+            // $table->foreign('exam_id')->references('id')->on('exams');//imp
             $table->integer('next_academic_year_id')->unsigned()->nullable();
             $table->foreign('next_academic_year_id')->references('id')->on('academic_years');
             $table->integer('next_standard_id')->unsigned()->nullable();

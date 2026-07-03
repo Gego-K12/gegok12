@@ -2,13 +2,8 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\Assignment;
-use App\Models\School;
-use App\Models\AcademicYear;
-use App\Models\StandardsLink;
-use App\Models\Subject;
-use App\Models\User;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class AssignmentFactory extends Factory
 {
@@ -27,7 +22,7 @@ class AssignmentFactory extends Factory
             'assigned_date' => now()->subDays(rand(1, 5)),
             'submission_date' => now()->addDays(rand(1, 5)),
 
-            'status' => $this->faker->randomElement(['pending','ongoing','cancel','completed']),
+            'status' => $this->faker->randomElement(['pending', 'ongoing', 'cancel', 'completed']),
         ];
     }
 }

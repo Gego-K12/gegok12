@@ -2,11 +2,12 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Models\Salary;
 use App\Models\TemplateItem;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Salary>
+ * @extends Factory<Salary>
  */
 class SalaryFactory extends Factory
 {
@@ -18,13 +19,14 @@ class SalaryFactory extends Factory
     public function definition(): array
     {
         $templateItem = TemplateItem::inRandomOrder()->first();
-        $templateId     = $templateItem->template_id;
+        $templateId = $templateItem->template_id;
+
         // $paycategoryId  = $templateItem->paycategory_id;
         return [
             'template_id' => $templateId,
             'gross_salary' => $this->faker->randomFloat(2, 10000, 80000),
-            'effective_date'=> now()->addDays(rand(1, 5)),
-            'comments'=> $this->faker->sentence(),
+            'effective_date' => now()->addDays(rand(1, 5)),
+            'comments' => $this->faker->sentence(),
         ];
     }
 }

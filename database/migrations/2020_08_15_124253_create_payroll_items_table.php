@@ -17,7 +17,7 @@ class CreatePayrollItemsTable extends Migration
             $table->increments('id');
             $table->string('name');
             $table->string('key');
-            $table->enum('type',['earning','deduction','defined']);
+            $table->enum('type', ['earning', 'deduction', 'defined']);
             $table->timestamps();
             $table->softDeletes();
         });

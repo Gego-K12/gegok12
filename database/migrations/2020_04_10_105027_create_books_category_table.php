@@ -20,7 +20,7 @@ class CreateBooksCategoryTable extends Migration
             /*$table->integer('academic_year_id')->unsigned();
             $table->foreign('academic_year_id')->references('id')->on('academic_years');*/
             $table->string('category');
-            //$table->enum('category',['math','literature','biographies','history','science','computers','travel','sports','arts','music','comics'])->nullable();
+            // $table->enum('category',['math','literature','biographies','history','science','computers','travel','sports','arts','music','comics'])->nullable();
             $table->timestamps();
         });
     }

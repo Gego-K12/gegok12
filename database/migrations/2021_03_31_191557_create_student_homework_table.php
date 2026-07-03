@@ -24,7 +24,7 @@ class CreateStudentHomeworkTable extends Migration
             $table->integer('checked_by')->unsigned()->nullable();
             $table->foreign('checked_by')->references('id')->on('users');
             $table->date('checked_on')->nullable();
-            $table->enum('status',['unchecked','checked'])->default('unchecked');
+            $table->enum('status', ['unchecked', 'checked'])->default('unchecked');
             $table->longText('comments')->nullable();
             $table->longText('reply_comment')->nullable();
             $table->timestamps();

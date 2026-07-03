@@ -20,11 +20,11 @@ class StandardsTableSeeder extends Seeder
 
         for ($i = 0; $i < count($standards); $i++) {
             DB::table('standards')->insert([
-                'school_id'  => 1,
-                'name'       => $standards[$i],
-                'slug'       => Str::slug($standards[$i]),
-                'order'      => $order[$i],
-                'status'     => 1,
+                'school_id' => 1,
+                'name' => $standards[$i],
+                'slug' => Str::slug($standards[$i]),
+                'order' => $order[$i],
+                'status' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

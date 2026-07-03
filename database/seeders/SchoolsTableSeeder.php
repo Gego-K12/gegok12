@@ -15,16 +15,15 @@ class SchoolsTableSeeder extends Seeder
     public function run()
     {
         DB::table('schools')->Insert([
-            'id'           =>  '1',
-            'name'         =>  'Demo School',
-            'email'        =>  'demoschool@gegok12.com',
-            'phone'        =>  '9500979461',
-            'status'       =>  '1',
-            'slug'         =>  'demo-school',
-            'created_at'   =>   date("Y-m-d H:i:s"),
-            'updated_at'   =>   date("Y-m-d H:i:s"),
+            'id' => '1',
+            'name' => 'Demo School',
+            'email' => 'demoschool@gegok12.com',
+            'phone' => '9500979461',
+            'status' => '1',
+            'slug' => 'demo-school',
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
         ]);
-
 
         // DB::table('schools')->Insert([
         //     'id'           =>  '2',

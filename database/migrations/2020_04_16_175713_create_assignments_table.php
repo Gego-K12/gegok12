@@ -31,7 +31,7 @@ class CreateAssignmentsTable extends Migration
             $table->integer('marks')->nullable();
             $table->dateTime('assigned_date')->nullable();
             $table->dateTime('submission_date')->nullable();
-            $table->enum('status',['pending','ongoing','cancel','completed']);
+            $table->enum('status', ['pending', 'ongoing', 'cancel', 'completed']);
             $table->timestamps();
             $table->softDeletes();
         });

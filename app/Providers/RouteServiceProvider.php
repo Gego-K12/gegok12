@@ -31,7 +31,6 @@ class RouteServiceProvider extends ServiceProvider
     protected $payrollNamespace = 'App\Http\Controllers\Payroll';
 
     // protected $alumniNamespace = 'App\Http\Controllers\Alumni'; // Moved to add-on module
-    protected $superadminNamespace = 'App\Http\Controllers\Superadmin';
 
     // public const HOME = '/dashboard';
 
@@ -66,7 +65,6 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapAccountantRoutes();
         $this->mapPayrollRoutes();
         // $this->mapAlumniRoutes(); // Moved to add-on module
-        $this->mapSuperadminRoutes();
         //
     }
 
@@ -178,12 +176,4 @@ class RouteServiceProvider extends ServiceProvider
     //         ->namespace($this->alumniNamespace)
     //         ->group(base_path('routes/alumni.php'));
     // }
-
-    protected function mapSuperadminRoutes()
-    {
-        Route::prefix('superadmin')
-            ->middleware(['web', 'auth', 'superadmin'])
-            ->namespace($this->superadminNamespace)
-            ->group(base_path('routes/superadmin.php'));
-    }
 }

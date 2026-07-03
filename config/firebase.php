@@ -218,8 +218,8 @@ return [
                 'guzzle_middlewares' => [],
             ],
         ],
-        //End App
-        //New app
+        // End App
+        // New app
         'appteacher' => [
 
             /*
@@ -420,6 +420,6 @@ return [
             ],
         ],
 
-        //End New
+        // End New
     ],
 ];

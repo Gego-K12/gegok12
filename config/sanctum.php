@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Middleware\VerifyCsrfToken;
+
 return [
 
     /*
@@ -40,7 +42,7 @@ return [
     */
 
     'middleware' => [
-        'verify_csrf_token' => App\Http\Middleware\VerifyCsrfToken::class,
+        'verify_csrf_token' => VerifyCsrfToken::class,
     ],
 
 ];

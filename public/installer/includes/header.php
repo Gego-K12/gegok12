@@ -67,33 +67,37 @@
                         3 => 'Database',
                         4 => 'Configuration',
                         5 => 'Install',
-                        6 => 'Complete'
+                        6 => 'Complete',
                     ];
-                    foreach ($steps as $num => $label):
+                    foreach ($steps as $num => $label) {
                         $class = 'step-pending';
-                        if ($num < $step) $class = 'step-completed';
-                        if ($num == $step) $class = 'step-active';
-                    ?>
+                        if ($num < $step) {
+                            $class = 'step-completed';
+                        }
+                        if ($num == $step) {
+                            $class = 'step-active';
+                        }
+                        ?>
                     <div class="flex items-center">
                         <div class="flex flex-col items-center">
                             <div class="w-10 h-10 rounded-full flex items-center justify-center font-semibold <?php echo $class; ?>">
-                                <?php if ($num < $step): ?>
+                                <?php if ($num < $step) { ?>
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                                     </svg>
-                                <?php else: ?>
+                                <?php } else { ?>
                                     <?php echo $num; ?>
-                                <?php endif; ?>
+                                <?php } ?>
                             </div>
                             <span class="text-xs mt-2 hidden md:block <?php echo $num == $step ? 'text-purple-600 font-semibold' : 'text-gray-500'; ?>">
                                 <?php echo $label; ?>
                             </span>
                         </div>
-                        <?php if ($num < 6): ?>
+                        <?php if ($num < 6) { ?>
                         <div class="w-8 md:w-16 h-0.5 mx-2 <?php echo $num < $step ? 'bg-green-500' : 'bg-gray-200'; ?>"></div>
-                        <?php endif; ?>
+                        <?php } ?>
                     </div>
-                    <?php endforeach; ?>
+                    <?php } ?>
                 </div>
             </div>
         </div>
@@ -101,20 +105,20 @@
         <!-- Main Content -->
         <main class="flex-1 container mx-auto px-4 py-8">
             <div class="max-w-3xl mx-auto">
-                <?php if ($error): ?>
+                <?php if ($error) { ?>
                 <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 flex items-center">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                     <?php echo htmlspecialchars($error); ?>
                 </div>
-                <?php endif; ?>
+                <?php } ?>
 
-                <?php if ($success): ?>
+                <?php if ($success) { ?>
                 <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6 flex items-center">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                     </svg>
                     <?php echo htmlspecialchars($success); ?>
                 </div>
-                <?php endif; ?>
+                <?php } ?>

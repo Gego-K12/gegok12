@@ -1,11 +1,11 @@
 <?php
-require_once __DIR__ . '/../includes/functions.php';
+require_once __DIR__.'/../includes/functions.php';
 $timezones = getTimezones();
 
 // Get the current URL for default app URL
 $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
 $host = $_SERVER['HTTP_HOST'];
-$baseUrl = $protocol . '://' . $host;
+$baseUrl = $protocol.'://'.$host;
 // Remove /installer from the URL
 $baseUrl = str_replace('/installer', '', $baseUrl);
 ?>
@@ -52,11 +52,11 @@ $baseUrl = str_replace('/installer', '', $baseUrl);
                 <label for="timezone" class="block text-sm font-medium text-gray-700 mb-2">Timezone</label>
                 <select id="timezone" name="timezone" required
                     class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all">
-                    <?php foreach ($timezones as $value => $label): ?>
+                    <?php foreach ($timezones as $value => $label) { ?>
                     <option value="<?php echo htmlspecialchars($value); ?>" <?php echo $value === 'Asia/Kolkata' ? 'selected' : ''; ?>>
                         <?php echo htmlspecialchars($label); ?>
                     </option>
-                    <?php endforeach; ?>
+                    <?php } ?>
                 </select>
             </div>
         </div>

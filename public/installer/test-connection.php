@@ -1,8 +1,8 @@
 <?php
+
 /**
  * AJAX endpoint for testing database connection
  */
-
 header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -35,5 +35,5 @@ try {
 
     echo json_encode(['success' => true, 'message' => 'Connection successful! Database is ready.']);
 } catch (PDOException $e) {
-    echo json_encode(['success' => false, 'message' => 'Connection failed: ' . $e->getMessage()]);
+    echo json_encode(['success' => false, 'message' => 'Connection failed: '.$e->getMessage()]);
 }

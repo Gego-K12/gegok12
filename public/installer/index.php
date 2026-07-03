@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Gego K12 - Visual Installation Wizard
  *
@@ -7,7 +8,6 @@
  *
  * @version 1.1
  */
-
 session_start();
 
 // Define base paths
@@ -16,18 +16,18 @@ define('PUBLIC_PATH', dirname(__DIR__));
 define('INSTALLER_PATH', __DIR__);
 
 // Get current step
-$step = isset($_GET['step']) ? (int)$_GET['step'] : 1;
+$step = isset($_GET['step']) ? (int) $_GET['step'] : 1;
 
 // Check if already installed
-$isInstalled = file_exists(BASE_PATH . '/storage/installed');
-$allowCompleteScreen = ($step === 6 && !empty($_SESSION['installer_finalized']));
+$isInstalled = file_exists(BASE_PATH.'/storage/installed');
+$allowCompleteScreen = ($step === 6 && ! empty($_SESSION['installer_finalized']));
 
-if ($step === 6 && !$isInstalled) {
+if ($step === 6 && ! $isInstalled) {
     header('Location: ?step=1');
     exit;
 }
 
-if ($isInstalled && !$allowCompleteScreen) {
+if ($isInstalled && ! $allowCompleteScreen) {
     header('Location: ../');
     exit;
 }
@@ -36,7 +36,7 @@ $success = '';
 
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    require_once INSTALLER_PATH . '/includes/functions.php';
+    require_once INSTALLER_PATH.'/includes/functions.php';
 
     switch ($step) {
         case 2:
@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 // Create .env file immediately after saving config
                 $envResult = createEnvFile();
-                if (!$envResult['success']) {
+                if (! $envResult['success']) {
                     $error = $envResult['message'];
                 } else {
                     header('Location: ?step=5');
@@ -83,37 +83,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Include the view
-require_once INSTALLER_PATH . '/includes/header.php';
+require_once INSTALLER_PATH.'/includes/header.php';
 
 switch ($step) {
     case 1:
-        require_once INSTALLER_PATH . '/views/welcome.php';
+        require_once INSTALLER_PATH.'/views/welcome.php';
         break;
     case 2:
-        require_once INSTALLER_PATH . '/includes/functions.php';
-        require_once INSTALLER_PATH . '/views/requirements.php';
+        require_once INSTALLER_PATH.'/includes/functions.php';
+        require_once INSTALLER_PATH.'/views/requirements.php';
         break;
     case 3:
-        require_once INSTALLER_PATH . '/views/database.php';
+        require_once INSTALLER_PATH.'/views/database.php';
         break;
     case 4:
-        require_once INSTALLER_PATH . '/views/admin.php';
+        require_once INSTALLER_PATH.'/views/admin.php';
         break;
     case 5:
         // Create .env file before showing the install page
-        require_once INSTALLER_PATH . '/includes/functions.php';
+        require_once INSTALLER_PATH.'/includes/functions.php';
         $envResult = createEnvFile();
-        if (!$envResult['success']) {
+        if (! $envResult['success']) {
             $error = $envResult['message'];
         }
-        require_once INSTALLER_PATH . '/views/install.php';
+        require_once INSTALLER_PATH.'/views/install.php';
         break;
     case 6:
-        require_once INSTALLER_PATH . '/views/complete.php';
+        require_once INSTALLER_PATH.'/views/complete.php';
         unset($_SESSION['installer_finalized']);
         break;
     default:
-        require_once INSTALLER_PATH . '/views/welcome.php';
+        require_once INSTALLER_PATH.'/views/welcome.php';
 }
 
-require_once INSTALLER_PATH . '/includes/footer.php';
+require_once INSTALLER_PATH.'/includes/footer.php';

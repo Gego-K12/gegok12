@@ -79,14 +79,14 @@ trait TodolistProcess
 
                     $this->addClassReminder($school_id, $reminder_date, $task->title, $task->id, $data->standardLink_id);
 
-                    $data = [];
+                    $pushPayload = [];
 
-                    $data['school_id'] = $school_id;
-                    $data['standard_id'] = $data->standardLink_id;
-                    $data['message'] = 'New Task Assigned';
-                    $data['type'] = 'task';
+                    $pushPayload['school_id'] = $school_id;
+                    $pushPayload['standard_id'] = $data->standardLink_id;
+                    $pushPayload['message'] = 'New Task Assigned';
+                    $pushPayload['type'] = 'task';
 
-                    event(new StandardPushEvent($data));
+                    event(new StandardPushEvent($pushPayload));
 
                     $array = [];
 
@@ -302,23 +302,24 @@ trait TodolistProcess
 
             if ($data->assignee == 'class') {
                 $task_assignee = TaskAssignee::where('task_id', $id)->first();
+                $standardLinkId = $data->standardLink_id;
 
-                if ($task_assignee->standardLink_id == $data->standardLink_id) {
+                if ($task_assignee->standardLink_id == $standardLinkId) {
                     $task_assignee->save();
 
-                    $data = [];
+                    $pushPayload = [];
 
-                    $data['school_id'] = $task->school_id;
-                    $data['standard_id'] = $data->standardLink_id;
-                    $data['message'] = 'Task Assigned Updated';
-                    $data['type'] = 'task';
+                    $pushPayload['school_id'] = $task->school_id;
+                    $pushPayload['standard_id'] = $standardLinkId;
+                    $pushPayload['message'] = 'Task Assigned Updated';
+                    $pushPayload['type'] = 'task';
 
-                    event(new StandardPushEvent($data));
+                    event(new StandardPushEvent($pushPayload));
 
                     $array = [];
 
                     $array['school_id'] = $task->school_id;
-                    $array['standardLink_id'] = $data->standardLink_id;
+                    $array['standardLink_id'] = $standardLinkId;
                     $array['details'] = trans('notification.task_assign_update_msg');
 
                     event(new ClassNotificationEvent($array));
@@ -328,30 +329,30 @@ trait TodolistProcess
                     $task_assignee_new = new TaskAssignee;
 
                     $task_assignee_new->task_id = $task->id;
-                    $task_assignee_new->standardLink_id = $data->standardLink_id;
+                    $task_assignee_new->standardLink_id = $standardLinkId;
                     $task_assignee_new->status = 1;
 
                     $task_assignee_new->save();
 
-                    $data = [];
+                    $pushPayload = [];
 
-                    $data['school_id'] = $task->school_id;
-                    $data['standard_id'] = $data->standardLink_id;
-                    $data['message'] = 'Task Assigned Updated';
-                    $data['type'] = 'task';
+                    $pushPayload['school_id'] = $task->school_id;
+                    $pushPayload['standard_id'] = $standardLinkId;
+                    $pushPayload['message'] = 'Task Assigned Updated';
+                    $pushPayload['type'] = 'task';
 
-                    event(new StandardPushEvent($data));
+                    event(new StandardPushEvent($pushPayload));
 
                     $array = [];
 
                     $array['school_id'] = $task->school_id;
-                    $array['standardLink_id'] = $data->standardLink_id;
+                    $array['standardLink_id'] = $standardLinkId;
                     $array['details'] = trans('notification.task_assign_update_msg');
 
                     event(new ClassNotificationEvent($array));
                 }
 
-                $this->addClassReminder($task->school_id, $reminder_date, $task->title, $task->id, $data->standardLink_id);
+                $this->addClassReminder($task->school_id, $reminder_date, $task->title, $task->id, $standardLinkId);
             } elseif ($data->assignee == 'student') {
                 $task_assignees = TaskAssignee::where('task_id', $id)->get();
                 foreach ($task_assignees as $task_assignee) {

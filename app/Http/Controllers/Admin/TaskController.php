@@ -43,18 +43,16 @@ class TaskController extends Controller
     public function showlist(Request $request)
     {
         $school_id = Auth::user()->school_id;
-        $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
+        $academic_year = SiteHelper::getAcademicYear($school_id);
 
-        $tasks = Task::where([
-            ['school_id', $school_id],
-            ['academic_year_id', $academic_year->id],
-        ])->ByType($request->type, Auth::id())->ByStatus($request->status);
-        if (count((array) \Request::getQueryString()) > 0) {
-            if ($request->search != '') {
-                $tasks = $tasks->where('title', 'LIKE', '%'.$request->search.'%')->orWhere('to_do_list', 'LIKE', '%'.$request->search.'%');
-            }
-        }
-        $tasks = $tasks->get();
+        $tasks = $this->taskReader->listByType(
+            schoolId: $school_id,
+            academicYearId: $academic_year->id,
+            type: $request->type,
+            userId: Auth::id(),
+            status: $request->status,
+            search: $request->search,
+        );
 
         $tasks = TaskResource::collection($tasks)->groupby('task_flag');
 
@@ -187,43 +185,31 @@ class TaskController extends Controller
             abort(404);
         }
 
-        $task_assignees = TaskAssignee::where('task_id', $id)->get();
-
-        foreach ($task_assignees as $key => $task_assignee) {
-            if ($task->type == 'teacher') {
-                $selected_teachers[$key] = $task_assignee->user_id;
-            } elseif ($task->type == 'student') {
-                $selectedUsers[$key] = $task_assignee->user_id;
-                $standardLink_id = $task_assignee->standardLink_id;
-                $class = $task_assignee->standardLink->StandardSection;
-            } elseif ($task->type == 'class') {
-                $class = $task_assignee->standardLink->StandardSection;
-            }
-        }
-        $array = [];
+        $assignees = $this->taskReader->resolveAssignees($task);
+        $selected_students = null;
+        $selected_teachers = null;
 
         if ($task->type == 'student') {
-            $selected_students = User::whereIn('id', $selectedUsers)->get();
-            $selected_students = UserResource::collection($selected_students);
+            $selected_students = UserResource::collection(User::whereIn('id', $assignees['selectedUsers'])->get());
         }
         if ($task->type == 'teacher') {
-            $selected_teachers = User::whereIn('id', $selected_teachers)->get();
-            $selected_teachers = TeacherResource::collection($selected_teachers);
+            $selected_teachers = TeacherResource::collection(User::whereIn('id', $assignees['selectedTeachers'])->get());
         }
-        $array['task_id'] = $task->id;
-        $array['task_assignee_id'] = $task_assignee->id;
-        $array['title'] = $task->title;
-        $array['to_do_list'] = $task->to_do_list;
-        $array['task_date'] = date('d-m-Y H:i:s', strtotime($task->task_date));
-        $array['assignee_display'] = ucwords($task->type);
-        $array['assignee'] = $task->type;
-        $array['reminder_date'] = date('d-m-Y H:i:s', strtotime($task->ReminderValue));
-        $array['selectedUsers'] = $selected_students;
-        $array['standardLink_id'] = $standardLink_id;
-        $array['class'] = $class;
-        $array['teachers'] = $selected_teachers;
 
-        return $array;
+        return [
+            'task_id' => $task->id,
+            'task_assignee_id' => $assignees['lastTaskAssigneeId'],
+            'title' => $task->title,
+            'to_do_list' => $task->to_do_list,
+            'task_date' => date('d-m-Y H:i:s', strtotime($task->task_date)),
+            'assignee_display' => ucwords($task->type),
+            'assignee' => $task->type,
+            'reminder_date' => date('d-m-Y H:i:s', strtotime($task->ReminderValue)),
+            'selectedUsers' => $selected_students,
+            'standardLink_id' => $assignees['standardLinkId'],
+            'class' => $assignees['className'],
+            'teachers' => $selected_teachers,
+        ];
     }
 
     /**
@@ -240,45 +226,41 @@ class TaskController extends Controller
             abort(404);
         }
 
-        $task_assignees = TaskAssignee::where('task_id', $id)->get();
+        $assignees = $this->taskReader->resolveAssignees($task);
 
-        foreach ($task_assignees as $key => $task_assignee) {
-            if ($task->type == 'teacher') {
-                $selected_teachers[$key] = $task_assignee->user_id;
-            } elseif ($task->type == 'student') {
-                $selectedUsers[$key] = $task_assignee->user_id;
-            } elseif ($task->type == 'class') {
-                $array['standardLink_id'] = $task_assignee->standardLink_id;
-            }
-        }
-        $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
-        $teachers = SiteHelper::getTeachers(Auth::user()->school_id, $academic_year->id);
+        $school_id = Auth::user()->school_id;
+        $academic_year = SiteHelper::getAcademicYear($school_id);
+        $teachers = SiteHelper::getTeachers($school_id, $academic_year->id);
         $array = [];
 
-        $array['standardlinks'] = SiteHelper::getStandardLinkList(Auth::user()->school_id);
+        $array['standardlinks'] = SiteHelper::getStandardLinkList($school_id);
         if ($request->standardLink_id != null) {
-            $students = SiteHelper::getClassStudents(Auth::user()->school_id, $academic_year->id, $request->standardLink_id);
+            $students = SiteHelper::getClassStudents($school_id, $academic_year->id, $request->standardLink_id);
             $array['students'] = StudentlistResource::collection($students);
             $array['standardLink_id'] = $request->standardLink_id;
+        } elseif ($task->type == 'student') {
+            $students = SiteHelper::getClassStudents($school_id, $academic_year->id, $assignees['standardLinkId']);
+            $array['students'] = StudentlistResource::collection($students);
+            $array['standardLink_id'] = $assignees['standardLinkId'];
         } else {
-            if ($task->type == 'student') {
-                $students = SiteHelper::getClassStudents(Auth::user()->school_id, $academic_year->id, $task_assignees[0]['standardLink_id']);
-                $array['students'] = StudentlistResource::collection($students);
-                $array['standardLink_id'] = $task_assignees[0]['standardLink_id'];
-            }
+            // Previously lost for type='class' - the old code set this
+            // inside the assignee loop, then immediately discarded it
+            // with `$array = [];` right after, so the edit form never
+            // pre-selected the class dropdown.
+            $array['standardLink_id'] = $assignees['standardLinkId'];
         }
 
         $array['teacherlist'] = TeacherResource::collection($teachers);
         $array['task_id'] = $task->id;
-        $array['task_assignee_id'] = $task_assignee->id;
+        $array['task_assignee_id'] = $assignees['lastTaskAssigneeId'];
         $array['title'] = $task->title;
         $array['to_do_list'] = $task->to_do_list;
         $array['task_date'] = date('d-m-Y H:i:s', strtotime($task->task_date));
         $array['assignee'] = $task->type;
         $array['reminder'] = $task->reminder;
         $array['reminder_date'] = $task->ReminderValue;
-        $array['selectedUsers'] = $selectedUsers;
-        $array['teachers'] = $selected_teachers;
+        $array['selectedUsers'] = $assignees['selectedUsers'];
+        $array['teachers'] = $assignees['selectedTeachers'];
 
         return $array;
     }

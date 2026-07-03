@@ -45,46 +45,7 @@ class TaskController extends Controller
      */
     public function myActiveList()
     {
-        //
-        $school_id = Auth::user()->school_id;
-        $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
-
-        $tasks = Task::where([
-            ['school_id', $school_id],
-            ['academic_year_id', $academic_year->id],
-        ])->ByType('by_me', Auth::id())->ByStatus(0)->get();
-
-        $tasks = TaskResource::collection($tasks)->groupby('Flag');
-
-        // if($tasks['Today']!=null)
-        // {
-        //     $tasks['Today'] = [];
-        // }
-        // if($tasks['Overdue']!=null)
-        // {
-        //     $tasks['Overdue'] = [];
-        // }
-        // if( $tasks['Upcoming']!=null )
-        // {
-        //     $tasks['Upcoming'] = [];
-        // }
-
-        if (! isset($tasks['Today'])) {
-            $tasks['Today'] = [];
-        }
-        if (! isset($tasks['Overdue'])) {
-            $tasks['Overdue'] = [];
-        }
-        if (! isset($tasks['Upcoming'])) {
-            $tasks['Upcoming'] = [];
-        }
-
-        /*return response()->json([
-            'success'   =>  true,
-            'message'   =>  'My Active Task List',
-            'data'      =>  $tasks
-        ],200);*/
-        return $tasks;
+        return $this->flagGroupedList('by_me', 0);
     }
 
     /**
@@ -94,47 +55,7 @@ class TaskController extends Controller
      */
     public function myCompletedList()
     {
-        //
-        $school_id = Auth::user()->school_id;
-        $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
-
-        $tasks = Task::where([
-            ['school_id', $school_id],
-            ['academic_year_id', $academic_year->id],
-        ])->ByType('by_me', Auth::id())->ByStatus(1)->get();
-
-        $tasks = TaskResource::collection($tasks)->groupby('Flag');
-
-        //   if($tasks['Today']!=null)
-        // {
-        //     $tasks['Today'] = [];
-        // }
-        // if($tasks['Overdue']!=null)
-        // {
-        //     $tasks['Overdue'] = [];
-        // }
-        // if( $tasks['Upcoming']!=null )
-        // {
-        //     $tasks['Upcoming'] = [];
-        // }
-
-        // add new
-        if (! isset($tasks['Today'])) {
-            $tasks['Today'] = [];
-        }
-        if (! isset($tasks['Overdue'])) {
-            $tasks['Overdue'] = [];
-        }
-        if (! isset($tasks['Upcoming'])) {
-            $tasks['Upcoming'] = [];
-        }
-
-        /*return response()->json([
-            'success'   =>  true,
-            'message'   =>  'My Completed Task List',
-            'data'      =>  $tasks
-        ],200);*/
-        return $tasks;
+        return $this->flagGroupedList('by_me', 1);
     }
 
     /**
@@ -144,46 +65,7 @@ class TaskController extends Controller
      */
     public function activeList()
     {
-        //
-        $school_id = Auth::user()->school_id;
-        $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
-
-        $tasks = Task::where([
-            ['school_id', $school_id],
-            ['academic_year_id', $academic_year->id],
-        ])->ByType('to_me', Auth::id())->ByStatus(0)->get();
-
-        $tasks = TaskResource::collection($tasks)->groupby('Flag');
-        // if( count($tasks['Today']) == 0 )
-        // {
-        //     $tasks['Today'] = [];
-        // }
-        // if( count($tasks['Overdue']) == 0 )
-        // {
-        //     $tasks['Overdue'] = [];
-        // }
-        // if( count($tasks['Upcoming']) == 0 )
-        // {
-        //     $tasks['Upcoming'] = [];
-        // }
-
-        // new
-        if (count($tasks['Today'] ?? []) == 0) {
-            $tasks['Today'] = [];
-        }
-        if (count($tasks['Overdue'] ?? []) == 0) {
-            $tasks['Overdue'] = [];
-        }
-        if (count($tasks['Upcoming'] ?? []) == 0) {
-            $tasks['Upcoming'] = [];
-        }
-
-        /*return response()->json([
-            'success'   =>  true,
-            'message'   =>  'Active Task List',
-            'data'      =>  $tasks
-        ],200);*/
-        return $tasks;
+        return $this->flagGroupedList('to_me', 0);
     }
 
     /**
@@ -193,45 +75,35 @@ class TaskController extends Controller
      */
     public function completedList()
     {
-        //
-        $school_id = Auth::user()->school_id;
-        $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
+        return $this->flagGroupedList('to_me', 1);
+    }
 
-        $tasks = Task::where([
-            ['school_id', $school_id],
-            ['academic_year_id', $academic_year->id],
-        ])->ByType('to_me', Auth::id())->ByStatus(1)->get();
+    /**
+     * Shared by myActiveList/myCompletedList/activeList/completedList -
+     * same query and Today/Overdue/Upcoming grouping, differing only in
+     * ByType() type and ByStatus() status.
+     */
+    private function flagGroupedList(string $type, int $status)
+    {
+        $school_id = Auth::user()->school_id;
+        $academic_year = SiteHelper::getAcademicYear($school_id);
+
+        $tasks = $this->taskReader->listByType(
+            schoolId: $school_id,
+            academicYearId: $academic_year->id,
+            type: $type,
+            userId: Auth::id(),
+            status: $status,
+        );
 
         $tasks = TaskResource::collection($tasks)->groupby('Flag');
-        // if( count($tasks['Today']) == 0 )
-        // {
-        //     $tasks['Today'] = [];
-        // }
-        // if( count($tasks['Overdue']) == 0 )
-        // {
-        //     $tasks['Overdue'] = [];
-        // }
-        // if( count($tasks['Upcoming']) == 0 )
-        // {
-        //     $tasks['Upcoming'] = [];
-        // }
 
-        // new
-        if (count($tasks['Today'] ?? []) == 0) {
-            $tasks['Today'] = [];
-        }
-        if (count($tasks['Overdue'] ?? []) == 0) {
-            $tasks['Overdue'] = [];
-        }
-        if (count($tasks['Upcoming'] ?? []) == 0) {
-            $tasks['Upcoming'] = [];
+        foreach (['Today', 'Overdue', 'Upcoming'] as $flag) {
+            if (count($tasks[$flag] ?? []) == 0) {
+                $tasks[$flag] = [];
+            }
         }
 
-        /*return response()->json([
-            'success'   =>  true,
-            'message'   =>  'Completed Task List',
-            'data'      =>  $tasks
-        ],200);*/
         return $tasks;
     }
 
@@ -485,40 +357,30 @@ class TaskController extends Controller
             abort(404);
         }
 
-        $task_assignees = TaskAssignee::where('task_id', $id)->get();
-
-        foreach ($task_assignees as $key => $task_assignee) {
-            if ($task->type == 'teacher') {
-                $selected_teachers[$key] = $task_assignee->user_id;
-            } elseif ($task->type == 'student') {
-                $selectedUsers[$key] = $task_assignee->user_id;
-                $standardLink_id = $task_assignee->standardLink_id;
-                $class = $task_assignee->standardLink->StandardSection;
-            } elseif ($task->type == 'class') {
-                $class = $task_assignee->standardLink->StandardSection;
-            }
-        }
-        $array = [];
+        $assignees = $this->taskReader->resolveAssignees($task);
+        $selected_students = null;
+        $selected_teachers = null;
 
         if ($task->type == 'student') {
-            $selected_students = User::whereIn('id', $selectedUsers)->get();
-            $selected_students = UserResource::collection($selected_students);
+            $selected_students = UserResource::collection(User::whereIn('id', $assignees['selectedUsers'])->get());
         }
         if ($task->type == 'teacher') {
-            $selected_teachers = User::whereIn('id', $selected_teachers)->get();
-            $selected_teachers = TeacherResource::collection($selected_teachers);
+            $selected_teachers = TeacherResource::collection(User::whereIn('id', $assignees['selectedTeachers'])->get());
         }
-        $array['task_id'] = $task->id;
-        $array['title'] = $task->title;
-        $array['to_do_list'] = $task->to_do_list;
-        $array['task_date'] = date('d-m-Y H:i:s', strtotime($task->task_date));
-        $array['assignee_display'] = ucwords($task->type);
-        $array['assignee'] = $task->type;
-        $array['reminder_date'] = date('d-m-Y H:i:s', strtotime($task->ReminderValue));
-        $array['selectedUsers'] = $selected_students;
-        $array['standardLink_id'] = $standardLink_id;
-        $array['class'] = $class;
-        $array['teachers'] = $selected_teachers;
+
+        $array = [
+            'task_id' => $task->id,
+            'title' => $task->title,
+            'to_do_list' => $task->to_do_list,
+            'task_date' => date('d-m-Y H:i:s', strtotime($task->task_date)),
+            'assignee_display' => ucwords($task->type),
+            'assignee' => $task->type,
+            'reminder_date' => date('d-m-Y H:i:s', strtotime($task->ReminderValue)),
+            'selectedUsers' => $selected_students,
+            'standardLink_id' => $assignees['standardLinkId'],
+            'class' => $assignees['className'],
+            'teachers' => $selected_teachers,
+        ];
 
         return response()->json([
             'success' => true,
@@ -541,36 +403,28 @@ class TaskController extends Controller
             abort(404);
         }
 
-        $task_assignees = TaskAssignee::where('task_id', $id)->get();
+        $assignees = $this->taskReader->resolveAssignees($task);
 
-        foreach ($task_assignees as $key => $task_assignee) {
-            if ($task->type == 'teacher') {
-                $selected_teachers[$key] = $task_assignee->user_id;
-            } elseif ($task->type == 'student') {
-                $selectedUsers[$key] = $task_assignee->user_id;
-                $standardLink_id = $task_assignee->standardLink_id;
-            } elseif ($task->type == 'class') {
-                $standardLink_id = $task_assignee->standardLink_id;
-            }
-        }
         $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
         $teachers = SiteHelper::getTeachers(Auth::user()->school_id, $academic_year->id);
-        $array = [];
+        $selected_teachers = null;
 
         if ($task->type == 'teacher') {
-            $selected_teachers = User::whereIn('id', $selected_teachers)->get();
-            $selected_teachers = TeacherResource::collection($selected_teachers);
+            $selected_teachers = TeacherResource::collection(User::whereIn('id', $assignees['selectedTeachers'])->get());
         }
-        $array['task_id'] = $task->id;
-        $array['task_assignee_id'] = $task_assignee->id;
-        $array['title'] = $task->title;
-        $array['to_do_list'] = $task->to_do_list;
-        $array['task_date'] = date('Y-m-d H:i:s', strtotime($task->task_date));
-        $array['assignee'] = $task->type;
-        $array['reminder_date'] = $task->ReminderValue;
-        $array['selectedUsers'] = $selectedUsers;
-        $array['standardLink_id'] = $standardLink_id;
-        $array['teachers'] = $selected_teachers;
+
+        $array = [
+            'task_id' => $task->id,
+            'task_assignee_id' => $assignees['lastTaskAssigneeId'],
+            'title' => $task->title,
+            'to_do_list' => $task->to_do_list,
+            'task_date' => date('Y-m-d H:i:s', strtotime($task->task_date)),
+            'assignee' => $task->type,
+            'reminder_date' => $task->ReminderValue,
+            'selectedUsers' => $assignees['selectedUsers'],
+            'standardLink_id' => $assignees['standardLinkId'],
+            'teachers' => $selected_teachers,
+        ];
 
         return response()->json([
             'success' => true,

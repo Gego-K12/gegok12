@@ -55,16 +55,15 @@ class TaskController extends Controller
         $school_id = Auth::user()->school_id;
         $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
 
-        $tasks = Task::where([
-            ['school_id', $school_id],
-            ['academic_year_id', $academic_year->id],
-        ])->ByType($request->type, Auth::id())->ByStatus($request->status);
-        if (count((array) \Request::getQueryString()) > 0) {
-            if ($request->search != '') {
-                $tasks = $tasks->where('title', 'LIKE', '%'.$request->search.'%')->orWhere('to_do_list', 'LIKE', '%'.$request->search.'%');
-            }
-        }
-        $tasks = $tasks->orderby('id', 'desc')->get();
+        $tasks = $this->taskReader->listByType(
+            schoolId: $school_id,
+            academicYearId: $academic_year->id,
+            type: $request->type,
+            userId: Auth::id(),
+            status: $request->status,
+            search: $request->search,
+            orderByIdDesc: true,
+        );
 
         $tasks = TaskResource::collection($tasks)->groupby('task_flag');
 
@@ -403,17 +402,8 @@ class TaskController extends Controller
             abort(404);
         }
 
-        $task_assignees = TaskAssignee::where('task_id', $id)->get();
+        $assignees = $this->taskReader->resolveAssignees($task);
 
-        foreach ($task_assignees as $key => $task_assignee) {
-            if ($task->type == 'teacher') {
-                $selected_teachers[$key] = $task_assignee->user_id;
-            } elseif ($task->type == 'student') {
-                $selectedUsers[$key] = $task_assignee->user_id;
-            } elseif ($task->type == 'class') {
-                $array['standardLink_id'] = $task_assignee->standardLink_id;
-            }
-        }
         $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
         $teachers = SiteHelper::getTeachers(Auth::user()->school_id, $academic_year->id);
         $array = [];
@@ -423,25 +413,37 @@ class TaskController extends Controller
             $students = SiteHelper::getClassStudents(Auth::user()->school_id, $academic_year->id, $request->standardLink_id);
             $array['students'] = StudentlistResource::collection($students);
             $array['standardLink_id'] = $request->standardLink_id;
+        } elseif ($task->type == 'student') {
+            // Preserves the original's use of the *first* assignee's
+            // standardLink_id here - unlike the shared resolveAssignees()
+            // loop (used by the other 5 controllers), which reflects the
+            // *last* assignee. This is a genuine pre-existing difference
+            // in Teacher's editList, not something this consolidation
+            // changes.
+            $firstStandardLinkId = TaskAssignee::where('task_id', $id)->value('standardLink_id');
+            $students = SiteHelper::getClassStudents(Auth::user()->school_id, $academic_year->id, $firstStandardLinkId);
+            $array['students'] = StudentlistResource::collection($students);
+            $array['standardLink_id'] = $firstStandardLinkId;
         } else {
-            if ($task->type == 'student') {
-                $students = SiteHelper::getClassStudents(Auth::user()->school_id, $academic_year->id, $task_assignees[0]['standardLink_id']);
-                $array['students'] = StudentlistResource::collection($students);
-                $array['standardLink_id'] = $task_assignees[0]['standardLink_id'];
-            }
+            // Previously lost for type='class' - the old code set this
+            // inside the assignee loop, then immediately discarded it
+            // with `$array = [];` right after, so the edit form never
+            // pre-selected the class dropdown. Same bug already fixed in
+            // Admin/Librarian/Receptionist/Student.
+            $array['standardLink_id'] = $assignees['standardLinkId'];
         }
 
         $array['teacherlist'] = TeacherResource::collection($teachers);
         $array['task_id'] = $task->id;
-        $array['task_assignee_id'] = $task_assignee->id;
+        $array['task_assignee_id'] = $assignees['lastTaskAssigneeId'];
         $array['title'] = $task->title;
         $array['to_do_list'] = $task->to_do_list;
         $array['task_date'] = date('d-m-Y H:i:s', strtotime($task->task_date));
         $array['assignee'] = $task->type;
         $array['reminder'] = $task->reminder;
         $array['reminder_date'] = $task->ReminderValue;
-        $array['selectedUsers'] = $selectedUsers;
-        $array['teachers'] = $selected_teachers;
+        $array['selectedUsers'] = $assignees['selectedUsers'];
+        $array['teachers'] = $assignees['selectedTeachers'];
 
         return $array;
     }
@@ -561,6 +563,11 @@ class TaskController extends Controller
         }
 
         try {
+            $task_assignees = TaskAssignee::where('task_id', $task->id)->get();
+            foreach ($task_assignees as $task_assignee) {
+                $task_assignee->delete();
+            }
+
             $task->delete();
 
             $message = trans('messages.delete_success_msg', ['module' => 'Task']);

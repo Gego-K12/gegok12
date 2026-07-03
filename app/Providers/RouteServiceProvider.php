@@ -18,10 +18,6 @@ class RouteServiceProvider extends ServiceProvider
 
     protected $adminNamespace = 'App\Http\Controllers\Admin';
 
-    protected $inventoryNamespace = 'App\Http\Controllers\Staff';
-
-    protected $stockNamespace = 'App\Http\Controllers\Stock';
-
     protected $librarianNamespace = 'App\Http\Controllers\Librarian';
 
     protected $studentNamespace = 'App\Http\Controllers\Student';
@@ -63,8 +59,6 @@ class RouteServiceProvider extends ServiceProvider
         // $this->mapStaticRoutes(); //static routes hidden
         $this->mapAdminRoutes();
         $this->mapSettingsRoutes();
-        $this->mapInventoryRoutes();
-        $this->mapStockRoutes();
         $this->mapLibrarianRoutes();
         $this->mapStudentRoutes();
         $this->mapTeacherRoutes();
@@ -119,22 +113,6 @@ class RouteServiceProvider extends ServiceProvider
             ->middleware(['web', 'auth', 'schooladmin'])
             ->namespace($this->adminNamespace)
             ->group(base_path('routes/setting.php'));
-    }
-
-    protected function mapInventoryRoutes()
-    {
-        Route::prefix('admin')
-            ->middleware(['web', 'auth', 'schooladmin', 'privilegeconditions'])  // , 'verifyotp'
-            ->namespace($this->inventoryNamespace)
-            ->group(base_path('routes/inventory.php'));
-    }
-
-    protected function mapStockRoutes()
-    {
-        Route::prefix('stock')
-            ->middleware(['web', 'auth', 'stockkeeper'])
-            ->namespace($this->stockNamespace)
-            ->group(base_path('routes/stock.php'));
     }
 
     protected function mapLibrarianRoutes()

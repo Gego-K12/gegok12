@@ -10,7 +10,7 @@ namespace App\Http\Controllers\Receptionist;
 use App\Helpers\SiteHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Holiday as HolidayResource;
-use App\Models\Events;
+use App\Services\HolidaysReaderService;
 use App\Traits\Common;
 use App\Traits\LogActivity;
 use Illuminate\Http\Response;
@@ -21,6 +21,8 @@ class HolidaysController extends Controller
     use Common;
     use LogActivity;
 
+    public function __construct(protected HolidaysReaderService $holidaysReader) {}
+
     /**
      * Display a listing of the resource.
      *
@@ -28,13 +30,12 @@ class HolidaysController extends Controller
      */
     public function list()
     {
-        //
         $school_id = Auth::user()->school_id;
         $academic_year = SiteHelper::getAcademicYear($school_id);
-        $holidays = Events::where([['school_id', $school_id], ['academic_year_id', $academic_year->id], ['category', 'holidays']])->orderBy('start_date', 'ASC')->paginate(10);
-        $holidays = HolidayResource::collection($holidays);
 
-        return $holidays;
+        return HolidayResource::collection(
+            $this->holidaysReader->paginatedList($school_id, $academic_year->id)
+        );
     }
 
     /**
@@ -44,7 +45,6 @@ class HolidaysController extends Controller
      */
     public function index()
     {
-        //
         return view('/reception/holiday/index');
     }
 }

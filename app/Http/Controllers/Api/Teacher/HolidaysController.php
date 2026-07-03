@@ -10,13 +10,13 @@ namespace App\Http\Controllers\Api\Teacher;
 use App\Helpers\SiteHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\API\Teacher\Holiday as HolidayResource;
-use App\Models\Events;
+use App\Services\HolidaysReaderService;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 
 class HolidaysController extends Controller
 {
-    //
+    public function __construct(protected HolidaysReaderService $holidaysReader) {}
 
     /**
      * Display a listing of the resource.
@@ -25,26 +25,16 @@ class HolidaysController extends Controller
      */
     public function index()
     {
-        //
         $school_id = Auth::user()->school_id;
         $academic_year = SiteHelper::getAcademicYear($school_id);
 
-        $holidays = Events::where([
-            ['school_id', $school_id],
-            ['academic_year_id', $academic_year->id],
-            ['category', 'holidays'],
-        ])->orderBy('start_date', 'ASC');
-        $count = count($holidays->get());
-        $holidays = $holidays->paginate(10);
+        $holidays = $this->holidaysReader->paginatedList($school_id, $academic_year->id);
 
-        $holidays = HolidayResource::collection($holidays);
-
-        // return $holidays;
         return response()->json([
             'success' => true,
             'message' => 'Holiday List',
-            'data' => $holidays,
-            'count' => $count,
-        ], 200); /* pagination not working */
+            'data' => HolidayResource::collection($holidays),
+            'count' => $holidays->total(),
+        ], 200);
     }
 }

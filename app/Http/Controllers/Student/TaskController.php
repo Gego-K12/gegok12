@@ -45,16 +45,15 @@ class TaskController extends Controller
         $school_id = Auth::user()->school_id;
         $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
 
-        $tasks = Task::where([
-            ['school_id', $school_id],
-            ['academic_year_id', $academic_year->id],
-        ])->ByType($request->type, Auth::id())->ByStatus($request->status);
-        if (count((array) \Request::getQueryString()) > 0) {
-            if ($request->search != '') {
-                $tasks = $tasks->where('title', 'LIKE', '%'.$request->search.'%')->orWhere('to_do_list', 'LIKE', '%'.$request->search.'%');
-            }
-        }
-        $tasks = $tasks->orderby('id', 'desc')->get();
+        $tasks = $this->taskReader->listByType(
+            schoolId: $school_id,
+            academicYearId: $academic_year->id,
+            type: $request->type,
+            userId: Auth::id(),
+            status: $request->status,
+            search: $request->search,
+            orderByIdDesc: true,
+        );
 
         $tasks = TaskResource::collection($tasks)->groupby('task_flag');
 
@@ -234,43 +233,31 @@ class TaskController extends Controller
             abort(404);
         }
 
-        $task_assignees = TaskAssignee::where('task_id', $id)->get();
-
-        foreach ($task_assignees as $key => $task_assignee) {
-            if ($task->type == 'teacher') {
-                $selected_teachers[$key] = $task_assignee->user_id;
-            } elseif ($task->type == 'student') {
-                $selectedUsers[$key] = $task_assignee->user_id;
-                $standardLink_id = $task_assignee->standardLink_id;
-                $class = $task_assignee->standardLink->StandardSection;
-            } elseif ($task->type == 'class') {
-                $class = $task_assignee->standardLink->StandardSection;
-            }
-        }
-        $array = [];
+        $assignees = $this->taskReader->resolveAssignees($task);
+        $selected_students = null;
+        $selected_teachers = null;
 
         if ($task->type == 'student') {
-            $selected_students = User::whereIn('id', $selectedUsers)->get();
-            $selected_students = UserResource::collection($selected_students);
+            $selected_students = UserResource::collection(User::whereIn('id', $assignees['selectedUsers'])->get());
         }
         if ($task->type == 'teacher') {
-            $selected_teachers = User::whereIn('id', $selected_teachers)->get();
-            $selected_teachers = TeacherResource::collection($selected_teachers);
+            $selected_teachers = TeacherResource::collection(User::whereIn('id', $assignees['selectedTeachers'])->get());
         }
-        $array['task_id'] = $task->id;
-        $array['task_assignee_id'] = $task_assignee->id;
-        $array['title'] = $task->title;
-        $array['to_do_list'] = $task->to_do_list;
-        $array['task_date'] = date('d-m-Y H:i:s', strtotime($task->task_date));
-        $array['assignee_display'] = ucwords($task->type);
-        $array['assignee'] = $task->type;
-        $array['reminder_date'] = date('d-m-Y H:i:s', strtotime($task->ReminderValue));
-        $array['selectedUsers'] = $selected_students;
-        $array['standardLink_id'] = $standardLink_id;
-        $array['class'] = $class;
-        $array['teachers'] = $selected_teachers;
 
-        return $array;
+        return [
+            'task_id' => $task->id,
+            'task_assignee_id' => $assignees['lastTaskAssigneeId'],
+            'title' => $task->title,
+            'to_do_list' => $task->to_do_list,
+            'task_date' => date('d-m-Y H:i:s', strtotime($task->task_date)),
+            'assignee_display' => ucwords($task->type),
+            'assignee' => $task->type,
+            'reminder_date' => date('d-m-Y H:i:s', strtotime($task->ReminderValue)),
+            'selectedUsers' => $selected_students,
+            'standardLink_id' => $assignees['standardLinkId'],
+            'class' => $assignees['className'],
+            'teachers' => $selected_teachers,
+        ];
     }
 
     /**
@@ -286,8 +273,6 @@ class TaskController extends Controller
         if (! $task) {
             abort(404);
         }
-
-        $task_assignees = TaskAssignee::where('task_id', $id)->get();
 
         $array = [];
 
@@ -417,6 +402,11 @@ class TaskController extends Controller
         }
 
         try {
+            $task_assignees = TaskAssignee::where('task_id', $task->id)->get();
+            foreach ($task_assignees as $task_assignee) {
+                $task_assignee->delete();
+            }
+
             $task->delete();
 
             $message = trans('messages.delete_success_msg', ['module' => 'Task']);
@@ -443,6 +433,10 @@ class TaskController extends Controller
 
         $taskAssignee = TaskAssignee::where([['task_id', $id], ['user_id', Auth::id()]])->first();
 
+        if (! $taskAssignee) {
+            abort(404);
+        }
+
         if ($taskAssignee->task->task_type !== 'open') {
             return response()->json([
                 'errors' => ['This task is not open for claiming.'],
@@ -451,7 +445,7 @@ class TaskController extends Controller
 
         if (! is_null($taskAssignee->claimed_by)) {
             return response()->json([
-                'errors' => ['This task has already been claimed by '.$task->claimedBy->FullName.'.'],
+                'errors' => ['This task has already been claimed by '.$taskAssignee->claimedBy->FullName.'.'],
             ], 422);
         }
 

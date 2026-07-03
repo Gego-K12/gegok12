@@ -38,32 +38,7 @@ class TaskController extends Controller
      */
     public function myActiveList($student_id)
     {
-        //
-        $school_id = Auth::user()->school_id;
-        $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
-
-        $tasks = Task::where([
-            ['school_id', $school_id],
-            ['academic_year_id', $academic_year->id],
-        ])->ByType('by_me', $student_id)->ByStatus(0)->get();
-
-        $tasks = TaskResource::collection($tasks)->groupby('Flag');
-        if (count($tasks['Today']) == 0) {
-            $tasks['Today'] = [];
-        }
-        if (count($tasks['Overdue']) == 0) {
-            $tasks['Overdue'] = [];
-        }
-        if (count($tasks['Upcoming']) == 0) {
-            $tasks['Upcoming'] = [];
-        }
-
-        /*return response()->json([
-            'success'   =>  true,
-            'message'   =>  'My Active Task List',
-            'data'      =>  $tasks
-        ],200);*/
-        return $tasks;
+        return $this->flagGroupedList('by_me', $student_id, 0);
     }
 
     /**
@@ -73,32 +48,7 @@ class TaskController extends Controller
      */
     public function myCompletedList($student_id)
     {
-        //
-        $school_id = Auth::user()->school_id;
-        $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
-
-        $tasks = Task::where([
-            ['school_id', $school_id],
-            ['academic_year_id', $academic_year->id],
-        ])->ByType('by_me', $student_id)->ByStatus(1)->get();
-
-        $tasks = TaskResource::collection($tasks)->groupby('Flag');
-        if (count($tasks['Today']) == 0) {
-            $tasks['Today'] = [];
-        }
-        if (count($tasks['Overdue']) == 0) {
-            $tasks['Overdue'] = [];
-        }
-        if (count($tasks['Upcoming']) == 0) {
-            $tasks['Upcoming'] = [];
-        }
-
-        /*return response()->json([
-            'success'   =>  true,
-            'message'   =>  'My Completed Task List',
-            'data'      =>  $tasks
-        ],200);*/
-        return $tasks;
+        return $this->flagGroupedList('by_me', $student_id, 1);
     }
 
     /**
@@ -108,32 +58,7 @@ class TaskController extends Controller
      */
     public function activeList($student_id)
     {
-        //
-        $school_id = Auth::user()->school_id;
-        $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
-
-        $tasks = Task::where([
-            ['school_id', $school_id],
-            ['academic_year_id', $academic_year->id],
-        ])->ByType('to_me', $student_id)->ByStatus(0)->get();
-
-        $tasks = TaskResource::collection($tasks)->groupby('Flag');
-        if (count($tasks['Today']) == 0) {
-            $tasks['Today'] = [];
-        }
-        if (count($tasks['Overdue']) == 0) {
-            $tasks['Overdue'] = [];
-        }
-        if (count($tasks['Upcoming']) == 0) {
-            $tasks['Upcoming'] = [];
-        }
-
-        /*return response()->json([
-            'success'   =>  true,
-            'message'   =>  'Active Task List',
-            'data'      =>  $tasks
-        ],200);*/
-        return $tasks;
+        return $this->flagGroupedList('to_me', $student_id, 0);
     }
 
     /**
@@ -143,31 +68,35 @@ class TaskController extends Controller
      */
     public function completedList($student_id)
     {
-        //
-        $school_id = Auth::user()->school_id;
-        $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
+        return $this->flagGroupedList('to_me', $student_id, 1);
+    }
 
-        $tasks = Task::where([
-            ['school_id', $school_id],
-            ['academic_year_id', $academic_year->id],
-        ])->ByType('to_me', $student_id)->ByStatus(1)->get();
+    /**
+     * Shared by myActiveList/myCompletedList/activeList/completedList -
+     * same query and Today/Overdue/Upcoming grouping, differing only in
+     * ByType() type and ByStatus() status.
+     */
+    private function flagGroupedList(string $type, $student_id, int $status)
+    {
+        $school_id = Auth::user()->school_id;
+        $academic_year = SiteHelper::getAcademicYear($school_id);
+
+        $tasks = $this->taskReader->listByType(
+            schoolId: $school_id,
+            academicYearId: $academic_year->id,
+            type: $type,
+            userId: $student_id,
+            status: $status,
+        );
 
         $tasks = TaskResource::collection($tasks)->groupby('Flag');
-        if (count($tasks['Today']) == 0) {
-            $tasks['Today'] = [];
-        }
-        if (count($tasks['Overdue']) == 0) {
-            $tasks['Overdue'] = [];
-        }
-        if (count($tasks['Upcoming']) == 0) {
-            $tasks['Upcoming'] = [];
+
+        foreach (['Today', 'Overdue', 'Upcoming'] as $flag) {
+            if (count($tasks[$flag]) == 0) {
+                $tasks[$flag] = [];
+            }
         }
 
-        /*return response()->json([
-            'success'   =>  true,
-            'message'   =>  'Completed Task List',
-            'data'      =>  $tasks
-        ],200);*/
         return $tasks;
     }
 

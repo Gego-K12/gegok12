@@ -202,35 +202,4 @@ class Events extends Model
 
         return $count;
     }
-
-    /**
-     * Scope to filter events by date range.
-     *
-     * @param  Builder  $query
-     * @param  \DateTime  $start_date
-     * @param  \DateTime  $end_date
-     * @return Builder
-     */
-    public function scopeByDate($query, $start_date, $end_date)
-    {
-        $query->where(function ($q) use ($start_date, $end_date) {
-            $q->where('start_date', '>=', $start_date)
-                ->where('start_date', '<', $end_date);
-
-        })->orWhere(function ($q) use ($start_date, $end_date) {
-            $q->where('start_date', '<=', $start_date)
-                ->where('end_date', '>', $end_date);
-
-        })->orWhere(function ($q) use ($start_date, $end_date) {
-            $q->where('end_date', '>', $start_date)
-                ->where('end_date', '<=', $end_date);
-
-        })->orWhere(function ($q) use ($start_date, $end_date) {
-            $q->where('start_date', '>=', $start_date)
-                ->where('end_date', '<=', $end_date);
-
-        });
-
-        return $query;
-    }
 }

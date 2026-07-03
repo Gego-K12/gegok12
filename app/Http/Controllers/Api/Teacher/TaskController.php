@@ -360,7 +360,23 @@ class TaskController extends Controller
         try {
 
             foreach ($request->task_completed as $id) {
-                $assignee = TaskAssignee::findOrFail($id);
+                // $id is a Task id (validated via exists:task,id in
+                // TaskStatusUpdateRequest) - look up this teacher's own
+                // assignee row for that task, not a TaskAssignee id
+                // directly. The previous TaskAssignee::findOrFail($id)
+                // looked $id up as a task_assignees primary key - a
+                // different, independently auto-incrementing table - with
+                // no ownership check at all, letting any authenticated
+                // teacher complete (or corrupt the status of) any other
+                // user's task assignment by guessing/incrementing ids.
+                $assignee = TaskAssignee::where([
+                    ['task_id', $id],
+                    ['user_id', Auth::id()],
+                ])->first();
+
+                if (! $assignee) {
+                    throw new Exception('Task assignment not found for this teacher.');
+                }
 
                 $assignee->update([
                     'status' => 'completed',

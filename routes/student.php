@@ -128,6 +128,7 @@ Route::get('/notification/showList', 'NotificationController@showList');
 
 // Feed
 Route::get('/feeds', 'FeedController@index');
+Route::get('/feed/filter', 'FeedController@filter');
 
 // noticeboard
 // index

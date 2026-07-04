@@ -408,6 +408,7 @@ Route::get('/notices', 'NoticeBoardController@index');
 
 // Feed
 Route::get('/feeds', 'FeedController@index');
+Route::get('/feed/filter', 'FeedController@filter');
 
 // library activity
 Route::get('/libraryactivity', 'LibraryActivityController@index');

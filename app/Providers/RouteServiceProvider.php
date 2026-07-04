@@ -28,6 +28,8 @@ class RouteServiceProvider extends ServiceProvider
 
     protected $accountantNamespace = 'App\Http\Controllers\Accountant';
 
+    protected $nonTeachingNamespace = 'App\Http\Controllers\NonTeaching';
+
     protected $payrollNamespace = 'App\Http\Controllers\Payroll';
 
     // protected $alumniNamespace = 'App\Http\Controllers\Alumni'; // Moved to add-on module
@@ -63,6 +65,7 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapTeacherRoutes();
         $this->mapReceptionistRoutes();
         $this->mapAccountantRoutes();
+        $this->mapNonTeachingRoutes();
         $this->mapPayrollRoutes();
         // $this->mapAlumniRoutes(); // Moved to add-on module
         //
@@ -158,6 +161,14 @@ class RouteServiceProvider extends ServiceProvider
             ->middleware(['web', 'auth', 'accountant'])
             ->namespace($this->accountantNamespace)
             ->group(base_path('routes/accountant.php'));
+    }
+
+    protected function mapNonTeachingRoutes()
+    {
+        Route::prefix('nonteaching')
+            ->middleware(['web', 'auth', 'nonteaching'])
+            ->namespace($this->nonTeachingNamespace)
+            ->group(base_path('routes/nonteaching.php'));
     }
 
     protected function mapPayrollRoutes()

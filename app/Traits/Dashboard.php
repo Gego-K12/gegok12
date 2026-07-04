@@ -327,6 +327,24 @@ trait Dashboard
     }
 
     /**
+     * Build dashboard data for non-teaching staff (driver, helper, peon,
+     * security, clerk, lab assistant, transport co-ordinator, others).
+     *
+     * @param  int  $school_id  School identifier
+     * @return array Non-teaching staff dashboard data
+     */
+    public function nonTeachingDashboard($school_id)
+    {
+        $array = [];
+
+        $academic_year = SiteHelper::getAcademicYear($school_id);
+
+        $array['noticeboard'] = NoticeBoard::where([['school_id', $school_id], ['academic_year_id', $academic_year->id]])->orderBy('created_at', 'DESC')->take(5)->get();
+
+        return $array;
+    }
+
+    /**
      * Build dashboard metrics for librarian users.
      *
      * @param  int  $school_id  School identifier

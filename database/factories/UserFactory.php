@@ -213,4 +213,25 @@ class UserFactory extends Factory
             ];
         });
     }
+
+    /**
+     * State: Non-Teaching Staff
+     *
+     * Creates a user with Non-Teaching Staff role (usergroup_id = 13),
+     * covering designations like driver, helper, peon, security, clerk,
+     * lab assistant, and transport co-ordinator.
+     * Automatically ensures the Non Teaching usergroup exists in database.
+     *
+     * @return Factory
+     */
+    public function nonTeachingStaff()
+    {
+        return $this->state(function (array $attributes) {
+            Usergroup::firstOrCreate(['id' => User::NON_TEACHING_USERGROUP_ID], ['name' => 'Non Teaching']);
+
+            return [
+                'usergroup_id' => User::NON_TEACHING_USERGROUP_ID,
+            ];
+        });
+    }
 }

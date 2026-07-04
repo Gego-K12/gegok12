@@ -16,18 +16,25 @@ use App\Models\Country;
 use App\Models\State;
 use App\Models\User;
 use App\Models\Userprofile;
+use App\Services\UserProfileReaderService;
+use App\Services\UserProfileWriterService;
 use App\Traits\Common;
 use App\Traits\LogActivity;
 use Exception;
-use Hash;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Log;
 
 class UserProfileController extends Controller
 {
     use Common;
     use LogActivity;
+
+    public function __construct(
+        protected UserProfileReaderService $userProfileReader,
+        protected UserProfileWriterService $userProfileWriter
+    ) {}
 
     public function ChangePassword()
     {
@@ -42,26 +49,7 @@ class UserProfileController extends Controller
      */
     public function updateChangePassword(ChangePasswordRequest $request)
     {
-        $user = User::find(Auth::id());
-        $hashedPassword = $user->password;
-
-        if ($hashedPassword != '') {
-            $user->password = Hash::make($request->newpassword);
-            $user->save();
-
-            $ip = $this->getRequestIP();
-            $this->doActivityLog(
-                $user,
-                Auth::user(),
-                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT']],
-                LOGNAME_CHANGE_PASSWORD,
-                'Changed Profile Password.'
-            );
-        }
-
-        $res['message'] = __('admin_userprofile.password_update');
-
-        return $res;
+        return $this->userProfileWriter->changePassword(Auth::id(), $request->newpassword);
     }
 
     public function changeavatar(Request $request)
@@ -71,15 +59,7 @@ class UserProfileController extends Controller
 
     public function getavatar()
     {
-        $userprofile = Userprofile::where('user_id', Auth::id())->first();
-        $array = [];
-
-        if (Auth::user()) {
-            $array['avatar'] = $this->getFilePath($userprofile->avatar);
-            $array['id'] = $userprofile->id;
-        }
-
-        return $array;
+        return $this->userProfileReader->avatar(Auth::id());
     }
 
     /**
@@ -95,6 +75,8 @@ class UserProfileController extends Controller
             // $path=$this->uploadFile(Auth::user()->school->slug.'/uploads/avatars', $request->avatar);
 
             $path = \Storage::putFile(Auth::user()->school->slug.'/uploads/avatars', $request->avatar, 'public');
+
+            $res = ['message' => null];
 
             if ($path != '') {
                 $userprofile->avatar = $path;
@@ -115,6 +97,7 @@ class UserProfileController extends Controller
 
             return $res;
         } catch (Exception $e) {
+            Log::info($e->getMessage());
         }
     }
 
@@ -185,6 +168,7 @@ class UserProfileController extends Controller
 
             return $res;
         } catch (Exception $e) {
+            Log::info($e->getMessage());
         }
     }
 

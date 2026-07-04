@@ -90,7 +90,7 @@ class Userprofile extends Model
      * @var array
      */
     protected $fillable = [
-        'school_id', 'user_id', 'usergroup_id', 'firstname', 'lastname', 'alternate_no', 'gender', 'date_of_birth', 'blood_group', 'birth_place', 'native_place', 'mother_tongue', 'caste', 'address', 'city_id', 'state_id', 'country_id', 'pincode', 'relation', 'aadhar_number', 'registration_number', 'EMIS_number', 'joining_date', 'notes', 'avatar', 'marital_status', 'status',
+        'school_id', 'user_id', 'usergroup_id', 'firstname', 'lastname', 'alternate_no', 'gender', 'date_of_birth', 'blood_group', 'birth_place', 'native_place', 'mother_tongue', 'caste', 'address', 'city_id', 'state_id', 'country_id', 'pincode', 'relation', 'aadhar_number', 'registration_number', 'EMIS_number', 'joining_date', 'relieved_at', 'notes', 'avatar', 'marital_status', 'status',
     ];
 
     /**
@@ -220,9 +220,18 @@ class Userprofile extends Model
      */
     public function getAvatarPathAttribute()
     {
-        if ($this->avatar != null) {
-            return $this->getFilePath($this->avatar);
+        $defaultPaths = ['uploads/male.png', 'uploads/female.png', 'uploads/user/avatar/default-user.jpg'];
 
+        if ($this->avatar != null) {
+            return in_array($this->avatar, $defaultPaths) ? asset($this->avatar) : $this->getFilePath($this->avatar);
         }
+
+        if ($this->gender == 'male') {
+            return asset('uploads/male.png');
+        } elseif ($this->gender == 'female') {
+            return asset('uploads/female.png');
+        }
+
+        return asset('uploads/user/avatar/default-user.jpg');
     }
 }

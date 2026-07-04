@@ -144,9 +144,24 @@ trait MemberProcess
     public function TeacherFilter($request, $school_id, $usergroup_id)
     {
         try {
-            $users = TeacherUser::where('school_id', $school_id)->ByRole($usergroup_id)->whereHas('userprofile', function ($q) {
-                $q->where('status', 'active')->orWhere('status', 'inactive');
-            });
+            $academic_year = \App\Helpers\SiteHelper::getAcademicYear($school_id);
+
+            $users = TeacherUser::where('school_id', $school_id)->ByRole($usergroup_id)
+                ->with([
+                    'standardLink' => function ($q) use ($academic_year) {
+                        $q->where('academic_year_id', $academic_year->id);
+                    },
+                    'teacherlink' => function ($q) use ($academic_year) {
+                        $q->where('academic_year_id', $academic_year->id);
+                    },
+                ])
+                ->whereHas('userprofile', function ($q) use ($request) {
+                    if ($request->view == 'exit') {
+                        $q->where('status', 'exit');
+                    } else {
+                        $q->where('status', 'active')->orWhere('status', 'inactive');
+                    }
+                });
 
             $alphabet = $request->alphabet ? $request->alphabet : '';
             if ($alphabet) {

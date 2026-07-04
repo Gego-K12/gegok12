@@ -34,13 +34,15 @@ class DatabaseSeeder extends Seeder
         $this->call(SubjectsTableSeeder::class);
         // $this->call(UsersTableSeeder::class);  //test
         $this->call(UsersSchoolAdminTableSeeder::class);
-        $this->call(UsersTeacherTableSeeder::class);  // test
-        $this->call(StandardsLinkTableSeeder::class); // test //
+        // $this->call(UsersTeacherTableSeeder::class);  // test
+        // $this->call(StandardsLinkTableSeeder::class); // test //
+        $this->call(DemoTeachingStaffSeeder::class); // replaces UsersTeacherTableSeeder + StandardsLinkTableSeeder + TeacherTableSeeder with a realistic staff hierarchy
+        $this->call(DemoNonTeachingStaffSeeder::class); // realistic-sized roster on top of UsersSchoolAdminTableSeeder's fixed demo logins
         $this->call(UsersStudentTableSeeder::class);  // test
 
         $this->call(SubscriptionsTableSeeder::class);  // test //
 
-        $this->call(TeacherTableSeeder::class); // test //
+        // $this->call(TeacherTableSeeder::class); // test //
 
         $this->call(BooksCategoryTableSeeder::class);
         $this->call(BooksTableSeeder::class);

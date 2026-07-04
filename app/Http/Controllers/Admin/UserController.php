@@ -39,6 +39,7 @@ class UserController extends Controller
             $userprofile = Userprofile::where('user_id', $user->id)->first();
 
             $userprofile->status = $request->status;
+            $userprofile->relieved_at = $request->status == 'exit' ? now() : null;
 
             $userprofile->save();
 

@@ -9,10 +9,9 @@ namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ChangePasswordRequest;
-use App\Models\User;
+use App\Services\UserProfileWriterService;
 use App\Traits\Common;
 use App\Traits\LogActivity;
-use Hash;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -21,6 +20,8 @@ class UserProfileController extends Controller
 {
     use Common;
     use LogActivity;
+
+    public function __construct(protected UserProfileWriterService $userProfileWriter) {}
 
     /**
      * Display a listing of the resource.
@@ -40,25 +41,6 @@ class UserProfileController extends Controller
      */
     public function updateChangePassword(ChangePasswordRequest $request)
     {
-        $user = User::find(Auth::id());
-        $hashedPassword = $user->password;
-
-        if ($hashedPassword != '') {
-            $user->password = Hash::make($request->newpassword);
-            $user->save();
-
-            $ip = $this->getRequestIP();
-            $this->doActivityLog(
-                $user,
-                Auth::user(),
-                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT']],
-                LOGNAME_CHANGE_PASSWORD,
-                'Changed Profile Password.'
-            );
-        }
-
-        $res['message'] = __('admin_userprofile.password_update');
-
-        return $res;
+        return $this->userProfileWriter->changePassword(Auth::id(), $request->newpassword);
     }
 }

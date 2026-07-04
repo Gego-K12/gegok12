@@ -15,12 +15,12 @@ use App\Http\Resources\API\State as StateResource;
 use App\Models\City;
 use App\Models\Country;
 use App\Models\State;
-use App\Models\User;
 use App\Models\Userprofile;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Log;
 
 class UserprofileController extends Controller
 {
@@ -87,6 +87,14 @@ class UserprofileController extends Controller
      * @param  int  $id
      * @return Response
      */
+    /**
+     * $id is unused: this always scopes to the authenticated user, never
+     * the route's $id, matching the original (broken) implementation's
+     * intent. Deliberately not changed to look the profile up by $id -
+     * doing so would let one authenticated user edit another's profile
+     * with no ownership check, since there's no route (or authorization)
+     * wiring this up yet.
+     */
     public function update(EditUserDetailRequest $request, $id)
     {
         //
@@ -94,7 +102,7 @@ class UserprofileController extends Controller
             // $user = User::where('id',Auth::user()->id)->get();
             $userprofile = Userprofile::where([['user_id', Auth::user()->id], ['school_id', Auth::user()->school_id]])->first();
 
-            if (Input::hasFile('avatar')) {
+            if ($request->hasFile('avatar')) {
                 $file = $request->file('avatar');
                 $path = \Storage::putFile(Auth::user()->school->slug.'/uploads/admin/member/avatar', $file);
                 $userprofile->avatar = $path;
@@ -129,6 +137,7 @@ class UserprofileController extends Controller
 
             return $res;
         } catch (Exception $e) {
+            Log::info($e->getMessage());
         }
     }
 }

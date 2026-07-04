@@ -11,6 +11,7 @@ Route::get('/dashboard/task/count', 'DashboardController@listCount');
 
 // feed
 Route::get('/feeds', 'FeedController@index');
+Route::get('/feed/filter', 'FeedController@filter');
 
 // birthday
 Route::get('/dashboard/birthdayUser', 'BirthdayController@birthdayUser');

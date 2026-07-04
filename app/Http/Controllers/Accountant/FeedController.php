@@ -7,15 +7,17 @@
 
 namespace App\Http\Controllers\Accountant;
 
+use App\Helpers\SiteHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Post;
-use App\Models\PostTag;
-use App\Models\Tag;
+use App\Services\FeedReaderService;
 use App\Traits\Common;
 use App\Traits\LogActivity;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Class FeedController
@@ -38,6 +40,8 @@ class FeedController extends Controller
      */
     use LogActivity;
 
+    public function __construct(protected FeedReaderService $feedReader) {}
+
     /**
      * Show the form for creating a new resource.
      *
@@ -45,13 +49,39 @@ class FeedController extends Controller
      */
     public function index(Request $request)
     {
-        $feeds = Post::where('visibility', 'all_class')->orderBy('posted_at', DESC)->get();
+        $schoolId = Auth::user()->school_id;
+        $academicYearId = SiteHelper::getAcademicYear($schoolId)->id;
 
-        $birthday = $this->getFilePath('uploads/images/birthday.jpg');
-        $anniversary = $this->getFilePath('uploads/images/work_anniversary.jpg');
-        $exam = $this->getFilePath('uploads/images/exam-banner.jpg');
+        $feeds = $this->scopedFeedQuery($request, $schoolId, $academicYearId)
+            ->orderBy('posted_at', 'desc')
+            ->get();
 
-        return view('/accountant/feed/feed', ['feeds' => $feeds, 'tags' => $tags, 'birthday' => $birthday, 'anniversary' => $anniversary, 'exam' => $exam]);
+        $banners = $this->feedReader->bannerPaths();
+
+        return view('/accountant/feed/feed', [
+            'feeds' => $feeds,
+            'tags' => $this->feedReader->tagCloud($schoolId),
+            'birthday' => $banners['birthday'],
+            'anniversary' => $banners['anniversary'],
+            'exam' => $banners['exam'],
+        ]);
+    }
+
+    /**
+     * school_id/academic_year_id/is_posted-scoped Post query, with the
+     * `list`/`search` request filters applied on top. Accountant's
+     * default (no `list`/`search` given) is `visibility = all_class`.
+     */
+    private function scopedFeedQuery(Request $request, int $schoolId, int $academicYearId): Builder
+    {
+        $query = Post::query();
+        $this->feedReader->scopeToTenant($query, $schoolId, $academicYearId);
+
+        if (! $this->feedReader->applyListOrSearchFilter($query, $request->list, $request->search, $schoolId)) {
+            $query->where('visibility', 'all_class');
+        }
+
+        return $query;
     }
 
     /**
@@ -61,34 +91,19 @@ class FeedController extends Controller
      */
     public function filter(Request $request)
     {
-        $tags = Tag::join('post_tag', 'tags.id', '=', 'post_tag.tag_id')
-        // group by tags.id in order to count number of rows in join and to get each tag only once
-            ->groupBy('tags.id')
-        // get only columns from tags table along with aggregate COUNT column
-            ->select(['tags.*', \DB::raw('COUNT(*) as cnt')])
-        // order by count in descending order
-            ->orderBy('cnt', 'desc')
-            ->take(20)
-            ->get();
+        $schoolId = Auth::user()->school_id;
+        $academicYearId = SiteHelper::getAcademicYear($schoolId)->id;
 
-        $birthday = $this->getFilePath('uploads/images/birthday.jpg');
-        $anniversary = $this->getFilePath('uploads/images/work_anniversary.jpg');
-        $exam = $this->getFilePath('uploads/images/exam-banner.jpg');
-        if ($request->list != '') {
-            $category = $request->list;
+        $feeds = $this->scopedFeedQuery($request, $schoolId, $academicYearId)->get();
 
-            $feeds = Post::where('visibility', $category)->get();
-        } elseif ($request->search != '') {
-            $category = $request->search;
+        $banners = $this->feedReader->bannerPaths();
 
-            $tags = Tag::where('tag_name', $category)->first();
-
-            $post_tag = PostTag::where('tag_id', $tags->id)->pluck('post_id')->toArray();
-
-            $feeds = Post::whereIn('id', $post_tag)->get();
-
-        }
-
-        return view('/accountant/feed/filter', ['feeds' => $feeds, 'tags' => $tags, 'birthday' => $birthday, 'anniversary' => $anniversary, 'exam' => $exam]);
+        return view('/accountant/feed/filter', [
+            'feeds' => $feeds,
+            'tags' => $this->feedReader->tagCloud($schoolId),
+            'birthday' => $banners['birthday'],
+            'anniversary' => $banners['anniversary'],
+            'exam' => $banners['exam'],
+        ]);
     }
 }

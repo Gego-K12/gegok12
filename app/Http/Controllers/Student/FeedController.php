@@ -7,13 +7,14 @@
 
 namespace App\Http\Controllers\Student;
 
+use App\Helpers\SiteHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Post;
-use App\Models\PostTag;
 use App\Models\StudentAcademic;
-use App\Models\Tag;
+use App\Services\FeedReaderService;
 use App\Traits\Common;
 use App\Traits\LogActivity;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -21,14 +22,11 @@ use Illuminate\Support\Facades\Auth;
 class FeedController extends Controller
 {
     use Common;
+
     //
     use LogActivity;
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return Response
-     */
+    public function __construct(protected FeedReaderService $feedReader) {}
 
     /**
      * Show the form for creating a new resource.
@@ -37,59 +35,65 @@ class FeedController extends Controller
      */
     public function index(Request $request)
     {
-        $student_id = Auth::id();
+        $schoolId = Auth::user()->school_id;
+        $academicYearId = SiteHelper::getAcademicYear($schoolId)->id;
 
-        $tags = Tag::join('post_tags', 'tags.id', '=', 'post_tags.tag_id')
-        // group by tags.id in order to count number of rows in join and to get each tag only once
-            ->groupBy('tags.id')
-        // get only columns from tags table along with aggregate COUNT column
-            ->select(['tags.*', \DB::raw('COUNT(*) as cnt')])
-        // order by count in descending order
-            ->orderBy('cnt', 'desc')
-            ->take(20)
-            ->get();
+        $feeds = $this->scopedFeedQuery($request, $schoolId, $academicYearId)
+            ->orderBy('posted_at', 'desc')
+            ->paginate(10);
 
-        $class = StudentAcademic::where('user_id', $student_id)->first();
+        $banners = $this->feedReader->bannerPaths();
 
-        $birthday = $this->getFilePath('uploads/images/birthday.jpg');
-        $anniversary = $this->getFilePath('uploads/images/work_anniversary.jpg');
-        $exam = $this->getFilePath('uploads/images/exam-banner.jpg');
+        return view('/student/feed/feed', [
+            'feeds' => $feeds,
+            'tags' => $this->feedReader->tagCloud($schoolId),
+            'birthday' => $banners['birthday'],
+            'anniversary' => $banners['anniversary'],
+            'exam' => $banners['exam'],
+        ]);
+    }
 
-        $feeds = Post::where('visible_for', $class->standardLink_id)->orWhere('visibility', 'all_class')->orderBy('posted_at', 'DESC')->paginate(10);
+    /**
+     * school_id/academic_year_id/is_posted-scoped Post query, with the
+     * `list`/`search` request filters applied on top. Student's default
+     * (no `list`/`search` given) is posts targeted at the student's own
+     * class, or broadcast to all classes. The two conditions are grouped
+     * in a nested where() so they don't break out of the tenant scoping
+     * above them - the same `orWhere`-breaks-AND-grouping bug already
+     * fixed for Task/Notice/Holidays/Events in this cleanup.
+     */
+    private function scopedFeedQuery(Request $request, int $schoolId, int $academicYearId): Builder
+    {
+        $query = Post::query();
+        $this->feedReader->scopeToTenant($query, $schoolId, $academicYearId);
 
-        return view('/student/feed/feed', ['feeds' => $feeds, 'tags' => $tags, 'birthday' => $birthday, 'anniversary' => $anniversary, 'exam' => $exam]);
+        if (! $this->feedReader->applyListOrSearchFilter($query, $request->list, $request->search, $schoolId)) {
+            $class = StudentAcademic::where('user_id', Auth::id())->first();
+
+            $query->where(function ($q) use ($class) {
+                $q->where('visible_for', $class?->standardLink_id)
+                    ->orWhere('visibility', 'all_class');
+            });
+        }
+
+        return $query;
     }
 
     public function filter(Request $request)
     {
+        $schoolId = Auth::user()->school_id;
+        $academicYearId = SiteHelper::getAcademicYear($schoolId)->id;
 
-        $tags = Tag::join('post_tag', 'tags.id', '=', 'post_tag.tag_id')
-        // group by tags.id in order to count number of rows in join and to get each tag only once
-            ->groupBy('tags.id')
-        // get only columns from tags table along with aggregate COUNT column
-            ->select(['tags.*', \DB::raw('COUNT(*) as cnt')])
-        // order by count in descending order
-            ->orderBy('cnt', 'desc')
-            ->take(20)
-            ->get();
+        $feeds = $this->scopedFeedQuery($request, $schoolId, $academicYearId)->get();
 
-        $birthday = $this->getFilePath('uploads/images/birthday.jpg');
-        $anniversary = $this->getFilePath('uploads/images/work_anniversary.jpg');
-        $exam = $this->getFilePath('uploads/images/exam-banner.jpg');
-        if ($request->list != '') {
-            $category = $request->list;
+        $banners = $this->feedReader->bannerPaths();
 
-            $feeds = Post::where('visibility', $category)->get();
-        } elseif ($request->search != '') {
-            $category = $request->search;
-
-            $tags = Tag::where('tag_name', $category)->first();
-
-            $post_tag = PostTag::where('tag_id', $tags->id)->pluck('post_id')->toArray();
-            $feeds = Post::whereIn('id', $post_tag)->get();
-
-        }
-
-        return view('/student/feed/filter', ['feeds' => $feeds, 'tags' => $tags, 'birthday' => $birthday, 'anniversary' => $anniversary, 'exam' => $exam]);
+        return view('/student/feed/filter', [
+            'feeds' => $feeds,
+            'tags' => $this->feedReader->tagCloud($schoolId),
+            'birthday' => $banners['birthday'],
+            'anniversary' => $banners['anniversary'],
+            'exam' => $banners['exam'],
+        ]);
     }
 }

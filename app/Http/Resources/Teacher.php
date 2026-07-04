@@ -15,7 +15,7 @@ class Teacher extends JsonResource
      */
     public function toArray($request)
     {
-        $details = $this->getTeacherDetails();
+        $profile = $this->latestTeacherProfile;
 
         return
         [
@@ -27,16 +27,16 @@ class Teacher extends JsonResource
             'avatar' => $this->userprofile->AvatarPath,
             'title' => $this->userprofile->gender == 'female' ? 'Ms.' : 'Mr.',
             'fullname' => $this->FullName,
-            'employee_id' => $details['employee_id'] ?? null,
-            'designation' => $details['designation'],
-            'designation_name' => $details['designation_name'],
-            'sub_designation' => $details['sub_designation'],
+            'employee_id' => optional($profile)->employee_id,
+            'designation' => optional($profile)->designation,
+            'designation_name' => optional($profile)->designation_name,
+            'sub_designation' => optional($profile)->sub_designation,
             'date_of_birth' => date('d M Y', strtotime($this->userprofile->date_of_birth)),
             'joining_date' => $this->userprofile->joining_date != null ? date('d M Y', strtotime($this->userprofile->joining_date)) : null,
             'relieved_at' => $this->userprofile->relieved_at != null ? date('d M Y', strtotime($this->userprofile->relieved_at)) : null,
             'status' => $this->status,
-            'librarycard_number' => $this->librarycard->library_card_no,
-            'book_limit' => $this->librarycard->book_limit,
+            'librarycard_number' => optional($this->librarycard)->library_card_no,
+            'book_limit' => optional($this->librarycard)->book_limit,
             'class_teacher_of' => $this->standardLink->standard_section ?? null,
             'subject_teacher_of' => $this->teacherlink->filter(function ($link) {
                 return $link->standardLink != null && $link->subject != null;

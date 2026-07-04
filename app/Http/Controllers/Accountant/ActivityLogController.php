@@ -8,7 +8,7 @@
 namespace App\Http\Controllers\Accountant;
 
 use App\Http\Controllers\Controller;
-use App\Models\ActivityLog;
+use App\Services\ActivityLogReaderService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
@@ -23,6 +23,8 @@ use Illuminate\View\View;
  */
 class ActivityLogController extends Controller
 {
+    public function __construct(protected ActivityLogReaderService $activityLogReader) {}
+
     /**
      * Display a paginated list of activity logs for the authenticated user.
      *
@@ -30,12 +32,8 @@ class ActivityLogController extends Controller
      */
     public function index()
     {
-        $activitylog = ActivityLog::where('causer_id', Auth::id())
-            ->orderby('id', 'desc')
-            ->paginate(10);
-
         return view('/accountant/activity_log/show', [
-            'activitylog' => $activitylog,
+            'activitylog' => $this->activityLogReader->forUser(Auth::id()),
         ]);
     }
 }

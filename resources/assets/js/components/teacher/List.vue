@@ -56,6 +56,10 @@
             <div v-else-if="props.column.field == 'date_of_birth'">
               {{ props.row.date_of_birth }}
             </div>
+            <div v-else-if="props.column.field == 'last_login_at'">
+              <span v-if="props.row.last_login_at" class="text-gray-700">{{ props.row.last_login_at }}</span>
+              <span v-else class="rounded-full px-2 py-1 text-xs font-semibold bg-gray-100 text-gray-500">Never Logged In</span>
+            </div>
           </template>
         </vue-good-table>
       </div>
@@ -184,6 +188,7 @@
           { label: 'Name', field: 'fullname', filterOptions: { enabled: true, placeholder: 'Search name' } },
           { label: 'Designation', field: 'designation_name', filterOptions: { enabled: true, placeholder: 'Search designation' } },
           { label: 'Status', field: 'status' },
+          { label: 'Last Login', field: 'last_login_at', sortable: false },
           { label: 'Primary Role', field: 'class_teacher_of' },
           { label: 'Subject Teacher to', field: 'subject_teacher_of', sortable: false },
         ];

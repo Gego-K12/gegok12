@@ -1447,6 +1447,18 @@ class User extends Authenticatable implements HasMedia
     }
 
     /**
+     * Get the most recent successful login activity-log entry for this user.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphOne
+     */
+    public function lastLogin()
+    {
+        return $this->morphOne(\Spatie\Activitylog\Models\Activity::class, 'subject')
+            ->where('log_name', 'login')
+            ->latestOfMany();
+    }
+
+    /**
      * Scope to filter users by employee ID.
      *
      * @param  Builder  $query

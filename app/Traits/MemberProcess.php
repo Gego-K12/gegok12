@@ -154,6 +154,7 @@ trait MemberProcess
                     'teacherlink' => function ($q) use ($academic_year) {
                         $q->where('academic_year_id', $academic_year->id);
                     },
+                    'lastLogin',
                 ])
                 ->whereHas('userprofile', function ($q) use ($request) {
                     if ($request->view == 'exit') {
@@ -245,7 +246,7 @@ trait MemberProcess
     public function StaffFilter($request, $school_id, $usergroup_id)
     {
         try {
-            $users = User::where('school_id', $school_id)->whereIn('usergroup_id', $usergroup_id)->whereHas('userprofile', function ($q) use ($request) {
+            $users = User::where('school_id', $school_id)->whereIn('usergroup_id', $usergroup_id)->with('lastLogin')->whereHas('userprofile', function ($q) use ($request) {
                 if ($request->view == 'exit') {
                     $q->where('status', 'exit');
                 } else {

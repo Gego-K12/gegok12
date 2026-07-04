@@ -690,6 +690,31 @@
     </li>
   <!-- payroll end -->
 
+<!-- tools start -->
+    @php
+      $toolsClass='';
+      $toolsArray=array('add','register');
+      if(\Request()->segment('2') == 'attendance' && in_array(\Request()->segment('4'), $toolsArray))
+      {
+        $toolsClass='active';
+      }
+    @endphp
+     <li class="relative py-3 px-3 hover:bg-light-green-900 {{$toolsClass}}">
+     <a href="#" class="flex items-center">
+            <svg class="w-5 h-5 fill-current text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg>
+            <span class="mx-3 whitespace-no-wrap flex items-center justify-between w-10/12">Tools <img src="{{url('images/right-arrow.svg')}}" class="w-2 h-2"> </span>
+        </a>
+      <ul class="list-reset sites-sidebar bottom-0" style="top: auto;">
+        <li class="py-3 px-3 hover:font-semibold {{Request::segment ('4') == 'register' ? 'active':''}}">
+          <a href="{{url('/admin/attendance/staff/register')}}" class="flex items-center">
+            <svg class="w-5 h-5 fill-current text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
+            <span class="mx-3 whitespace-no-wrap">Staff Attendance Register</span>
+          </a>
+        </li>
+      </ul>
+    </li>
+  <!-- tools end -->
+
     <!-- class wall start -->
     @php
         $class='';

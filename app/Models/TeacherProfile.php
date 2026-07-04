@@ -164,4 +164,14 @@ class TeacherProfile extends Model
     {
         return $this->getFilePath($this->avatar);
     }
+
+    /**
+     * Get the human-readable designation name (e.g. "senior_teacher" -> "Senior Teacher").
+     *
+     * @return string|null
+     */
+    public function getDesignationNameAttribute()
+    {
+        return $this->designation != null ? str_replace('_', ' ', ucwords($this->designation)) : null;
+    }
 }

@@ -35,7 +35,7 @@
           </template>
           <template #table-row="props">
             <div v-if="props.column.field == 'fullname'">
-              <teacher-name-cell :url="url" :name="props.row.name" :avatar="props.row.avatar" :title="props.row.title" :fullname="props.row.fullname" :employee-id="props.row.employee_id" :joining-date="props.row.joining_date" :relieved-at="props.row.relieved_at"></teacher-name-cell>
+              <teacher-name-cell :url="url" show-path="/admin/teacher/show/" :name="props.row.name" :avatar="props.row.avatar" :title="props.row.title" :fullname="props.row.fullname" :employee-id="props.row.employee_id" :joining-date="props.row.joining_date" :relieved-at="props.row.relieved_at"></teacher-name-cell>
             </div>
             <div v-else-if="props.column.field == 'designation_name'">
               {{ props.row.designation_name }}

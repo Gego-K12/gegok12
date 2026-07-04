@@ -245,8 +245,12 @@ trait MemberProcess
     public function StaffFilter($request, $school_id, $usergroup_id)
     {
         try {
-            $users = User::where('school_id', $school_id)->whereIn('usergroup_id', $usergroup_id)->whereHas('userprofile', function ($q) {
-                $q->where('status', 'active')->orWhere('status', 'inactive');
+            $users = User::where('school_id', $school_id)->whereIn('usergroup_id', $usergroup_id)->whereHas('userprofile', function ($q) use ($request) {
+                if ($request->view == 'exit') {
+                    $q->where('status', 'exit');
+                } else {
+                    $q->where('status', 'active')->orWhere('status', 'inactive');
+                }
             });
 
             $alphabet = $request->alphabet ? $request->alphabet : '';

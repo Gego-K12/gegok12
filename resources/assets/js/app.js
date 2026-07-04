@@ -135,6 +135,7 @@ app.component('create-promotion', () => import('./components/promotion/Create.vu
 //attendance
 app.component('create-attendance', () => import('./components/attendance/Create.vue').then(m => m.default));
 app.component('create-staff-attendance', () => import('./components/attendance/staff/Create.vue').then(m => m.default));
+app.component('staff-attendance-register', () => import('./components/attendance/staff/Register.vue').then(m => m.default));
 
 
 

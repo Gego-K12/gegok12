@@ -97,6 +97,127 @@ class StaffAttendanceController extends Controller
     }
 
     /**
+     * Show the staff register page (calendar + daily present/absent list).
+     *
+     * @return Response
+     */
+    public function register()
+    {
+        $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
+
+        return view('/admin/staff_attendance/register', [
+            'academicYearStart' => date('Y-m-d', strtotime($academic_year->start_date)),
+            'today' => date('Y-m-d'),
+        ]);
+    }
+
+    /**
+     * Get the dates within a month that have staff attendance recorded, so
+     * the register calendar can distinguish recorded from unrecorded days.
+     *
+     * @param  string  $month  Y-m
+     * @return array
+     */
+    public function registerMonthSummary($month)
+    {
+        if (! preg_match('/^\d{4}-\d{2}$/', $month)) {
+            abort(422, 'Invalid month');
+        }
+
+        $school_id = Auth::user()->school_id;
+        $start = Carbon::createFromFormat('Y-m-d', $month.'-01')->startOfMonth();
+        $end = $start->copy()->endOfMonth();
+
+        $recordedDates = Attendance::where('school_id', $school_id)
+            ->whereNull('standardLink_id')
+            ->whereBetween('date', [$start->toDateString(), $end->toDateString()])
+            ->selectRaw('DATE(date) as recorded_date')
+            ->distinct()
+            ->pluck('recorded_date');
+
+        return ['recordedDates' => $recordedDates];
+    }
+
+    /**
+     * Get the present/absent status of every staff member for a given date.
+     *
+     * @param  string  $date
+     * @return array
+     */
+    public function registerByDate($date)
+    {
+        if (! preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+            abort(422, 'Invalid date');
+        }
+
+        $school_id = Auth::user()->school_id;
+        $academic_year = SiteHelper::getAcademicYear($school_id);
+
+        $staff = User::with(['userprofile', 'usergroup'])
+            ->whereIn('usergroup_id', [5, 8, 10, 11, 12, 13])
+            ->where([
+                ['school_id', $school_id],
+                ['status', 'active'],
+            ])
+            ->get()
+            ->sortBy('userprofile.firstname');
+
+        $attendanceByUser = Attendance::with('absentReason')
+            ->where([
+                ['school_id', $school_id],
+                ['academic_year_id', $academic_year->id],
+                ['date', $date],
+                ['standardLink_id', null],
+            ])
+            ->get()
+            ->groupBy('user_id');
+
+        $sessionsRecorded = [
+            'forenoon' => Attendance::where([['school_id', $school_id], ['date', $date], ['session', 'forenoon'], ['standardLink_id', null]])->exists(),
+            'afternoon' => Attendance::where([['school_id', $school_id], ['date', $date], ['session', 'afternoon'], ['standardLink_id', null]])->exists(),
+        ];
+
+        $list = $staff->map(function ($member) use ($attendanceByUser) {
+            $records = $attendanceByUser->get($member->id, collect());
+
+            $sessions = [];
+            foreach (['forenoon', 'afternoon'] as $session) {
+                $record = $records->firstWhere('session', $session);
+
+                $sessions[$session] = $record ? [
+                    'status' => (bool) $record->status,
+                    'reason' => $record->status ? null : optional($record->absentReason)->title,
+                    'remarks' => $record->remarks,
+                ] : null;
+            }
+
+            $recorded = array_filter($sessions);
+            $overall = empty($recorded)
+                ? 'not_recorded'
+                : (collect($recorded)->every(fn ($s) => $s['status']) ? 'present' : 'absent');
+
+            return [
+                'user_id' => $member->id,
+                'name' => $member->FullName,
+                'designation' => optional($member->usergroup)->name,
+                'sessions' => $sessions,
+                'overall' => $overall,
+            ];
+        })->values();
+
+        return [
+            'date' => $date,
+            'sessionsRecorded' => $sessionsRecorded,
+            'staff' => $list,
+            'summary' => [
+                'present' => $list->where('overall', 'present')->count(),
+                'absent' => $list->where('overall', 'absent')->count(),
+                'not_recorded' => $list->where('overall', 'not_recorded')->count(),
+            ],
+        ];
+    }
+
+    /**
      * Store staff attendance records.
      *
      * Creates attendance entries for staff,

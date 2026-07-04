@@ -8,12 +8,14 @@
 namespace App\Http\Controllers\Receptionist;
 
 use App\Http\Controllers\Controller;
-use App\Models\ActivityLog;
+use App\Services\ActivityLogReaderService;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 
 class ActivityLogController extends Controller
 {
+    public function __construct(protected ActivityLogReaderService $activityLogReader) {}
+
     /**
      * Display a listing of the resource.
      *
@@ -21,8 +23,8 @@ class ActivityLogController extends Controller
      */
     public function index()
     {
-        $activitylog = ActivityLog::where('causer_id', Auth::id())->orderby('id', 'desc')->paginate(10);
-
-        return view('/reception/activity_log/show', ['activitylog' => $activitylog]);
+        return view('/reception/activity_log/show', [
+            'activitylog' => $this->activityLogReader->forUser(Auth::id()),
+        ]);
     }
 }

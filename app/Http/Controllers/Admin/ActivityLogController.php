@@ -8,7 +8,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\ActivityLog;
+use App\Services\ActivityLogReaderService;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 
@@ -19,6 +19,8 @@ use Illuminate\Support\Facades\Auth;
  */
 class ActivityLogController extends Controller
 {
+    public function __construct(protected ActivityLogReaderService $activityLogReader) {}
+
     /**
      * Display a listing of the resource.
      *
@@ -26,8 +28,8 @@ class ActivityLogController extends Controller
      */
     public function index()
     {
-        $activitylog = ActivityLog::where('causer_id', Auth::id())->orderby('id', 'desc')->paginate(10);
-
-        return view('/admin/activity_log/show', ['activitylog' => $activitylog]);
+        return view('/admin/activity_log/show', [
+            'activitylog' => $this->activityLogReader->forUser(Auth::id()),
+        ]);
     }
 }

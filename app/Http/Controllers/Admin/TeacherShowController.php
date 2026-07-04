@@ -141,7 +141,7 @@ class TeacherShowController extends Controller
     public function show($name)
     {
         //
-        $user = User::where('name', $name)->first();
+        $user = TeacherUser::where('name', $name)->first();
 
         return view('/admin/teacher/show', ['user' => $user]);
     }

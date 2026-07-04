@@ -25,12 +25,13 @@ class TeacherProfileFactory extends Factory
         $pg_degree = Qualification::where('status', 1)->where('type', 'pg')->pluck('id')->toArray();
         $pg_degree = $this->faker->randomElement($pg_degree);
 
-        $designation = $this->faker->randomElement(['assistant_teacher', 'co_ordinator', 'head_of_the_department', 'librarian', 'others', 'senior_teacher', 'vice_principal']);
+        $designation = $this->faker->randomElement(['assistant_teacher', 'co_ordinator', 'head_of_the_department', 'physical_education_teacher', 'others', 'senior_teacher', 'vice_principal']);
+        $sub_designation = null;
         if ($designation == 'others') {
             $sub_designation = 'clerk';
         }
 
-        $employee_id = $this->faker->randomElement(['1', '2', '3', '4', '5']);
+        $employee_id = $this->faker->unique()->numberBetween(1000, 9999);
 
         return [
             //

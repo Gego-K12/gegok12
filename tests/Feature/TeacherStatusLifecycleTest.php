@@ -8,8 +8,10 @@
 namespace Tests\Feature;
 
 use App\Models\School;
+use App\Models\Standard;
 use App\Models\User;
 use App\Models\Userprofile;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -159,5 +161,57 @@ class TeacherStatusLifecycleTest extends TestCase
         // Verify userprofile exists with exit status
         $this->assertNotNull($freshTeacher->userprofile);
         $this->assertEquals('exit', $freshTeacher->userprofile->status);
+    }
+
+    /**
+     * Test 5: Relieving a teacher through the real admin "Relieve" action
+     * (not a direct DB update) sets relieved_at and immediately blocks
+     * that teacher from logging in.
+     */
+    public function test_step_5_relieving_teacher_via_admin_action_sets_relieved_at_and_blocks_login(): void
+    {
+        // The admin routes require at least one Standard to pass the
+        // MustBePrivilege middleware.
+        Standard::create([
+            'school_id' => $this->school->id,
+            'name' => '1',
+            'slug' => '1',
+            'order' => '01',
+            'status' => 1,
+        ]);
+
+        $admin = User::factory()->schoolAdmin()->for($this->school)->create();
+
+        $teacher = User::find($this->teacher->id);
+        $this->assertEquals('active', $teacher->userprofile->status);
+        $this->assertNull($teacher->userprofile->relieved_at);
+
+        // Relieve the teacher via the real admin action (same endpoint the
+        // "Relieve" button on the teacher detail page calls), not a direct
+        // database mutation.
+        $response = $this->actingAs($admin)->post('/admin/user/updateStatus/'.$teacher->name, [
+            'status' => 'exit',
+        ]);
+
+        $response->assertRedirect();
+
+        $teacher->refresh();
+        $this->assertEquals('exit', $teacher->userprofile->status);
+        $this->assertNotNull($teacher->userprofile->relieved_at);
+        $this->assertEquals(
+            now()->format('Y-m-d'),
+            Carbon::parse($teacher->userprofile->relieved_at)->format('Y-m-d')
+        );
+
+        // Log the admin out before attempting to log in as the relieved teacher.
+        $this->post('/logout');
+
+        $loginResponse = $this->post('/login', [
+            'email' => $this->teacherEmail,
+            'password' => $this->teacherPassword,
+        ]);
+
+        $loginResponse->assertSessionHasErrors();
+        $this->assertGuest();
     }
 }

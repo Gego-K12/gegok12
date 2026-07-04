@@ -1449,11 +1449,20 @@ class User extends Authenticatable implements HasMedia
     /**
      * Get the most recent successful login activity-log entry for this user.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphOne
+     * Deliberately a hasOne (not morphOne): logins are always recorded
+     * against the base App\Models\User (see LogSuccessfulLogin), but this
+     * relation is also called on subclasses like TeacherUser/LibrarianUser.
+     * morphOne would constrain subject_type using the calling subclass's
+     * own class name via getMorphClass(), which never matches what's
+     * actually stored. self::class always resolves to App\Models\User
+     * here, regardless of which subclass inherits this method.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
     public function lastLogin()
     {
-        return $this->morphOne(\Spatie\Activitylog\Models\Activity::class, 'subject')
+        return $this->hasOne(\Spatie\Activitylog\Models\Activity::class, 'subject_id', 'id')
+            ->where('subject_type', self::class)
             ->where('log_name', 'login')
             ->latestOfMany();
     }

@@ -183,6 +183,50 @@ class AuthenticationTest extends TestCase
     }
 
     /**
+     * Test Non-Teaching Staff (driver/helper/peon/etc., usergroup 13) can
+     * log in and land on a real working dashboard, not the 404 that used
+     * to follow a successful login for this role.
+     */
+    public function test_non_teaching_staff_can_login_and_reach_dashboard(): void
+    {
+        $school = School::factory()->create();
+
+        $driver = User::factory()
+            ->nonTeachingStaff()
+            ->for($school)
+            ->create([
+                'email' => 'driver@school.com',
+                'password' => bcrypt('password123'),
+            ]);
+
+        Userprofile::create([
+            'user_id' => $driver->id,
+            'school_id' => $school->id,
+            'usergroup_id' => $driver->usergroup_id,
+            'firstname' => 'School',
+            'lastname' => 'Driver',
+            'status' => 'active',
+        ]);
+
+        $response = $this->post('/login', [
+            'email' => 'driver@school.com',
+            'password' => 'password123',
+        ]);
+
+        $response->assertRedirect('/admin/dashboard');
+        $this->assertAuthenticatedAs($driver);
+
+        // Login always lands on /admin/dashboard first; the schooladmin
+        // middleware then routes non-admin roles to their own dashboard.
+        $dashboardResponse = $this->get('/admin/dashboard');
+        $dashboardResponse->assertRedirect('/nonteaching/dashboard');
+
+        $nonTeachingResponse = $this->get('/nonteaching/dashboard');
+        $nonTeachingResponse->assertOk();
+        $nonTeachingResponse->assertSee('Notice Board');
+    }
+
+    /**
      * Test Teacher with exit status cannot login
      * (She no longer works in school, login should be denied)
      */

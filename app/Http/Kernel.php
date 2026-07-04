@@ -8,6 +8,7 @@ use App\Http\Middleware\EncryptCookies;
 use App\Http\Middleware\MustBeAccountant;
 use App\Http\Middleware\MustBeAlumni;
 use App\Http\Middleware\MustBeLibrarian;
+use App\Http\Middleware\MustBeNonTeaching;
 use App\Http\Middleware\MustBeOTP;
 use App\Http\Middleware\MustBeParent;
 use App\Http\Middleware\MustBePrivilege;
@@ -118,6 +119,7 @@ class Kernel extends HttpKernel
         'receptionist' => MustBeReceptionist::class,
         'accountant' => MustBeAccountant::class,
         'stockkeeper' => MustBeStockKeeper::class,
+        'nonteaching' => MustBeNonTeaching::class,
         'adminaccountant' => AdminAccountant::class,
         'privilegeconditions' => MustBePrivilege::class, // checks academic year and standards
         'verifyotp' => MustBeOTP::class, // verify otp while school registration

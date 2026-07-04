@@ -5,7 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 
-class MustBeSchoolAdmin
+class MustBeNonTeaching
 {
     /**
      * Handle an incoming request.
@@ -16,8 +16,12 @@ class MustBeSchoolAdmin
     public function handle($request, Closure $next)
     {
 
-        if (\Auth::user()->isAdmin()) {
+        if (\Auth::user()->isNonTeachingStaff()) {
             return $next($request);
+        }
+
+        if (\Auth::user()->isAdmin()) {
+            return redirect('/admin/dashboard');
         }
 
         if (\Auth::user()->isTeacher()) {
@@ -32,23 +36,12 @@ class MustBeSchoolAdmin
             return redirect('/library/dashboard');
         }
 
-        if (\Auth::user()->isAlumni()) {
-            return redirect('/alumni/dashboard');
-        }
-
         if (\Auth::user()->isReceptionist()) {
             return redirect('/receptionist/dashboard');
         }
 
         if (\Auth::user()->isAccountant()) {
             return redirect('/accountant/dashboard');
-        }
-        if (\Auth::user()->isStockKeeper()) {
-            return redirect('/stock/dashboard');
-        }
-
-        if (\Auth::user()->isNonTeachingStaff()) {
-            return redirect('/nonteaching/dashboard');
         }
 
         abort(404);

@@ -49,3 +49,7 @@ Route::post('/{slug}/admission-form/validationStudentDetail', 'AdmissionControll
 Route::post('/{slug}/admission-form/validationAcademicDetail', 'AdmissionController@validationAcademicDetail');
 Route::post('/{slug}/admission-form/validationParentDetail', 'AdmissionController@validationParentDetail');
 Route::post('/{slug}/admission-form/validationPersonalDetail', 'AdmissionController@validationPersonalDetail');
+
+if (file_exists(base_path('routes/gfee.php'))) {
+    require base_path('routes/gfee.php');
+}

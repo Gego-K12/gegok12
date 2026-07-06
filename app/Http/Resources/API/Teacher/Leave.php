@@ -18,7 +18,7 @@ class Leave extends JsonResource
     {
         $start = Carbon::parse(date('Y-m-d', strtotime($this->from_date)));
         $end = Carbon::parse(date('Y-m-d', strtotime($this->to_date)));
-        $leave_days = $end->diffInDays($start) + 1;
+        $leave_days = $start->diffInDays($end) + 1;
         if ($this->session == 'afternoon' || $this->session == 'forenoon') {
             $leave_days = $leave_days / 2;
         }

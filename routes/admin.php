@@ -665,6 +665,7 @@ Route::post('/bankdetails/update/{id}', 'BankDetailController@update');
 Route::get('/attendance/staff/list', 'StaffAttendanceController@list');
 Route::get('/attendance/staff/add', 'StaffAttendanceController@create');
 Route::post('/attendance/staff/add', 'StaffAttendanceController@store');
+Route::get('/attendance/staff/approved-leaves/{date}/{session}', 'StaffAttendanceController@approvedLeaves');
 
 Route::get('/attendance/staff/register', 'StaffAttendanceController@register');
 Route::get('/attendance/staff/register/summary/{month}', 'StaffAttendanceController@registerMonthSummary');

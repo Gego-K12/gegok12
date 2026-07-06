@@ -15,6 +15,7 @@ use App\Http\Resources\StaffAttendanceResource;
 use App\Http\Resources\Teacherlist as TeacherlistResource;
 use App\Models\AbsentReason;
 use App\Models\Attendance;
+use App\Models\TeacherLeaveApplication;
 use App\Models\User;
 use App\Models\Users\TeacherUser;
 use App\Traits\AcademicProcess;
@@ -94,6 +95,46 @@ class StaffAttendanceController extends Controller
     {
         //
         return view('/admin/staff_attendance/create');
+    }
+
+    /**
+     * Get staff with an approved leave covering the given date and session,
+     * so the attendance form can show it as a reference alongside the
+     * present/absent lists.
+     *
+     * @param  string  $date
+     * @param  string  $session
+     * @return \Illuminate\Support\Collection
+     */
+    public function approvedLeaves($date, $session)
+    {
+        if (! preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+            abort(422, 'Invalid date');
+        }
+
+        $school_id = Auth::user()->school_id;
+
+        $leaves = TeacherLeaveApplication::with(['teacher', 'absentReason', 'leaveType'])
+            ->where('school_id', $school_id)
+            ->whereNull('standardLink_id')
+            ->where('status', 'approved')
+            ->whereDate('from_date', '<=', $date)
+            ->whereDate('to_date', '>=', $date)
+            ->where(function ($query) use ($session) {
+                $query->where('session', 'day')->orWhere('session', $session);
+            })
+            ->get();
+
+        return $leaves->map(function ($leave) {
+            return [
+                'user_id' => $leave->user_id,
+                'name' => $leave->teacher->FullName,
+                'session' => ucfirst($leave->session),
+                'leave_type' => optional($leave->leaveType)->name,
+                'reason' => optional($leave->absentReason)->title,
+                'remarks' => $leave->remarks,
+            ];
+        })->values();
     }
 
     /**

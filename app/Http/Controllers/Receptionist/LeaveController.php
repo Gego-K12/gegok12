@@ -47,7 +47,11 @@ class LeaveController extends Controller
             // ['user_id',Auth::id()],
             ['school_id', $school_id],
             ['academic_year_id', $academic_year->id],
-        ])->orderBy('id', 'DESC')->paginate(10);
+        ]);
+        if ($request->status != null) {
+            $application = $application->where('status', $request->status);
+        }
+        $application = $application->orderBy('id', 'DESC')->paginate(10);
 
         $application = LeaveResource::collection($application);
 
@@ -132,8 +136,8 @@ class LeaveController extends Controller
         $array['leavelist'] = LeaveType::where([['school_id', $school_id], ['academic_year_id', $academic_year->id], ['status', 1]])->get();
         $array['reasonlist'] = AbsentReason::where('status', 1)->get();
         $array['stafflist'] = User::whereIn('usergroup_id', [5, 8, 10, 11, 12, 13])->where([['school_id', Auth::user()->school_id], ['status', 'active']])->get()->sortBy('userprofile.firstname');
-        $array['from_date'] = Carbon::now()->addHour(1)->format('d-m-Y h:i:s');
-        $array['to_date'] = Carbon::now()->addDay(1)->format('d-m-Y h:i:s');
+        $array['from_date'] = Carbon::now()->addHour(1)->format('d-m-Y');
+        $array['to_date'] = Carbon::now()->addDay(1)->format('d-m-Y');
 
         return $array;
     }
@@ -146,7 +150,7 @@ class LeaveController extends Controller
     public function create()
     {
         //
-        return view('reception/leave/create', ['application' => $application]);
+        return view('reception/leave/create');
     }
 
     /**
@@ -183,8 +187,8 @@ class LeaveController extends Controller
 
             $data = [];
 
-            $user = User::where('id', Auth::user()->getTeacherDetails()['reporting_to'])->first();
-            if ($user->id != Auth::id()) {
+            $user = User::where('id', Auth::user()->getTeacherDetails()['reporting_to'] ?? null)->first();
+            if ($user != null && $user->id != Auth::id()) {
                 $data['user'] = $user;
                 $data['details'] = trans('notification.add_success_msg', ['user' => Auth::user()->FullName, 'module' => 'Leave Application']);
 
@@ -199,6 +203,7 @@ class LeaveController extends Controller
                 LOGNAME_ADD_LEAVEAPPLICATION,
                 $message
             );
+            session()->flash('successmessage', $message);
             $res['success'] = $message;
 
             return $res;
@@ -222,8 +227,8 @@ class LeaveController extends Controller
 
         $leave = TeacherLeaveApplication::where('id', $id)->first();
 
-        $array['from_date'] = date('d-m-Y H:i:s', strtotime($leave->from_date));
-        $array['to_date'] = date('d-m-Y H:i:s', strtotime($leave->to_date));
+        $array['from_date'] = date('d-m-Y', strtotime($leave->from_date));
+        $array['to_date'] = date('d-m-Y', strtotime($leave->to_date));
         $array['reason_id'] = $leave->reason_id;
         $array['remarks'] = $leave->remarks;
         $array['leave_type_id'] = $leave->leave_type_id;
@@ -293,8 +298,8 @@ class LeaveController extends Controller
 
             $data = [];
 
-            $user = User::where('id', Auth::user()->getTeacherDetails()['reporting_to'])->first();
-            if ($user->id != Auth::id()) {
+            $user = User::where('id', Auth::user()->getTeacherDetails()['reporting_to'] ?? null)->first();
+            if ($user != null && $user->id != Auth::id()) {
                 $data['user'] = $user;
                 $data['details'] = trans('notification.update_success_msg', ['user' => Auth::user()->FullName, 'module' => 'Leave Application']);
 
@@ -309,6 +314,7 @@ class LeaveController extends Controller
                 LOGNAME_EDIT_LEAVEAPPLICATION,
                 $message
             );
+            session()->flash('successmessage', $message);
             $res['success'] = $message;
 
             return $res;
@@ -338,8 +344,9 @@ class LeaveController extends Controller
 
             $data = [];
 
-            $user = User::where('id', Auth::user()->getTeacherDetails()->reporting_to)->first();
-            if ($user->id != Auth::id()) {
+            $teacherDetails = Auth::user()->getTeacherDetails();
+            $user = User::where('id', is_array($teacherDetails) ? ($teacherDetails['reporting_to'] ?? null) : $teacherDetails->reporting_to)->first();
+            if ($user != null && $user->id != Auth::id()) {
                 $data['user'] = $user;
                 $data['details'] = trans('notification.delete_success_msg', ['user' => Auth::user()->FullName, 'module' => 'Leave Application']);
 
@@ -355,6 +362,7 @@ class LeaveController extends Controller
                 $message
             );
 
+            session()->flash('successmessage', $message);
             $res['success'] = $message;
 
             return $res;
@@ -378,8 +386,8 @@ class LeaveController extends Controller
         $leave = TeacherLeaveApplication::where('id', $id)->first();
 
         $array['teacher_name'] = $leave->teacher->FullName;
-        $array['from_date'] = date('d-m-Y H:i:s', strtotime($leave->from_date));
-        $array['to_date'] = date('d-m-Y H:i:s', strtotime($leave->to_date));
+        $array['from_date'] = date('d-m-Y', strtotime($leave->from_date));
+        $array['to_date'] = date('d-m-Y', strtotime($leave->to_date));
         $array['reason_id'] = $leave->absentReason->title;
         $array['remarks'] = $leave->remarks;
         $array['leave_type_id'] = $leave->leaveType->name;
@@ -531,7 +539,11 @@ class LeaveController extends Controller
         ])->first();
 
         $student = User::find($teacher_id);
-        $teacher = User::where('id', $teacherprofiles->reporting_to)->first();
+        $teacher = $teacherprofiles == null ? null : User::where('id', $teacherprofiles->reporting_to)->first();
+
+        if ($teacher == null) {
+            return;
+        }
 
         $array = [];
 

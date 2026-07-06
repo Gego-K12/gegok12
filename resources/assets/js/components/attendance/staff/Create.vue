@@ -47,7 +47,7 @@
       </div>
 
       <div class="w-full flex flex-col lg:flex-row hidden" id="select">
-        <div class="w-full lg:w-1/2 bg-white shadow border px-4">
+        <div class="w-full lg:w-1/3 bg-white shadow border px-4">
           <div class="w-full my-4">
             <div class="flex justify-between items-center my-4">
               <h2 class="font-semibold text-base text-gray-700 capitalize">staffs
@@ -60,7 +60,7 @@
                   :checked="true"
                   @change="absentStudent($event,present,index)">
                 </div>
-                <div class="mx-2"> 
+                <div class="mx-2">
                   <p class="tw-form-label">{{ present.user_name }}</p>
                 </div>
               </div>
@@ -68,7 +68,7 @@
           </div>
         </div>
 
-        <div class="w-full lg:w-1/2 bg-white shadow border px-4 lg:ml-2 my-2 lg:my-0">
+        <div class="w-full lg:w-1/3 bg-white shadow border px-4 lg:ml-2 my-2 lg:my-0">
           <div class="w-full my-4">
             <div class="flex justify-between items-center my-4">
               <h2 class="font-semibold text-base text-gray-700 capitalize">Absent Staffs</h2>
@@ -104,6 +104,22 @@
             </div>
           </div>
         </div>
+
+        <div class="w-full lg:w-1/3 bg-white shadow border px-4 lg:ml-2 my-2 lg:my-0">
+          <div class="w-full my-4">
+            <div class="flex justify-between items-center my-4">
+              <h2 class="font-semibold text-base text-gray-700 capitalize">Approved Leaves
+              <span class="text-xs">( For the selected date &amp; session )</span></h2>
+            </div>
+            <div v-if="approvedLeaves.length === 0" class="text-sm text-gray-500">No approved leaves for this date.</div>
+            <div class="py-2 border-b" v-for="leave in approvedLeaves" :key="leave.user_id">
+              <p class="tw-form-label">{{ leave.name }}</p>
+              <p class="text-xs text-gray-500">{{ leave.leave_type }} &middot; {{ leave.session }}</p>
+              <p class="text-xs text-gray-500" v-if="leave.reason">Reason: {{ leave.reason }}</p>
+              <p class="text-xs text-gray-500" v-if="leave.remarks">{{ leave.remarks }}</p>
+            </div>
+          </div>
+        </div>
       </div>
 
     	<div class="my-6 hidden" id="btn_div">
@@ -131,11 +147,12 @@
         presents:[{ 
           present_id : '',
         }],
-        absents:[{ 
+        absents:[{
           user_id : '',
           reason_id:'',
           remarks:'',
         }],
+        approvedLeaves:[],
         errors:[],
         success:null,
       }
@@ -179,6 +196,15 @@
             user_name: staff.teacher_name,
             user: staff
           });
+        });
+
+        this.fetchApprovedLeaves();
+      },
+
+      fetchApprovedLeaves()
+      {
+        axios.get('/'+this.mode+'/attendance/staff/approved-leaves/'+this.date+'/'+this.session).then(response => {
+          this.approvedLeaves = response.data;
         });
       },
 

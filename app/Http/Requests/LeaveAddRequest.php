@@ -98,7 +98,7 @@ class LeaveAddRequest extends FormRequest
         return [
             //
             'from_date' => 'required|check_from_date|check_from_date_exists',
-            'to_date' => 'required|after:from_date|check_to_date',
+            'to_date' => 'required|after_or_equal:from_date|check_to_date',
             'reason_id' => 'required',
             'remarks' => 'nullable|check_remarks',
             'leave_type_id' => 'required',
@@ -118,7 +118,7 @@ class LeaveAddRequest extends FormRequest
 
             'to_date.required' => 'To Date is required',
 
-            'to_date.after' => 'To Date should be greater than From date',
+            'to_date.after_or_equal' => 'To Date should be on or after From date',
 
             'to_date.check_to_date' => 'Enter Valid To Date',
 

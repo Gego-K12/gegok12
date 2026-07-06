@@ -49,10 +49,9 @@
                         <div class="mb-2 flex items-center relative">
                             <VueDatePicker
                               v-model="from_date"
-                              format="dd-MM-yyyy HH:mm:ss"
+                              format="dd-MM-yyyy"
                               model-type="format"
-                              :enable-time-picker="true"
-                              :is-24="true"
+                              :time-config="{ enableTimePicker: false }"
                               :auto-apply="true"
                               input-class-name="w-full rounded"
                             />
@@ -69,10 +68,9 @@
                         <div class="mb-2 flex items-center relative">
                             <VueDatePicker
                               v-model="to_date"
-                              format="dd-MM-yyyy HH:mm:ss"
+                              format="dd-MM-yyyy"
                               model-type="format"
-                              :enable-time-picker="true"
-                              :is-24="true"
+                              :time-config="{ enableTimePicker: false }"
                               :auto-apply="true"
                               input-class-name="w-full rounded"
                             />
@@ -228,14 +226,12 @@
                 formData.append('leave_type_id',this.leave_type_id);
                 formData.append('staff_id', this.staff_id);          
                      
-                axios.post('/receptionist/leave/add',formData,{headers: {'Content-Type': 'multipart/form-data'}}).then(response => {     
+                axios.post('/receptionist/leave/add',formData,{headers: {'Content-Type': 'multipart/form-data'}}).then(response => {
                     this.success = response.data.success;
                     this.resetForm();
-                    this.flash(this.success,'success',{timeout: 3000});
                     window.location.href = "/receptionist/staff/leaves";
                 }).catch(error => {
                     this.errors = error.response.data.errors;
-                    this.flash('Please fill all fields ☹','error',{timeout: 3000});
                 });
             },
         },

@@ -28,7 +28,7 @@ class SingleNotificationEventListener implements ShouldQueue
     public function handle(SingleNotificationEvent $event)
     {
         //
-        if ($event->data['type'] == 'birthday') {
+        if (($event->data['type'] ?? null) == 'birthday') {
             Notification::send($event->data['user'], new BirthdayNotification($event->data['details'], $event->data['user']['id']));
         }
         Notification::send($event->data['user'], new NewMessageNotification($event->data['details']));

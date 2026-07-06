@@ -18,7 +18,7 @@
 */
 
 /*!
- * FilePond 4.32.11
+ * FilePond 4.32.12
  * Licensed under MIT, https://opensource.org/licenses/MIT/
  * Please visit https://pqina.nl/filepond/ for details.
  */
@@ -38,13 +38,6 @@
  */
 
 /*!
- * Quill Editor v1.3.7
- * https://quilljs.com/
- * Copyright (c) 2014, Jason Chen
- * Copyright (c) 2013, salesforce.com
- */
-
-/*!
  * The buffer module from node.js, for the browser.
  *
  * @author   Feross Aboukhadijeh <http://feross.org>
@@ -52,15 +45,15 @@
  */
 
 /*!
- * VueQuill @vueup/vue-quill v1.2.0
+ * VueQuill @vueup/vue-quill v1.5.5
  * https://vueup.github.io/vue-quill/
  * 
- * Includes quill v1.3.7
+ * Includes quill v2.0.2 || >=2.0.4 <3
  * https://quilljs.com/
  * 
- * Copyright (c) 2023 Ahmad Luthfi Masruri
+ * Copyright (c) 2026 Ahmad Luthfi Masruri
  * Released under the MIT license
- * Date: 2023-05-12T08:44:03.742Z
+ * Date: 2026-06-19T13:57:31.494Z
  */
 
 /*!
@@ -99,7 +92,7 @@ OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 PERFORMANCE OF THIS SOFTWARE.
 ***************************************************************************** */
 
-/*! Axios v1.13.5 Copyright (c) 2026 Matt Zabriskie and contributors */
+/*! Axios v1.18.1 Copyright (c) 2026 Matt Zabriskie and contributors */
 
 /*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
 
@@ -113,31 +106,19 @@ PERFORMANCE OF THIS SOFTWARE.
  */
 
 /**
-* @vue/compiler-core v3.5.28
+* @vue/runtime-core v3.5.39
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
 * @license MIT
 **/
 
 /**
-* @vue/compiler-dom v3.5.28
+* @vue/runtime-dom v3.5.39
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
 * @license MIT
 **/
 
 /**
-* @vue/runtime-core v3.5.28
-* (c) 2018-present Yuxi (Evan) You and Vue contributors
-* @license MIT
-**/
-
-/**
-* @vue/runtime-dom v3.5.28
-* (c) 2018-present Yuxi (Evan) You and Vue contributors
-* @license MIT
-**/
-
-/**
-* @vue/shared v3.5.28
+* @vue/shared v3.5.39
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
 * @license MIT
 **/

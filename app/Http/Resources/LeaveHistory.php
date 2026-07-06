@@ -18,7 +18,7 @@ class LeaveHistory extends JsonResource
     {
         $start = Carbon::parse(date('Y-m-d', strtotime($this->from_date)));
         $end = Carbon::parse(date('Y-m-d', strtotime($this->to_date)));
-        $leave_days = $end->diffInDays($start) + 1;
+        $leave_days = $start->diffInDays($end) + 1;
         if ($this->session == 'afternoon' || $this->session == 'forenoon') {
             $leave_days = $leave_days / 2;
         }
@@ -26,8 +26,8 @@ class LeaveHistory extends JsonResource
         return
         [
             //
-            'from_date' => date('d M Y h:i:s A', strtotime($this->from_date)),
-            'to_date' => date('d M Y h:i:s A', strtotime($this->to_date)),
+            'from_date' => date('d M Y', strtotime($this->from_date)),
+            'to_date' => date('d M Y', strtotime($this->to_date)),
             'reason' => $this->absentReason->title,
             'remarks' => $this->remarks,
             'leave_type' => $this->leaveType->name,

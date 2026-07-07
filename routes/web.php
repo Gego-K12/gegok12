@@ -33,6 +33,16 @@ Route::group(['middleware' => ['siteadmin'], 'namespace' => 'Admin'], function (
     Route::get('/payment/subscription', 'PaymentController@Subscription');
 });
 
+Route::group(['middleware' => ['auth', 'siteadmin']], function () {
+    Route::get('/plugins', function () {
+        return view('siteadmin.plugins.index');
+    });
+
+    Route::get('/plugins/{plugin}/log', function (\App\Models\Plugin $plugin) {
+        return view('siteadmin.plugins.log', ['plugin' => $plugin]);
+    });
+});
+
 Route::get('/cache-clear', function () {
     Artisan::call('cache:clear');
 });

@@ -711,6 +711,13 @@
             <span class="mx-3 whitespace-no-wrap">Staff Attendance Register</span>
           </a>
         </li>
+
+        {{-- Plugin Tools-menu hook: any installed plugin with has_tools_menu=true
+             and portal including admin gets its resources/views/plugins/{slug}/tools-menu.blade.php
+             included here automatically, so new plugins never require editing this file. --}}
+        @foreach(\App\Models\Plugin::withToolsMenuFor('admin')->get() as $installedPlugin)
+            @includeIf($installedPlugin->toolsMenuViewName())
+        @endforeach
       </ul>
     </li>
   <!-- tools end -->
@@ -1283,4 +1290,10 @@ fill="#fff" stroke="none">
     <!-- end -->
     @endif
 
+    {{-- Plugin menu hook: any installed plugin with has_menu=true and portal=admin
+         gets its resources/views/plugins/{slug}/menu.blade.php included here automatically,
+         so new plugins never require editing this file. --}}
+    @foreach(\App\Models\Plugin::withMenuFor('admin')->get() as $installedPlugin)
+        @includeIf($installedPlugin->menuViewName('admin'))
+    @endforeach
 </ul>

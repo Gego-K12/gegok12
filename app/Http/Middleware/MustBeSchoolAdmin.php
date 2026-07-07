@@ -51,6 +51,10 @@ class MustBeSchoolAdmin
             return redirect('/nonteaching/dashboard');
         }
 
+        if (\Auth::user()->isSiteAdmin()) {
+            return redirect('/plugins');
+        }
+
         abort(404);
     }
 }

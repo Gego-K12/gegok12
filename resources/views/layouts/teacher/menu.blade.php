@@ -223,4 +223,11 @@
             <span class="mx-3 whitespace-no-wrap">Activity Log</span>
         </a>
     </li>
+
+    {{-- Plugin menu hook: any installed plugin with has_menu=true and portal=teacher
+         gets its resources/views/plugins/{slug}/menu.blade.php included here automatically,
+         so new plugins never require editing this file. --}}
+    @foreach(\App\Models\Plugin::withMenuFor('teacher')->get() as $installedPlugin)
+        @includeIf($installedPlugin->menuViewName('teacher'))
+    @endforeach
 </ul>

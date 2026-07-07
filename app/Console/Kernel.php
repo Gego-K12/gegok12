@@ -25,6 +25,7 @@ use App\Console\Commands\CheckSubscriptionExpired;
 use App\Console\Commands\CheckTask;
 use App\Console\Commands\CheckWebNotification;
 use App\Console\Commands\DataSeeder\SeedAttendance;
+use App\Console\Commands\ProcessPluginInstalls;
 use App\Console\Commands\Test\CheckEnv;
 use App\Console\Commands\Test\CheckPushNotification;
 use App\Console\Commands\Test\CheckTest;
@@ -72,6 +73,8 @@ class Kernel extends ConsoleKernel
         InstallTimetableModule::class,
         InstallTransportModule::class,
         InstallVideoroomModule::class,
+
+        ProcessPluginInstalls::class,
     ];
 
     /**
@@ -105,6 +108,10 @@ class Kernel extends ConsoleKernel
             ->withoutOverlapping();
 
         $schedule->command('gego:checktask')
+            ->everyMinute()
+            ->withoutOverlapping();
+
+        $schedule->command('gego:processplugininstalls')
             ->everyMinute()
             ->withoutOverlapping();
 

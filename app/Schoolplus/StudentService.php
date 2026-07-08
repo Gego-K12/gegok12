@@ -2,18 +2,17 @@
 
 namespace App\Schoolplus;
 
-use App\Models\User;
-use App\Models\Mark;
-use App\Models\Exam;
-use App\Models\Subject;
-use App\Models\ExamSchedule;
-use App\Models\StandardLink;
-use App\Models\StudentAcademic;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use App\Http\Resources\StudentMark as StudentMarkResource;
 use App\Helpers\SiteHelper;
-use Illuminate\Support\Facades\Auth;
+use App\Http\Resources\StudentMark as StudentMarkResource;
+use App\Models\Exam;
+use App\Models\StandardLink;
+use App\Models\Subject;
+use App\Models\User;
 use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 use Log;
 
 /**
@@ -27,8 +26,6 @@ use Log;
  *
  * This service is designed to be consumed by
  * controllers, Livewire components, or APIs.
- *
- * @package App\Schoolplus
  */
 class StudentService
 {
@@ -39,7 +36,7 @@ class StudentService
      */
     public function test()
     {
-        return "this works";
+        return 'this works';
     }
 
     /**
@@ -47,10 +44,10 @@ class StudentService
      *
      * Ensures the user belongs to the student user group.
      *
-     * @param int|string $studentId
-     * @return \App\Models\User
+     * @param  int|string  $studentId
+     * @return User
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws ModelNotFoundException
      */
     private function getStudentById($studentId)
     {
@@ -60,13 +57,13 @@ class StudentService
             return $user;
         }
 
-        throw new ModelNotFoundException('Student not found by ID ' . $studentId);
+        throw new ModelNotFoundException('Student not found by ID '.$studentId);
     }
 
     /**
      * Get basic student information.
      *
-     * @param int|string $studentId
+     * @param  int|string  $studentId
      * @return mixed
      */
     public function getBasicInfo($studentId)
@@ -83,8 +80,8 @@ class StudentService
      * - this month
      * - academic year so far
      *
-     * @param int|string $studentId
-     * @param string $period
+     * @param  int|string  $studentId
+     * @param  string  $period
      * @return mixed
      */
     public function getAttendanceInfo($studentId, $period)
@@ -102,7 +99,7 @@ class StudentService
      * - Class teacher
      * - Average attendance rate
      *
-     * @param int|string $studentId
+     * @param  int|string  $studentId
      * @return mixed
      */
     public function getClassRoomInfo($studentId)
@@ -113,7 +110,7 @@ class StudentService
     /**
      * Get list of teachers associated with the student.
      *
-     * @param int|string $studentId
+     * @param  int|string  $studentId
      * @return mixed
      */
     public function getTeachersList($studentId)
@@ -124,7 +121,7 @@ class StudentService
     /**
      * Get list of subjects associated with the student.
      *
-     * @param int|string $studentId
+     * @param  int|string  $studentId
      * @return mixed
      */
     public function getSubjectsList($studentId)
@@ -135,7 +132,7 @@ class StudentService
     /**
      * Get list of upcoming classroom events.
      *
-     * @param int|string $studentId
+     * @param  int|string  $studentId
      * @return mixed
      */
     public function upcomingClassroomEventsList($studentId)
@@ -146,7 +143,7 @@ class StudentService
     /**
      * Get list of past classroom events.
      *
-     * @param int|string $studentId
+     * @param  int|string  $studentId
      * @return mixed
      */
     public function pastClassroomEventsList($studentId)
@@ -162,8 +159,8 @@ class StudentService
      * - yesterday
      * - tomorrow
      *
-     * @param int|string $studentId
-     * @param string $day
+     * @param  int|string  $studentId
+     * @param  string  $day
      * @return mixed
      */
     public function getLessonPlanForDay($studentId, $day)
@@ -174,8 +171,8 @@ class StudentService
     /**
      * Get memos or kudos for a given day.
      *
-     * @param int|string $studentId
-     * @param string $day
+     * @param  int|string  $studentId
+     * @param  string  $day
      * @return mixed
      */
     public function getMemosOrKudos($studentId, $day)
@@ -188,25 +185,25 @@ class StudentService
      *
      * Groups marks by exam name.
      *
-     * @param int|string $studentId
-     * @param int|string $examId
-     * @return \Illuminate\Support\Collection
+     * @param  int|string  $studentId
+     * @param  int|string  $examId
+     * @return Collection
      */
     public function getStudentMark($studentId, $examId)
     {
         $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
         if (class_exists('Gegok12\Exam\Models\Mark')) {
-        $mark = \Gegok12\Exam\Models\Mark::where('exam_id', $examId)
-            ->where('user_id', $studentId)
-            ->where('school_id', Auth::user()->school_id)
-            ->where('academic_year_id', $academic_year->id)
-            ->get();
+            $mark = \Gegok12\Exam\Models\Mark::where('exam_id', $examId)
+                ->where('user_id', $studentId)
+                ->where('school_id', Auth::user()->school_id)
+                ->where('academic_year_id', $academic_year->id)
+                ->get();
 
-        StudentMarkResource::withoutWrapping();
+            StudentMarkResource::withoutWrapping();
 
-        return StudentMarkResource::collection($mark)->groupBy('exam.name');
-        
-    	}
+            return StudentMarkResource::collection($mark)->groupBy('exam.name');
+
+        }
     }
 
     /**
@@ -214,23 +211,23 @@ class StudentService
      *
      * Groups marks by exam name.
      *
-     * @param int|string $studentId
-     * @return \Illuminate\Support\Collection
+     * @param  int|string  $studentId
+     * @return Collection
      */
     public function getAllMarks($studentId)
     {
         $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
         if (class_exists('Gegok12\Exam\Models\Mark')) {
 
-	        $mark = \Gegok12\Exam\Models\Mark::where('user_id', $studentId)
-	            ->where('school_id', Auth::user()->school_id)
-	            ->where('academic_year_id', $academic_year->id)
-	            ->get();
+            $mark = \Gegok12\Exam\Models\Mark::where('user_id', $studentId)
+                ->where('school_id', Auth::user()->school_id)
+                ->where('academic_year_id', $academic_year->id)
+                ->get();
 
-	        StudentMarkResource::withoutWrapping();
+            StudentMarkResource::withoutWrapping();
 
-	        return StudentMarkResource::collection($mark)->groupBy('exam.name');
-    	}
+            return StudentMarkResource::collection($mark)->groupBy('exam.name');
+        }
     }
 
     /**
@@ -241,11 +238,11 @@ class StudentService
      * - Subject-wise class average
      * - Exam names
      *
-     * @param int|string $studentId
-     * @param int|string $examIdOne
-     * @param int|string $examIdTwo
-     * @param int|string $standardId
-     * @return \Illuminate\View\View
+     * @param  int|string  $studentId
+     * @param  int|string  $examIdOne
+     * @param  int|string  $examIdTwo
+     * @param  int|string  $standardId
+     * @return View
      */
     public function compareMarks($studentId, $examIdOne, $examIdTwo, $standardId)
     {
@@ -253,20 +250,20 @@ class StudentService
             $standard = StandardLink::where('id', $standardId)->first();
 
             $standard_id = $standard->standard_id;
-            $section_id  = $standard->section_id;
+            $section_id = $standard->section_id;
 
             $subjects = Subject::where('standard_id', $standard_id)
                 ->where('section_id', $section_id)
                 ->pluck('name')
                 ->toArray();
 
-            $subjects =[];
+            $subjects = [];
             $marksone = [];
             $markstwo = [];
-            $examone  = [];
-            $examtwo  = [];
+            $examone = [];
+            $examtwo = [];
             $examOneAverage = [];
-            $examTwoAverage = [];  
+            $examTwoAverage = [];
 
             if (class_exists('Gegok12\Exam\Models\Mark')) {
                 $marksone = \Gegok12\Exam\Models\Mark::where('user_id', $studentId)
@@ -280,17 +277,17 @@ class StudentService
                     ->toArray();
 
                 $examOneAverage = \Gegok12\Exam\Models\Mark::where([
-                        ['standard_id', $standardId],
-                        ['exam_id', $examIdOne],
-                    ])
+                    ['standard_id', $standardId],
+                    ['exam_id', $examIdOne],
+                ])
                     ->groupBy('subject_id')
                     ->selectRaw('round(avg(obtained_marks)) as avg')
                     ->pluck('avg');
 
                 $examTwoAverage = \Gegok12\Exam\Models\Mark::where([
-                        ['standard_id', $standardId],
-                        ['exam_id', $examIdTwo],
-                    ])
+                    ['standard_id', $standardId],
+                    ['exam_id', $examIdTwo],
+                ])
                     ->groupBy('subject_id')
                     ->selectRaw('round(avg(obtained_marks)) as avg')
                     ->pluck('avg');
@@ -309,13 +306,13 @@ class StudentService
             }
 
             return view('/admin/exammark/process', [
-                'subjects'        => $subjects,
-                'marksone'        => $marksone,
-                'markstwo'        => $markstwo,
-                'examone'         => $examone,
-                'examtwo'         => $examtwo,
-                'examOneAverage'  => $examOneAverage,
-                'examTwoAverage'  => $examTwoAverage,
+                'subjects' => $subjects,
+                'marksone' => $marksone,
+                'markstwo' => $markstwo,
+                'examone' => $examone,
+                'examtwo' => $examtwo,
+                'examOneAverage' => $examOneAverage,
+                'examTwoAverage' => $examTwoAverage,
             ]);
 
         } catch (Exception $e) {

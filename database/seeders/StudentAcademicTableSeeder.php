@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use DB;
-use Illuminate\Database\Seeder;
+use App\Models\StudentAcademic;
 use App\Models\User;
+use Illuminate\Database\Seeder;
 
 class StudentAcademicTableSeeder extends Seeder
 {
@@ -16,15 +16,14 @@ class StudentAcademicTableSeeder extends Seeder
     public function run()
     {
         //
-        $students = User::where('usergroup_id',6)->get();
+        $students = User::where('usergroup_id', 6)->get();
 
-       	foreach($students as $student) 
-        {
-        	factory(\App\Models\StudentAcademic::class, 1)->create([
-                'school_id'     =>  $student->school_id,
-                
-                'user_id'       =>  $student->id, 
+        foreach ($students as $student) {
+            factory(StudentAcademic::class, 1)->create([
+                'school_id' => $student->school_id,
+
+                'user_id' => $student->id,
             ]);
-		}
+        }
     }
 }

@@ -2,8 +2,9 @@
 
 namespace App\Livewire\Admin\Setting;
 
-use Livewire\Component;
 use App\Models\Country;
+use Illuminate\View\View;
+use Livewire\Component;
 
 /**
  * Class CountryDetail
@@ -11,8 +12,6 @@ use App\Models\Country;
  * Livewire component responsible for displaying
  * detailed information of a single country
  * in the Admin Settings section.
- *
- * @package App\Livewire\Admin\Setting
  */
 class CountryDetail extends Component
 {
@@ -29,7 +28,7 @@ class CountryDetail extends Component
      * Assigns the country identifier received from the route
      * to the component property.
      *
-     * @param int|string $id Country ID
+     * @param  int|string  $id  Country ID
      * @return void
      */
     public function mount($id)
@@ -43,7 +42,7 @@ class CountryDetail extends Component
      * Fetches country details based on the provided ID
      * and passes the data to the Blade view.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function render()
     {

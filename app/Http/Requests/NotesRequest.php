@@ -4,7 +4,6 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Input;
 
 class NotesRequest extends FormRequest
 {
@@ -26,26 +25,25 @@ class NotesRequest extends FormRequest
     public function rules()
     {
 
-         Validator::extend('checknotes', function ($attribute, $value, $parameters, $validator) 
-        {   
-           return preg_match('/^\p{L}[\p{L} A-Za-z0-9_~\-!,@#\$%\^&*.:(\)((?:\'|").*(?:\'|"))\s]+$/u',request('notes')); 
-                 
+        Validator::extend('checknotes', function ($attribute, $value, $parameters, $validator) {
+            return preg_match('/^\p{L}[\p{L} A-Za-z0-9_~\-!,@#\$%\^&*.:(\)((?:\'|").*(?:\'|"))\s]+$/u', request('notes'));
+
         });
+
         return [
 
-             'notes' => 'required|checknotes',
-            
+            'notes' => 'required|checknotes',
+
         ];
     }
 
-     public function messages()
-   {
-       return
-       [ 
-           'notes.required' =>__('notes.notes_required'),
-           'notes.checknotes' =>__('notes.notes_checknotes'),
-        
-           
-       ];
-}
+    public function messages()
+    {
+        return
+        [
+            'notes.required' => __('notes.notes_required'),
+            'notes.checknotes' => __('notes.notes_checknotes'),
+
+        ];
+    }
 }

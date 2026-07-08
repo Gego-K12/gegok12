@@ -7,29 +7,29 @@
 
 namespace App\Http\Controllers\Payroll;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Payroll\PayrollSalaryRequest;
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use App\Http\Requests\Payroll\SalaryUpdateRequest;
 use App\Http\Resources\OwnershipMemberResource;
-use App\Http\Resources\Payroll\SalaryResource;
 use App\Http\Resources\Payroll\SalaryListResource;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
+use App\Http\Resources\Payroll\SalaryResource;
 use App\Models\PayrollTemplate;
-use App\Models\SalaryItem;
 use App\Models\Salary;
+use App\Models\SalaryItem;
 use App\Models\User;
 use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Log;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 class PayrollSalaryController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index()
     {
@@ -40,13 +40,14 @@ class PayrollSalaryController extends Controller
     {
         $salary = Salary::where('school_id', Auth::user()->school_id)->with('user')->orderby('id', 'desc')->paginate(20);
         $salary = SalaryListResource::collection($salary);
+
         return $salary;
     }
 
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create()
     {
@@ -60,14 +61,15 @@ class PayrollSalaryController extends Controller
         $template = PayrollTemplate::where([['status', 1], ['school_id', Auth::user()->school_id]])->get();
         $array['staff'] = OwnershipMemberResource::collection($staff);
         $array['template'] = $template;
+
         return $array;
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param  Request  $request
+     * @return Response
      */
     public function store(PayrollSalaryRequest $request)
     {
@@ -82,10 +84,10 @@ class PayrollSalaryController extends Controller
             $salary->effective_date = $request->effective_date;
             $salary->save();
             for ($i = 0; $i < $request->payrollscount; $i++) {
-                $amount = 'amount' . $i;
-                $template_item = 'template_item' . $i;
-                $category_id = 'category_id' . $i;
-                $category_value = 'category_value' . $i;
+                $amount = 'amount'.$i;
+                $template_item = 'template_item'.$i;
+                $category_id = 'category_id'.$i;
+                $category_value = 'category_value'.$i;
                 $salaryitem = new SalaryItem;
                 $salaryitem->salary_id = $salary->id;
                 $salaryitem->template_item_id = $request->$template_item;
@@ -97,15 +99,14 @@ class PayrollSalaryController extends Controller
                 $salaryitem->save();
             }
 
-
             $res['success'] = 'Salary added successfully';
 
             \DB::commit();
+
             return $res;
         } catch (Exception $e) {
             \DB::rollBack();
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -138,17 +139,16 @@ class PayrollSalaryController extends Controller
             $request->$category_value
         );
 
-        $el = new ExpressionLanguage();
+        $el = new ExpressionLanguage;
 
         return $el->evaluate($expression);
     }
-
 
     /**
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit($id)
     {
@@ -163,13 +163,12 @@ class PayrollSalaryController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(SalaryUpdateRequest $request, $id)
     {
-        // dd($request->all());
         \DB::beginTransaction();
         try {
             $salary = Salary::find($id);
@@ -181,10 +180,10 @@ class PayrollSalaryController extends Controller
             $salary->save();
             $salary->salaryitems()->delete();
             for ($i = 0; $i < $request->payrollscount; $i++) {
-                $amount = 'amount' . $i;
-                $template_item = 'template_item' . $i;
-                $category_id = 'category_id' . $i;
-                $category_value = 'category_value' . $i;
+                $amount = 'amount'.$i;
+                $template_item = 'template_item'.$i;
+                $category_id = 'category_id'.$i;
+                $category_value = 'category_value'.$i;
                 $salaryitem = new SalaryItem;
                 $salaryitem->salary_id = $salary->id;
                 $salaryitem->template_item_id = $request->$template_item;
@@ -198,11 +197,11 @@ class PayrollSalaryController extends Controller
             $res['success'] = 'Salary updated successfully';
 
             \DB::commit();
+
             return $res;
         } catch (Exception $e) {
             \DB::rollBack();
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -210,7 +209,7 @@ class PayrollSalaryController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy($id)
     {
@@ -222,6 +221,7 @@ class PayrollSalaryController extends Controller
         $salary->salaryitems()->delete();
         $salary->delete();
         $res['message'] = 'Salary deleted successfully';
+
         // }
         return $res;
     }

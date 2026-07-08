@@ -1,13 +1,16 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
  */
+
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class StudentParentLink
@@ -22,15 +25,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property \DateTime $created_at
  * @property \DateTime $updated_at
  * @property \DateTime $deleted_at
- * @property-read \App\Models\User $userParent
- * @property-read \App\Models\User $userStudent
+ * @property-read User $userParent
+ * @property-read User $userStudent
+ *
  * @mixin \Eloquent
  */
 class StudentParentLink extends Model
 {
+    use HasFactory;
     //
     use SoftDeletes;
-    use HasFactory;
 
     /**
      * The attributes that should be mutated to dates.
@@ -52,26 +56,26 @@ class StudentParentLink extends Model
      * @var array
      */
     protected $fillable = [
-        'school_id','parent_id','student_id','status'
+        'school_id', 'parent_id', 'student_id', 'status',
     ];
 
     /**
      * Get the parent user for this relationship.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function userParent()
     {
-    	return $this->belongsTo('App\Models\Users\ParentUser','parent_id')->where('usergroup_id',7);
+        return $this->belongsTo('App\Models\Users\ParentUser', 'parent_id')->where('usergroup_id', 7);
     }
 
     /**
      * Get the student user for this relationship.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function userStudent()
     {
-    	return $this->belongsTo('App\Models\User','student_id')->where('usergroup_id',6);
+        return $this->belongsTo('App\Models\User', 'student_id')->where('usergroup_id', 6);
     }
 }

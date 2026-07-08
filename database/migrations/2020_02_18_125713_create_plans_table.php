@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreatePlansTable extends Migration
 {
@@ -20,7 +20,7 @@ class CreatePlansTable extends Migration
             $table->text('display_name');
             $table->integer('order')->default(1);
             $table->boolean('is_active')->default(1);
-            $table->double('amount',10,2)->default(0);
+            $table->double('amount', 10, 2)->default(0);
             $table->integer('no_of_members')->nullable();
             $table->integer('no_of_events')->nullable();
             $table->integer('no_of_folders')->nullable()->comment('Gallery');

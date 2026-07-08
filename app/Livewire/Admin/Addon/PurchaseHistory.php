@@ -2,14 +2,15 @@
 
 namespace App\Livewire\Admin\Addon;
 
-use Livewire\Component;
-use Illuminate\Support\Facades\Validator;
 use App\Traits\HandlesGuzzleRequests;
-use Livewire\WithFileUploads;
-use GuzzleHttp\Client;
-use Exception;
-use Log;
 use Auth;
+use Exception;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\View\View;
+use Livewire\Component;
+use Livewire\TemporaryUploadedFile;
+use Livewire\WithFileUploads;
+use Log;
 
 /**
  * Class PurchaseHistory
@@ -22,8 +23,6 @@ use Auth;
  * - Displaying purchase details
  * - Uploading payment attachments
  * - Pagination navigation
- *
- * @package App\Livewire\Admin\Addon
  */
 class PurchaseHistory extends Component
 {
@@ -33,7 +32,7 @@ class PurchaseHistory extends Component
     /**
      * Authenticated user instance.
      *
-     * @var \Illuminate\Contracts\Auth\Authenticatable|null
+     * @var Authenticatable|null
      */
     public $user;
 
@@ -56,7 +55,7 @@ class PurchaseHistory extends Component
     /**
      * Uploaded attachment image file.
      *
-     * @var \Livewire\TemporaryUploadedFile|null
+     * @var TemporaryUploadedFile|null
      */
     public $image;
 
@@ -94,15 +93,15 @@ class PurchaseHistory extends Component
      * Passes purchase history data and pagination
      * details to the Blade view.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function render()
     {
         return view('livewire.admin.addon.purchase-history', [
             'purchase_history_lists' => $this->purchase_histories['data'],
-            'contact_detail'         => $this->purchase_histories['contact'],
-            'pagination'             => [
-                'meta'  => $this->purchase_histories['meta'] ?? [],
+            'contact_detail' => $this->purchase_histories['contact'],
+            'pagination' => [
+                'meta' => $this->purchase_histories['meta'] ?? [],
                 'links' => $this->purchase_histories['links'] ?? [],
             ],
         ]);
@@ -111,18 +110,18 @@ class PurchaseHistory extends Component
     /**
      * Fetch purchase history data from external API.
      *
-     * @param int $page Current pagination page
+     * @param  int  $page  Current pagination page
      * @return array|null
      */
     public function getPurchaseHistory($page)
     {
-        $purchase_history_url = env('ADDON_API_URL') . '/api/addon/purchases';
+        $purchase_history_url = env('ADDON_API_URL').'/api/addon/purchases';
 
         try {
             $response = $this->guzzleGet($purchase_history_url, [
-                'email'       => $this->user->email,
+                'email' => $this->user->email,
                 'domain_name' => request()->getHost(),
-                'page'        => $page,
+                'page' => $page,
             ]);
 
             return $response;
@@ -135,7 +134,7 @@ class PurchaseHistory extends Component
     /**
      * Open attachment upload modal for a specific purchase.
      *
-     * @param int|string $purchase_history_id
+     * @param  int|string  $purchase_history_id
      * @return void
      */
     public function openUploadModal($purchase_history_id)
@@ -160,11 +159,11 @@ class PurchaseHistory extends Component
 
         try {
             if ($this->image) {
-                $paymentUrl = env('ADDON_API_URL') . '/api/update/purchase/attachment';
+                $paymentUrl = env('ADDON_API_URL').'/api/update/purchase/attachment';
 
                 $data = [
-                    'payment_id'       => $this->purchase_history_id,
-                    'attachment_file'  => $this->image,
+                    'payment_id' => $this->purchase_history_id,
+                    'attachment_file' => $this->image,
                 ];
 
                 $response = $this->guzzleImagePost($paymentUrl, $data, true);
@@ -199,7 +198,7 @@ class PurchaseHistory extends Component
      * Ensures the page number stays within valid bounds
      * and refreshes the purchase history list.
      *
-     * @param int $page
+     * @param  int  $page
      * @return void
      */
     public function goToPage($page)

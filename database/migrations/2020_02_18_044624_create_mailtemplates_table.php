@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateMailtemplatesTable extends Migration
 {
@@ -18,7 +18,7 @@ class CreateMailtemplatesTable extends Migration
             $table->text('name');
             $table->text('subject')->nullable();
             $table->text('mail_content')->nullable();
-            $table->enum('status',['active','inactive'])->default('active');
+            $table->enum('status', ['active', 'inactive'])->default('active');
             $table->timestamps();
             $table->softDeletes();
         });

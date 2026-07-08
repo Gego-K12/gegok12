@@ -152,10 +152,26 @@
                                     </span>
                                     <span class="meta-chip chip-sky" v-else-if="list.priority == 'normal'">Normal</span>
                                     <span class="meta-chip chip-green" v-else-if="list.priority == 'low'">Low priority</span>
+
+                                    <!-- Open task: not yet claimed -->
+                                    <span class="meta-chip chip-open" v-if="list.task_type == 'open' && !list.claimed_by">
+                                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:10px;height:10px;stroke:#7c3aed;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0">
+                                            <circle cx="12" cy="12" r="10"/>
+                                        </svg>
+                                        Open task
+                                    </span>
+
+                                    <!-- Open task: claimed -->
+                                    <span class="meta-chip chip-claimed" v-if="list.task_type == 'open' && list.claimed_by">
+                                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:10px;height:10px;stroke:#1e40af;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0">
+                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                                        </svg>
+                                        Claimed by {{ list.claimed_by_name }}
+                                    </span>
                                 </div>
 
                                 <!-- Progress bar -->
-                                <div class="progress-block" v-if="list.completion_count && list.total_count">
+                                <div class="progress-block" v-if="list.completion_count && list.total_count && list.task_type != 'open'">
                                     <div class="progress-info">
                                         <span>Task completion</span>
                                         <span class="progress-fraction">{{ list.completion_count }} / {{ list.total_count }}</span>
@@ -168,6 +184,21 @@
 
                             <!-- Actions -->
                             <div class="task-actions">
+
+                                <!-- Claim button: only shows for open + unclaimed tasks -->
+                                
+                                    <a href="#"
+                                    @click.prevent="claimTask(list.task_id)"
+                                    title="Claim this task"
+                                    class="act-btn act-btn-claim"
+                                    v-if="list.task_type == 'open' && !list.is_claimed && mode == 'student'"
+                                >
+                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:13px;height:13px;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round">
+                                        <path d="M20 6L9 17l-5-5"/>
+                                    </svg>
+                                    Claim
+                                </a>
+
                                 <a href="#" :title="list.reminder" class="act-btn act-btn-default">
                                     <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M347.216,301.211l-71.387-53.54V138.609c0-10.966-8.864-19.83-19.83-19.83c-10.966,0-19.83,8.864-19.83,19.83v118.978c0,6.246,2.935,12.136,7.932,15.864l79.318,59.489c3.569,2.677,7.734,3.966,11.878,3.966c6.048,0,11.997-2.717,15.884-7.952C357.766,320.208,355.981,307.775,347.216,301.211z"/>
@@ -179,15 +210,10 @@
                                         <text y=".9em" font-size="90">⏰</text>
                                     </svg>
                                 </a>
-                                <!-- <a :href="url+'/'+mode+'/task/edit/'+list.task_id" title="Edit" class="act-btn act-btn-default" v-if="list.auth_id == list.created_by">
-                                    <svg viewBox="0 0 477.873 477.873" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M392.533,238.937c-9.426,0-17.067,7.641-17.067,17.067V426.67c0,9.426-7.641,17.067-17.067,17.067H51.2c-9.426,0-17.067-7.641-17.067-17.067V85.337c0-9.426,7.641-17.067,17.067-17.067H256c9.426,0,17.067-7.641,17.067-17.067S265.426,34.137,256,34.137H51.2C22.923,34.137,0,57.06,0,85.337V426.67c0,28.277,22.923,51.2,51.2,51.2h307.2c28.277,0,51.2-22.923,51.2-51.2V256.003C409.6,246.578,401.959,238.937,392.533,238.937z"/>
-                                        <path d="M458.742,19.142c-12.254-12.256-28.875-19.14-46.206-19.138c-17.341-0.05-33.979,6.846-46.199,19.149L141.534,243.937c-1.865,1.879-3.272,4.163-4.113,6.673l-34.133,102.4c-2.979,8.943,1.856,18.607,10.799,21.585c1.735,0.578,3.552,0.873,5.38,0.875c1.832-0.003,3.653-0.297,5.393-0.87l102.4-34.133c2.515-0.84,4.8-2.254,6.673-4.13l224.802-224.802C484.25,86.023,484.253,44.657,458.742,19.142z"/>
-                                    </svg>
-                                </a> -->
-                                 <!-- Admin & Principal -->
-                                <a
-                                    v-if="mode == 'admin' || mode == 'principal' || mode == 'teacher'"
+
+                                <!-- Admin & Principal -->
+                                
+                                    <a v-if="mode == 'admin' || mode == 'principal' || mode == 'teacher'"
                                     :href="url+'/'+mode+'/task/view/'+list.task_id"
                                     title="View"
                                     class="act-btn act-btn-default"
@@ -199,9 +225,8 @@
                                 </a>
 
                                 <!-- Remaining Users -->
-                                <a
-                                    v-else
-                                    href="#"
+                                
+                                    <a href="#" v-else
                                     @click.prevent="showModal(list.task_id)"
                                     title="View"
                                     class="act-btn act-btn-default"
@@ -211,7 +236,7 @@
                                         <circle cx="12" cy="12" r="3"></circle>
                                     </svg>
                                 </a>
-                                  
+
                                 <a href="#" @click.prevent="deleteTask(list.task_id)" title="Delete" class="act-btn act-btn-danger" v-if="list.auth_id == list.created_by">
                                     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;stroke:#6b7280;stroke-width:2;stroke-linecap:round;stroke-linejoin:round">
                                         <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
@@ -291,6 +316,13 @@
                                 <span class="modal-field-label">Due Date</span>
                                 <span class="modal-field-value">{{ task.task_date }}</span>
                             </div>
+                            <div class="modal-field" v-if="task.task_type == 'open'">
+                                <span class="modal-field-label">Claim Status</span>
+                                <span class="modal-field-value">
+                                    <span v-if="task.claimed_by">Claimed by {{ task.claimed_by_name }}</span>
+                                    <span v-else>Unclaimed</span>
+                                </span>
+                            </div>
                             <div class="modal-field" style="border-bottom:none">
                                 <span class="modal-field-label">Reminder On</span>
                                 <span class="modal-field-value">{{ task.reminder_date }}</span>
@@ -341,6 +373,7 @@
             getlist() {
                 axios.get('/' + this.mode + '/task/list?status=' + this.status + '&type=' + this.type + '&search=' + this.search).then(response => {
                     this.tasks = response.data;
+                    
                 });
             },
 
@@ -406,6 +439,18 @@
                 this.success = null;
                 axios.post('/' + this.mode + '/task/snooze/' + id).then(response => {
                     this.success = response.data.success;
+                }).catch(error => {
+                    this.errors = error.response.data.errors;
+                });
+            },
+
+            // --- NEW: claim an open task ---
+            claimTask(id) {
+                this.errors = [];
+                this.success = null;
+                axios.post('/' + this.mode + '/task/claim/' + id).then(response => {
+                    this.success = response.data.success;
+                    this.getlist();
                 }).catch(error => {
                     this.errors = error.response.data.errors;
                 });
@@ -769,6 +814,8 @@
 .chip-amber   { background: #fef3c7;  color: #92400e; }
 .chip-sky     { background: #e0f2fe;  color: #075985; }
 .chip-green   { background: #dcfce7;  color: #166534; }
+.chip-open    { background: #f3e8ff;  color: #7c3aed; }
+.chip-claimed { background: #dbeafe;  color: #1e40af; }
 
 /* ── Progress ──────────────────────────────────────────────── */
 .progress-block { margin-top: 10px; }
@@ -801,12 +848,9 @@
 .task-actions {
     display: flex;
     align-items: center;
-    gap: 2px;
+    gap: 4px;
     flex-shrink: 0;
-    opacity: 0;
-    transition: opacity 0.15s;
 }
-.task-row:hover .task-actions { opacity: 1; }
 
 .act-btn {
     display: flex;
@@ -815,10 +859,13 @@
     width: 30px;
     height: 30px;
     border-radius: 7px;
-    transition: background 0.15s;
     text-decoration: none;
     cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s, background 0.15s;
 }
+.task-row:hover .act-btn { opacity: 1; }
+
 .act-btn svg {
     width: 14px;
     height: 14px;
@@ -828,6 +875,22 @@
 .act-btn-default:hover svg { fill: #374151; }
 .act-btn-danger:hover { background: #fee2e2; }
 .act-btn-danger:hover svg { stroke: #dc2626 !important; }
+
+/* Claim button always visible (not hover-only) since it's an important call to action */
+.act-btn-claim {
+    opacity: 1 !important;
+    width: auto;
+    height: 30px;
+    padding: 0 12px;
+    gap: 5px;
+    background: #7c3aed;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.act-btn-claim svg { fill: none; }
+.act-btn-claim:hover { background: #6d28d9; }
 
 /* ── Empty states ──────────────────────────────────────────── */
 .task-empty {

@@ -1,26 +1,30 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
  */
+
 namespace App\Http\Controllers\Teacher;
 
-use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\ActivityLog;
+use App\Services\ActivityLogReaderService;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 
 class ActivityLogController extends Controller
 {
+    public function __construct(protected ActivityLogReaderService $activityLogReader) {}
+
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index()
     {
-        $activitylog = ActivityLog::with('user')->where('causer_id',Auth::id())->orderby('id','desc')->paginate(10);
-       
-        return view('/teacher/activity_log/show',[ 'activitylog' => $activitylog ]);
+        return view('/teacher/activity_log/show', [
+            'activitylog' => $this->activityLogReader->forUser(Auth::id()),
+        ]);
     }
 }

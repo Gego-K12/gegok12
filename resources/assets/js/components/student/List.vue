@@ -290,113 +290,187 @@
             </div>
         </div>
         <div v-if="this.tab == 'group'" class="modal modal-mask">
-    <div class="modal-wrapper px-4">
-        <div class="modal-container w-full max-w-md px-8 mx-auto">
-
-            <div class="modal-header flex justify-between items-center">
-                <h2>Add Students To Group</h2>
-
+    <div class="modal-wrapper px-4" @click.self="closeModal()">
+        <div class="modal-container w-full max-w-md mx-auto bg-white rounded-xl shadow-2xl overflow-hidden">
+            <!-- Header -->
+            <div class="modal-header flex justify-between items-center px-6 py-4 border-b border-gray-100 bg-gray-50">
+                <h2 class="text-lg font-semibold text-gray-800">Add Students To Group</h2>
                 <button
-                    class="modal-default-button text-2xl py-1"
+                    class="modal-default-button text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-full w-8 h-8 flex items-center justify-center text-xl transition-colors"
                     @click="closeModal()"
                 >
                     &times;
                 </button>
             </div>
 
-            <div class="modal-body">
-
-                <label class="tw-form-label">Select Group</label>
-
+            <!-- Body -->
+            <div class="modal-body px-6 py-5">
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                    Select Group
+                </label>
                 <select
-                    class="tw-form-control w-full"
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-shadow"
                     v-model="group_id"
                 >
                     <option value="">Select Group</option>
-
                     <option
                         v-for="group in groups"
                         :key="group.id"
                         :value="group.id"
                     >
-                        {{ group.group_name }}
+                        {{ group.group_name ? group.group_name.replace(/\b\w/g, char => char.toUpperCase()) : '' }}
                     </option>
-
                 </select>
 
                 <span
                     v-if="errors.group_id"
-                    class="text-red-500 text-xs font-semibold"
+                    class="text-red-500 text-xs font-medium mt-1.5 block"
                 >
                     {{ errors.group_id[0] }}
                 </span>
-
                 <span
                     v-if="errors.selectedUsers"
-                    class="text-red-500 text-xs font-semibold block mt-2"
+                    class="text-red-500 text-xs font-medium block mt-2"
                 >
                     {{ errors.selectedUsers[0] }}
                 </span>
-
             </div>
 
-
-            <div class="my-6">
-                <a
-                    href="#"
-                    class="btn btn-submit blue-bg text-white rounded px-3 py-1 mr-3 text-sm font-medium"
+            <!-- Footer -->
+            <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+                <button
+                    class="px-4 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
+                    @click="closeModal()"
+                >
+                    Cancel
+                </button>
+                <button
+                    class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition-colors"
                     @click="submitGroup()"
                 >
                     Update Group
-                </a>
+                </button>
             </div>
-
         </div>
     </div>
 </div>
 <div v-if="this.tab == 'tag'" class="modal modal-mask">
-    <div class="modal-wrapper px-4">
-        <div class="modal-container w-full max-w-md px-8 mx-auto">
+    <div class="modal-wrapper px-4" @click.self="closeModal()">
+        <div class="modal-container w-full max-w-md mx-auto bg-white rounded-xl shadow-2xl overflow-hidden">
 
-            <div class="modal-header flex justify-between items-center">
-                <h2>Add Tag To Students</h2>
-
+            <!-- Header -->
+            <div class="modal-header flex justify-between items-center px-6 py-4 border-b border-gray-100 bg-gray-50">
+                <div class="flex items-center gap-2">
+                    <div class="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center">
+                        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-5 5a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"/>
+                        </svg>
+                    </div>
+                    <h2 class="text-lg font-semibold text-gray-800">Add Tag To Students</h2>
+                </div>
                 <button
-                    class="modal-default-button text-2xl py-1"
+                    class="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-200 hover:text-gray-600 transition-colors text-xl"
                     @click="closeModal()"
                 >
                     &times;
                 </button>
             </div>
 
-            <div class="modal-body">
+            <!-- Body -->
+            <div class="modal-body px-6 py-5 space-y-4">
 
-                <label class="tw-form-label">Tag Name</label>
+                <!-- Existing Tag Select -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+                        Select Existing Tag
+                    </label>
+                    <select
+                        v-model="tag_name"
+                        class="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition-all appearance-none"
+                        style="background-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 fill=%22none%22 viewBox=%220 0 20 20%22><path stroke=%22%236b7280%22 stroke-width=%221.5%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 d=%22M6 8l4 4 4-4%22/></svg>'); background-repeat: no-repeat; background-position: right 0.7rem center; background-size: 1.2em; padding-right: 2.5rem;"
+                    >
+                        <option value="">— Choose a tag —</option>
+                        <option v-for="tag in tags" :key="tag.id" :value="tag.tag_name">
+                            {{ tag.tag_name }}
+                        </option>
+                    </select>
+                </div>
 
-                <input
-                    type="text"
-                    class="tw-form-control w-full"
-                    v-model="tag_name"
-                    placeholder="Enter Tag Name"
-                >
+                <!-- Divider with OR -->
+                <div class="flex items-center gap-3">
+                    <div class="flex-1 h-px bg-gray-100"></div>
+                    <span class="text-xs font-medium text-gray-400">OR</span>
+                    <div class="flex-1 h-px bg-gray-100"></div>
+                </div>
 
+                <!-- Create New Tag Toggle -->
+                <div>
+                    <button
+                        type="button"
+                        @click="showNewTag = !showNewTag"
+                        class="w-full flex items-center justify-between text-xs font-semibold text-gray-600 px-3 py-2 rounded-lg border border-dashed border-gray-300 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600 transition-all"
+                    >
+                        <span class="flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            Create a new tag
+                        </span>
+                        <svg
+                            class="w-4 h-4 transition-transform"
+                            :class="showNewTag ? 'rotate-180' : ''"
+                            fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+                        >
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+
+                    <transition name="slide-down">
+                        <div v-if="showNewTag" class="mt-2">
+                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+                                Tag Name
+                            </label>
+                            <input
+                                type="text"
+                                v-model="new_tag_name"
+                                placeholder="e.g. Needs Extra Support"
+                                class="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 text-gray-700 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition-all"
+                            />
+                        </div>
+                    </transition>
+                </div>
+
+                <!-- Validation errors -->
                 <span
                     v-if="errors.tag_name"
-                    class="text-red-500 text-xs font-semibold"
+                    class="text-red-500 text-xs font-medium block"
                 >
                     {{ errors.tag_name[0] }}
                 </span>
-
+                <span
+                    v-if="errors.selectedUsers"
+                    class="text-red-500 text-xs font-medium block"
+                >
+                    {{ errors.selectedUsers[0] }}
+                </span>
             </div>
 
-            <div class="my-6">
-                <a
-                    href="#"
-                    class="btn btn-submit blue-bg text-white rounded px-3 py-1"
+            <!-- Footer -->
+            <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+                <button
+                    type="button"
+                    class="px-4 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
+                    @click="closeModal()"
+                >
+                    Cancel
+                </button>
+                <button
+                    type="button"
+                    class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition-colors"
                     @click="submitTag()"
                 >
                     Save Tag
-                </a>
+                </button>
             </div>
 
         </div>
@@ -452,6 +526,9 @@
                 groups: [],
                 group_id: '',
                 tag_name: '',
+                tags: [],
+                new_tag_name: '',
+                showNewTag: false,
             }
         },
 
@@ -637,18 +714,59 @@
                 }
                 if(this.selectedUsersCount > 0)
                 {
-                    alert(value);
+                   
                     this.tab = value;
 
                     if(value == 'group')
                     {
                         this.getGroups();
                     }
+                    if(value == 'tag')
+                    {
+                        this.getTags();
+                    }
                 }
                 else
                 {
                   alert("Select Students")
                 }
+            },
+            getTags()
+            {
+                axios.get('/admin/student-tags')
+                .then(response => {
+                    this.tags = response.data.tags;
+                })
+                .catch(error => {
+                    console.log('ERROR', error.response);
+                });
+            },
+            submitTag()
+            {
+                this.errors = [];
+                this.success = null;
+
+                const name = this.new_tag_name.trim() || this.tag_name;
+
+                if (!name) {
+                    this.errors = { tag_name: ["Please select or enter a tag name."] };
+                    return;
+                }
+
+                axios.post('/admin/tags/add-students', {
+                    tag_name: name,
+                    selectedUsers: this.selectedUsers,
+                }).then(response => {
+
+                    this.success = response.data.message;
+                    this.tab = 0;
+                    window.location.reload();
+
+                }).catch(error => {
+
+                    this.errors = error.response.data.errors;
+
+                });
             },
             getGroups()
             {
@@ -789,30 +907,13 @@
 
                 });
             },
-            submitTag()
-            {
-                this.errors = [];
-                this.success = null;
-
-                axios.post('/admin/tags/add-students', {
-                    tag_name: this.tag_name,
-                    selectedUsers: this.selectedUsers,
-                }).then(response => {
-
-                    this.success = response.data.message;
-                    this.tab = 0;
-                    window.location.reload();
-
-                }).catch(error => {
-
-                    this.errors = error.response.data.errors;
-
-                });
-            },
 
             closeModal()
             {
                 this.tab = 0;
+                this.tag_name = '';
+                this.new_tag_name = '';
+                this.showNewTag = false;
             },
 
             addNotify(e)
@@ -972,4 +1073,52 @@
   {
     color:red;
   }
+  .modal-mask {
+    position: fixed;
+    z-index: 9998;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    transition: opacity 0.2s ease;
+}
+
+.modal-wrapper {
+    margin: auto;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.modal-container {
+    animation: modal-pop 0.2s ease-out;
+}
+
+@keyframes modal-pop {
+    from {
+        opacity: 0;
+        transform: scale(0.96) translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+.slide-down-enter-active,
+.slide-down-leave-active {
+  transition: all 0.2s ease;
+  overflow: hidden;
+}
+.slide-down-enter-from,
+.slide-down-leave-to {
+  opacity: 0;
+  max-height: 0;
+}
+.slide-down-enter-to,
+.slide-down-leave-from {
+  opacity: 1;
+  max-height: 100px;
+}
 </style>

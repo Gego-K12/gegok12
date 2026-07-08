@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
@@ -6,12 +7,12 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\AcademicYear;
 use App\Helpers\SiteHelper;
+use App\Http\Controllers\Controller;
+use App\Models\AcademicYear;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * Class NavigationController
@@ -19,8 +20,6 @@ use App\Helpers\SiteHelper;
  * Handles academic year navigation and selection for admin users.
  * Responsible for fetching academic year lists and updating
  * the currently selected academic year in cache.
- *
- * @package App\Http\Controllers\Admin
  */
 class NavigationController extends Controller
 {
@@ -56,7 +55,6 @@ class NavigationController extends Controller
      * Clears existing academic year cache values and
      * stores the newly selected academic year ID.
      *
-     * @param \Illuminate\Http\Request $request
      * @return void
      */
     public function index(Request $request)
@@ -64,9 +62,9 @@ class NavigationController extends Controller
         $academic_year_id = $request->academic_year_id;
 
         Cache::forget('academic_year');
-        Cache::forget("academic_year_for_school_" . Auth::user()->school_id);
+        Cache::forget('academic_year_for_school_'.Auth::user()->school_id);
 
-        Cache::remember("academic_year", env('CACHE_TIME'), function () use ($academic_year_id) {
+        Cache::remember('academic_year', env('CACHE_TIME'), function () use ($academic_year_id) {
             return $academic_year_id;
         });
 

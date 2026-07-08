@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateStudentAcademicsTable extends Migration
 {
@@ -26,21 +26,21 @@ class CreateStudentAcademicsTable extends Migration
             $table->string('roll_number')->nullable();
             $table->string('id_card_number')->nullable();
             $table->string('board_registration_number')->nullable();
-            $table->enum('mode_of_transport',['auto','car','city_bus','cycle','rickshaw','school_bus','taxi','walking'])->nullable();
+            $table->enum('mode_of_transport', ['auto', 'car', 'city_bus', 'cycle', 'rickshaw', 'school_bus', 'taxi', 'walking'])->nullable();
             $table->longText('transport_details')->nullable();
-            $table->enum('siblings',['yes','no'])->nullable();
+            $table->enum('siblings', ['yes', 'no'])->nullable();
             $table->string('siblings_count')->nullable();
             $table->longText('sibling_details')->nullable();
-            $table->float('height',8,2)->nullable();
-            $table->float('weight',8,2)->nullable();
+            $table->float('height', 8, 2)->nullable();
+            $table->float('weight', 8, 2)->nullable();
             $table->longText('medication_problems')->nullable();
             $table->longText('medication_needs')->nullable();
             $table->longText('medication_allergies')->nullable();
             $table->longText('food_allergies')->nullable();
             $table->longText('other_allergies')->nullable();
             $table->longText('other_medical_information')->nullable();
-            $table->enum('academic_status',['pass','fail'])->nullable();
-            $table->enum('bus_pass',['yes','no'])->nullable();
+            $table->enum('academic_status', ['pass', 'fail'])->nullable();
+            $table->enum('bus_pass', ['yes', 'no'])->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

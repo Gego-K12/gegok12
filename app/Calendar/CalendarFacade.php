@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Facade;
  * This facade provides a static interface to the
  * Calendar service registered in the Laravel service container.
  *
- * @package App\Calendar
  *
  * @method static mixed someMethod(...$arguments)
  */

@@ -2,23 +2,22 @@
 
 namespace App\Livewire\Conversations;
 
-use Livewire\Component;
 use App\Models\Message;
+use Illuminate\View\View;
+use Livewire\Component;
 
 /**
  * Class ConversationMessage
  *
  * Livewire component responsible for rendering
  * a single message within a conversation.
- *
- * @package App\Livewire\Conversations
  */
 class ConversationMessage extends Component
 {
     /**
      * Message instance to be displayed.
      *
-     * @var \App\Models\Message
+     * @var Message
      */
     public $message;
 
@@ -27,7 +26,6 @@ class ConversationMessage extends Component
      *
      * Assigns the message model instance to the component.
      *
-     * @param \App\Models\Message $message
      * @return void
      */
     public function mount(Message $message)
@@ -40,7 +38,7 @@ class ConversationMessage extends Component
      *
      * Displays the conversation message.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function render()
     {

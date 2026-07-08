@@ -7,23 +7,27 @@
 
 namespace App\Http\Controllers\Accountant;
 
+use App\Helpers\SiteHelper;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\TaskRequest;
 use App\Http\Resources\Accountant\Task as TaskResource;
 use App\Http\Resources\Teacher as TeacherResource;
 use App\Http\Resources\User as UserResource;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\DB;
-use App\Http\Requests\TaskRequest;
-use App\Models\Users\TeacherUser;
-use App\Traits\TodolistProcess;
-use App\Models\TaskAssignee;
-use Illuminate\Http\Request;
-use App\Traits\LogActivity;
-use App\Helpers\SiteHelper;
-use App\Traits\Common;
 use App\Models\Task;
+use App\Models\TaskAssignee;
 use App\Models\User;
+use App\Models\Users\TeacherUser;
+use App\Services\TaskReaderService;
+use App\Traits\Common;
+use App\Traits\LogActivity;
+use App\Traits\TodolistProcess;
 use Exception;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\View\View;
 use Log;
 
 /**
@@ -38,34 +42,34 @@ use Log;
  * - Mark tasks as completed
  * - Delete tasks
  * - Log all task-related activities
- *
- * @package App\Http\Controllers\Accountant
  */
 class TaskController extends Controller
 {
-    use TodolistProcess;
-    use LogActivity;
     use Common;
+    use LogActivity;
+    use TodolistProcess;
+
+    public function __construct(protected TaskReaderService $taskReader) {}
 
     /**
      * Retrieve tasks filtered by type and status.
      *
      * Tasks are grouped by task flag.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     public function showlist(Request $request)
     {
         $school_id = Auth::user()->school_id;
-        $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
+        $academic_year = SiteHelper::getAcademicYear($school_id);
 
-        $tasks = Task::where([
-            ['school_id', $school_id],
-            ['academic_year_id', $academic_year->id]
-        ])->ByType($request->type, Auth::id())
-          ->ByStatus($request->status)
-          ->get();
+        $tasks = $this->taskReader->listByType(
+            schoolId: $school_id,
+            academicYearId: $academic_year->id,
+            type: $request->type,
+            userId: Auth::id(),
+            status: $request->status,
+        );
 
         $tasks = TaskResource::collection($tasks)->groupby('task_flag');
 
@@ -75,19 +79,18 @@ class TaskController extends Controller
     /**
      * Return an empty task list response.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function list(Request $request)
     {
         $tasks = [];
+
         return response()->json($tasks);
     }
 
     /**
      * Mark selected tasks as completed.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return array<string, string>|null
      */
     // public function changestatus(Request $request)
@@ -117,7 +120,6 @@ class TaskController extends Controller
     //         }
     //     } catch (Exception $e) {
     //         Log::info($e->getMessage());
-    //         dd($e->getMessage());
     //     }
     // }
     public function changestatus(Request $request)
@@ -126,29 +128,26 @@ class TaskController extends Controller
 
         try {
 
-            foreach ($request->task_completed as $id)
-            {
+            foreach ($request->task_completed as $id) {
                 $assignee = TaskAssignee::where([
                     ['task_id', $id],
-                    ['user_id', Auth::id()]
+                    ['user_id', Auth::id()],
                 ])->first();
 
                 $assignee->update([
                     'status' => 'completed',
                     // 'claimed_by' => Auth::id(),
                 ]);
-                // dd($assignee);
 
                 // Check all assignees completed
                 $pendingCount = TaskAssignee::where('task_id', $assignee->task_id)
                     ->where('status', 'pending')
                     ->count();
 
-                if ($pendingCount == 0)
-                {
+                if ($pendingCount == 0) {
                     Task::where('id', $assignee->task_id)
                         ->update([
-                            'task_status' => 1
+                            'task_status' => 1,
                         ]);
                 }
 
@@ -162,7 +161,7 @@ class TaskController extends Controller
                     Auth::user(),
                     [
                         'ip' => $ip,
-                        'details' => request()->userAgent()
+                        'details' => request()->userAgent(),
                     ],
                     LOGNAME_MARK_TASK_COMPLETE,
                     $message
@@ -175,7 +174,7 @@ class TaskController extends Controller
                 'success' => $message,
             ]);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
 
             DB::rollBack();
 
@@ -183,7 +182,7 @@ class TaskController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Something went wrong'
+                'message' => 'Something went wrong',
             ], 500);
         }
     }
@@ -191,29 +190,30 @@ class TaskController extends Controller
     /**
      * Display the task listing page.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function index()
     {
         $query = \Request::getQueryString();
+
         return view('/accountant/todolist/index', ['query' => $query]);
     }
 
     /**
      * Display the task creation page.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function create()
     {
         $query = \Request::getQueryString();
+
         return view('/accountant/todolist/create', ['query' => $query]);
     }
 
     /**
      * Store a newly created task and assign users.
      *
-     * @param  \App\Http\Requests\TaskRequest  $request
      * @return array<string, string>|null
      */
     public function store(TaskRequest $request)
@@ -237,10 +237,10 @@ class TaskController extends Controller
             );
 
             $res['success'] = $message;
+
             return $res;
         } catch (Exception $e) {
             Log::info($e->getMessage());
-            dd($e->getMessage());
         }
     }
 
@@ -252,71 +252,65 @@ class TaskController extends Controller
      */
     public function show($id)
     {
-        $task = Task::where('id', $id)->first();
-        $task_assignees = TaskAssignee::where('task_id', $id)->get();
+        $task = $this->taskReader->find($id, Auth::user()->school_id);
 
-        foreach ($task_assignees as $key => $task_assignee) {
-            if ($task->type == 'teacher') {
-                $selected_teachers[$key] = $task_assignee->user_id;
-            } elseif ($task->type == 'student') {
-                $selectedUsers[$key] = $task_assignee->user_id;
-                $standardLink_id = $task_assignee->standardLink_id;
-                $class = $task_assignee->standardLink->StandardSection;
-            } elseif ($task->type == 'class') {
-                $class = $task_assignee->standardLink->StandardSection;
-            }
+        if (! $task) {
+            abort(404);
         }
 
-        $array = [];
+        $assignees = $this->taskReader->resolveAssignees($task);
+        $selected_students = null;
+        $selected_teachers = null;
 
         if ($task->type == 'student') {
-            $selected_students = User::whereIn('id', $selectedUsers)->get();
-            $selected_students = UserResource::collection($selected_students);
+            $selected_students = UserResource::collection(User::whereIn('id', $assignees['selectedUsers'])->get());
         }
-
         if ($task->type == 'teacher') {
-            $selected_teachers = TeacherUser::whereIn('id', $selected_teachers)->get();
-            $selected_teachers = TeacherResource::collection($selected_teachers);
+            $selected_teachers = TeacherResource::collection(TeacherUser::whereIn('id', $assignees['selectedTeachers'])->get());
         }
 
-        $array['task_id']           = $task->id;
-        $array['task_assignee_id']  = $task_assignee->id;
-        $array['title']             = $task->title;
-        $array['to_do_list']        = $task->to_do_list;
-        $array['task_date']         = date('d-m-Y H:i:s', strtotime($task->task_date));
-        $array['assignee_display']  = ucwords($task->type);
-        $array['assignee']          = $task->type;
-        $array['reminder_date']     = date('d-m-Y H:i:s', strtotime($task->ReminderValue));
-        $array['selectedUsers']     = $selected_students;
-        $array['standardLink_id']   = $standardLink_id;
-        $array['class']             = $class;
-        $array['teachers']          = $selected_teachers;
-
-        return $array;
+        return [
+            'task_id' => $task->id,
+            'task_assignee_id' => $assignees['lastTaskAssigneeId'],
+            'title' => $task->title,
+            'to_do_list' => $task->to_do_list,
+            'task_date' => date('d-m-Y H:i:s', strtotime($task->task_date)),
+            'assignee_display' => ucwords($task->type),
+            'assignee' => $task->type,
+            'reminder_date' => date('d-m-Y H:i:s', strtotime($task->ReminderValue)),
+            'selectedUsers' => $selected_students,
+            'standardLink_id' => $assignees['standardLinkId'],
+            'class' => $assignees['className'],
+            'teachers' => $selected_teachers,
+        ];
     }
 
     /**
      * Retrieve task data for editing.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return array<string, mixed>
      */
     public function editList(Request $request, $id)
     {
-        $task = Task::where('id', $id)->first();
-        $task_assignees = TaskAssignee::where('task_id', $id)->get();
+        $task = $this->taskReader->find($id, Auth::user()->school_id);
+
+        if (! $task) {
+            abort(404);
+        }
+
+        $assignees = $this->taskReader->resolveAssignees($task);
 
         $array = [];
 
-        $array['task_date']         = date('Y-m-d');
-        $array['task_id']           = $task->id;
-        $array['task_assignee_id']  = $task_assignee->id;
-        $array['title']             = $task->title;
-        $array['to_do_list']        = $task->to_do_list;
-        $array['task_date']         = date('d-m-Y H:i:s', strtotime($task->task_date));
-        $array['assignee']          = $task->type;
-        $array['reminder']          = $task->reminder;
+        $array['task_date'] = date('Y-m-d');
+        $array['task_id'] = $task->id;
+        $array['task_assignee_id'] = $assignees['lastTaskAssigneeId'];
+        $array['title'] = $task->title;
+        $array['to_do_list'] = $task->to_do_list;
+        $array['task_date'] = date('d-m-Y H:i:s', strtotime($task->task_date));
+        $array['assignee'] = $task->type;
+        $array['reminder'] = $task->reminder;
 
         return $array;
     }
@@ -325,27 +319,37 @@ class TaskController extends Controller
      * Show the task edit page.
      *
      * @param  int  $id
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function edit($id)
     {
-        $task = Task::where('id', $id)->first();
+        $task = $this->taskReader->find($id, Auth::user()->school_id);
+
+        if (! $task) {
+            abort(404);
+        }
+
         return view('/accountant/todolist/edit', ['task' => $task]);
     }
 
     /**
      * Update the specified task.
      *
-     * @param  \App\Http\Requests\TaskRequest  $request
      * @param  int  $id
      * @return array<string, string>|null
      */
     public function update(TaskRequest $request, $id)
     {
+        $school_id = Auth::user()->school_id;
+
+        if (! $this->taskReader->find($id, $school_id)) {
+            abort(404);
+        }
+
         try {
             $auth_id = Auth::id();
 
-            $task = $this->editTaskAssignee($request, $auth_id, $id);
+            $task = $this->editTaskAssignee($request, $auth_id, $id, $school_id);
 
             $message = trans('messages.update_success_msg', ['module' => 'Task']);
 
@@ -359,28 +363,33 @@ class TaskController extends Controller
             );
 
             $res['success'] = $message;
+
             return $res;
         } catch (Exception $e) {
             Log::info($e->getMessage());
-            dd($e->getMessage());
         }
     }
 
     /**
      * Snooze the specified task.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return array<string, string>|null
      */
     public function snooze(Request $request, $id)
     {
+        $school_id = Auth::user()->school_id;
+        $task = $this->taskReader->find($id, $school_id);
+
+        if (! $task) {
+            abort(404);
+        }
+
         try {
             $auth_id = Auth::id();
-            $task = Task::where('id', $id)->first();
 
             if ($task->snooze == 0) {
-                $task = $this->snoozeTask($request, $auth_id, $id);
+                $task = $this->snoozeTask($request, $auth_id, $id, $school_id);
 
                 $mins = env('SNOOZE_TIME') / 60;
                 $message = trans('messages.task_snooze_msg', ['mins' => $mins]);
@@ -398,10 +407,10 @@ class TaskController extends Controller
             );
 
             $res['success'] = $message;
+
             return $res;
         } catch (Exception $e) {
             Log::info($e->getMessage());
-            dd($e->getMessage());
         }
     }
 
@@ -413,8 +422,18 @@ class TaskController extends Controller
      */
     public function destroy($id)
     {
+        $task = $this->taskReader->find($id, Auth::user()->school_id);
+
+        if (! $task) {
+            abort(404);
+        }
+
         try {
-            $task = Task::where('id', $id)->first();
+            $task_assignees = TaskAssignee::where('task_id', $task->id)->get();
+            foreach ($task_assignees as $task_assignee) {
+                $task_assignee->delete();
+            }
+
             $task->delete();
 
             $message = trans('messages.delete_success_msg', ['module' => 'Task']);
@@ -429,10 +448,10 @@ class TaskController extends Controller
             );
 
             $res['success'] = $message;
+
             return $res;
         } catch (Exception $e) {
             Log::info($e->getMessage());
-            dd($e->getMessage());
         }
     }
 }

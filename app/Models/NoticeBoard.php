@@ -1,13 +1,15 @@
 <?php
+
 // SPDX-License-Identifier: MIT
 // (c) 2025 GegoSoft Technologies and GegoK12 Contributors
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Traits\Common;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\Common;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class NoticeBoard
@@ -29,17 +31,18 @@ use App\Traits\Common;
  * @property \DateTime $updated_at
  * @property \DateTime $deleted_at
  * @property string $attachment_path
- * @property-read \App\Models\School $school
- * @property-read \App\Models\BackgroundImage $backgroundimage
- * @property-read \App\Models\AcademicYear $academicYear
- * @property-read \App\Models\StandardLink $standardLink
+ * @property-read School $school
+ * @property-read BackgroundImage $backgroundimage
+ * @property-read AcademicYear $academicYear
+ * @property-read StandardLink $standardLink
+ *
  * @mixin \Eloquent
  */
 class NoticeBoard extends Model
 {
-    use SoftDeletes;
-    use HasFactory;
     use Common;
+    use HasFactory;
+    use SoftDeletes;
 
     protected $table = 'notice_board';
 
@@ -49,7 +52,7 @@ class NoticeBoard extends Model
      * @var array
      */
     protected $fillable = [
-        'school_id' , 'academic_year_id' , 'standardLink_id' , 'type' ,'title', 'publish_date', 'expire_date','description','attachment_file', 'status'
+        'school_id', 'academic_year_id', 'standardLink_id', 'type', 'title', 'publish_date', 'expire_date', 'description', 'attachment_file', 'status',
     ];
 
     /**
@@ -57,7 +60,7 @@ class NoticeBoard extends Model
      *
      * @var array
      */
-    //protected $dates = ['publish_date' , 'expire_date'];
+    // protected $dates = ['publish_date' , 'expire_date'];
 
     protected $casts = [
         'publish_date' => 'datetime',
@@ -67,41 +70,41 @@ class NoticeBoard extends Model
     /**
      * Get the school for this notice.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function school()
     {
-        return $this->belongsTo('App\Models\School','school_id');
+        return $this->belongsTo('App\Models\School', 'school_id');
     }
 
     /**
      * Get the background image for this notice.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function backgroundimage()
     {
-        return $this->belongsTo('App\Models\BackgroundImage','background_id');
+        return $this->belongsTo('App\Models\BackgroundImage', 'background_id');
     }
 
     /**
      * Get the academic year for this notice.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function academicYear()
     {
-    	return $this->belongsTo('\App\Models\AcademicYear','academic_year_id');
+        return $this->belongsTo('\App\Models\AcademicYear', 'academic_year_id');
     }
 
     /**
      * Get the standard link for this notice.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function standardLink()
     {
-    	return $this->belongsTo('\App\Models\StandardLink','standardLink_id');
+        return $this->belongsTo('\App\Models\StandardLink', 'standardLink_id');
     }
 
     /**

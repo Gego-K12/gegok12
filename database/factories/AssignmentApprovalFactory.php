@@ -2,9 +2,8 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\AssignmentApproval;
-use App\Models\Assignment;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class AssignmentApprovalFactory extends Factory
 {
@@ -13,7 +12,7 @@ class AssignmentApprovalFactory extends Factory
     public function definition()
     {
         return [
-            'status'        => $this->faker->randomElement(['pending','approved','rejected']), 
+            'status' => $this->faker->randomElement(['pending', 'approved', 'rejected']),
         ];
     }
 }

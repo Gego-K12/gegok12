@@ -1,10 +1,11 @@
 <?php
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
+
 namespace Database\Factories;
 
 use App\Models\RoleUser;
-//use Faker\Generator as Faker;
+// use Faker\Generator as Faker;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class RoleUserFactory extends Factory
@@ -14,9 +15,9 @@ class RoleUserFactory extends Factory
     public function definition()
     {
 
-	    return [
-	        //
-	    	'user_type'	=>	'App\Models\User',
-	    ];
-	}
+        return [
+            //
+            'user_type' => 'App\Models\User',
+        ];
+    }
 }

@@ -2,12 +2,12 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Validator;
-use App\Models\TeacherLeaveApplication;
-use Illuminate\Support\Facades\Auth;
 use App\Helpers\SiteHelper;
-use Carbon\Carbon;
+use App\Models\TeacherLeaveApplication;
+use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class ReceptionLeaveAddRequest extends FormRequest
 {
@@ -22,102 +22,99 @@ class ReceptionLeaveAddRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
-        Validator::extend('check_remarks',function($attribute,$value,$parameters,$validator)
-        {
-            return preg_match('/^[A-Za-z_~\-!@#\$%\^&*.,:(\)\s]+$/', $attribute) ;
+        Validator::extend('check_remarks', function ($attribute, $value, $parameters, $validator) {
+            return preg_match('/^[A-Za-z_~\-!@#\$%\^&*.,:(\)\s]+$/', $attribute);
         });
 
-        Validator::extend('check_from_date_exists',function($attribute,$value,$parameters,$validator)
-        {
+        Validator::extend('check_from_date_exists', function ($attribute, $value, $parameters, $validator) {
             $school_id = Auth::user()->school_id;
             $academic_year = SiteHelper::getAcademicYear($school_id);
 
-            $from_date = date('Y-m-d',strtotime(request('from_date')));
+            $from_date = date('Y-m-d', strtotime(request('from_date')));
             $application = TeacherLeaveApplication::where([
-                    ['user_id', request('staff_id')],
-                    ['school_id', $school_id],
-                    ['academic_year_id', $academic_year->id],
-                    ['status', '!=', 'cancelled'],
-                ])
+                ['user_id', request('staff_id')],
+                ['school_id', $school_id],
+                ['academic_year_id', $academic_year->id],
+                ['status', '!=', 'cancelled'],
+            ])
                 ->whereDate('from_date', '<=', $from_date)
                 ->whereDate('to_date', '>=', $from_date)
                 ->latest()
                 ->first();
 
-            if( $application == null)
-            {
+            if ($application == null) {
                 return true;
             }
+
             return false;
         });
 
-        Validator::extend('check_from_date',function($attribute,$value,$parameters,$validator)
-        {
+        Validator::extend('check_from_date', function ($attribute, $value, $parameters, $validator) {
             $school_id = Auth::user()->school_id;
             $academic_year = SiteHelper::getAcademicYear($school_id);
-            $start_date = date('Y-m-d H:i:s',strtotime($academic_year->start_date));
-            $end_date   = date('Y-m-d H:i:s',strtotime($academic_year->end_date));
-            $from_date = date('Y-m-d H:i:s',strtotime(request('from_date')));
+            $start_date = date('Y-m-d H:i:s', strtotime($academic_year->start_date));
+            $end_date = date('Y-m-d H:i:s', strtotime($academic_year->end_date));
+            $from_date = date('Y-m-d H:i:s', strtotime(request('from_date')));
 
-            if( ( $start_date <= $from_date ) || ( $end_date >= $from_date ) )
-            {
+            if (($start_date <= $from_date) || ($end_date >= $from_date)) {
                 return true;
             }
+
             return false;
         });
 
-        Validator::extend('check_to_date',function($attribute,$value,$parameters,$validator)
-        {
+        Validator::extend('check_to_date', function ($attribute, $value, $parameters, $validator) {
             $school_id = Auth::user()->school_id;
             $academic_year = SiteHelper::getAcademicYear($school_id);
-            $start_date = date('Y-m-d H:i:s',strtotime($academic_year->start_date));
-            $end_date   = date('Y-m-d H:i:s',strtotime($academic_year->end_date));
-            $to_date = date('Y-m-d H:i:s',strtotime(request('to_date')));
+            $start_date = date('Y-m-d H:i:s', strtotime($academic_year->start_date));
+            $end_date = date('Y-m-d H:i:s', strtotime($academic_year->end_date));
+            $to_date = date('Y-m-d H:i:s', strtotime(request('to_date')));
 
-            if( ( $start_date <= $to_date ) || ( $end_date >= $to_date ) )
-            {
+            if (($start_date <= $to_date) || ($end_date >= $to_date)) {
                 return true;
             }
+
             return false;
         });
 
         return [
             //
-            'from_date'     =>  'required|check_from_date|check_from_date_exists',
-            'to_date'       =>  'required|after:from_date|check_to_date',
-            'reason_id'     =>  'required',
-            'remarks'       =>  'nullable|check_remarks',
-            'leave_type_id' =>  'required',
-            'session'       =>  'required',
+            'from_date' => 'required|check_from_date|check_from_date_exists',
+            'to_date' => 'required|after_or_equal:from_date|check_to_date',
+            'reason_id' => 'required',
+            'remarks' => 'nullable|check_remarks',
+            'leave_type_id' => 'required',
+            'session' => 'required',
         ];
     }
+
     public function messages()
     {
         return [
             //
-            'from_date.required'                =>  'From Date is required',
+            'from_date.required' => 'From Date is required',
 
-            'from_date.check_from_date'         =>  'Enter Valid From Date',
+            'from_date.check_from_date' => 'Enter Valid From Date',
 
-            'from_date.check_from_date_exists'  =>  'Leave Request Already Exists For This Date',
+            'from_date.check_from_date_exists' => 'Leave Request Already Exists For This Date',
 
-            'to_date.required'                  =>  'To Date is required',
+            'to_date.required' => 'To Date is required',
 
-            'to_date.after'                     =>  'To Date should be greater than From date',
+            'to_date.after_or_equal' => 'To Date should be on or after From date',
 
-            'to_date.check_to_date'             =>  'Enter Valid To Date',
+            'to_date.check_to_date' => 'Enter Valid To Date',
 
-            'reason_id.required'                =>  'Reason is required',
+            'reason_id.required' => 'Reason is required',
 
-            'remarks.check_remarks'             =>  'Enter Valid Remarks',
+            'remarks.check_remarks' => 'Enter Valid Remarks',
 
-            'leave_type_id.required'            =>  'Leave Type is required',
+            'leave_type_id.required' => 'Leave Type is required',
 
-            'session.required'                  =>  'Please Select Session'
+            'session.required' => 'Please Select Session',
         ];
     }
 }

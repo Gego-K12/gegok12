@@ -1,11 +1,15 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
  */
+
 namespace App\Models\Users;
 
 use App\Models\User;
+use Gegok12\Alumni\Models\Alumniprofile;
+use Illuminate\Database\Eloquent\Builder;
 
 /**
  * Class AlumniUser
@@ -13,7 +17,8 @@ use App\Models\User;
  * Specialized User model for alumni-specific functionality.
  * Extends the base User model with alumni-focused relationships and business logic.
  *
- * @property-read \Gegok12\Alumni\Models\Alumniprofile|null $alumniprofile
+ * @property-read Alumniprofile|null $alumniprofile
+ *
  * @mixin \Eloquent
  */
 class AlumniUser extends User
@@ -21,9 +26,9 @@ class AlumniUser extends User
     /**
      * Scope to filter alumni by passing batch/year.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string $passing_session
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param  Builder  $query
+     * @param  string  $passing_session
+     * @return Builder
      */
     public function scopeByBatch($query, $passing_session)
     {
@@ -50,6 +55,7 @@ class AlumniUser extends User
                 $array[$i][] = $this->alumniprofile['grade'][$i];
             }
         }
+
         return $array;
     }
 
@@ -79,6 +85,7 @@ class AlumniUser extends User
                 }
             }
         }
+
         return $array;
     }
 
@@ -101,6 +108,7 @@ class AlumniUser extends User
                 $array[$i][] = $this->alumniprofile['job_end_month'][$i] ?? null;
             }
         }
+
         return $array;
     }
 
@@ -131,6 +139,7 @@ class AlumniUser extends User
                 }
             }
         }
+
         return $array;
     }
 

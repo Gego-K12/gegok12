@@ -19,7 +19,6 @@ use Illuminate\Support\Facades\Log;
  * - SMS_GATEWAY_API_KEY: API authentication key
  * - SMS_GATEWAY_SENDER_ID: Sender ID for SMS
  * - SMS_GATEWAY_ROUTE_NO: Route number for message prioritization
-
  */
 trait MSG91
 {
@@ -32,8 +31,8 @@ trait MSG91
      * Updates Reminder records with API response after sending.
      * Uses environment variables for API credentials.
      *
-     * @param string $content The message content to send
-     * @param string $to Mobile number(s) to send to (comma-separated for multiple)
+     * @param  string  $content  The message content to send
+     * @param  string  $to  Mobile number(s) to send to (comma-separated for multiple)
      * @return string API response from MSG91 gateway
      *
      * @throws Exception Logs exceptions without throwing
@@ -49,35 +48,35 @@ trait MSG91
             $message = urlencode($content);
 
             // Prepare POST parameters for cURL request
-            $postData = array(
-                'authkey'  => $API_KEY,
-                'mobiles'  => $to,
-                'message'  => $message,
-                'sender'   => $SENDER_ID,
-                'route'    => $ROUTE_NO,
-                'response' => $this->RESPONSE_TYPE
-            );
+            $postData = [
+                'authkey' => $API_KEY,
+                'mobiles' => $to,
+                'message' => $message,
+                'sender' => $SENDER_ID,
+                'route' => $ROUTE_NO,
+                'response' => $this->RESPONSE_TYPE,
+            ];
 
             $curl = curl_init();
 
             try {
-                curl_setopt_array($curl, array(
-                    CURLOPT_URL => "https://api.msg91.com/api/sendhttp.php?&mobiles=".$postData['mobiles']."&authkey=".$postData['authkey']."&route=".$postData['route']."&sender=".$postData['sender']."&message=".$postData['message']."&country=91",
+                curl_setopt_array($curl, [
+                    CURLOPT_URL => 'https://api.msg91.com/api/sendhttp.php?&mobiles='.$postData['mobiles'].'&authkey='.$postData['authkey'].'&route='.$postData['route'].'&sender='.$postData['sender'].'&message='.$postData['message'].'&country=91',
                     CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_ENCODING       => "",
-                    CURLOPT_MAXREDIRS      => 10,
-                    CURLOPT_TIMEOUT        => 30,
-                    CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
-                    CURLOPT_CUSTOMREQUEST  => "GET",
+                    CURLOPT_ENCODING => '',
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 30,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => 'GET',
                     CURLOPT_SSL_VERIFYHOST => 0,
                     CURLOPT_SSL_VERIFYPEER => 0,
-                ));
+                ]);
 
                 $response = curl_exec($curl);
                 $err = curl_error($curl);
 
                 if ($err) {
-                    return "cURL Error #:" . $err;
+                    return 'cURL Error #:'.$err;
                 }
 
                 // Update reminder records with SMS response
@@ -107,8 +106,8 @@ trait MSG91
      * Message format: "Welcome to GegoK12. Your OTP is : [OTP]"
      * Uses reminder API credentials from environment variables.
      *
-     * @param string $OTP The OTP code to send
-     * @param string $mobileNumber Mobile number to send OTP to
+     * @param  string  $OTP  The OTP code to send
+     * @param  string  $mobileNumber  Mobile number to send OTP to
      * @return string API response from MSG91 gateway
      *
      * @throws Exception Logs exceptions without throwing
@@ -124,35 +123,35 @@ trait MSG91
             $message = urlencode("Welcome to GegoK12. Your OTP is : $OTP");
 
             // Prepare POST parameters for API request
-            $postData = array(
-                'authkey'  => $API_KEY,
-                'mobiles'  => $mobileNumber,
-                'message'  => $message,
-                'sender'   => $SENDER_ID,
-                'route'    => $ROUTE_NO,
-                'response' => $this->RESPONSE_TYPE
-            );
+            $postData = [
+                'authkey' => $API_KEY,
+                'mobiles' => $mobileNumber,
+                'message' => $message,
+                'sender' => $SENDER_ID,
+                'route' => $ROUTE_NO,
+                'response' => $this->RESPONSE_TYPE,
+            ];
 
             $curl = curl_init();
 
             try {
-                curl_setopt_array($curl, array(
-                    CURLOPT_URL => "https://api.msg91.com/api/sendhttp.php?&mobiles=".$postData['mobiles']."&authkey=".$postData['authkey']."&route=".$postData['route']."&sender=".$postData['sender']."&message=".$postData['message']."&country=91",
+                curl_setopt_array($curl, [
+                    CURLOPT_URL => 'https://api.msg91.com/api/sendhttp.php?&mobiles='.$postData['mobiles'].'&authkey='.$postData['authkey'].'&route='.$postData['route'].'&sender='.$postData['sender'].'&message='.$postData['message'].'&country=91',
                     CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_ENCODING       => "",
-                    CURLOPT_MAXREDIRS      => 10,
-                    CURLOPT_TIMEOUT        => 30,
-                    CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
-                    CURLOPT_CUSTOMREQUEST  => "GET",
+                    CURLOPT_ENCODING => '',
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 30,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => 'GET',
                     CURLOPT_SSL_VERIFYHOST => 0,
                     CURLOPT_SSL_VERIFYPEER => 0,
-                ));
+                ]);
 
                 $response = curl_exec($curl);
                 $err = curl_error($curl);
 
                 if ($err) {
-                    return "cURL Error #:" . $err;
+                    return 'cURL Error #:'.$err;
                 }
 
                 return $response;
@@ -171,8 +170,8 @@ trait MSG91
      * Message format: "GegoK12. Message : [message_content]"
      * Uses reminder API credentials from environment variables.
      *
-     * @param string $message_content The emergency notification message
-     * @param string $mobileNumber Mobile number(s) to send to (comma-separated for multiple)
+     * @param  string  $message_content  The emergency notification message
+     * @param  string  $mobileNumber  Mobile number(s) to send to (comma-separated for multiple)
      * @return string API response from MSG91 gateway
      *
      * @throws Exception Logs exceptions without throwing
@@ -188,35 +187,35 @@ trait MSG91
             $message = urlencode("GegoK12. Message : $message_content");
 
             // Prepare POST parameters for API request
-            $postData = array(
-                'authkey'  => $API_KEY,
-                'mobiles'  => $mobileNumber,
-                'message'  => $message,
-                'sender'   => $SENDER_ID,
-                'route'    => $ROUTE_NO,
-                'response' => $this->RESPONSE_TYPE
-            );
+            $postData = [
+                'authkey' => $API_KEY,
+                'mobiles' => $mobileNumber,
+                'message' => $message,
+                'sender' => $SENDER_ID,
+                'route' => $ROUTE_NO,
+                'response' => $this->RESPONSE_TYPE,
+            ];
 
             $curl = curl_init();
 
             try {
-                curl_setopt_array($curl, array(
-                    CURLOPT_URL => "https://api.msg91.com/api/sendhttp.php?&mobiles=".$postData['mobiles']."&authkey=".$postData['authkey']."&route=".$postData['route']."&sender=".$postData['sender']."&message=".$postData['message']."&country=91",
+                curl_setopt_array($curl, [
+                    CURLOPT_URL => 'https://api.msg91.com/api/sendhttp.php?&mobiles='.$postData['mobiles'].'&authkey='.$postData['authkey'].'&route='.$postData['route'].'&sender='.$postData['sender'].'&message='.$postData['message'].'&country=91',
                     CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_ENCODING       => "",
-                    CURLOPT_MAXREDIRS      => 10,
-                    CURLOPT_TIMEOUT        => 30,
-                    CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
-                    CURLOPT_CUSTOMREQUEST  => "GET",
+                    CURLOPT_ENCODING => '',
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 30,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => 'GET',
                     CURLOPT_SSL_VERIFYHOST => 0,
                     CURLOPT_SSL_VERIFYPEER => 0,
-                ));
+                ]);
 
                 $response = curl_exec($curl);
                 $err = curl_error($curl);
 
                 if ($err) {
-                    return "cURL Error #:" . $err;
+                    return 'cURL Error #:'.$err;
                 }
 
                 return $response;

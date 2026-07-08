@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
@@ -6,17 +7,17 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Resources\Classwall\PageCategory as PageCategoryResource;
-use App\Http\Requests\Classwall\PageCategoryRequest;
-use App\Models\ClassRoomPageCategory;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
-use App\Traits\LogActivity;
 use App\Helpers\SiteHelper;
-use App\Traits\Common;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Classwall\PageCategoryRequest;
+use App\Http\Resources\Classwall\PageCategory as PageCategoryResource;
+use App\Models\ClassRoomPageCategory;
 use App\Models\User;
+use App\Traits\Common;
+use App\Traits\LogActivity;
 use Exception;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Auth;
 use Log;
 
 /**
@@ -24,14 +25,12 @@ use Log;
  *
  * Manages classroom page categories including listing
  * and creation of categories with activity logging.
- *
- * @package App\Http\Controllers\Admin
  */
 class PageCategoryController extends Controller
 {
+    use Common;
     //
     use LogActivity;
-    use Common;
 
     /**
      * Get active page categories for the current school and academic year.
@@ -39,7 +38,7 @@ class PageCategoryController extends Controller
      * Returns a resource collection of page categories
      * associated with the authenticated user's school.
      *
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @return AnonymousResourceCollection
      */
     public function list()
     {
@@ -64,23 +63,21 @@ class PageCategoryController extends Controller
      * Creates a new classroom page category for the
      * current academic year and logs the activity.
      *
-     * @param \App\Http\Requests\Classwall\PageCategoryRequest $request
      * @return array|null
      */
     public function store(PageCategoryRequest $request)
     {
         //
-        try
-        {
+        try {
             $school_id = Auth::user()->school_id;
             $academic_year = SiteHelper::getAcademicYear($school_id);
 
             $category = new ClassRoomPageCategory;
 
-            $category->school_id        = $school_id;
+            $category->school_id = $school_id;
             $category->academic_year_id = $academic_year->id;
-            $category->name             = strtolower(str_replace(' ', '_', $request->name));
-            $category->status           = 1;
+            $category->name = strtolower(str_replace(' ', '_', $request->name));
+            $category->status = 1;
 
             $category->save();
 
@@ -96,12 +93,10 @@ class PageCategoryController extends Controller
             );
 
             $res['success'] = $message;
+
             return $res;
-        }
-        catch (Exception $e)
-        {
+        } catch (Exception $e) {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 }

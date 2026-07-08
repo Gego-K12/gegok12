@@ -2,9 +2,10 @@
 
 namespace App\Livewire\Conversations;
 
-use Livewire\Component;
-use Illuminate\Support\Collection;
 use App\Models\Conversation;
+use Illuminate\Support\Collection;
+use Illuminate\View\View;
+use Livewire\Component;
 
 /**
  * Class ConversationList
@@ -17,15 +18,13 @@ use App\Models\Conversation;
  * - Initial conversation list injection
  * - Listening for real-time conversation creation events
  * - Prepending new conversations to the list
- *
- * @package App\Livewire\Conversations
  */
 class ConversationList extends Component
 {
     /**
      * Collection of conversations.
      *
-     * @var \Illuminate\Support\Collection
+     * @var Collection
      */
     public $conversations;
 
@@ -35,7 +34,6 @@ class ConversationList extends Component
      * Injects the initial conversation collection
      * into the component.
      *
-     * @param \Illuminate\Support\Collection $conversations
      * @return void
      */
     public function mount(Collection $conversations)
@@ -54,8 +52,7 @@ class ConversationList extends Component
     public function getListeners()
     {
         return [
-            'echo-private:users.' . auth()->id() . ',Conversations\\ConversationCreated'
-                => 'prependConversationFromBroadcast',
+            'echo-private:users.'.auth()->id().',Conversations\\ConversationCreated' => 'prependConversationFromBroadcast',
         ];
     }
 
@@ -65,7 +62,7 @@ class ConversationList extends Component
      * Fetches the conversation by ID and
      * adds it to the beginning of the collection.
      *
-     * @param int|string $id Conversation ID
+     * @param  int|string  $id  Conversation ID
      * @return void
      */
     public function prependConversation($id)
@@ -79,7 +76,7 @@ class ConversationList extends Component
      * Extracts conversation ID from the payload
      * and prepends the conversation to the list.
      *
-     * @param array $payload Broadcast event payload
+     * @param  array  $payload  Broadcast event payload
      * @return void
      */
     public function prependConversationFromBroadcast($payload)
@@ -92,7 +89,7 @@ class ConversationList extends Component
      *
      * Displays the conversation list.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function render()
     {

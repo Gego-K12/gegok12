@@ -25,16 +25,16 @@ class BackgroundImageRequest extends FormRequest
     {
         return [
             //
-            'bg_image'    => 'required|mimes:jpg,jpeg,png',
+            'bg_image' => 'required|mimes:jpg,jpeg,png',
         ];
     }
 
     public function messages()
     {
-        return[
-            'bg_image.required'   => 'Image is required',
-            'bg_image.mimes'      => 'Choose jpg,jpeg,png file',
-              
+        return [
+            'bg_image.required' => 'Image is required',
+            'bg_image.mimes' => 'Choose jpg,jpeg,png file',
+
         ];
     }
 }

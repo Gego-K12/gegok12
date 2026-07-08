@@ -3,10 +3,8 @@
 namespace App\Listeners;
 
 use App\Events\VerificationMailEvent;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Support\Facades\Mail;
 use App\Mail\EmailVerification;
+use Illuminate\Support\Facades\Mail;
 
 class VerificationMailEventListener
 {
@@ -23,7 +21,6 @@ class VerificationMailEventListener
     /**
      * Handle the event.
      *
-     * @param  VerificationMailEvent  $event
      * @return void
      */
     public function handle(VerificationMailEvent $event)

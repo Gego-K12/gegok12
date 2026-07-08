@@ -2,12 +2,11 @@
 
 namespace App\Http\Requests\API;
 
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Authentication;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Validator;
 
 class OTPRequest extends FormRequest
 {
@@ -28,71 +27,68 @@ class OTPRequest extends FormRequest
      */
     public function rules()
     {
-    $this->user = User::where('mobile_no', request('mobile_no'))->where('usergroup_id', request('usergroup'))->first();
-        Validator::extend('checkotp', function ($attribute, $value, $parameters, $validator) 
-        {
-            //$user = User::where('mobile_no',request('mobile_no'))->first();
-            $user=$this->user;
+        $this->user = User::where('mobile_no', request('mobile_no'))->where('usergroup_id', request('usergroup'))->first();
+        Validator::extend('checkotp', function ($attribute, $value, $parameters, $validator) {
+            // $user = User::where('mobile_no',request('mobile_no'))->first();
+            $user = $this->user;
             $otp = Authentication::where([
-                ['user_id',$user->id],
-                ['status',0],
-                ['type','reset'],
-            ])->orderBy('id','DESC')->get();
+                ['user_id', $user->id],
+                ['status', 0],
+                ['type', 'reset'],
+            ])->orderBy('id', 'DESC')->get();
 
-            if($otp[0]['token'] != request('password'))
-            {
-                return FALSE;
+            if ($otp[0]['token'] != request('password')) {
+                return false;
             }
-            return TRUE;            
+
+            return true;
         });
 
-        Validator::extend('checkotp_ip', function ($attribute, $value, $parameters, $validator) 
-        {
-            //$user = User::where('mobile_no',request('mobile_no'))->first();
-            $user=$this->user;
+        Validator::extend('checkotp_ip', function ($attribute, $value, $parameters, $validator) {
+            // $user = User::where('mobile_no',request('mobile_no'))->first();
+            $user = $this->user;
             $otp = Authentication::where([
-                ['user_id',$user->id],
-                ['status',0],
-                ['type','reset'],
-            ])->orderBy('id','DESC')->get(); 
+                ['user_id', $user->id],
+                ['status', 0],
+                ['type', 'reset'],
+            ])->orderBy('id', 'DESC')->get();
 
-            if($otp[0]['ip_address'] != $_SERVER['REMOTE_ADDR'])
-            {
-                return FALSE;
+            if ($otp[0]['ip_address'] != $_SERVER['REMOTE_ADDR']) {
+                return false;
             }
-            return TRUE;            
+
+            return true;
         });
 
-        Validator::extend('checkotp_expiry', function ($attribute, $value, $parameters, $validator) 
-        {
-           // $user = User::where('mobile_no',request('mobile_no'))->first();
-            $user=$this->user;
+        Validator::extend('checkotp_expiry', function ($attribute, $value, $parameters, $validator) {
+            // $user = User::where('mobile_no',request('mobile_no'))->first();
+            $user = $this->user;
             $otp = Authentication::where([
-                ['user_id',$user->id],
-                ['status',0],
-                ['type','reset'],
-            ])->orderBy('id','DESC')->get();
-            
-            if($otp[0]['expires_on'] < Carbon::now())
-            {
-                return FALSE;
+                ['user_id', $user->id],
+                ['status', 0],
+                ['type', 'reset'],
+            ])->orderBy('id', 'DESC')->get();
+
+            if ($otp[0]['expires_on'] < Carbon::now()) {
+                return false;
             }
-            return TRUE;            
+
+            return true;
         });
 
         return [
             'password' => 'required|checkotp|checkotp_ip|checkotp_expiry',
-            'usergroup' =>  'required',
+            'usergroup' => 'required',
         ];
     }
 
     public function messages()
     {
         return [
-            'password.required'          => 'Password Is Required',
-            'password.checkotp'          => 'Invalid Password',
-            'password.checkotp_ip'       => 'Invalid IP Address',
-            'password.checkotp_expiry'   => 'Password Expired',
+            'password.required' => 'Password Is Required',
+            'password.checkotp' => 'Invalid Password',
+            'password.checkotp_ip' => 'Invalid IP Address',
+            'password.checkotp_expiry' => 'Password Expired',
         ];
     }
 }

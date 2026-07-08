@@ -3,7 +3,6 @@
 namespace App\Conference;
 
 use Illuminate\Support\ServiceProvider;
-use App\Conference\ConferenceService;
 
 class ConferenceServiceProvider extends ServiceProvider
 {
@@ -14,8 +13,8 @@ class ConferenceServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind('conference', function() {
-            return new ConferenceService();
+        $this->app->bind('conference', function () {
+            return new ConferenceService;
         });
     }
 

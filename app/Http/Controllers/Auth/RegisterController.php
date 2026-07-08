@@ -1,31 +1,33 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
  */
+
 namespace App\Http\Controllers\Auth;
 
-use Illuminate\Foundation\Auth\RegistersUsers;
-use Illuminate\Auth\Events\Registered;
-use App\Http\Requests\RegisterRequest;
-use App\Traits\AuthenticationProcess;
-use App\Mail\AdminNotifyNewUserMail;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\DB;
+use App\Http\Requests\RegisterRequest;
+use App\Mail\AdminNotifyNewUserMail;
 use App\Mail\EmailVerification;
 use App\Models\AcademicYear;
-use App\Models\Subscription;
-use App\Models\SchoolDetail;
-use Illuminate\Support\Str;
-use App\Models\Userprofile;
 use App\Models\School;
+use App\Models\SchoolDetail;
+use App\Models\Subscription;
 use App\Models\User;
+use App\Models\Userprofile;
+use App\Traits\AuthenticationProcess;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class RegisterController extends Controller
 {
@@ -62,17 +64,15 @@ class RegisterController extends Controller
     /**
      * Create a new school and user instance after a valid registration.
      *
-     * @param  array  $data
-     * @return \App\Models\User
+     * @return User
      */
     protected function create(array $data)
     {
         DB::beginTransaction();
-        try
-        {
+        try {
             $school = $this->createSchool($data);
 
-            //$this->createSchoolDetails($school); //added in observer
+            // $this->createSchoolDetails($school); //added in observer
 
             $user = $this->createSchoolAdmin($school, $data);
 
@@ -97,11 +97,9 @@ class RegisterController extends Controller
             ]);
 
             return $user;
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
             DB::rollBack();
-            Log::error("Registration Failed");
+            Log::error('Registration Failed');
         }
     }
 
@@ -117,9 +115,9 @@ class RegisterController extends Controller
 
         $this->guard()->login($user);
 
-        if($user->mobile_verified == 0)
-        {
-            $this->createAuthentication($user,$request,'register');
+        if ($user->mobile_verified == 0) {
+            $this->createAuthentication($user, $request, 'register');
+
             return redirect('/verifyotp');
         }
 
@@ -134,178 +132,144 @@ class RegisterController extends Controller
 
     private function createSchool($data)
     {
-        try
-        {
+        try {
             $school = School::create([
-                'name'          =>  $data['school_name'],
-                'email'         =>  $data['email'],
-                'phone'         =>  $data['mobile_no'],
-                'slug'          =>  Str::slug($data['school_name'], '-'),
-                'status'        =>  "1",
-                'created_at'    =>  Carbon::now(),
-                'updated_at'    =>  Carbon::now(),
+                'name' => $data['school_name'],
+                'email' => $data['email'],
+                'phone' => $data['mobile_no'],
+                'slug' => Str::slug($data['school_name'], '-'),
+                'status' => '1',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
             ]);
 
-            Log::info('New School Created. School Id : '. $school->id. ' Name : '. $school->name );
+            Log::info('New School Created. School Id : '.$school->id.' Name : '.$school->name);
 
             return $school;
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
     private function createUserProfile(User $user)
     {
-        try
-        {
+        try {
             $userProfile = Userprofile::create([
-                'user_id'           => $user->id,
-                'school_id'         => $user->school_id,
-                'usergroup_id'      => "3",
-                'created_at'        => Carbon::now(),
-                'updated_at'        => Carbon::now(),
+                'user_id' => $user->id,
+                'school_id' => $user->school_id,
+                'usergroup_id' => '3',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
             ]);
 
-            Log::info('User Profile created '. $userProfile->id. ' for user' . $user->name);
-        }
-        catch(Exception $e)
-        {
+            Log::info('User Profile created '.$userProfile->id.' for user'.$user->name);
+        } catch (Exception $e) {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
     private function createSchoolSubscription(User $user)
     {
-        try
-        {
+        try {
             Subscription::create([
-                'school_id'     =>  $user->school_id,
-                'user_id'       =>  $user->id,
-                'plan_id'       =>  "1",
-                'status'        =>  "pending",
-                'created_at'    =>  Carbon::now(),
-                'updated_at'    =>  Carbon::now(),
+                'school_id' => $user->school_id,
+                'user_id' => $user->id,
+                'plan_id' => '1',
+                'status' => 'pending',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
             ]);
 
-            Log::info('School subscription created for School Id '. $user->school_id);
-        }
-        catch(Exception $e)
-        {
+            Log::info('School subscription created for School Id '.$user->school_id);
+        } catch (Exception $e) {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
     private function createSchoolAdmin($school, $data)
     {
-        try
-        {
+        try {
             $user = User::create([
-                'school_id'     => $school->id,
-                'usergroup_id'  => "3",
-                'name'          => $data['name'],
-                'email'         => $data['email'],
-                'mobile_no'     => $data['mobile_no'],
-                'password'      => Hash::make($data['password']),
+                'school_id' => $school->id,
+                'usergroup_id' => '3',
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'mobile_no' => $data['mobile_no'],
+                'password' => Hash::make($data['password']),
                 'email_verification_code' => Str::random(40),
-                'created_at'    => Carbon::now(),
-                'updated_at'    => Carbon::now(),
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
             ]);
 
-            Log::info('School Admin created for School Id ' . $user->school_id);
+            Log::info('School Admin created for School Id '.$user->school_id);
 
-        return $user;
-        }
-        catch(Exception $e)
-        {
+            return $user;
+        } catch (Exception $e) {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
     private function createSchoolDetails($school)
     {
-        try
-        {
-            $keys = ['school_logo', 'moto', 'affiliated_by', 'affiliation_no', 'date_of_establishment', 'board', 'landline_no', 'about_us' , 'website'];
+        try {
+            $keys = ['school_logo', 'moto', 'affiliated_by', 'affiliation_no', 'date_of_establishment', 'board', 'landline_no', 'about_us', 'website'];
 
             foreach ($keys as $key) {
                 $detail = SchoolDetail::create([
-                    'school_id' =>  $school->id,
-                    'meta_key'  =>  $key,
-                    'meta_value' => "-",
+                    'school_id' => $school->id,
+                    'meta_key' => $key,
+                    'meta_value' => '-',
                 ]);
             }
 
-            Log::info('School Details for School Id ' . $school->id);
-        }
-        catch(Exception $e)
-        {
+            Log::info('School Details for School Id '.$school->id);
+        } catch (Exception $e) {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
     private function createAcademicYear($school)
     {
-        try
-        {
+        try {
             $detail = AcademicYear::create([
-                'school_id'     =>  $school->id,
-                'name'          =>  '2020-2021',
-                'description'   =>  'Current Academic Year',
-                'start_date'    =>  '2020-06-01',
-                'end_date'      =>  '2021-05-31',
-                'status'        =>  1,
+                'school_id' => $school->id,
+                'name' => '2020-2021',
+                'description' => 'Current Academic Year',
+                'start_date' => '2020-06-01',
+                'end_date' => '2021-05-31',
+                'status' => 1,
             ]);
 
-            Log::info('Academic Year for School Id ' . $school->id);
-        }
-        catch(Exception $e)
-        {
+            Log::info('Academic Year for School Id '.$school->id);
+        } catch (Exception $e) {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
     private function sendEmailVerification(User $user)
     {
-        try
-        {
-            if (env('MAIL_STATUS') == 'on')
-            {
+        try {
+            if (env('MAIL_STATUS') == 'on') {
                 Mail::to($user->email)->queue(new EmailVerification($user));
 
                 Log::info('Verification Email Sent');
             }
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
     private function sendAdminNotifyMail(User $user)
     {
-        try
-        {
-            $admin = User::where('usergroup_id',1)->first();
-            if (env('MAIL_STATUS') == 'on')
-            {
+        try {
+            $admin = User::where('usergroup_id', 1)->first();
+            if (env('MAIL_STATUS') == 'on') {
                 Mail::to($admin->email)->queue(new AdminNotifyNewUserMail($user));
 
                 Log::info('Verification Email Sent');
             }
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 }

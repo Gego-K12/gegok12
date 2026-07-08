@@ -22,7 +22,5 @@ return [
     'profile_update' => 'Profile Updated',
     'password_update' => 'Password Updated',
     'credentials_update' => 'User credentials Updated Succesfully',
-    
-    
 
 ];

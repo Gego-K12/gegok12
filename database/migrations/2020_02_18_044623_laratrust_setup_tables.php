@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
@@ -7,7 +8,7 @@ class LaratrustSetupTables extends Migration
     /**
      * Run the migrations.
      *
-     * @return  void
+     * @return void
      */
     public function up()
     {
@@ -36,8 +37,8 @@ class LaratrustSetupTables extends Migration
             $table->foreign('role_id')->references('id')->on('roles');
             $table->integer('user_id')->unsigned();
             $table->foreign('user_id')->references('id')->on('users');
-            $table->string('user_type');  
-            $table->timestamps(); 
+            $table->string('user_type');
+            $table->timestamps();
             $table->softDeletes();
         });
 
@@ -48,8 +49,8 @@ class LaratrustSetupTables extends Migration
             $table->foreign('permission_id')->references('id')->on('permissions');
             $table->integer('user_id')->unsigned();
             $table->foreign('user_id')->references('id')->on('users');
-            $table->string('user_type');  
-            $table->timestamps(); 
+            $table->string('user_type');
+            $table->timestamps();
             $table->softDeletes();
         });
 
@@ -59,8 +60,8 @@ class LaratrustSetupTables extends Migration
             $table->integer('permission_id')->unsigned();
             $table->foreign('permission_id')->references('id')->on('permissions');
             $table->integer('role_id')->unsigned();
-            $table->foreign('role_id')->references('id')->on('roles'); 
-            $table->timestamps(); 
+            $table->foreign('role_id')->references('id')->on('roles');
+            $table->timestamps();
             $table->softDeletes();
         });
     }
@@ -68,7 +69,7 @@ class LaratrustSetupTables extends Migration
     /**
      * Reverse the migrations.
      *
-     * @return  void
+     * @return void
      */
     public function down()
     {

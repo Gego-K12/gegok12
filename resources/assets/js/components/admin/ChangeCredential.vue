@@ -1,19 +1,18 @@
 <template>
-  
+
   <div class="" >
-    
-    <div class="flex flex-wrap lg:flex-row justify-between">
+    <div class="flex flex-wrap lg:flex-row justify-between" v-if="!hideButton">
       <div class=""></div>
       <div class="flex items-center">
         <div  class="flex items-center">
           <a  href="#" class="no-underline text-white px-4 my-3 mx-1 flex items-center custom-green py-1 justify-center" @click="addModal()">
             <span class="mx-1 text-sm font-semibold">Credentials</span>
-            
-          </a> 
+
+          </a>
         </div>
       </div>
-    </div> 
-   
+    </div>
+
     <div v-if="this.tab == 1" class="modal modal-mask">
       <div class="modal-wrapper px-4">
         <div class="modal-container w-full  max-w-md px-8 mx-auto">
@@ -59,11 +58,12 @@
 
 <script>
 
+    import { bus } from "../../app";
     // import 'vue-flash-message/dist/vue-flash-message.min.css';
     // import VueFlashMessage from 'vue-flash-message';
     // Vue.use(VueFlashMessage);
   export default {
-    props:['url' , 'name'],
+    props:['url' , 'name', 'hideButton'],
     data () {
       return {
         lists:[],
@@ -137,9 +137,12 @@
     },
 
     created()
-    {   
-      this.getData();  
-     
+    {
+      this.getData();
+
+      bus.on("openChangeCredentials", () => {
+        this.addModal();
+      });
     }
   }
 </script>

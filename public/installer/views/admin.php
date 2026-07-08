@@ -1,11 +1,11 @@
 <?php
-require_once __DIR__ . '/../includes/functions.php';
+require_once __DIR__.'/../includes/functions.php';
 $timezones = getTimezones();
 
 // Get the current URL for default app URL
 $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
 $host = $_SERVER['HTTP_HOST'];
-$baseUrl = $protocol . '://' . $host;
+$baseUrl = $protocol.'://'.$host;
 // Remove /installer from the URL
 $baseUrl = str_replace('/installer', '', $baseUrl);
 ?>
@@ -52,11 +52,11 @@ $baseUrl = str_replace('/installer', '', $baseUrl);
                 <label for="timezone" class="block text-sm font-medium text-gray-700 mb-2">Timezone</label>
                 <select id="timezone" name="timezone" required
                     class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all">
-                    <?php foreach ($timezones as $value => $label): ?>
+                    <?php foreach ($timezones as $value => $label) { ?>
                     <option value="<?php echo htmlspecialchars($value); ?>" <?php echo $value === 'Asia/Kolkata' ? 'selected' : ''; ?>>
                         <?php echo htmlspecialchars($label); ?>
                     </option>
-                    <?php endforeach; ?>
+                    <?php } ?>
                 </select>
             </div>
         </div>
@@ -108,6 +108,18 @@ $baseUrl = str_replace('/installer', '', $baseUrl);
                     </p>
                 </div>
             </div>
+        </div>
+
+        <div class="bg-gray-50 border border-gray-200 rounded-xl p-4">
+            <label class="flex items-start cursor-pointer">
+                <input type="checkbox" id="share_usage_data" name="share_usage_data" value="1"
+                    class="mt-1 h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500">
+                <span class="ml-3 text-sm text-gray-700">
+                    <span class="font-medium text-gray-800">Help improve Gego K12</span> — share anonymous
+                    installation data (your domain, app version, PHP version). No school data, admin email,
+                    or personal information is ever sent. Unchecked by default; you can leave this off.
+                </span>
+            </label>
         </div>
 
         <div class="flex justify-between">

@@ -2,11 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Book;
+use App\Models\LibraryCard;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Input;
-use App\Models\LibraryCard;
-use App\Models\Book;
 
 class BookLendingRequest extends FormRequest
 {
@@ -29,57 +28,50 @@ class BookLendingRequest extends FormRequest
     {
 
         Validator::extend('check_book_code', function ($attribute, $value, $parameters, $validator) {
-            
 
-            $code=Book::where('book_code',request('book_code_no'))->exists();
-                       
-            if($code)
-            {
-              
-              return TRUE;
+            $code = Book::where('book_code', request('book_code_no'))->exists();
+
+            if ($code) {
+
+                return true;
             }
-           
-            return FALSE;              
 
-      });
+            return false;
 
+        });
 
-       Validator::extend('check_card_no', function ($attribute, $value, $parameters, $validator) {
-            
+        Validator::extend('check_card_no', function ($attribute, $value, $parameters, $validator) {
 
-            $card=LibraryCard::where('library_card_no',request('library_card_no'))->exists();
-                       
-            if($card)
-            {
-              
-              return TRUE;
+            $card = LibraryCard::where('library_card_no', request('library_card_no'))->exists();
+
+            if ($card) {
+
+                return true;
             }
-           
-            return FALSE;              
 
-      });
-        
+            return false;
+
+        });
 
         return [
-            
-            'book_code_no'   => 'required|check_book_code',
-            'library_card_no'  => 'required|check_card_no',
-            'issue_date'=>'required',
-           
+
+            'book_code_no' => 'required|check_book_code',
+            'library_card_no' => 'required|check_card_no',
+            'issue_date' => 'required',
+
         ];
     }
 
     public function messages()
     {
-        return[
-            
-            'book_code_no.required'     =>  'Book Code is required',
-            'book_code_no.check_book_code'   =>  'Enter Valid Book Code',
-            'library_card_no.required'     => 'Card No is Required',
-            'library_card_no.check_card_no'     => 'Enter Valid Card Number',
-            'issue_date.required'=>'Select Issue Date',
-           
-           
+        return [
+
+            'book_code_no.required' => 'Book Code is required',
+            'book_code_no.check_book_code' => 'Enter Valid Book Code',
+            'library_card_no.required' => 'Card No is Required',
+            'library_card_no.check_card_no' => 'Enter Valid Card Number',
+            'issue_date.required' => 'Select Issue Date',
+
         ];
     }
 }

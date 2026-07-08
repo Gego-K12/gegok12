@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateNoticeBoardTable extends Migration
 {
@@ -23,7 +23,7 @@ class CreateNoticeBoardTable extends Migration
             $table->foreign('standardLink_id')->references('id')->on('standards_link');
             $table->integer('background_id')->unsigned()->nullable();
             $table->foreign('background_id')->references('id')->on('background_images');
-            $table->enum('type',['class','school','teacher']);
+            $table->enum('type', ['class', 'school', 'teacher']);
             $table->string('title');
             $table->dateTime('publish_date')->nullable();
             $table->dateTime('expire_date')->nullable();

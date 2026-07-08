@@ -1,16 +1,14 @@
 <?php
+
 // SPDX-License-Identifier: MIT
 // (c) 2025 GegoSoft Technologies and GegoK12 Contributors
 
 namespace App\Models;
 
-use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\MediaLibrary\HasMedia\HasMedia;
-use Illuminate\Database\Eloquent\Model;
-use Spatie\MediaLibrary\Models\Media;
 use App\Traits\Common;
-use App\Models\PostTag;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * Class Tag
@@ -22,8 +20,9 @@ use App\Models\PostTag;
  * @property \DateTime $created_at
  * @property \DateTime $updated_at
  * @property int $tagCount
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Post[] $posts
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\PostTag[] $posttag
+ * @property-read Collection|Post[] $posts
+ * @property-read Collection|PostTag[] $posttag
+ *
  * @mixin \Eloquent
  */
 class Tag extends Model
@@ -38,7 +37,6 @@ class Tag extends Model
      * @var string
      */
     protected $table = 'tags';
-
 
     /**
      * The attributes that are mass assignable.
@@ -72,7 +70,7 @@ class Tag extends Model
     /**
      * Get posts with this tag.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
     public function posts()
     {
@@ -82,7 +80,7 @@ class Tag extends Model
     /**
      * Get post tags for this tag.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
     public function posttag()
     {
@@ -92,18 +90,17 @@ class Tag extends Model
     /**
      * Get count of posts with this tag.
      *
-     * @param string $tag_name
+     * @param  string  $tag_name
      * @return int
      */
     public function getTag($tag_name)
-    {//dump($tag_name);
+    {
 
-        $tag=Tag::where('tag_name',$tag_name)->first();
+        $tag = Tag::where('tag_name', $tag_name)->first();
 
-        $count=PostTag::where('tag_id',$tag->id)->count();
+        $count = PostTag::where('tag_id', $tag->id)->count();
 
         return $count;
 
     }
-
 }

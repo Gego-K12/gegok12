@@ -3,7 +3,6 @@
 namespace App\Schoolplus;
 
 use Illuminate\Support\ServiceProvider;
-use App\Schoolplus\StudentService;
 
 class StudentServiceProvider extends ServiceProvider
 {
@@ -14,8 +13,8 @@ class StudentServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind('student', function() {
-            return new StudentService();
+        $this->app->bind('student', function () {
+            return new StudentService;
         });
     }
 
@@ -24,8 +23,5 @@ class StudentServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
-    {
-       
-    }
+    public function boot() {}
 }

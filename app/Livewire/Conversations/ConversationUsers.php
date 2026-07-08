@@ -2,23 +2,22 @@
 
 namespace App\Livewire\Conversations;
 
-use Livewire\Component;
 use Illuminate\Support\Collection;
+use Illuminate\View\View;
+use Livewire\Component;
 
 /**
  * Class ConversationUsers
  *
  * Livewire component responsible for displaying
  * the list of users participating in a conversation.
- *
- * @package App\Livewire\Conversations
  */
 class ConversationUsers extends Component
 {
     /**
      * Collection of users participating in the conversation.
      *
-     * @var \Illuminate\Support\Collection
+     * @var Collection
      */
     public $users;
 
@@ -28,7 +27,6 @@ class ConversationUsers extends Component
      * Injects the collection of conversation users
      * into the component.
      *
-     * @param \Illuminate\Support\Collection $users
      * @return void
      */
     public function mount(Collection $users)
@@ -41,7 +39,7 @@ class ConversationUsers extends Component
      *
      * Displays the conversation users list.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function render()
     {

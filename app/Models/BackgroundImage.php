@@ -1,12 +1,13 @@
 <?php
+
 // SPDX-License-Identifier: MIT
 // (c) 2025 GegoSoft Technologies and GegoK12 Contributors
 
 namespace App\Models;
 
+use App\Traits\Common;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Traits\Common;
 
 /**
  * Class BackgroundImage
@@ -19,11 +20,12 @@ use App\Traits\Common;
  * @property \DateTime $updated_at
  * @property \DateTime $deleted_at
  * @property string $attachment_path
+ *
  * @mixin \Eloquent
  */
 class BackgroundImage extends Model
 {
-	use Common;
+    use Common;
     use SoftDeletes;
 
     /**

@@ -2,8 +2,9 @@
 
 namespace App\Livewire\Admin\Setting;
 
-use Livewire\Component;
 use App\Models\City;
+use Illuminate\View\View;
+use Livewire\Component;
 
 /**
  * Class CityDetail
@@ -11,8 +12,6 @@ use App\Models\City;
  * Livewire component responsible for displaying
  * detailed information of a single city
  * in the Admin Settings section.
- *
- * @package App\Livewire\Admin\Setting
  */
 class CityDetail extends Component
 {
@@ -29,7 +28,7 @@ class CityDetail extends Component
      * Assigns the city identifier received from the route
      * to the component property.
      *
-     * @param int|string $id City ID
+     * @param  int|string  $id  City ID
      * @return void
      */
     public function mount($id)
@@ -43,7 +42,7 @@ class CityDetail extends Component
      * Fetches city details based on the provided city ID
      * and passes the data to the Blade view.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function render()
     {

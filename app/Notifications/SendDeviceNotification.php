@@ -15,12 +15,13 @@ class SendDeviceNotification extends Notification implements ShouldQueue
     use Queueable;
 
     public array $data;
+
     public string $token;
 
     public function __construct(array $data, string $token)
     {
         $this->queue = 'notification';
-        $this->data  = $data;
+        $this->data = $data;
         $this->token = $token;
     }
 
@@ -32,13 +33,13 @@ class SendDeviceNotification extends Notification implements ShouldQueue
     public function toFcm($notifiable): FcmMessage
     {
         try {
-            $type    = $this->data['type'] ?? 'Notification';
+            $type = $this->data['type'] ?? 'Notification';
             $message = $this->data['message'] ?? '';
 
             return FcmMessage::create()
                 ->token($this->token)
                 ->data([
-                    'type'    => $type,
+                    'type' => $type,
                     'message' => $message,
                 ])
                 ->notification(
@@ -69,16 +70,16 @@ class SendDeviceNotification extends Notification implements ShouldQueue
         } catch (\Exception $e) {
             Log::error('FCM Notification Error', [
                 'token' => $this->token,
-                'data'  => $this->data,
+                'data' => $this->data,
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             // Optional: prevent job from crashing
             return FcmMessage::create()
                 ->token($this->token)
                 ->data([
-                    'type'    => 'Error',
+                    'type' => 'Error',
                     'message' => 'Notification failed',
                 ]);
         }

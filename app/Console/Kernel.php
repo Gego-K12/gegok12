@@ -2,6 +2,33 @@
 
 namespace App\Console;
 
+use App\Console\Commands\Addon\InstallAlumniModule;
+use App\Console\Commands\Addon\InstallCertificateModule;
+use App\Console\Commands\Addon\InstallChatModule;
+use App\Console\Commands\Addon\InstallExamModule;
+use App\Console\Commands\Addon\InstallFeeModule;
+use App\Console\Commands\Addon\InstallInventoryModule;
+use App\Console\Commands\Addon\InstallQuizModule;
+use App\Console\Commands\Addon\InstallTimetableModule;
+use App\Console\Commands\Addon\InstallTransportModule;
+use App\Console\Commands\Addon\InstallVideoroomModule;
+use App\Console\Commands\AddStandard;
+use App\Console\Commands\CheckAnniversary;
+use App\Console\Commands\CheckBirthday;
+use App\Console\Commands\CheckBirthdayReminder;
+use App\Console\Commands\CheckMail;
+use App\Console\Commands\CheckNotification;
+use App\Console\Commands\CheckSendMail;
+use App\Console\Commands\CheckSms;
+use App\Console\Commands\CheckSubscription;
+use App\Console\Commands\CheckSubscriptionExpired;
+use App\Console\Commands\CheckTask;
+use App\Console\Commands\CheckWebNotification;
+use App\Console\Commands\DataSeeder\SeedAttendance;
+use App\Console\Commands\ProcessPluginInstalls;
+use App\Console\Commands\Test\CheckEnv;
+use App\Console\Commands\Test\CheckPushNotification;
+use App\Console\Commands\Test\CheckTest;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -15,43 +42,44 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         //
 
-        //Test
-            \App\Console\Commands\Test\CheckEnv::class,
-            \App\Console\Commands\Test\CheckTest::class,
-            \App\Console\Commands\Test\CheckPushNotification::class,
+        // Test
+        CheckEnv::class,
+        CheckTest::class,
+        CheckPushNotification::class,
 
         //
-            \App\Console\Commands\CheckSubscription::class,
-            \App\Console\Commands\CheckSubscriptionExpired::class,
-            \App\Console\Commands\CheckMail::class,
-            \App\Console\Commands\CheckSms::class,
-            \App\Console\Commands\CheckBirthday::class,
-            \App\Console\Commands\CheckAnniversary::class,
-            \App\Console\Commands\CheckBirthdayReminder::class,
-            \App\Console\Commands\CheckNotification::class,
-            \App\Console\Commands\CheckWebNotification::class,
-            \App\Console\Commands\CheckSendMail::class,
-            \App\Console\Commands\CheckTask::class,
+        CheckSubscription::class,
+        CheckSubscriptionExpired::class,
+        CheckMail::class,
+        CheckSms::class,
+        CheckBirthday::class,
+        CheckAnniversary::class,
+        CheckBirthdayReminder::class,
+        CheckNotification::class,
+        CheckWebNotification::class,
+        CheckSendMail::class,
+        CheckTask::class,
 
-            \App\Console\Commands\DataSeeder\SeedAttendance::class,
+        SeedAttendance::class,
 
-            \App\Console\Commands\AddStandard::class,
-            \App\Console\Commands\Addon\InstallAlumniModule::class,
-            \App\Console\Commands\Addon\InstallCertificateModule::class,
-            \App\Console\Commands\Addon\InstallChatModule::class,
-            \App\Console\Commands\Addon\InstallExamModule::class,
-            \App\Console\Commands\Addon\InstallFeeModule::class,
-            \App\Console\Commands\Addon\InstallInventoryModule::class,
-            \App\Console\Commands\Addon\InstallQuizModule::class,
-            \App\Console\Commands\Addon\InstallTimetableModule::class,
-            \App\Console\Commands\Addon\InstallTransportModule::class,
-            \App\Console\Commands\Addon\InstallVideoroomModule::class,
+        AddStandard::class,
+        InstallAlumniModule::class,
+        InstallCertificateModule::class,
+        InstallChatModule::class,
+        InstallExamModule::class,
+        InstallFeeModule::class,
+        InstallInventoryModule::class,
+        InstallQuizModule::class,
+        InstallTimetableModule::class,
+        InstallTransportModule::class,
+        InstallVideoroomModule::class,
+
+        ProcessPluginInstalls::class,
     ];
 
     /**
      * Define the application's command schedule.
      *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
      * @return void
      */
     protected function schedule(Schedule $schedule)
@@ -60,48 +88,52 @@ class Kernel extends ConsoleKernel
         //          ->hourly();
 
         $schedule->command('gego:checksubscription')
-                 ->daily()
-                 ->withoutOverlapping();
+            ->daily()
+            ->withoutOverlapping();
 
         $schedule->command('gego:checksubscriptionexpired')
-                 ->daily()
-                 ->withoutOverlapping();
+            ->daily()
+            ->withoutOverlapping();
 
         $schedule->command('gego:checkbirthday')
-                 ->daily()
-                 ->withoutOverlapping();
-                 
-         $schedule->command('gego:checkbirthdayreminder')
-                 ->daily()
-                 ->withoutOverlapping();         
+            ->daily()
+            ->withoutOverlapping();
+
+        $schedule->command('gego:checkbirthdayreminder')
+            ->daily()
+            ->withoutOverlapping();
 
         $schedule->command('gego:checkanniversary')
-                 ->daily()
-                 ->withoutOverlapping(); 
+            ->daily()
+            ->withoutOverlapping();
 
         $schedule->command('gego:checktask')
-                 ->everyMinute()
-                 ->withoutOverlapping();
+            ->everyMinute()
+            ->withoutOverlapping();
+
+        $schedule->command('gego:processplugininstalls')
+            ->everyMinute()
+            ->withoutOverlapping();
 
         $schedule->command('gego:checknotification')
-                 ->hourly()
-                 ->withoutOverlapping();
+            ->hourly()
+            ->withoutOverlapping();
 
         $schedule->command('gego:checksms')
-                 ->hourly()
-                 ->withoutOverlapping();
+            ->hourly()
+            ->withoutOverlapping();
 
         $schedule->command('gego:checkmail')
-                 ->hourly()
-                 ->withoutOverlapping();
+            ->hourly()
+            ->withoutOverlapping();
 
         $schedule->command('gego:checksendmail')
-                 ->everyMinute()
-                 ->withoutOverlapping();
-                 
+            ->everyMinute()
+            ->withoutOverlapping();
+
         $schedule->command('gego:checkwebnotification')
-                 ->everyMinute()
-                 ->withoutOverlapping();
+            ->everyMinute()
+            ->withoutOverlapping();
     }
 
     /**

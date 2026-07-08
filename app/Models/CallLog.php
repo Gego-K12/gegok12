@@ -1,4 +1,5 @@
 <?php
+
 // SPDX-License-Identifier: MIT
 // (c) 2025 GegoSoft Technologies and GegoK12 Contributors
 
@@ -25,13 +26,14 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $entry_by
  * @property \DateTime $created_at
  * @property \DateTime $updated_at
+ *
  * @mixin \Eloquent
  */
 class CallLog extends Model
 {
     protected $table = 'call_log';
 
-     protected $fillable = [
-       'school_id','academic_year_id','call_type','calling_purpose','name','call_date','start_time','end_time','duration','description','entry_by'
+    protected $fillable = [
+        'school_id', 'academic_year_id', 'call_type', 'calling_purpose', 'name', 'call_date', 'start_time', 'end_time', 'duration', 'description', 'entry_by',
     ];
 }

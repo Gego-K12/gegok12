@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
@@ -6,24 +7,25 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Events\Notification\ClassNotificationEvent;
+use App\Events\StandardPushEvent;
+use App\Helpers\SiteHelper;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\HomeworkRequest;
 use App\Http\Resources\API\Teacher as TeacherResource;
 use App\Http\Resources\Homework as HomeworkResource;
-use App\Events\Notification\ClassNotificationEvent;
 use App\Http\Resources\Subject as SubjectResource;
-use App\Http\Requests\HomeworkRequest;
-use App\Http\Controllers\Controller;
+use App\Models\Homework;
+use App\Models\StandardLink;
+use App\Models\Teacherlink;
+use App\Traits\Common;
+use App\Traits\LogActivity;
+use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
-use App\Events\StandardPushEvent;
-use App\Models\AcademicYear;
-use Illuminate\Http\Request;
-use App\Models\StandardLink;
-use App\Traits\LogActivity;
-use App\Models\Teacherlink;
-use App\Helpers\SiteHelper;
-use App\Models\Homework;
-use App\Traits\Common;
-use Exception;
+use Illuminate\View\View;
 use Log;
 
 /**
@@ -38,13 +40,11 @@ use Log;
  * - Deleting homework
  * - Sending notifications
  * - Logging homework-related activities
- *
- * @package App\Http\Controllers\Admin
  */
 class HomeWorkController extends Controller
 {
-    use LogActivity;
     use Common;
+    use LogActivity;
 
     /**
      * Get a paginated list of homework with optional filters.
@@ -53,8 +53,7 @@ class HomeWorkController extends Controller
      * - Past homework
      * - Standard-based filtering
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @return AnonymousResourceCollection
      */
     public function showList(Request $request)
     {
@@ -82,7 +81,7 @@ class HomeWorkController extends Controller
     /**
      * Display the homework listing page.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function index()
     {
@@ -94,11 +93,12 @@ class HomeWorkController extends Controller
     /**
      * Show the homework creation page.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function create()
     {
         $standard = \Request::get('standardLink_id') ? \Request::get('standardLink_id') : '';
+
         return view('/admin/homework/create', ['standard' => $standard]);
     }
 
@@ -121,7 +121,7 @@ class HomeWorkController extends Controller
 
         $teacherlink = Teacherlink::where([
             ['school_id', $school_id],
-            ['academic_year_id', $academic_year->id]
+            ['academic_year_id', $academic_year->id],
         ])->get();
 
         $subjectlist = SubjectResource::collection($teacherlink)->groupby('standardLink_id');
@@ -143,7 +143,6 @@ class HomeWorkController extends Controller
      * - Notifications
      * - Activity logging
      *
-     * @param  \App\Http\Requests\HomeworkRequest  $request
      * @return array<string, string>|null
      */
     public function store(HomeworkRequest $request)
@@ -155,9 +154,9 @@ class HomeWorkController extends Controller
 
             $homework = new Homework;
 
-            $homework->school_id        = $school_id;
+            $homework->school_id = $school_id;
             $homework->academic_year_id = $academic_year->id;
-            $homework->standardLink_id  = $request->standardLink_id;
+            $homework->standardLink_id = $request->standardLink_id;
 
             $standardLink = StandardLink::where('id', $request->standardLink_id)->first();
 
@@ -168,7 +167,7 @@ class HomeWorkController extends Controller
 
             $file = $request->file('attachment');
             if ($file) {
-                $folder = Auth::user()->school->slug . '/homework';
+                $folder = Auth::user()->school->slug.'/homework';
                 $path = $this->uploadFile($folder, $file);
                 $homework->attachment = $path;
             }
@@ -202,6 +201,7 @@ class HomeWorkController extends Controller
             );
 
             $res['success'] = $message;
+
             return $res;
         } catch (Exception $e) {
             Log::info($e->getMessage());
@@ -212,11 +212,12 @@ class HomeWorkController extends Controller
      * Display the specified homework.
      *
      * @param  int  $id
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function show($id)
     {
         $homework = Homework::where('id', $id)->first();
+
         return view('/admin/homework/show', ['homework' => $homework]);
     }
 
@@ -224,11 +225,12 @@ class HomeWorkController extends Controller
      * Show the homework edit page.
      *
      * @param  int  $id
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function edit($id)
     {
         $homework = Homework::where('id', $id)->first();
+
         return view('/admin/homework/edit', ['homework' => $homework]);
     }
 
@@ -242,7 +244,7 @@ class HomeWorkController extends Controller
     {
         //
         $standardLink = SiteHelper::getStandardLinkList(Auth::user()->school_id);
-        $teacherlink = TeacherLink::get();
+        $teacherlink = Teacherlink::get();
 
         $subjectlist = SubjectResource::collection($teacherlink)->groupby('standardLink_id');
         $teacherlist = TeacherResource::collection($teacherlink)->groupby(['standardLink_id', 'subject_id']);
@@ -270,7 +272,6 @@ class HomeWorkController extends Controller
     /**
      * Update the specified homework.
      *
-     * @param  \App\Http\Requests\HomeworkRequest  $request
      * @param  int  $id
      * @return array<string, string>|null
      */
@@ -288,7 +289,7 @@ class HomeWorkController extends Controller
 
             $file = $request->file('attachment');
             if ($file) {
-                $folder = Auth::user()->school->slug . '/homework';
+                $folder = Auth::user()->school->slug.'/homework';
                 $path = $this->uploadFile($folder, $file);
                 $homework->attachment = $path;
             } else {
@@ -324,6 +325,7 @@ class HomeWorkController extends Controller
             );
 
             $res['success'] = $message;
+
             return $res;
         } catch (Exception $e) {
             Log::info($e->getMessage());
@@ -365,6 +367,7 @@ class HomeWorkController extends Controller
                 );
 
                 $res['success'] = $message;
+
                 return $res;
             }
 

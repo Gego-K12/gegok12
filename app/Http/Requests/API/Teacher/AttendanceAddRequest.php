@@ -2,12 +2,11 @@
 
 namespace App\Http\Requests\API\Teacher;
 
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Auth;
 use App\Helpers\SiteHelper;
 use App\Models\Attendance;
-use Carbon\Carbon;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class AttendanceAddRequest extends FormRequest
 {
@@ -28,90 +27,78 @@ class AttendanceAddRequest extends FormRequest
      */
     public function rules()
     {
-        
-        Validator::extend('check_date',function($attribute,$value,$parameters,$validator)
-        {   
-            $academic_year  = SiteHelper::getAcademicYear(Auth::user()->school_id);
-            $start_date = date('Y-m-d',strtotime($academic_year->start_date));
-            $date = date('Y-m-d',strtotime(request('Date')));
 
-            if( ( $date <= date('Y-m-d') ) && ( $date >= $start_date ) )
-            {
+        Validator::extend('check_date', function ($attribute, $value, $parameters, $validator) {
+            $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
+            $start_date = date('Y-m-d', strtotime($academic_year->start_date));
+            $date = date('Y-m-d', strtotime(request('Date')));
+
+            if (($date <= date('Y-m-d')) && ($date >= $start_date)) {
                 return true;
             }
-                
+
             return false;
         });
 
-        Validator::extend('check_session',function($attribute,$value,$parameters,$validator)
-        {   
-            $academic_year  = SiteHelper::getAcademicYear(Auth::user()->school_id);
-            $date = date('Y-m-d',strtotime(request('Date')));
-            $Standardlinkid = (int)request('Standardlinkid');
+        Validator::extend('check_session', function ($attribute, $value, $parameters, $validator) {
+            $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
+            $date = date('Y-m-d', strtotime(request('Date')));
+            $Standardlinkid = (int) request('Standardlinkid');
             $attendance = Attendance::where([
-                ['school_id',Auth::user()->school_id],
-                ['academic_year_id',$academic_year->id],
-                ['date','=',$date],
-                ['session',request('Session')],
-                ['standardLink_id',$Standardlinkid]
+                ['school_id', Auth::user()->school_id],
+                ['academic_year_id', $academic_year->id],
+                ['date', '=', $date],
+                ['session', request('Session')],
+                ['standardLink_id', $Standardlinkid],
             ])->exists();
-            if($attendance)
-            {
+            if ($attendance) {
                 return false;
             }
+
             return true;
         });
 
-        Validator::extend('check_user',function($attribute,$value,$parameters,$validator)
-        { 
-          $count=0;
-          for($i=0 ; $i < count(Request('AbsentList')) ; $i++)
-          { 
-            if($value==request('AbsentList.'.$i.'.student_id'))
-            {
-              $count++;
+        Validator::extend('check_user', function ($attribute, $value, $parameters, $validator) {
+            $count = 0;
+            for ($i = 0; $i < count(Request('AbsentList')); $i++) {
+                if ($value == request('AbsentList.'.$i.'.student_id')) {
+                    $count++;
+                }
             }
-          }
-          if($count<=1)
-          {
-            return true;
-          }
-          return false;
+            if ($count <= 1) {
+                return true;
+            }
+
+            return false;
         });
-
-
-
-        
 
         $rules =
         [
             //
-            'Standardlinkid'    => 'required',
-            'Date'              => 'required|date|check_date',
-            'Session'           => 'required|check_session',
-            'AbsentList.*.student_id'=> 'required|check_user',
-            'AbsentList.*.reasonId'  => 'required|numeric|max:200',
-            //'AbsentList.*.remarks' => 'required',
+            'Standardlinkid' => 'required',
+            'Date' => 'required|date|check_date',
+            'Session' => 'required|check_session',
+            'AbsentList.*.student_id' => 'required|check_user',
+            'AbsentList.*.reasonId' => 'required|numeric|max:200',
+            // 'AbsentList.*.remarks' => 'required',
         ];
-
-      
 
         return $rules;
     }
 
     public function messages()
     {
-        $messages = 
+        $messages =
         [
             //
-            'Standardlinkid.required'   =>  'Class Is Required',
+            'Standardlinkid.required' => 'Class Is Required',
 
-            'Date.required'             =>  'Date Is Required',
-            'Date.check_date'           =>  'Enter Valid Date',
+            'Date.required' => 'Date Is Required',
+            'Date.check_date' => 'Enter Valid Date',
 
-            'Session.required'          =>  'Session Is Required',
-            'Session.check_session'     =>  'Attendance Already Updated',
-            'AbsentList.*.student_id.check_user'   =>  'Student Already exist',
+            'Session.required' => 'Session Is Required',
+            'Session.check_session' => 'Attendance Already Updated',
+            'AbsentList.*.student_id.check_user' => 'Student Already exist',
         ];
 
         /*for($i=0 ; $i < count(Request('AbsentList')) ; $i++)
@@ -122,6 +109,6 @@ class AttendanceAddRequest extends FormRequest
             $messages['remarks'.$i.'.max']              = 'Remarks may not be greater than 20 letters';
         }*/
 
-        return$messages;
+        return $messages;
     }
 }

@@ -15,10 +15,10 @@ class GroupResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'         => $this->id,
+            'id' => $this->id,
             'group_name' => $this->group_name,
             // 'members_count'   => $this->members_count,
-            'created_at' => $this->created_at?->format('d M Y')
+            'created_at' => $this->created_at?->format('d M Y'),
         ];
     }
 }

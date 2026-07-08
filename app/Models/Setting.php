@@ -1,8 +1,10 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
  */
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -21,6 +23,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $active
  * @property \DateTime $created_at
  * @property \DateTime $updated_at
+ *
  * @mixin \Eloquent
  */
 class Setting extends Model
@@ -31,14 +34,14 @@ class Setting extends Model
      *
      * @var string
      */
-	protected $table = 'settings';
+    protected $table = 'settings';
 
-	/**
-	 * The attributes that are mass assignable.
-	 *
-	 * @var array
-	 */
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
     protected $fillable = [
-        'key','name','description','value', 'field','active',
+        'key', 'name', 'description', 'value', 'field', 'active',
     ];
 }

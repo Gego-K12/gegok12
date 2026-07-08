@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Helpers\SiteHelper;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
-use App\Helpers\SiteHelper;
 
 class HolidayAddRequest extends FormRequest
 {
@@ -32,7 +32,7 @@ class HolidayAddRequest extends FormRequest
                     ) {
                         $fail('Enter Valid Date');
                     }
-                }
+                },
             ];
 
             $rules['title'.$i] = [

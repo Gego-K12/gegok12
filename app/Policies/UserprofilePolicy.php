@@ -2,18 +2,17 @@
 
 namespace App\Policies;
 
-use Illuminate\Auth\Access\HandlesAuthorization;
-use App\Models\Userprofile;
 use App\Models\User;
+use App\Models\Userprofile;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class UserprofilePolicy
 {
     use HandlesAuthorization;
-    
+
     /**
      * Determine whether the user can view any userprofiles.
      *
-     * @param  \App\Models\User  $user
      * @return mixed
      */
     public function viewAny(User $user)
@@ -25,7 +24,6 @@ class UserprofilePolicy
     /**
      * Determine whether the user can view the userprofile.
      *
-     * @param  \App\Models\User  $user
      * @param  \App\Userprofile  $userprofile
      * @return mixed
      */
@@ -38,7 +36,6 @@ class UserprofilePolicy
     /**
      * Determine whether the user can create userprofiles.
      *
-     * @param  \App\Models\User  $user
      * @return mixed
      */
     public function create(User $user)
@@ -50,7 +47,6 @@ class UserprofilePolicy
     /**
      * Determine whether the user can update the userprofile.
      *
-     * @param  \App\Models\User  $user
      * @param  \App\Userprofile  $userprofile
      * @return mixed
      */
@@ -63,7 +59,6 @@ class UserprofilePolicy
     /**
      * Determine whether the user can delete the userprofile.
      *
-     * @param  \App\Models\User  $user
      * @param  \App\Userprofile  $userprofile
      * @return mixed
      */
@@ -75,7 +70,6 @@ class UserprofilePolicy
     /**
      * Determine whether the user can restore the userprofile.
      *
-     * @param  \App\Models\User  $user
      * @param  \App\Userprofile  $userprofile
      * @return mixed
      */
@@ -87,7 +81,6 @@ class UserprofilePolicy
     /**
      * Determine whether the user can permanently delete the userprofile.
      *
-     * @param  \App\Models\User  $user
      * @param  \App\Userprofile  $userprofile
      * @return mixed
      */

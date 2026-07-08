@@ -1,11 +1,13 @@
 <?php
+
 // SPDX-License-Identifier: MIT
 // (c) 2025 GegoSoft Technologies and GegoK12 Contributors
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 
 /**
@@ -21,9 +23,10 @@ use Illuminate\Support\Facades\Auth;
  * @property \DateTime $created_at
  * @property \DateTime $updated_at
  * @property \DateTime $deleted_at
- * @property-read \App\Models\User $user
- * @property-read \App\Models\Task $task
- * @property-read \App\Models\StandardLink $standardLink
+ * @property-read User $user
+ * @property-read Task $task
+ * @property-read StandardLink $standardLink
+ *
  * @mixin \Eloquent
  */
 class TaskAssignee extends Model
@@ -38,14 +41,13 @@ class TaskAssignee extends Model
      */
     protected $table = 'task_assignees';
 
-
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'task_id' , 'user_id' , 'standardLink_id' , 'status' , 'assigned_type','group_id','claimed_by'
+        'task_id', 'user_id', 'standardLink_id', 'status', 'assigned_type', 'group_id', 'claimed_by',
     ];
 
     /**
@@ -58,38 +60,45 @@ class TaskAssignee extends Model
     /**
      * Get the user assigned to this task.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function user()
     {
-    	return $this->belongsTo('\App\Models\User','user_id');
+        return $this->belongsTo('\App\Models\User', 'user_id');
     }
 
     /**
      * Get the task for this assignment.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function task()
     {
-    	return $this->belongsTo('\App\Models\Task','task_id');
+        return $this->belongsTo('\App\Models\Task', 'task_id');
     }
 
     /**
      * Get the standard link for this assignment.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function standardLink()
     {
-    	return $this->belongsTo('\App\Models\StandardLink','standardLink_id');
+        return $this->belongsTo('\App\Models\StandardLink', 'standardLink_id');
     }
+
     public function scopeForUser($query, $userId = null)
     {
         return $query->where('user_id', $userId ?? Auth::id());
     }
+
     public function scopeCompleted($query)
     {
         return $query->where('status', 'completed');
+    }
+
+    public function claimedBy()
+    {
+        return $this->belongsTo(User::class, 'claimed_by');
     }
 }

@@ -2,14 +2,14 @@
 
 namespace App\Livewire\Admin\Addon;
 
-use Livewire\Component;
-use Illuminate\Support\Facades\Validator;
 use App\Traits\HandlesGuzzleRequests;
-use Illuminate\Support\Facades\Http;
-use GuzzleHttp\Client;
-use Exception;
-use Log;
 use Auth;
+use Exception;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
+use Livewire\Component;
+use Log;
 
 /**
  * Class Detail
@@ -23,8 +23,6 @@ use Auth;
  * - Loads available payment gateways
  * - Handles add-on purchase requests
  * - Redirects to payment gateways (Razorpay / Bank)
- *
- * @package App\Livewire\Admin\Addon
  */
 class Detail extends Component
 {
@@ -54,7 +52,7 @@ class Detail extends Component
     /**
      * Currently authenticated user.
      *
-     * @var \Illuminate\Contracts\Auth\Authenticatable|null
+     * @var Authenticatable|null
      */
     public $user;
 
@@ -90,8 +88,6 @@ class Detail extends Component
      * Indicates whether the purchase process is currently running.
      *
      * Used to prevent duplicate submissions.
-     *
-     * @var bool
      */
     public bool $isProcessing = false;
 
@@ -110,7 +106,7 @@ class Detail extends Component
      * - Payment gateways
      * - Add-on details using slug
      *
-     * @param string $slug Add-on slug
+     * @param  string  $slug  Add-on slug
      * @return void
      */
     public function mount($slug)
@@ -127,15 +123,15 @@ class Detail extends Component
      * Passes add-on details, features, contact details,
      * and payment gateways to the Blade view.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function render()
     {
         return view('livewire.admin.addon.detail', [
-            'addondetail'      => $this->addon_detail['data'],
-            'contact_detail'  => $this->addon_detail['contact'],
+            'addondetail' => $this->addon_detail['data'],
+            'contact_detail' => $this->addon_detail['contact'],
             'paymentgateways' => $this->paymentgateways,
-            'addonfeatures'   => $this->addon_detail['addon_features'],
+            'addonfeatures' => $this->addon_detail['addon_features'],
         ]);
     }
 
@@ -147,15 +143,17 @@ class Detail extends Component
      * - Creates add-on purchase entry
      * - Initiates payment gateway flow
      *
-     * @return \Illuminate\Http\RedirectResponse|void
+     * @return RedirectResponse|void
      */
     public function buyAddon()
     {
-        if ($this->isProcessing) return;
+        if ($this->isProcessing) {
+            return;
+        }
         $this->isProcessing = true;
 
         $validatedData = $this->validate([
-            'payment_gateway' => 'required'
+            'payment_gateway' => 'required',
         ]);
 
         try {
@@ -163,17 +161,17 @@ class Detail extends Component
 
             $status = 'pending';
             $create = [
-                'addon_slug'       => $this->addon_slug,
-                'payment_gateway'  => $this->payment_gateway,
-                'domain_name'      => request()->getHost(),
-                'name'             => $this->user->name,
-                'email'            => $this->user->email,
-                'status'           => $status,
-                'amount'           => $this->addon_detail['data']['price'],
-                'mobile_no'        => $this->user->mobile_no
+                'addon_slug' => $this->addon_slug,
+                'payment_gateway' => $this->payment_gateway,
+                'domain_name' => request()->getHost(),
+                'name' => $this->user->name,
+                'email' => $this->user->email,
+                'status' => $status,
+                'amount' => $this->addon_detail['data']['price'],
+                'mobile_no' => $this->user->mobile_no,
             ];
 
-            $apiUrl = env('ADDON_API_URL') . '/api/addon-purchase';
+            $apiUrl = env('ADDON_API_URL').'/api/addon-purchase';
 
             $response = $this->guzzlePost($apiUrl, $create, true);
 
@@ -182,12 +180,13 @@ class Detail extends Component
                 $create['payment_id'] = $payment['id'];
 
                 if ($gateway['gatewayname'] == 'razorpay') {
-                    $paymentUrl = env('ADDON_API_URL') . '/api/razorpay/payment';
+                    $paymentUrl = env('ADDON_API_URL').'/api/razorpay/payment';
 
                     $payment_response = $this->guzzlePost($paymentUrl, $create, true);
 
                     if ($payment_response && isset($payment_response['success']) && $payment_response['success']) {
                         $this->dispatch('redirect-to-url', $payment_response['link']);
+
                         return;
                     }
                 }
@@ -195,7 +194,7 @@ class Detail extends Component
                 \Session::put('successmessage', $response['message']);
             }
 
-            return redirect(url('admin/addon/' . $this->addon_slug . '/detail'));
+            return redirect(url('admin/addon/'.$this->addon_slug.'/detail'));
 
         } catch (Exception $e) {
             $this->isProcessing = false;
@@ -220,7 +219,7 @@ class Detail extends Component
         $this->gatewayname = $gateway['gatewayname'];
 
         if ($gateway['gatewayname'] == 'bank') {
-            $apiUrl = env('ADDON_API_URL') . '/api/paymentgateway/detail';
+            $apiUrl = env('ADDON_API_URL').'/api/paymentgateway/detail';
 
             $response = $this->guzzleGet($apiUrl, [
                 'gatewayname' => $gateway['gatewayname'],
@@ -237,13 +236,13 @@ class Detail extends Component
      */
     public function getAddonDetail()
     {
-        $addon_url = env('ADDON_API_URL') . '/api/detail/' . $this->addon_slug;
+        $addon_url = env('ADDON_API_URL').'/api/detail/'.$this->addon_slug;
 
         try {
             $response = $this->guzzleGet($addon_url, [
-                'email'       => $this->user->email,
+                'email' => $this->user->email,
                 'domain_name' => request()->getHost(),
-                'addon_slug'  => $this->addon_slug,
+                'addon_slug' => $this->addon_slug,
             ]);
 
             return $response;
@@ -260,10 +259,11 @@ class Detail extends Component
      */
     public function getPaymentgateways()
     {
-        $api_url = env('ADDON_API_URL') . '/api/paymentgateways';
+        $api_url = env('ADDON_API_URL').'/api/paymentgateways';
 
         try {
             $response = $this->guzzleGet($api_url);
+
             return $response['data'];
 
         } catch (Exception $e) {

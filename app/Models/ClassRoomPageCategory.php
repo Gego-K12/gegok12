@@ -1,11 +1,15 @@
 <?php
+
 // SPDX-License-Identifier: MIT
 // (c) 2025 GegoSoft Technologies and GegoK12 Contributors
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class ClassRoomPageCategory
@@ -20,9 +24,10 @@ use Illuminate\Database\Eloquent\Model;
  * @property \DateTime $created_at
  * @property \DateTime $updated_at
  * @property \DateTime $deleted_at
- * @property-read \App\Models\School $school
- * @property-read \App\Models\AcademicYear $academicYear
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ClassRoomPage[] $classRoomPage
+ * @property-read School $school
+ * @property-read AcademicYear $academicYear
+ * @property-read Collection|ClassRoomPage[] $classRoomPage
+ *
  * @mixin \Eloquent
  */
 class ClassRoomPageCategory extends Model
@@ -37,7 +42,7 @@ class ClassRoomPageCategory extends Model
      * @var array
      */
     protected $fillable = [
-        'school_id' , 'academic_year_id' , 'name' , 'status'
+        'school_id', 'academic_year_id', 'name', 'status',
     ];
 
     /**
@@ -50,30 +55,30 @@ class ClassRoomPageCategory extends Model
     /**
      * Get the school for this category.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function school()
     {
-    	return $this->belongsTo('\App\Models\School','school_id');
+        return $this->belongsTo('\App\Models\School', 'school_id');
     }
 
     /**
      * Get the academic year for this category.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function academicYear()
     {
-        return $this->belongsTo('\App\Models\AcademicYear','academic_year_id');
+        return $this->belongsTo('\App\Models\AcademicYear', 'academic_year_id');
     }
 
     /**
      * Get classroom pages in this category.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function classRoomPage()
     {
-    	return $this->hasMany('\App\Models\ClassRoomPage','category_id','id');
+        return $this->hasMany('\App\Models\ClassRoomPage', 'category_id', 'id');
     }
 }

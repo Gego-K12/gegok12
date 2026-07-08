@@ -3,12 +3,10 @@
 namespace App\Listeners;
 
 use App\Events\CalendarEvent;
-use Illuminate\Queue\InteractsWithQueue;
+use App\Mail\CalendarMail;
+use App\Models\Users\TeacherUser;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\CalendarMail;
-use App\Models\User;
-use App\Models\Events;
 
 class CalendarEventListener implements ShouldQueue
 {
@@ -30,10 +28,9 @@ class CalendarEventListener implements ShouldQueue
      */
     public function handle(CalendarEvent $events)
     {
-        $users=User::where('school_id',$events->events->school_id)->ByRole(5)->get();
-        
-        foreach ($users as $user) 
-        {
+        $users = TeacherUser::where('school_id', $events->events->school_id)->ByRole(5)->get();
+
+        foreach ($users as $user) {
             Mail::to($user->email)->queue(new CalendarMail($events->events));
         }
     }

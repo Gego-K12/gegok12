@@ -26,13 +26,13 @@ class CreateTaskAssigneesTable extends Migration
             $table->bigInteger('claimed_by')->unsigned()->nullable();
             $table->enum('status', [
                 'pending',
-                'completed'
+                'completed',
             ])->default('pending');
-            
+
             $table->enum('assigned_type', [
                 'user',
                 'class',
-                'group'
+                'group',
             ])->default('user');
 
             $table->timestamps();

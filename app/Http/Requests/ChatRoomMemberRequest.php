@@ -11,30 +11,29 @@ class ChatRoomMemberRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;  
+        return true;
     }
 
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, 
+     * @return array<string,
      */
     public function rules(): array
     {
         return [
-            'type' => ['required'], 
-          'user_id' => ['required'], 
+            'type' => ['required'],
+            'user_id' => ['required'],
 
         ];
     }
 
-  
     public function messages(): array
     {
         return [
             'type.required' => 'Type is required.',
-            
-                        'user_id.required' => 'user_id is required.',
+
+            'user_id.required' => 'user_id is required.',
 
         ];
     }

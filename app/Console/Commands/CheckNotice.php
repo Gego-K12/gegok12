@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\NoticeBoard;
 use Exception;
+use Illuminate\Console\Command;
 use Log;
 
 class CheckNotice extends Command
@@ -41,20 +41,15 @@ class CheckNotice extends Command
     public function handle()
     {
         //
-        try
-        {
-            $notices = NoticeBoard::where('expire_date','<=',date('Y-m-d'))->where('status',1)->get();
-            foreach($notices as $notice)
-            {
+        try {
+            $notices = NoticeBoard::where('expire_date', '<=', date('Y-m-d'))->where('status', 1)->get();
+            foreach ($notices as $notice) {
                 $update['status'] = 0;
 
-                NoticeBoard::where('id',$notice->id)->update($update);
+                NoticeBoard::where('id', $notice->id)->update($update);
             }
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 }

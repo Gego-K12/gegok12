@@ -1,19 +1,21 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
  */
+
 namespace App\Http\Controllers\Api;
 
-use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\LoginRequest;
-use Illuminate\Http\Request;
-use App\Models\Userprofile;
 use App\Models\User;
+use App\Models\Userprofile;
 use App\Token;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use Log;
 
 class TokenController extends Controller
@@ -25,66 +27,58 @@ class TokenController extends Controller
     public function issueToken(LoginRequest $request)
     {
 
-    /*    $validator = Validator::make($request->all(), [
-            'device_id' => 'required|check_logoutdevice_id',
-        ],[
-            'check_logoutdevice_id' => 'Your account is currently logged onto another device. Please log out of the other device or contact your administrator',
-        ])->validate();*/
+        /*    $validator = Validator::make($request->all(), [
+                'device_id' => 'required|check_logoutdevice_id',
+            ],[
+                'check_logoutdevice_id' => 'Your account is currently logged onto another device. Please log out of the other device or contact your administrator',
+            ])->validate();*/
 
-        
-         $validator = Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'device_id' => 'required|check_logoutdevice_id',
         ], [
             'check_logoutdevice_id' => 'Your account is currently logged onto another device. Please log out of the other device or contact your administrator',
         ]);
 
-         if ($validator->fails()) {
-                        $status_code=422;
-                        $res['message']="The given data was invalid.";
-                        $res['errors']=$validator->errors();
-                      
-                      return response()->json($res, $status_code);
-         }
+        if ($validator->fails()) {
+            $status_code = 422;
+            $res['message'] = 'The given data was invalid.';
+            $res['errors'] = $validator->errors();
 
-     try
-        {
-            
-    if(Auth::attempt(['mobile_no' => request('email'), 'password' => request('password'),'usergroup_id'=>7]) )
-            {
+            return response()->json($res, $status_code);
+        }
+
+        try {
+
+            if (Auth::attempt(['mobile_no' => request('email'), 'password' => request('password'), 'usergroup_id' => 7])) {
                 $user = Auth::user();
-            
-            $userprofile = Userprofile::where('user_id', $user->id)->first();
-                if($userprofile->status == 'active')
-                {
-                   
-                    $user = User::where([['id',$user->id],['school_id',$user->school_id]])->first();
-                     
+
+                $userprofile = Userprofile::where('user_id', $user->id)->first();
+                if ($userprofile->status == 'active') {
+
+                    $user = User::where([['id', $user->id], ['school_id', $user->school_id]])->first();
+
                     $user->platform_token = $request->device_name;
 
                     $user->device_id = $request->device_id;
 
                     $user->save();
 
-                    $token = $user->createToken("gego")->plainTextToken;
+                    $token = $user->createToken('gego')->plainTextToken;
 
-                    //$token = $user->createToken($request->device_name)->plainTextToken;
+                    // $token = $user->createToken($request->device_name)->plainTextToken;
 
                     return response()->json([
-                        'status'        => 'success',
-                        'token'         =>  $token,
-                        'parent_id'     =>  $user->id,
-                        'user_email'    =>  $user->email == null ? '':$user->email,
-                        'user_name'     =>  $user->name,
+                        'status' => 'success',
+                        'token' => $token,
+                        'parent_id' => $user->id,
+                        'user_email' => $user->email == null ? '' : $user->email,
+                        'user_name' => $user->name,
                     ], $this->successStatus);
                 }
             }
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
-
 
         /*$request->validate([
             'email' => 'required',
@@ -131,22 +125,21 @@ class TokenController extends Controller
 
     public function logout(Request $request)
     {
-        if (Auth::check()) 
-        {
+        if (Auth::check()) {
             Auth()->user()->tokens()->delete();
         }
 
-        $user = User::where([['id',Auth::id()],['school_id',Auth::user()->school_id]])->first();
+        $user = User::where([['id', Auth::id()], ['school_id', Auth::user()->school_id]])->first();
 
-        $user->platform_token  = NULL;
+        $user->platform_token = null;
 
-        $user->device_id = NULL;
+        $user->device_id = null;
 
         $user->save();
 
         return response()->json([
-            'success'   =>  true,
-            'message'   =>  'Logged out successfully'
-        ],200);
+            'success' => true,
+            'message' => 'Logged out successfully',
+        ], 200);
     }
 }

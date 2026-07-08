@@ -1,13 +1,18 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
  */
+
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
-//use Laravel\Scout\Searchable;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+// use Laravel\Scout\Searchable;
 
 /**
  * Class LessonPlan
@@ -33,15 +38,16 @@ use Illuminate\Database\Eloquent\Model;
  * @property \DateTime $created_at
  * @property \DateTime $updated_at
  * @property \DateTime $deleted_at
- * @property-read \App\Models\Teacherlink $teacherlink
- * @property-read \App\Models\LessonPlanApproval $lessonPlanApproval
+ * @property-read Teacherlink $teacherlink
+ * @property-read LessonPlanApproval $lessonPlanApproval
+ *
  * @mixin \Eloquent
  */
 class LessonPlan extends Model
 {
     //
     use SoftDeletes;
-    //use Searchable;
+    // use Searchable;
 
     /**
      * The table associated with the model.
@@ -56,7 +62,7 @@ class LessonPlan extends Model
      * @var array
      */
     protected $fillable = [
-        'teacher_link_id' , 'unit_no' , 'unit_name' , 'description' , 'title' , 'duration' , 'objective' , 'materials_required' , 'introduction' , 'procedure' , 'conclusion' , 'notes' , 'assessment' , 'modification' , 'status', 'is_published', 'published_at' ,'start_date' , 'end_date'
+        'teacher_link_id', 'unit_no', 'unit_name', 'description', 'title', 'duration', 'objective', 'materials_required', 'introduction', 'procedure', 'conclusion', 'notes', 'assessment', 'modification', 'status', 'is_published', 'published_at', 'start_date', 'end_date',
     ];
 
     /**
@@ -86,27 +92,27 @@ class LessonPlan extends Model
         $array = $this->toArray();
 
         // Customize array...
-        //return array('id' => $array['id'], 'teacher_link_id' => $array['teacher_link_id'], 'title' => $array['title'], 'unit_name' => $array['unit_name']);
+        // return array('id' => $array['id'], 'teacher_link_id' => $array['teacher_link_id'], 'title' => $array['title'], 'unit_name' => $array['unit_name']);
         return $array;
     }
 
     /**
      * Get the lesson plan approval for this lesson plan.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return HasOne
      */
     public function lessonPlanApproval()
     {
-        return $this->hasOne('\App\Models\LessonPlanApproval','lesson_plan_id','id');
+        return $this->hasOne('\App\Models\LessonPlanApproval', 'lesson_plan_id', 'id');
     }
 
     /**
      * Get the teacher link associated with this lesson plan.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function teacherlink()
     {
-        return $this->belongsTo('\App\Models\Teacherlink','teacher_link_id');
+        return $this->belongsTo('\App\Models\Teacherlink', 'teacher_link_id');
     }
 }

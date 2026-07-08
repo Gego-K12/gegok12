@@ -25,7 +25,7 @@ class ChangeAvatarRequest extends FormRequest
     {
         return [
             //
-            'avatar'    => 'required|mimes:jpg,jpeg,png',
+            'avatar' => 'required|mimes:jpg,jpeg,png',
         ];
     }
 
@@ -33,8 +33,8 @@ class ChangeAvatarRequest extends FormRequest
     {
         return [
             //
-            'avatar.required'   => 'Avatar is required',
-            'avatar.mimes'      => 'Choose jpg,jpeg,png file',
+            'avatar.required' => 'Avatar is required',
+            'avatar.mimes' => 'Choose jpg,jpeg,png file',
         ];
     }
 }

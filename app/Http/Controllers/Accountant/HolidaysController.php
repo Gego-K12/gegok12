@@ -1,21 +1,20 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
  */
+
 namespace App\Http\Controllers\Accountant;
 
-use App\Http\Resources\Holiday as HolidayResource;
-use App\Http\Requests\HolidayUpdateRequest;
-use App\Http\Requests\HolidayAddRequest;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
 use App\Helpers\SiteHelper;
-use App\Traits\LogActivity;
-use App\Models\Events;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\Holiday as HolidayResource;
+use App\Services\HolidaysReaderService;
 use App\Traits\Common;
-use Exception;
+use App\Traits\LogActivity;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Class HolidaysController
@@ -26,38 +25,36 @@ use Exception;
  * - Fetch and list holidays for the current school and academic year
  * - Provide holiday data as API resources
  * - Render holiday listing views
- *
- * @package App\Http\Controllers\Accountant
  */
 class HolidaysController extends Controller
 {
-    use LogActivity;
     use Common;
+    use LogActivity;
+
+    public function __construct(protected HolidaysReaderService $holidaysReader) {}
 
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function list()
     {
-        //
         $school_id = Auth::user()->school_id;
         $academic_year = SiteHelper::getAcademicYear($school_id);
-        $holidays = Events::where([['school_id',$school_id],['academic_year_id',$academic_year->id],['category','holidays']])->orderBy('start_date','ASC')->paginate(10);
-        $holidays = HolidayResource::collection($holidays);
 
-        return $holidays;
+        return HolidayResource::collection(
+            $this->holidaysReader->paginatedList($school_id, $academic_year->id)
+        );
     }
 
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index()
     {
-        //
         return view('/accountant/holiday/index');
     }
 }

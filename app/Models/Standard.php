@@ -1,13 +1,18 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
  */
+
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laracasts\Presenter\PresentableTrait;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Standard
@@ -22,18 +27,19 @@ use Illuminate\Database\Eloquent\Model;
  * @property \DateTime $created_at
  * @property \DateTime $updated_at
  * @property \DateTime $deleted_at
- * @property-read \App\Models\School $school
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Subject[] $subject
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\StandardLink[] $standardLink
- * @property-read \App\Models\Promotion $currentPromotion
- * @property-read \App\Models\Promotion $nextPromotion
+ * @property-read School $school
+ * @property-read Collection|Subject[] $subject
+ * @property-read Collection|StandardLink[] $standardLink
+ * @property-read Promotion $currentPromotion
+ * @property-read Promotion $nextPromotion
+ *
  * @mixin \Eloquent
  */
 class Standard extends Model
 {
+    use PresentableTrait;
     //
     use SoftDeletes;
-    use PresentableTrait;
 
     protected $presenter = "App\Presenters\UserprofilePresenter";
 
@@ -50,57 +56,57 @@ class Standard extends Model
      * @var array
      */
     protected $fillable = [
-       'school_id' ,  'name' ,'slug' , 'order' , 'status'
+        'school_id',  'name', 'slug', 'order', 'status',
     ];
 
     /**
      * Get the school for this standard.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function school()
     {
-        return $this->belongsTo('\App\Models\School','school_id');
+        return $this->belongsTo('\App\Models\School', 'school_id');
     }
 
     /**
      * Get the current promotion record for this standard.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function currentPromotion()
     {
-        return $this->belongsTo('App\Models\Promotion','standard_id','id');
+        return $this->belongsTo('App\Models\Promotion', 'standard_id', 'id');
     }
 
     /**
      * Get the next promotion record for this standard.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function nextPromotion()
     {
-        return $this->belongsTo('App\Models\Promotion','standard_id','id');
+        return $this->belongsTo('App\Models\Promotion', 'standard_id', 'id');
     }
 
     /**
      * Get subjects for this standard.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function subject()
     {
-        return $this->hasMany('\App\Models\Subject','school_id','id');
+        return $this->hasMany('\App\Models\Subject', 'school_id', 'id');
     }
 
     /**
      * Get standard links (class-section combinations) for this standard.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function standardLink()
     {
-        return $this->hasMany('\App\Models\StandardLink','standard_id','id');
+        return $this->hasMany('\App\Models\StandardLink', 'standard_id', 'id');
     }
 
     public function scopeActive($query)
@@ -110,7 +116,6 @@ class Standard extends Model
 
     public function getStandardNameAttribute()
     {
-        
 
         $name = strtoupper($this->name);
 

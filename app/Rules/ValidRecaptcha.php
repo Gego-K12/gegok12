@@ -2,8 +2,8 @@
 
 namespace App\Rules;
 
-use Illuminate\Contracts\Validation\Rule;
 use GuzzleHttp\Client;
+use Illuminate\Contracts\Validation\Rule;
 
 class ValidRecaptcha implements Rule
 {
@@ -28,14 +28,15 @@ class ValidRecaptcha implements Rule
     {
         // Validate ReCaptcha
         $client = new Client([
-            'base_uri' => 'https://google.com/recaptcha/api/'
+            'base_uri' => 'https://google.com/recaptcha/api/',
         ]);
         $response = $client->post('siteverify', [
             'query' => [
                 'secret' => env('GOOGLE_RECAPTCHA_SECRET'),
-                'response' => $value
-            ]
+                'response' => $value,
+            ],
         ]);
+
         return json_decode($response->getBody())->success;
     }
 

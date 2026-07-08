@@ -286,6 +286,13 @@
         <!--end-->
     </div>
     <!--end-->
+
+    {{-- Plugin dashboard-widget hook: any installed plugin with has_dashboard_widget=true
+         and portal=student gets its resources/views/plugins/{slug}/dashboard-widget.blade.php
+         included here automatically, so new plugins never require editing this file. --}}
+    @foreach(\App\Models\Plugin::withDashboardWidgetFor('student')->get() as $installedPlugin)
+        @includeIf($installedPlugin->dashboardWidgetViewName('student'))
+    @endforeach
 @endsection
 @push('scripts')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>

@@ -2,8 +2,46 @@
 
 namespace App\Http;
 
-use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
+use App\Http\Middleware\AdminAccountant;
+use App\Http\Middleware\CheckForMaintenanceMode;
+use App\Http\Middleware\EncryptCookies;
+use App\Http\Middleware\MustBeAccountant;
+use App\Http\Middleware\MustBeAlumni;
+use App\Http\Middleware\MustBeLibrarian;
+use App\Http\Middleware\MustBeNonTeaching;
+use App\Http\Middleware\MustBeOTP;
+use App\Http\Middleware\MustBeParent;
+use App\Http\Middleware\MustBePrivilege;
+use App\Http\Middleware\MustBeReceptionist;
+use App\Http\Middleware\MustBeSchoolAdmin;
+use App\Http\Middleware\MustBeSchoolSubAdmin;
+use App\Http\Middleware\MustBeSiteAdmin;
+use App\Http\Middleware\MustBeSiteSubAdmin;
+use App\Http\Middleware\MustBeStockKeeper;
+use App\Http\Middleware\MustBeStudent;
+use App\Http\Middleware\MustBeTeacher;
+use App\Http\Middleware\RedirectIfAuthenticated;
+use App\Http\Middleware\TrimStrings;
+use App\Http\Middleware\TrustProxies;
+use App\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Auth\Middleware\Authenticate;
+use Illuminate\Auth\Middleware\AuthenticateWithBasicAuth;
+use Illuminate\Auth\Middleware\Authorize;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
+use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
+use Illuminate\Foundation\Http\Middleware\ValidatePostSize;
+use Illuminate\Http\Middleware\SetCacheHeaders;
+use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Routing\Middleware\ThrottleRequests;
+use Illuminate\Routing\Middleware\ValidateSignature;
+use Illuminate\Session\Middleware\StartSession;
+use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Laratrust\Middleware\Ability;
+use Laratrust\Middleware\Permission;
+use Laratrust\Middleware\Role;
+use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
+use Nckg\Impersonate\Impersonate;
 
 class Kernel extends HttpKernel
 {
@@ -15,15 +53,15 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $middleware = [
-        \App\Http\Middleware\CheckForMaintenanceMode::class,
-        \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
-        \App\Http\Middleware\TrimStrings::class,
-        \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+        CheckForMaintenanceMode::class,
+        ValidatePostSize::class,
+        TrimStrings::class,
+        ConvertEmptyStringsToNull::class,
 
-        \App\Http\Middleware\TrustProxies::class,
-        \Illuminate\Session\Middleware\StartSession::class,
+        TrustProxies::class,
+        StartSession::class,
 
-        \Nckg\Impersonate\Impersonate::class,
+        Impersonate::class,
 
     ];
 
@@ -34,19 +72,19 @@ class Kernel extends HttpKernel
      */
     protected $middlewareGroups = [
         'web' => [
-            \App\Http\Middleware\EncryptCookies::class,
-            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
-            //\Illuminate\Session\Middleware\StartSession::class,
+            EncryptCookies::class,
+            AddQueuedCookiesToResponse::class,
+            // \Illuminate\Session\Middleware\StartSession::class,
             // \Illuminate\Session\Middleware\AuthenticateSession::class,
-            \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-            \App\Http\Middleware\VerifyCsrfToken::class,
-            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            ShareErrorsFromSession::class,
+            VerifyCsrfToken::class,
+            SubstituteBindings::class,
         ],
 
         'api' => [
             EnsureFrontendRequestsAreStateful::class,
             'throttle:60,1',
-            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            SubstituteBindings::class,
         ],
     ];
 
@@ -58,33 +96,34 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $routeMiddleware = [
-        'auth'                  =>  \Illuminate\Auth\Middleware\Authenticate::class,
-        'auth.basic'            =>  \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
-        'bindings'              =>  \Illuminate\Routing\Middleware\SubstituteBindings::class,
-        'cache.headers'         =>  \Illuminate\Http\Middleware\SetCacheHeaders::class,
-        'can'                   =>  \Illuminate\Auth\Middleware\Authorize::class,
-        'guest'                 =>  \App\Http\Middleware\RedirectIfAuthenticated::class,
-        'signed'                =>  \Illuminate\Routing\Middleware\ValidateSignature::class,
-        'throttle'              =>  \Illuminate\Routing\Middleware\ThrottleRequests::class,
-        'siteadmin'             =>  \App\Http\Middleware\MustBeSiteAdmin::class,
-        'sitesubadmin'          =>  \App\Http\Middleware\MustBeSiteSubAdmin::class,
-        'role'                  =>  \Laratrust\Middleware\Role::class,
-        'permission'            =>  \Laratrust\Middleware\Permission::class,
-        'ability'               =>  \Laratrust\Middleware\Ability::class,
+        'auth' => Authenticate::class,
+        'auth.basic' => AuthenticateWithBasicAuth::class,
+        'bindings' => SubstituteBindings::class,
+        'cache.headers' => SetCacheHeaders::class,
+        'can' => Authorize::class,
+        'guest' => RedirectIfAuthenticated::class,
+        'signed' => ValidateSignature::class,
+        'throttle' => ThrottleRequests::class,
+        'siteadmin' => MustBeSiteAdmin::class,
+        'sitesubadmin' => MustBeSiteSubAdmin::class,
+        'role' => Role::class,
+        'permission' => Permission::class,
+        'ability' => Ability::class,
 
-        'schooladmin'           =>  \App\Http\Middleware\MustBeSchoolAdmin::class,
-        'schoolsubadmin'        =>  \App\Http\Middleware\MustBeSchoolSubAdmin::class,
-        'teacher'               =>  \App\Http\Middleware\MustBeTeacher::class,  
-        'librarian'             =>  \App\Http\Middleware\MustBeLibrarian::class,  
-        'student'               =>  \App\Http\Middleware\MustBeStudent::class,  
-        'parent'                =>  \App\Http\Middleware\MustBeParent::class,  
-        'receptionist'          =>  \App\Http\Middleware\MustBeReceptionist::class,  
-        'accountant'            =>  \App\Http\Middleware\MustBeAccountant::class,
-        'stockkeeper'           =>  \App\Http\Middleware\MustBeStockKeeper::class,
-        'adminaccountant'       =>  \App\Http\Middleware\AdminAccountant::class,   
-        'privilegeconditions'   =>  \App\Http\Middleware\MustBePrivilege::class, //checks academic year and standards  
-        'verifyotp'             =>  \App\Http\Middleware\MustBeOTP::class, //verify otp while school registration   
-        'alumni'                =>  \App\Http\Middleware\MustBeAlumni::class,
-        
+        'schooladmin' => MustBeSchoolAdmin::class,
+        'schoolsubadmin' => MustBeSchoolSubAdmin::class,
+        'teacher' => MustBeTeacher::class,
+        'librarian' => MustBeLibrarian::class,
+        'student' => MustBeStudent::class,
+        'parent' => MustBeParent::class,
+        'receptionist' => MustBeReceptionist::class,
+        'accountant' => MustBeAccountant::class,
+        'stockkeeper' => MustBeStockKeeper::class,
+        'nonteaching' => MustBeNonTeaching::class,
+        'adminaccountant' => AdminAccountant::class,
+        'privilegeconditions' => MustBePrivilege::class, // checks academic year and standards
+        'verifyotp' => MustBeOTP::class, // verify otp while school registration
+        'alumni' => MustBeAlumni::class,
+
     ];
 }

@@ -18,7 +18,7 @@ class CreateAssignmentApprovalsTable extends Migration
             $table->integer('assignment_id')->unsigned();
             $table->foreign('assignment_id')->references('id')->on('assignments');
             $table->string('comments')->nullable();
-            $table->enum('status',['approved','pending','rejected'])->default('pending');
+            $table->enum('status', ['approved', 'pending', 'rejected'])->default('pending');
             $table->integer('approved_by')->unsigned()->nullable();
             $table->foreign('approved_by')->references('id')->on('users');
             $table->timestamp('approved_at')->nullable();

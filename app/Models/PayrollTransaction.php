@@ -1,11 +1,14 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
  */
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -30,60 +33,61 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \DateTime $created_at
  * @property \DateTime $updated_at
  * @property \DateTime $deleted_at
- * @property-read \App\Models\User $user
- * @property-read \App\Models\TransactionType $transactiontype
- * @property-read \App\Models\Payroll $payroll
- * @property-read \App\Models\TransactionAccount $account
+ * @property-read User $user
+ * @property-read TransactionType $transactiontype
+ * @property-read Payroll $payroll
+ * @property-read TransactionAccount $account
+ *
  * @mixin \Eloquent
  */
 class PayrollTransaction extends Model
 {
     //
-  use SoftDeletes;
+    use SoftDeletes;
 
-    protected $casts=['transaction_detail'=>'array'];
+    protected $casts = ['transaction_detail' => 'array'];
 
     protected $fillable = [
-        'school_id' , 'transaction_no','paytype_id','account_id','staff_id','payroll_id','transaction_date','amount','payment_method','transaction_detail','reference_number','attachment','remarks'
+        'school_id', 'transaction_no', 'paytype_id', 'account_id', 'staff_id', 'payroll_id', 'transaction_date', 'amount', 'payment_method', 'transaction_detail', 'reference_number', 'attachment', 'remarks',
     ];
 
     /**
      * Get the staff member for this transaction.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function user()
     {
-        return $this->belongsTo(User::class,'staff_id');
+        return $this->belongsTo(User::class, 'staff_id');
     }
 
     /**
      * Get the transaction type for this transaction.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function transactiontype()
     {
-        return $this->belongsTo(TransactionType::class,'paytype_id');
+        return $this->belongsTo(TransactionType::class, 'paytype_id');
     }
 
     /**
      * Get the payroll record for this transaction.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function payroll()
     {
-        return $this->belongsTo(Payroll::class,'payroll_id');
+        return $this->belongsTo(Payroll::class, 'payroll_id');
     }
 
     /**
      * Get the transaction account for this transaction.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function account()
     {
-        return $this->belongsTo(TransactionAccount::class,'account_id');
-   }
+        return $this->belongsTo(TransactionAccount::class, 'account_id');
+    }
 }

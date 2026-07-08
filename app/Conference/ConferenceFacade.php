@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Facade;
  * Provides a static interface to the Conference
  * service registered in the Laravel service container.
  *
- * @package App\Conference
  *
  * @method static mixed someMethod(...$arguments)
  */

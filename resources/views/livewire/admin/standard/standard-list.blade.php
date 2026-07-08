@@ -170,8 +170,6 @@
 
                     </table>
 
-                    {{ $standards->links() }}
-
                 </div>
 
             </div>

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
@@ -6,20 +7,21 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Resources\Classwall\Page as PageResource;
-use App\Http\Requests\Classwall\PageUpdateRequest;
-use App\Http\Requests\Classwall\PageAddRequest;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Auth;
-use App\Models\ClassRoomPageDetail;
-use App\Models\ClassRoomPage;
-use Illuminate\Http\Request;
-use App\Traits\LogActivity;
 use App\Helpers\SiteHelper;
-use App\Traits\Common;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Classwall\PageAddRequest;
+use App\Http\Requests\Classwall\PageUpdateRequest;
+use App\Http\Resources\Classwall\Page as PageResource;
+use App\Models\ClassRoomPage;
+use App\Models\ClassRoomPageDetail;
 use App\Models\User;
+use App\Traits\Common;
+use App\Traits\LogActivity;
 use Exception;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\View\View;
 use Log;
 
 /**
@@ -28,18 +30,16 @@ use Log;
  * Handles classroom page management including listing,
  * creation, viewing, editing, updating, and deletion.
  * Includes activity logging and authorization checks.
- *
- * @package App\Http\Controllers\Admin
  */
 class PagesController extends Controller
 {
-    use LogActivity;
     use Common;
+    use LogActivity;
 
     /**
      * Get paginated list of active classroom pages.
      *
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @return AnonymousResourceCollection
      */
     public function list()
     {
@@ -61,7 +61,7 @@ class PagesController extends Controller
     /**
      * Display classroom page index view.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function index()
     {
@@ -72,7 +72,7 @@ class PagesController extends Controller
     /**
      * Show classroom page creation form.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function create()
     {
@@ -83,32 +83,29 @@ class PagesController extends Controller
     /**
      * Store a newly created classroom page.
      *
-     * @param \App\Http\Requests\Classwall\PageAddRequest $request
      * @return array|null
      */
     public function store(PageAddRequest $request)
     {
         //
-        try
-        {
+        try {
             $school_id = Auth::user()->school_id;
             $academic_year = SiteHelper::getAcademicYear($school_id);
 
             $page = new ClassRoomPage;
 
-            $page->school_id        = $school_id;
+            $page->school_id = $school_id;
             $page->academic_year_id = $academic_year->id;
-            $page->page_name        = $request->page_name;
-            $page->category_id      = $request->category;
-            $page->description      = $request->description;
-            $page->created_by       = Auth::id();
-            $page->status           = 1;
+            $page->page_name = $request->page_name;
+            $page->category_id = $request->category;
+            $page->description = $request->description;
+            $page->created_by = Auth::id();
+            $page->status = 1;
 
             $file = $request->file('cover_image');
-            if ($file)
-            {
-                $folder = Auth::user()->school->slug . '/pages';
-                $path   = $this->uploadFile($folder, $file);
+            if ($file) {
+                $folder = Auth::user()->school->slug.'/pages';
+                $path = $this->uploadFile($folder, $file);
                 $page->cover_image = $path;
             }
 
@@ -126,19 +123,17 @@ class PagesController extends Controller
             );
 
             $res['success'] = $message;
+
             return $res;
-        }
-        catch (Exception $e)
-        {
+        } catch (Exception $e) {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
     /**
      * Get page statistics and user interaction data.
      *
-     * @param int $id
+     * @param  int  $id
      * @return array
      */
     public function showList($id)
@@ -148,24 +143,23 @@ class PagesController extends Controller
 
         $array = [];
 
-        $array['page_name']    = $page->page_name;
-        $array['category']     = $page->category_id;
-        $array['description']  = $page->description;
-        $array['cover_image']  = $page->CoverImagePath;
-        $array['like_count']   = $page->classRoomPageDetail()->where('like', 1)->count();
+        $array['page_name'] = $page->page_name;
+        $array['category'] = $page->category_id;
+        $array['description'] = $page->description;
+        $array['cover_image'] = $page->CoverImagePath;
+        $array['like_count'] = $page->classRoomPageDetail()->where('like', 1)->count();
         $array['unlike_count'] = $page->classRoomPageDetail()->where('dislike', 1)->count();
         $array['follow_count'] = $page->classRoomPageDetail()->where('is_following', 1)->count();
 
         $pagedetail = ClassRoomPageDetail::where([
             ['user_id', Auth::id()],
-            ['page_id', $page->id]
+            ['page_id', $page->id],
         ])->first();
 
-        if ($pagedetail != null)
-        {
+        if ($pagedetail != null) {
             $array['is_following'] = $pagedetail->is_following;
-            $array['like']         = $pagedetail->like;
-            $array['dislike']      = $pagedetail->dislike;
+            $array['like'] = $pagedetail->like;
+            $array['dislike'] = $pagedetail->dislike;
         }
 
         return $array;
@@ -174,28 +168,28 @@ class PagesController extends Controller
     /**
      * Display page detail view.
      *
-     * @param int $id
-     * @return \Illuminate\View\View
+     * @param  int  $id
+     * @return View
      */
     public function show($id)
     {
         //
         $page = ClassRoomPage::where('id', $id)->first();
 
-        $entity_id   = $page->id;
+        $entity_id = $page->id;
         $entity_name = 'App\Models\Page';
 
         return view('/admin/classwall/page/show', [
-            'page'        => $page,
-            'entity_id'   => $entity_id,
-            'entity_name' => $entity_name
+            'page' => $page,
+            'entity_id' => $entity_id,
+            'entity_name' => $entity_name,
         ]);
     }
 
     /**
      * Get page data for edit form.
      *
-     * @param int $id
+     * @param  int  $id
      * @return array
      */
     public function editList($id)
@@ -205,8 +199,8 @@ class PagesController extends Controller
 
         $array = [];
 
-        $array['page_name']   = $page->page_name;
-        $array['category']    = $page->category_id;
+        $array['page_name'] = $page->page_name;
+        $array['category'] = $page->category_id;
         $array['description'] = $page->description;
         $array['cover_image'] = $page->CoverImagePath;
 
@@ -216,40 +210,38 @@ class PagesController extends Controller
     /**
      * Show classroom page edit form.
      *
-     * @param int $id
-     * @return \Illuminate\View\View
+     * @param  int  $id
+     * @return View
      */
     public function edit($id)
     {
         //
         $page = ClassRoomPage::where('id', $id)->first();
+
         return view('/admin/classwall/page/edit', ['page' => $page]);
     }
 
     /**
      * Update a classroom page.
      *
-     * @param \App\Http\Requests\Classwall\PageUpdateRequest $request
-     * @param int $id
+     * @param  int  $id
      * @return array|null
      */
     public function update(PageUpdateRequest $request, $id)
     {
         //
-        try
-        {
+        try {
             $page = ClassRoomPage::where('id', $id)->first();
 
-            $page->page_name   = $request->page_name;
+            $page->page_name = $request->page_name;
             $page->category_id = $request->category;
             $page->description = $request->description;
-            $page->created_by  = Auth::id();
+            $page->created_by = Auth::id();
 
             $file = $request->file('cover_image');
-            if ($file)
-            {
-                $folder = Auth::user()->school->slug . '/pages';
-                $path   = $this->uploadFile($folder, $file);
+            if ($file) {
+                $folder = Auth::user()->school->slug.'/pages';
+                $path = $this->uploadFile($folder, $file);
                 $page->cover_image = $path;
             }
 
@@ -267,30 +259,26 @@ class PagesController extends Controller
             );
 
             $res['success'] = $message;
+
             return $res;
-        }
-        catch (Exception $e)
-        {
+        } catch (Exception $e) {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
     /**
      * Delete a classroom page.
      *
-     * @param int $id
+     * @param  int  $id
      * @return array|null
      */
     public function destroy($id)
     {
         //
-        try
-        {
+        try {
             $page = ClassRoomPage::where('id', $id)->first();
 
-            if (Gate::allows('page', $page))
-            {
+            if (Gate::allows('page', $page)) {
                 $page->delete();
 
                 $message = trans('messages.delete_success_msg', ['module' => 'Page']);
@@ -305,17 +293,13 @@ class PagesController extends Controller
                 );
 
                 $res['success'] = $message;
+
                 return $res;
-            }
-            else
-            {
+            } else {
                 abort(403);
             }
-        }
-        catch (Exception $e)
-        {
+        } catch (Exception $e) {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 }

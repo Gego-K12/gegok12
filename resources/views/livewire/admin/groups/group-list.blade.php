@@ -64,13 +64,13 @@
                                             View
                                         </button>
                                     </a>
-                                    {{-- <a href="#">
                                     <button
+                                        type="button"
+                                        wire:click="edit({{ $group->id }})"
                                         class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs"
                                     >
                                         Edit
                                     </button>
-                                </a> --}}
                                 </div>
                             </td>
                         </tr>
@@ -96,7 +96,9 @@
             <div class="bg-white rounded shadow-lg w-full max-w-md p-6">
 
                 <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-lg font-semibold">Add Group</h2>
+                    <h2 class="text-lg font-semibold">
+                        {{ $group_id ? 'Edit Group' : 'Add Group' }}
+                    </h2>
 
                     <button 
                         type="button"
@@ -178,11 +180,11 @@
                             Cancel
                         </button>
 
-                        <button 
+                        <button
                             type="submit"
                             class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700"
                         >
-                            Save
+                            {{ $group_id ? 'Update' : 'Save' }}
                         </button>
                     </div>
                 </form>

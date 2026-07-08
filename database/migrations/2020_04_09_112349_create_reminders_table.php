@@ -16,15 +16,15 @@ class CreateRemindersTable extends Migration
         Schema::create('reminders', function (Blueprint $table) {
             $table->increments('id');
             $table->bigInteger('school_id')->unsigned();
-            $table->foreign('school_id')->references('id')->on('schools'); 
+            $table->foreign('school_id')->references('id')->on('schools');
             $table->text('from');
             $table->text('to');
             $table->text('subject');
             $table->longtext('message');
             $table->integer('entity_id')->nullable();
             $table->string('entity_name')->nullable();
-            $table->enum('via',['sms','mail','notification','web_notification'])->nullable();
-            $table->enum('queue_status',['queue','process','deliver','cancel'])->default('queue');
+            $table->enum('via', ['sms', 'mail', 'notification', 'web_notification'])->nullable();
+            $table->enum('queue_status', ['queue', 'process', 'deliver', 'cancel'])->default('queue');
             $table->longText('sms_response')->nullable();
             $table->dateTime('executed_at')->nullable();
             $table->integer('template_id')->nullable();

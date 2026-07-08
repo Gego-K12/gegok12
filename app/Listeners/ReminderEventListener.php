@@ -3,12 +3,9 @@
 namespace App\Listeners;
 
 use App\Events\ReminderEvent;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Support\Facades\Mail;
-use App\Traits\ReminderProcess;
 use App\Models\User;
-use App\Models\Events;
+use App\Traits\ReminderProcess;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
 class ReminderEventListener implements ShouldQueue
 {
@@ -32,22 +29,16 @@ class ReminderEventListener implements ShouldQueue
      */
     public function handle(ReminderEvent $event)
     {
-        if($event->via =='mail')
-        {
-            $users=User::where('school_id',$event->school_id)->ByRole('5')->pluck('email')->toArray();
-        }
-        elseif($event->via == 'sms')
-        {
-            $users=User::where('school_id',$event->school_id)->ByRole('5')->pluck('mobile_no')->toArray();
-        }
-        else
-        {
-            $users=User::where('school_id',$event->school_id)->ByRole('5')->pluck('email')->toArray();
+        if ($event->via == 'mail') {
+            $users = User::where('school_id', $event->school_id)->ByRole('5')->pluck('email')->toArray();
+        } elseif ($event->via == 'sms') {
+            $users = User::where('school_id', $event->school_id)->ByRole('5')->pluck('mobile_no')->toArray();
+        } else {
+            $users = User::where('school_id', $event->school_id)->ByRole('5')->pluck('email')->toArray();
         }
 
-        foreach ($users as $user) 
-        {
-            $this->createReminder($event->school_id,$event->from,$user,$event->subject,$event->message,$event->entity_id,$event->entity_name,$event->via,$event->data,$event->executed_at);
+        foreach ($users as $user) {
+            $this->createReminder($event->school_id, $event->from, $user, $event->subject, $event->message, $event->entity_id, $event->entity_name, $event->via, $event->data, $event->executed_at);
         }
     }
 }

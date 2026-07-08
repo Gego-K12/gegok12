@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
@@ -6,18 +7,17 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Requests\LeaveTypeUpdateRequest;
-use App\Http\Requests\LeaveTypeAddRequest;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Helpers\SiteHelper;
-use App\Traits\LogActivity;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\LeaveTypeAddRequest;
+use App\Http\Requests\LeaveTypeUpdateRequest;
 use App\Models\LeaveType;
-use League\Csv\Writer;
 use App\Traits\Common;
-use Carbon\Carbon;
+use App\Traits\LogActivity;
 use Exception;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 /**
  * Class LeaveTypesController
@@ -31,18 +31,16 @@ use Exception;
  * - Update leave type limits
  * - Delete leave types
  * - Log all leave-type related activities
- *
- * @package App\Http\Controllers\Admin
  */
 class LeaveTypesController extends Controller
 {
-    use LogActivity;
     use Common;
+    use LogActivity;
 
     /**
      * Display a list of active leave types for the current academic year.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function index()
     {
@@ -53,18 +51,18 @@ class LeaveTypesController extends Controller
         $leavetypes = LeaveType::where([
             ['school_id', $school_id],
             ['academic_year_id', $academic_year->id],
-            ['status', 1]
+            ['status', 1],
         ])->get();
 
         return view('admin/leavetypes/index', [
-            'leavetypes' => $leavetypes
+            'leavetypes' => $leavetypes,
         ]);
     }
 
     /**
      * Show the form for creating a new leave type.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function create()
     {
@@ -75,24 +73,22 @@ class LeaveTypesController extends Controller
     /**
      * Store a newly created leave type.
      *
-     * @param  \App\Http\Requests\LeaveTypeAddRequest  $request
-     * @return \Illuminate\Http\RedirectResponse|null
+     * @return RedirectResponse|null
      */
     public function store(LeaveTypeAddRequest $request)
     {
         //
-        try
-        {
+        try {
             $school_id = Auth::user()->school_id;
             $academic_year = SiteHelper::getAcademicYear($school_id);
 
             $leavetype = new LeaveType;
 
-            $leavetype->school_id        = $school_id;
+            $leavetype->school_id = $school_id;
             $leavetype->academic_year_id = $academic_year->id;
-            $leavetype->name             = $request->name;
-            $leavetype->max_no_of_days   = $request->max_no_of_days;
-            $leavetype->status           = 1;
+            $leavetype->name = $request->name;
+            $leavetype->max_no_of_days = $request->max_no_of_days;
+            $leavetype->status = 1;
 
             $leavetype->save();
 
@@ -108,10 +104,7 @@ class LeaveTypesController extends Controller
             );
 
             return redirect('/admin/leavetypes')->with('successmessage', $message);
-        }
-        catch (Exception $e)
-        {
-            //dd($e->getMessage());
+        } catch (Exception $e) {
         }
     }
 
@@ -119,7 +112,7 @@ class LeaveTypesController extends Controller
      * Show the form for editing the specified leave type.
      *
      * @param  int  $id
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function edit($id)
     {
@@ -127,25 +120,23 @@ class LeaveTypesController extends Controller
         $leavetype = LeaveType::where('id', $id)->first();
 
         return view('admin/leavetypes/edit', [
-            'leavetype' => $leavetype
+            'leavetype' => $leavetype,
         ]);
     }
 
     /**
      * Update the specified leave type.
      *
-     * @param  \App\Http\Requests\LeaveTypeUpdateRequest  $request
      * @param  int  $id
-     * @return \Illuminate\Http\RedirectResponse|null
+     * @return RedirectResponse|null
      */
     public function update(LeaveTypeUpdateRequest $request, $id)
     {
         //
-        try
-        {
+        try {
             $leavetype = LeaveType::where('id', $id)->first();
 
-            $leavetype->name           = $request->name;
+            $leavetype->name = $request->name;
             $leavetype->max_no_of_days = $request->max_no_of_days;
 
             $leavetype->save();
@@ -162,10 +153,7 @@ class LeaveTypesController extends Controller
             );
 
             return redirect('/admin/leavetypes')->with('successmessage', $message);
-        }
-        catch (Exception $e)
-        {
-            //dd($e->getMessage());
+        } catch (Exception $e) {
         }
     }
 
@@ -173,13 +161,12 @@ class LeaveTypesController extends Controller
      * Remove the specified leave type.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\RedirectResponse|null
+     * @return RedirectResponse|null
      */
     public function destroy($id)
     {
         //
-        try
-        {
+        try {
             $leavetype = LeaveType::where('id', $id)->first();
             $leavetype->delete();
 
@@ -195,10 +182,7 @@ class LeaveTypesController extends Controller
             );
 
             return redirect()->back()->with('successmessage', $message);
-        }
-        catch (Exception $e)
-        {
-            //dd($e->getMessage());
+        } catch (Exception $e) {
         }
     }
 }

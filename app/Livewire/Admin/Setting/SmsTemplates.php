@@ -2,10 +2,10 @@
 
 namespace App\Livewire\Admin\Setting;
 
-use Livewire\Component;
 use App\Models\Smstemplate;
+use Illuminate\View\View;
+use Livewire\Component;
 use Livewire\WithPagination;
-use Jantinnerezo\LivewireAlert\LivewireAlert;
 
 /**
  * Class SmsTemplates
@@ -17,8 +17,6 @@ use Jantinnerezo\LivewireAlert\LivewireAlert;
  * Features:
  * - Paginated SMS template listing
  * - Sorted by latest templates first
- *
- * @package App\Livewire\Admin\Setting
  */
 class SmsTemplates extends Component
 {
@@ -31,14 +29,14 @@ class SmsTemplates extends Component
      * by descending ID and passes the data
      * to the Blade view.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function render()
     {
         $sms_templates = Smstemplate::orderBy('id', 'desc')->paginate(10);
 
         return view('livewire.admin.setting.sms-templates', [
-            'sms_templates' => $sms_templates
+            'sms_templates' => $sms_templates,
         ]);
     }
 }

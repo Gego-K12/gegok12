@@ -17,7 +17,7 @@ class CreateBackgroundImagesTable extends Migration
             $table->increments('id');
             $table->bigInteger('school_id')->unsigned();
             $table->foreign('school_id')->references('id')->on('schools');
-            $table->enum('type',['event','noticeboard']);
+            $table->enum('type', ['event', 'noticeboard']);
             $table->string('background_image')->nullable();
             $table->timestamps();
             $table->softDeletes();

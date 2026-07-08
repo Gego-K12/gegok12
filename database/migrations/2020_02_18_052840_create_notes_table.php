@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateNotesTable extends Migration
 {
@@ -16,14 +16,14 @@ class CreateNotesTable extends Migration
         Schema::create('notes', function (Blueprint $table) {
             $table->increments('id');
             $table->bigInteger('school_id')->unsigned();
-            $table->foreign('school_id')->references('id')->on('schools'); 
-            $table->longtext('notes');      
+            $table->foreign('school_id')->references('id')->on('schools');
+            $table->longtext('notes');
             $table->integer('entity_id');
             $table->text('entity_name');
             $table->integer('created_by')->unsigned();
             $table->foreign('created_by')->references('id')->on('users');
             $table->integer('updated_by')->unsigned();
-            $table->foreign('updated_by')->references('id')->on('users');    
+            $table->foreign('updated_by')->references('id')->on('users');
             $table->timestamps();
         });
     }

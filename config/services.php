@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\User;
+
 return [
 
     /*
@@ -30,18 +32,18 @@ return [
     ],
 
     'stripe' => [
-        'model' => App\Models\User::class,
+        'model' => User::class,
         'key' => env('STRIPE_KEY'),
         'secret' => env('STRIPE_SECRET'),
     ],
-     'twilio' => [
-         'sid' => env('TWILIO_SID'),
-         'token' => env('TWILIO_TOKEN'),
-         'key' => env('TWILIO_KEY'),
-         'secret' => env('TWILIO_SECRET')
-      ],
-      'google_maps' => [
-            'key' => env('GOOGLE_MAPS_API_KEY'),
-        ]
+    'twilio' => [
+        'sid' => env('TWILIO_SID'),
+        'token' => env('TWILIO_TOKEN'),
+        'key' => env('TWILIO_KEY'),
+        'secret' => env('TWILIO_SECRET'),
+    ],
+    'google_maps' => [
+        'key' => env('GOOGLE_MAPS_API_KEY'),
+    ],
 
 ];

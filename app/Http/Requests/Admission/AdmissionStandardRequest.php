@@ -25,11 +25,11 @@ class AdmissionStandardRequest extends FormRequest
     {
         return [
             //
-            'standard_id'   => 'required',           
+            'standard_id' => 'required',
         ];
     }
 
-     public function messages()
+    public function messages()
     {
         return
         [

@@ -11,17 +11,18 @@
     "require": {
         "php": "^8.4",
         "algolia/algoliasearch-client-php": "*",
-        "aws/aws-sdk-php-laravel": "dev-master",
+        "aws/aws-sdk-php-laravel": "^3.11",
         "barryvdh/laravel-dompdf": "v3.1.1",
         "filament/tables": "^3.2",
+        "gegok12/work-permission": "1.0.0",
         "guzzlehttp/guzzle": "^7.8",
         "jantinnerezo/livewire-alert": "^3.0-stable",
         "kreait/laravel-firebase": "^6.1",
-        "laracasts/presenter": "dev-master",
+        "laracasts/presenter": "^0.2.8",
         "laravel-notification-channels/fcm": "^5.0",
         "laravel/framework": "^12.0",
         "laravel/helpers": "*",
-        "laravel/legacy-factories": "1.x-dev",
+        "laravel/legacy-factories": "^1.4",
         "laravel/sanctum": "^4.2.0",
         "laravel/scout": "^10.20.0",
         "laravel/tinker": "^2.10.1",
@@ -29,11 +30,11 @@
         "league/csv": "^9.11",
         "league/flysystem-aws-s3-v3": "^3.24.0",
         "livewire/livewire": "^3.4",
-        "maatwebsite/excel": "3.1.x-dev",
+        "maatwebsite/excel": "4.x-dev",
         "nckg/laravel-impersonate": "4.0.1",
         "predis/predis": "v3.0.0-alpha1",
         "pusher/pusher-php-server": "7.2",
-        "santigarcor/laratrust": "8.x-dev",
+        "santigarcor/laratrust": "^8.5",
         "spatie/laravel-activitylog": "4.10.2",
         "spatie/laravel-ignition": "^2.0",
         "spatie/laravel-medialibrary": "^11.17.0",
@@ -44,8 +45,8 @@
         "symfony/mailgun-mailer": "^7.2",
         "symfony/postmark-mailer": "^7.2",
         "symfony/process": "^7.0",
-        "titasgailius/search-relations": "dev-master",
-        "twilio/sdk": "dev-main"
+        "titasgailius/search-relations": "^2.0",
+        "twilio/sdk": "^8.11"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.13",
@@ -128,5 +129,11 @@
         }
     },
     "minimum-stability": "stable",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "repositories": [
+        {
+            "type": "path",
+            "url": "custompackages/gegok12/workpermission"
+        }
+    ]
 }

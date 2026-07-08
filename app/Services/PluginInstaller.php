@@ -75,6 +75,8 @@ class PluginInstaller
         try {
             if ($plugin->source_type === 'zip') {
                 $this->prepareZipSource($plugin);
+            } elseif ($plugin->source_type === 'path') {
+                $this->preparePathSource($plugin);
             } else {
                 $this->prepareGitSource($plugin);
             }
@@ -280,6 +282,24 @@ class PluginInstaller
             'url' => $plugin->source_ref,
         ]);
         $plugin->appendLog("Registered git repository {$plugin->source_ref}.");
+    }
+
+    /**
+     * A plugin scaffolded locally via `gegok12:newPlugin` — source_ref holds
+     * "{vendor}/{slug}", already sitting at custompackages/{vendor}/{slug}
+     * (the scaffold command writes the files directly there), so this just
+     * registers the composer path repository pointing at it. Unlike zip
+     * installs, there's no extraction/move step, and unlike zip's uninstall
+     * behavior, the source is never deleted on uninstall — it's the
+     * developer's own working copy, not a byproduct of the install.
+     */
+    private function preparePathSource(Plugin $plugin): void
+    {
+        $this->addRepository($plugin, [
+            'type' => 'path',
+            'url' => 'custompackages/'.$plugin->source_ref,
+        ]);
+        $plugin->appendLog("Registered local path repository custompackages/{$plugin->source_ref}.");
     }
 
     private function addRepository(Plugin $plugin, array $repository): void

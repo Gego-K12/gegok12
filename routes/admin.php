@@ -829,3 +829,7 @@ Route::get('setting/edit/standard/{id}', function ($id) {
 if (file_exists(base_path('routes/gworkpermission-admin.php'))) {
     require base_path('routes/gworkpermission-admin.php');
 }
+
+if (file_exists(base_path('routes/gshort-term-courses-admin.php'))) {
+    require base_path('routes/gshort-term-courses-admin.php');
+}

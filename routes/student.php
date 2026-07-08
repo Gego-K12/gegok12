@@ -134,3 +134,7 @@ Route::get('/feed/filter', 'FeedController@filter');
 // index
 Route::get('/notice/show/list', 'NoticeBoardController@list');
 Route::get('/notices', 'NoticeBoardController@index');
+
+if (file_exists(base_path('routes/gshort-term-courses-student.php'))) {
+    require base_path('routes/gshort-term-courses-student.php');
+}

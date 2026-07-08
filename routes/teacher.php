@@ -431,3 +431,7 @@ Route::get('groups/{standardLinkId}', 'GroupController@index');
 if (file_exists(base_path('routes/gworkpermission-teacher.php'))) {
     require base_path('routes/gworkpermission-teacher.php');
 }
+
+if (file_exists(base_path('routes/gshort-term-courses-teacher.php'))) {
+    require base_path('routes/gshort-term-courses-teacher.php');
+}

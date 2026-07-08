@@ -1,13 +1,16 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
  */
+
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class ParentProfile
@@ -28,16 +31,17 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property \DateTime $created_at
  * @property \DateTime $updated_at
  * @property \DateTime $deleted_at
- * @property-read \App\Models\School $school
- * @property-read \App\Models\User $user
- * @property-read \App\Models\Qualification $qualification
+ * @property-read School $school
+ * @property-read User $user
+ * @property-read Qualification $qualification
+ *
  * @mixin \Eloquent
  */
 class ParentProfile extends Model
 {
+    use HasFactory;
     //
     use SoftDeletes;
-    use HasFactory;
 
     /**
      * The table associated with the model.
@@ -59,36 +63,36 @@ class ParentProfile extends Model
      * @var array
      */
     protected $fillable = [
-      'school_id' , 'user_id' , 'qualification_id' , 'profession' , 'sub_occupation'  , 'designation' , 'organization_name' , 'official_address' , 'relation' , 'annual_income'
+        'school_id', 'user_id', 'qualification_id', 'profession', 'sub_occupation', 'designation', 'organization_name', 'official_address', 'relation', 'annual_income',
     ];
 
     /**
      * Get the school for this parent profile.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function school()
     {
-      return $this->belongsTo('App\Models\School','school_id');
+        return $this->belongsTo('App\Models\School', 'school_id');
     }
 
     /**
      * Get the user for this parent profile.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function user()
     {
-      return $this->belongsTo('App\Models\User','user_id');
+        return $this->belongsTo('App\Models\User', 'user_id');
     }
 
     /**
      * Get the qualification for this parent.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function qualification()
     {
-        return $this->belongsTo('\App\Models\Qualification','qualification_id');
+        return $this->belongsTo('\App\Models\Qualification', 'qualification_id');
     }
 }

@@ -2,10 +2,11 @@
 
 namespace Database\Factories;
 
+use App\Models\SalaryItem;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\SalaryItem>
+ * @extends Factory<SalaryItem>
  */
 class SalaryItemFactory extends Factory
 {
@@ -17,7 +18,7 @@ class SalaryItemFactory extends Factory
     public function definition(): array
     {
         return [
-            'amount' => $this->faker->randomFloat(2, 100, 3000)
+            'amount' => $this->faker->randomFloat(2, 100, 3000),
         ];
     }
 }

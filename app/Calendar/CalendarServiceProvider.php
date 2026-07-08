@@ -3,7 +3,6 @@
 namespace App\Calendar;
 
 use Illuminate\Support\ServiceProvider;
-use App\Calendar\CalendarService;
 
 /**
  * Class CalendarServiceProvider
@@ -11,8 +10,6 @@ use App\Calendar\CalendarService;
  * Service provider responsible for registering
  * the Calendar service within the Laravel
  * service container.
- *
- * @package App\Calendar
  */
 class CalendarServiceProvider extends ServiceProvider
 {
@@ -27,8 +24,8 @@ class CalendarServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind('calendar', function() {
-            return new CalendarService();
+        $this->app->bind('calendar', function () {
+            return new CalendarService;
         });
     }
 
@@ -40,8 +37,5 @@ class CalendarServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
-    {
-       
-    }
+    public function boot() {}
 }

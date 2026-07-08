@@ -24,20 +24,20 @@ class BankDetailRequest extends FormRequest
     public function rules()
     {
         return [
-            'bank_name'     =>'required',
-            'key'           =>'required',
-            'account_number'=>'required|numeric',
-            'ifsc_code'     =>'required',
+            'bank_name' => 'required',
+            'key' => 'required',
+            'account_number' => 'required|numeric',
+            'ifsc_code' => 'required',
         ];
     }
 
-     public function messages()
+    public function messages()
     {
-        return[
-            'bank_name.required'       =>  'Enter Bank Name',
-            'key.required'             =>  'Enter key',
-            'account_number.required'  =>  'Enter Account number',
-            'ifsc_code.required'       =>  'Enter valid IFSC code',
+        return [
+            'bank_name.required' => 'Enter Bank Name',
+            'key.required' => 'Enter key',
+            'account_number.required' => 'Enter Account number',
+            'ifsc_code.required' => 'Enter valid IFSC code',
         ];
     }
 }

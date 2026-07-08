@@ -1,13 +1,12 @@
 <?php
 
 namespace App\Http\Requests;
- 
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Auth;
+
 use App\Models\User;
 use Hash;
-use Lang;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class ChangePasswordRequest extends FormRequest
 {
@@ -27,35 +26,32 @@ class ChangePasswordRequest extends FormRequest
      * @return array
      */
     public function rules()
-    {      
-        Validator::extend('checkpassword', function ($attribute, $value, $parameters, $validator) 
-        {
+    {
+        Validator::extend('checkpassword', function ($attribute, $value, $parameters, $validator) {
             $user = User::find(Auth::id());
             $hashedPassword = $user->password;
 
-            if($user->password!='') 
-            {
-                if(Hash::check(request('oldpassword'),$hashedPassword)) 
-                {
-                    return TRUE;
-                } 
-                return FALSE;
-            }
-        });      
+            if ($user->password != '') {
+                if (Hash::check(request('oldpassword'), $hashedPassword)) {
+                    return true;
+                }
 
-        Validator::extend('check_new_password', function ($attribute, $value, $parameters, $validator) 
-        {
-            if(request('newpassword') == request('oldpassword')) 
-            {
-                return FALSE;
+                return false;
             }
-            return TRUE;
-        });  
+        });
+
+        Validator::extend('check_new_password', function ($attribute, $value, $parameters, $validator) {
+            if (request('newpassword') == request('oldpassword')) {
+                return false;
+            }
+
+            return true;
+        });
 
         return [
-            'oldpassword'       => 'required|checkpassword', 
-            'newpassword'       => 'required|min:8|check_new_password', 
-            'confirmpassword'   => 'required|min:8|same:newpassword'              
+            'oldpassword' => 'required|checkpassword',
+            'newpassword' => 'required|min:8|check_new_password',
+            'confirmpassword' => 'required|min:8|same:newpassword',
         ];
     }
 
@@ -65,18 +61,18 @@ class ChangePasswordRequest extends FormRequest
      * @return array
      */
     public function messages()
-    {      
+    {
         return [
-            'oldpassword.required'              =>  __('userprofile.oldpassword'), 
-            'oldpassword.checkpassword'         =>  __('userprofile.oldpassword_err'), 
+            'oldpassword.required' => __('userprofile.oldpassword'),
+            'oldpassword.checkpassword' => __('userprofile.oldpassword_err'),
 
-            'newpassword.required'              =>  __('userprofile.newpassword'),
-            'newpassword.min'                   =>  __('userprofile.newpassword_min'),
-            'newpassword.check_new_password'    =>  __('userprofile.check_new_password'),
+            'newpassword.required' => __('userprofile.newpassword'),
+            'newpassword.min' => __('userprofile.newpassword_min'),
+            'newpassword.check_new_password' => __('userprofile.check_new_password'),
 
-            'confirmpassword.required'          =>  __('userprofile.confirmpassword'),
-            'confirmpassword.min'               =>  __('userprofile.newpassword_min'),
-            'confirmpassword.same'              =>  __('userprofile.same_confirmpassword'),              
+            'confirmpassword.required' => __('userprofile.confirmpassword'),
+            'confirmpassword.min' => __('userprofile.newpassword_min'),
+            'confirmpassword.same' => __('userprofile.same_confirmpassword'),
         ];
     }
 }

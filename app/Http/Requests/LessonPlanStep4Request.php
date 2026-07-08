@@ -24,29 +24,27 @@ class LessonPlanStep4Request extends FormRequest
      */
     public function rules()
     {
-        Validator::extend('check_modification',function($attribute,$value,$parameters,$validator)
-        {
+        Validator::extend('check_modification', function ($attribute, $value, $parameters, $validator) {
             return preg_match('/^[A-Za-z0-9_~\-!@#\$%\^&*.,:(\)\s]+$/', $attribute);
         });
 
-        Validator::extend('check_notes',function($attribute,$value,$parameters,$validator)
-        {
+        Validator::extend('check_notes', function ($attribute, $value, $parameters, $validator) {
             return preg_match('/^[A-Za-z0-9_~\-!@#\$%\^&*.,:(\)\s]+$/', $attribute);
         });
 
         return [
             //
-            'modification'          => 'nullable|check_modification',
-            'notes'                 => 'nullable|check_notes',
+            'modification' => 'nullable|check_modification',
+            'notes' => 'nullable|check_notes',
         ];
     }
 
     public function messages()
     {
         return [
-            'modification.check_modification'           => 'Enter Valid Modification',
+            'modification.check_modification' => 'Enter Valid Modification',
 
-            'notes.check_notes'                         => 'Enter Valid Notes',
+            'notes.check_notes' => 'Enter Valid Notes',
         ];
     }
 }

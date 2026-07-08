@@ -1,89 +1,89 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
  */
+
 namespace App\Http\Controllers\Teacher;
 
-use App\Http\Resources\VisitorLog as VisitorLogResource;
 use App\Events\Notification\SingleNotificationEvent;
-use App\Http\Resources\User as UserResource;
-use App\Http\Requests\VisitorLogRequest;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Controller;
-use App\Models\Users\StudentUser;
-use App\Models\ParentProfile;
-use Illuminate\Http\Request;
 use App\Helpers\SiteHelper;
-use App\Traits\LogActivity;
-use App\Models\Userprofile;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\VisitorLogRequest;
+use App\Http\Resources\User as UserResource;
+use App\Http\Resources\VisitorLog as VisitorLogResource;
+use App\Models\ParentProfile;
+use App\Models\User;
+use App\Models\Users\StudentUser;
 use App\Models\VisitorLog;
 use App\Traits\Common;
-use App\Models\User;
+use App\Traits\LogActivity;
 use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 use Log;
+
 /**
  * Class VisitorLogController
  *
  * Handles visitor log management for teachers including
  * listing, creating, viewing, updating and deleting visitor records.
- *
- * @package App\Http\Controllers\Teacher
  */
 class VisitorLogController extends Controller
 {
-    use LogActivity;
     use Common;
+    use LogActivity;
 
     /**
      * Display paginated visitor log list (API).
      *
-     * @param  Request  $request
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @return AnonymousResourceCollection
      */
     public function showlist(Request $request)
     {
         $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
 
-        $visitorlog = VisitorLog::where([['school_id',Auth::user()->school_id],['academic_year_id',$academic_year->id]])->orderBy('date_of_visit','DESC')->paginate(5);       
-       
+        $visitorlog = VisitorLog::where([['school_id', Auth::user()->school_id], ['academic_year_id', $academic_year->id]])->orderBy('date_of_visit', 'DESC')->paginate(5);
+
         $visitorloglist = VisitorLogResource::collection($visitorlog);
-        
+
         return $visitorloglist;
     }
 
     /**
      * Show visitor log listing page.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function index()
-    { 
+    {
         return view('/teacher/visitorlog/index');
     }
-     
-     /**
+
+    /**
      * Get required data for visitor log create/edit forms.
      *
      * Includes teachers, standards and students based on standard selection.
      *
-     * @param  Request  $request
      * @return array
-     */ 
-     public function list(Request $request)
+     */
+    public function list(Request $request)
     {
         //
         $array = [];
 
-        $teacher    =   User::BySchool(Auth::user()->school_id)->where('usergroup_id',5)->orWhere('usergroup_id',8)->ByStatus('active')->get();
-        $array['teacherlist']   = UserResource::collection($teacher);
+        $teacher = User::BySchool(Auth::user()->school_id)->where('usergroup_id', 5)->orWhere('usergroup_id', 8)->ByStatus('active')->get();
+        $array['teacherlist'] = UserResource::collection($teacher);
 
-        $array['standardlist']  = SiteHelper::getStandardLinkList(Auth::user()->school_id);
+        $array['standardlist'] = SiteHelper::getStandardLinkList(Auth::user()->school_id);
 
-        if($request->standardLink_id != null)
-        {
+        if ($request->standardLink_id != null) {
             $studentlist = StudentUser::BySchool(Auth::user()->school_id)->ByRole(6)->ByStandard($request->standardLink_id)->get();
-            $array['studentlist']   = UserResource::collection($studentlist);
+            $array['studentlist'] = UserResource::collection($studentlist);
         }
 
         return $array;
@@ -92,110 +92,98 @@ class VisitorLogController extends Controller
     /**
      * Show visitor log create page.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function create()
     {
         $date = date('Y-m-d');
 
-        return view('/teacher/visitorlog/create',['date' => $date]);
+        return view('/teacher/visitorlog/create', ['date' => $date]);
     }
-    
+
     /**
      * Store a new visitor log entry.
      *
-     * @param  VisitorLogRequest  $request
      * @return array
      */
     public function store(VisitorLogRequest $request)
     {
-        try 
-        {
+        try {
             $school_id = Auth::user()->school_id;
             $academic_year = SiteHelper::getAcademicYear($school_id);
 
             $visitorlog = new VisitorLog;
 
-            $visitorlog->school_id              =   $school_id;
-            $visitorlog->academic_year_id       =   $academic_year->id;           
-            $visitorlog->student_id             =   $request->student_id;
-            $visitorlog->relation               =   $request->relation;
-            $visitorlog->relation_with_student  =   $request->relation_with_student;
-            if($request->relation=='parent')
-            {
-                $student = User::where('id',$request->student_id)->first();
+            $visitorlog->school_id = $school_id;
+            $visitorlog->academic_year_id = $academic_year->id;
+            $visitorlog->student_id = $request->student_id;
+            $visitorlog->relation = $request->relation;
+            $visitorlog->relation_with_student = $request->relation_with_student;
+            if ($request->relation == 'parent') {
+                $student = User::where('id', $request->student_id)->first();
 
-                if( ($request->relation_with_student == 'father') || ($request->relation_with_student == 'mother') )
-                {
-                    foreach($student->parents as $parent)
-                    { 
-                        $parentprofile = ParentProfile::where('user_id',$parent->userParent->id)->first();
+                if (($request->relation_with_student == 'father') || ($request->relation_with_student == 'mother')) {
+                    foreach ($student->parents as $parent) {
+                        $parentprofile = ParentProfile::where('user_id', $parent->userParent->id)->first();
 
-                        if($request->relation_with_student == $parentprofile->relation)
-                        {
-                            $visitorlog->name           = $parentprofile->user->FullName;
+                        if ($request->relation_with_student == $parentprofile->relation) {
+                            $visitorlog->name = $parentprofile->user->FullName;
                             $visitorlog->contact_number = $parentprofile->user->mobile_no;
-                            $visitorlog->email          = $parentprofile->user->email;
-                            $visitorlog->address        = $parentprofile->official_address;
+                            $visitorlog->email = $parentprofile->user->email;
+                            $visitorlog->address = $parentprofile->official_address;
                         }
                     }
+                } elseif ($request->relation_with_student == 'others') {
+                    $visitorlog->relation_name = $request->relation_name;
+                    $visitorlog->name = $request->name;
+                    $visitorlog->contact_number = $request->contact_number;
+                    $visitorlog->email = $request->email;
+                    $visitorlog->address = $request->address;
                 }
-                elseif($request->relation_with_student == 'others')
-                {
-                    $visitorlog->relation_name          =   $request->relation_name;
-                    $visitorlog->name                   =   $request->name;
-                    $visitorlog->contact_number         =   $request->contact_number;
-                    $visitorlog->email                  =   $request->email;
-                    $visitorlog->address                =   $request->address;
-                }             
-            }
-            else
-            {
-                $visitorlog->name                   =   $request->name;
-                $visitorlog->contact_number         =   $request->contact_number;
-                $visitorlog->email                  =   $request->email;
+            } else {
+                $visitorlog->name = $request->name;
+                $visitorlog->contact_number = $request->contact_number;
+                $visitorlog->email = $request->email;
             }
 
-            $visitorlog->employee_id            =   $request->employee_id;
-            $visitorlog->visiting_purpose       =   $request->visiting_purpose;
-            $visitorlog->number_of_visitors     =   $request->number_of_visitors;
-            $visitorlog->company_name           =   $request->company_name;
-            $visitorlog->address                =   $request->address;
-            $visitorlog->date_of_visit          =   date('Y-m-d',strtotime($request->date_of_visit));
-            $visitorlog->entry_time             =   $request->entry_time;
-            $visitorlog->exit_time              =   $request->exit_time;
-            $visitorlog->remark                 =   $request->remark;
+            $visitorlog->employee_id = $request->employee_id;
+            $visitorlog->visiting_purpose = $request->visiting_purpose;
+            $visitorlog->number_of_visitors = $request->number_of_visitors;
+            $visitorlog->company_name = $request->company_name;
+            $visitorlog->address = $request->address;
+            $visitorlog->date_of_visit = date('Y-m-d', strtotime($request->date_of_visit));
+            $visitorlog->entry_time = $request->entry_time;
+            $visitorlog->exit_time = $request->exit_time;
+            $visitorlog->remark = $request->remark;
 
             $visitorlog->save();
 
-            $message = trans('messages.add_success_msg',['module' => 'Visitor Log']);
+            $message = trans('messages.add_success_msg', ['module' => 'Visitor Log']);
 
             $data = [];
 
-            $data['user']       = SiteHelper::getAdmin($school_id);
-            $data['details']    = trans('notification.add_success_msg',['user' => Auth::user()->FullName , 'module' => 'Visitor Log']);
+            $data['user'] = SiteHelper::getAdmin($school_id);
+            $data['details'] = trans('notification.add_success_msg', ['user' => Auth::user()->FullName, 'module' => 'Visitor Log']);
 
             event(new SingleNotificationEvent($data));
 
-            $ip= $this->getRequestIP();
+            $ip = $this->getRequestIP();
             $this->doActivityLog(
                 $visitorlog,
                 Auth::user(),
-                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT'] ],
+                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT']],
                 LOGNAME_ADD_VISITOR_LOG,
                 $message
-            ); 
+            );
 
             $res['success'] = $message;
+
             return $res;
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
-    
+
     /**
      * Display visitor log details.
      *
@@ -204,37 +192,33 @@ class VisitorLogController extends Controller
      */
     public function show($id)
     {
-        $visitorlog=VisitorLog::where('id',$id)->first();
+        $visitorlog = VisitorLog::where('id', $id)->first();
 
         $array = [];
 
-        $array['id']                    =  $visitorlog->id;
-        $array['name']                  =  $visitorlog->name;
-        $array['relation']              =  $visitorlog->relation;   
-        if($visitorlog->relation == 'parent')
-        {
-            $array['standardLink_id']       =  $visitorlog->getstandard($visitorlog->student_id);
-            $array['student_id']            =  $visitorlog->student_id;
-            $array['relation_with_student'] =  $visitorlog->relation_with_student;
-            if($visitorlog->relation_with_student == 'others')
-            {
-                $array['relation_name']    =   $visitorlog->relation_name;
+        $array['id'] = $visitorlog->id;
+        $array['name'] = $visitorlog->name;
+        $array['relation'] = $visitorlog->relation;
+        if ($visitorlog->relation == 'parent') {
+            $array['standardLink_id'] = $visitorlog->getstandard($visitorlog->student_id);
+            $array['student_id'] = $visitorlog->student_id;
+            $array['relation_with_student'] = $visitorlog->relation_with_student;
+            if ($visitorlog->relation_with_student == 'others') {
+                $array['relation_name'] = $visitorlog->relation_name;
             }
-        } 
-        else
-        {           
-            $array['company_name']          =  $visitorlog->company_name;
-            $array['contact_number']        =  $visitorlog->contact_number;
-            $array['address']               =  $visitorlog->address;
+        } else {
+            $array['company_name'] = $visitorlog->company_name;
+            $array['contact_number'] = $visitorlog->contact_number;
+            $array['address'] = $visitorlog->address;
         }
-        $array['email']                 =  $visitorlog->email == null ? "":$visitorlog->email;
-        $array['number_of_visitors']    =  $visitorlog->number_of_visitors;
-        $array['visiting_purpose']      =  $visitorlog->visiting_purpose;      
-        $array['employee_id']           =  $visitorlog->employee_id;
-        $array['date_of_visit']         =  date('Y-m-d',strtotime($visitorlog->date_of_visit));
-        $array['entry_time']            =  $visitorlog->entry_time;
-        $array['exit_time']             =  $visitorlog->exit_time;
-        $array['remark']                =  $visitorlog->remark == null ? "":$visitorlog->remark;
+        $array['email'] = $visitorlog->email == null ? '' : $visitorlog->email;
+        $array['number_of_visitors'] = $visitorlog->number_of_visitors;
+        $array['visiting_purpose'] = $visitorlog->visiting_purpose;
+        $array['employee_id'] = $visitorlog->employee_id;
+        $array['date_of_visit'] = date('Y-m-d', strtotime($visitorlog->date_of_visit));
+        $array['entry_time'] = $visitorlog->entry_time;
+        $array['exit_time'] = $visitorlog->exit_time;
+        $array['remark'] = $visitorlog->remark == null ? '' : $visitorlog->remark;
 
         return $array;
     }
@@ -243,110 +227,97 @@ class VisitorLogController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit($id)
     {
-        $visitorlog = VisitorLog::where([['id',$id],['school_id',Auth::user()->school_id]])->first();
+        $visitorlog = VisitorLog::where([['id', $id], ['school_id', Auth::user()->school_id]])->first();
 
-        return view('/teacher/visitorlog/edit' , ['visitorlog' => $visitorlog]);
+        return view('/teacher/visitorlog/edit', ['visitorlog' => $visitorlog]);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(VisitorLogRequest $request, $id)
     {
-        
-        try
-        {
-            $visitorlog = VisitorLog::where('id',$id)->first();
 
-            $visitorlog->student_id             =   $request->student_id;
-            $visitorlog->relation               =   $request->relation;
-            $visitorlog->relation_with_student  =   $request->relation_with_student;
-            if($request->relation=='parent')
-            {
-                $student = User::where('id',$request->student_id)->first();
+        try {
+            $visitorlog = VisitorLog::where('id', $id)->first();
 
-                if( ($request->relation_with_student == 'father') || ($request->relation_with_student == 'mother') )
-                {
-                    foreach($student->parents as $parent)
-                    { 
-                        $parentprofile = ParentProfile::where('user_id',$parent->userParent->id)->first();
+            $visitorlog->student_id = $request->student_id;
+            $visitorlog->relation = $request->relation;
+            $visitorlog->relation_with_student = $request->relation_with_student;
+            if ($request->relation == 'parent') {
+                $student = User::where('id', $request->student_id)->first();
 
-                        if($request->relation_with_student == $parentprofile->relation)
-                        {
-                            $visitorlog->name           = $parentprofile->user->FullName;
+                if (($request->relation_with_student == 'father') || ($request->relation_with_student == 'mother')) {
+                    foreach ($student->parents as $parent) {
+                        $parentprofile = ParentProfile::where('user_id', $parent->userParent->id)->first();
+
+                        if ($request->relation_with_student == $parentprofile->relation) {
+                            $visitorlog->name = $parentprofile->user->FullName;
                             $visitorlog->contact_number = $parentprofile->user->mobile_no;
-                            $visitorlog->email          = $parentprofile->user->email;
-                            $visitorlog->address        = $parentprofile->official_address;
+                            $visitorlog->email = $parentprofile->user->email;
+                            $visitorlog->address = $parentprofile->official_address;
                         }
                     }
+                } elseif ($request->relation_with_student == 'others') {
+                    $visitorlog->relation_name = $request->relation_name;
+                    $visitorlog->name = $request->name;
+                    $visitorlog->contact_number = $request->contact_number;
+                    $visitorlog->email = $request->email;
+                    $visitorlog->address = $request->address;
                 }
-                elseif($request->relation_with_student == 'others')
-                {
-                    $visitorlog->relation_name          =   $request->relation_name;
-                    $visitorlog->name                   =   $request->name;
-                    $visitorlog->contact_number         =   $request->contact_number;
-                    $visitorlog->email                  =   $request->email;
-                    $visitorlog->address                =   $request->address;
-                }             
-            }
-            else
-            {
-                $visitorlog->name                   =   $request->name;
-                $visitorlog->contact_number         =   $request->contact_number;
-                $visitorlog->email                  =   $request->email;
-                $visitorlog->address                =   $request->address;
+            } else {
+                $visitorlog->name = $request->name;
+                $visitorlog->contact_number = $request->contact_number;
+                $visitorlog->email = $request->email;
+                $visitorlog->address = $request->address;
             }
 
-            $visitorlog->employee_id            =   $request->employee_id;
-            $visitorlog->visiting_purpose       =   $request->visiting_purpose;
-            $visitorlog->number_of_visitors     =   $request->number_of_visitors;
-            if($request->company_name != null)
-            {
-                $visitorlog->company_name           =   $request->company_name;
+            $visitorlog->employee_id = $request->employee_id;
+            $visitorlog->visiting_purpose = $request->visiting_purpose;
+            $visitorlog->number_of_visitors = $request->number_of_visitors;
+            if ($request->company_name != null) {
+                $visitorlog->company_name = $request->company_name;
             }
-            $visitorlog->date_of_visit          =   date('Y-m-d',strtotime($request->date_of_visit));
-            $visitorlog->entry_time             =   $request->entry_time;
-            $visitorlog->exit_time              =   $request->exit_time;
-            if($request->remark != null)
-            {
-                $visitorlog->remark                 =   $request->remark;
+            $visitorlog->date_of_visit = date('Y-m-d', strtotime($request->date_of_visit));
+            $visitorlog->entry_time = $request->entry_time;
+            $visitorlog->exit_time = $request->exit_time;
+            if ($request->remark != null) {
+                $visitorlog->remark = $request->remark;
             }
 
             $visitorlog->save();
 
-            $message=trans('messages.update_success_msg',['module' => 'Visitor Log']);
+            $message = trans('messages.update_success_msg', ['module' => 'Visitor Log']);
 
             $data = [];
 
-            $data['user']       = SiteHelper::getAdmin($school_id);
-            $data['details']    = trans('notification.update_success_msg',['user' => Auth::user()->FullName , 'module' => 'Visitor Log']);
+            $data['user'] = SiteHelper::getAdmin($school_id);
+            $data['details'] = trans('notification.update_success_msg', ['user' => Auth::user()->FullName, 'module' => 'Visitor Log']);
 
             event(new SingleNotificationEvent($data));
 
-            $ip= $this->getRequestIP();
+            $ip = $this->getRequestIP();
             $this->doActivityLog(
                 $visitorlog,
                 Auth::user(),
-                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT'] ],
+                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT']],
                 LOGNAME_EDIT_VISITOR_LOG,
                 $message
             );
 
             $res['success'] = $message;
+
             return $res;
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -354,41 +325,38 @@ class VisitorLogController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy($id)
     {
-        try 
-        {
-            $visitorlog=VisitorLog::where('id',$id)->first();
+        try {
+            $visitorlog = VisitorLog::where('id', $id)->first();
 
             $visitorlog->delete();
 
-            $message=trans('messages.delete_success_msg',['module' => 'Visitor Log']);
+            $message = trans('messages.delete_success_msg', ['module' => 'Visitor Log']);
 
             $data = [];
 
-            $data['user']       = SiteHelper::getAdmin(Auth::user()->school_id);
-            $data['details']    = trans('notification.delete_success_msg',['user' => Auth::user()->FullName , 'module' => 'Visitor Log']);
+            $data['user'] = SiteHelper::getAdmin(Auth::user()->school_id);
+            $data['details'] = trans('notification.delete_success_msg', ['user' => Auth::user()->FullName, 'module' => 'Visitor Log']);
 
             event(new SingleNotificationEvent($data));
 
-            $ip= $this->getRequestIP();
+            $ip = $this->getRequestIP();
             $this->doActivityLog(
                 $visitorlog,
                 Auth::user(),
-                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT'] ],
+                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT']],
                 LOGNAME_DELETE_VISITOR_LOG,
                 $message
             );
 
             $res['message'] = $message;
+
             return $res;
-        }
-        catch(Exception $e) 
-        {
+        } catch (Exception $e) {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 }

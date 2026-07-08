@@ -1,21 +1,23 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
  */
+
 namespace App\Http\Controllers\Teacher;
 
 use App\Events\Notification\SingleNotificationEvent;
-use App\Http\Resources\CallLog as CallLogResource;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Http\Requests\LogRequest;
 use App\Helpers\SiteHelper;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\LogRequest;
+use App\Http\Resources\CallLog as CallLogResource;
 use App\Models\CallLog;
-use App\Models\User;
 use App\Traits\Common;
 use App\Traits\LogActivity;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 
 class CallLogController extends Controller
 {
@@ -25,23 +27,22 @@ class CallLogController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function showlist(Request $request)
     {
         $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
 
-        $calllog = CallLog::where([['school_id',Auth::user()->school_id],['academic_year_id',$academic_year->id]])->get();
-       
-       
+        $calllog = CallLog::where([['school_id', Auth::user()->school_id], ['academic_year_id', $academic_year->id]])->get();
+
         $callloglist = CallLogResource::collection($calllog);
-        
+
         return $callloglist;
     }
 
     public function index()
-    { 
-        //$calllog=CallLog::where('id',$id)->first();
+    {
+        // $calllog=CallLog::where('id',$id)->first();
         return view('/teacher/calllog/index');
     }
 
@@ -52,75 +53,59 @@ class CallLogController extends Controller
 
     public function store(LogRequest $request)
     {
-        try 
-        {
+        try {
             $school_id = Auth::user()->school_id;
 
             $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
 
-            $calllog=new CallLog;
+            $calllog = new CallLog;
 
-            $calllog->school_id=$school_id;
-            $calllog->academic_year_id=$academic_year->id;
-            $calllog->name=$request->name;
-            $calllog->calling_purpose=$request->calling_purpose;
-            $calllog->call_type=$request->call_type;
-            $calllog->incoming_number=$request->incoming_number;
-            $calllog->outgoing_number=$request->outgoing_number;
-            $calllog->call_date=$request->call_date;
-            $calllog->start_time=$request->start_time;
-            $calllog->end_time=$request->end_time;
+            $calllog->school_id = $school_id;
+            $calllog->academic_year_id = $academic_year->id;
+            $calllog->name = $request->name;
+            $calllog->calling_purpose = $request->calling_purpose;
+            $calllog->call_type = $request->call_type;
+            $calllog->incoming_number = $request->incoming_number;
+            $calllog->outgoing_number = $request->outgoing_number;
+            $calllog->call_date = $request->call_date;
+            $calllog->start_time = $request->start_time;
+            $calllog->end_time = $request->end_time;
 
-           /* $end_time=$request->end_time;
-            $start_time=$request->start_time;
+            $calllog->description = $request->description;
+            $calllog->entry_by = Auth::user()->name;
 
-             $hours = $end_time->diffInHours($start_time);
-             $minutes = $end_time->diffInMinutes($start_time);
-             $seconds = $end_time->diffInSeconds($start_time);
-
-            $calllog->duration=$hours . ':' . $minutes. ':' .$seconds;*/
-
-           /* $diff_in_minutes = $request->end_time->diff($request->start_time);
-
-            dd($diff_in_minutes);
-*/
-            $calllog->description=$request->description;
-            $calllog->entry_by=Auth::user()->name;
-           
             $calllog->save();
 
-            $message = trans('messages.add_success_msg',['module' => 'Call Log']);
+            $message = trans('messages.add_success_msg', ['module' => 'Call Log']);
 
             $data = [];
 
-            $data['user']       = SiteHelper::getAdmin($school_id);
-            $data['details']    = trans('notification.add_success_msg',['user' => Auth::user()->FullName , 'module' => 'Call Log']);
+            $data['user'] = SiteHelper::getAdmin($school_id);
+            $data['details'] = trans('notification.add_success_msg', ['user' => Auth::user()->FullName, 'module' => 'Call Log']);
 
             event(new SingleNotificationEvent($data));
 
-            $ip= $this->getRequestIP();
+            $ip = $this->getRequestIP();
             $this->doActivityLog(
                 $calllog,
                 Auth::user(),
-                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT'] ],
+                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT']],
                 LOGNAME_ADD_CALL_LOG,
                 $message
-            ); 
+            );
 
-            $res['success']=trans('messages.add_success_msg',['module' => 'Call Log']);
+            $res['success'] = trans('messages.add_success_msg', ['module' => 'Call Log']);
+
             return $res;
-        }
-        catch(Exception $e)
-        {
-            //dd($e->getMessage());
+        } catch (Exception $e) {
         }
     }
 
     public function show($id)
     {
-        $calllog=CallLog::where('id',$id)->get();
+        $calllog = CallLog::where('id', $id)->get();
 
-        $calllog=CallLogResource::collection($calllog);
+        $calllog = CallLogResource::collection($calllog);
 
         return $calllog;
     }
@@ -129,41 +114,39 @@ class CallLogController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit($id)
     {
-        $calllog = CallLog::where([['id',$id],['school_id',Auth::user()->school_id]])->first();
+        $calllog = CallLog::where([['id', $id], ['school_id', Auth::user()->school_id]])->first();
 
-        return view('/teacher/calllog/edit' , ['calllog' => $calllog]);
+        return view('/teacher/calllog/edit', ['calllog' => $calllog]);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(Request $request, $id)
     {
-        try
-        {
+        try {
             $school_id = Auth::user()->school_id;
 
             $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
-            $calllog=CallLog::find($id);
+            $calllog = CallLog::find($id);
 
-            $calllog->school_id=$school_id;
-            $calllog->academic_year_id=$academic_year->id;
-            $calllog->name=$request->name;
-            $calllog->calling_purpose=$request->calling_purpose;
-            $calllog->call_type=$request->call_type;
-            $calllog->incoming_number=$request->incoming_number;
-            $calllog->outgoing_number=$request->outgoing_number;
-            $calllog->call_date=$request->call_date;
-            $calllog->start_time=$request->start_time;
-            $calllog->end_time=$request->end_time;
+            $calllog->school_id = $school_id;
+            $calllog->academic_year_id = $academic_year->id;
+            $calllog->name = $request->name;
+            $calllog->calling_purpose = $request->calling_purpose;
+            $calllog->call_type = $request->call_type;
+            $calllog->incoming_number = $request->incoming_number;
+            $calllog->outgoing_number = $request->outgoing_number;
+            $calllog->call_date = $request->call_date;
+            $calllog->start_time = $request->start_time;
+            $calllog->end_time = $request->end_time;
 
             /* $hours = $end_time->diffInHours($start_time);
              $minutes = $end_time->diffInMinutes($start_time);
@@ -171,35 +154,33 @@ class CallLogController extends Controller
 
             $calllog->duration=$hours . ':' . $minutes. ':' .$seconds;*/
 
-            $calllog->description=$request->description;
-            $calllog->entry_by=Auth::user()->name;
+            $calllog->description = $request->description;
+            $calllog->entry_by = Auth::user()->name;
 
             $calllog->save();
 
-            $message=trans('messages.update_success_msg',['module' => 'Call Log']);
+            $message = trans('messages.update_success_msg', ['module' => 'Call Log']);
 
             $data = [];
 
-            $data['user']       = SiteHelper::getAdmin($school_id);
-            $data['details']    = trans('notification.update_success_msg',['user' => Auth::user()->FullName , 'module' => 'Call Log']);
+            $data['user'] = SiteHelper::getAdmin($school_id);
+            $data['details'] = trans('notification.update_success_msg', ['user' => Auth::user()->FullName, 'module' => 'Call Log']);
 
             event(new SingleNotificationEvent($data));
 
-            $ip= $this->getRequestIP();
+            $ip = $this->getRequestIP();
             $this->doActivityLog(
                 $calllog,
                 Auth::user(),
-                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT'] ],
+                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT']],
                 LOGNAME_EDIT_CALL_LOG,
                 $message
             );
 
             $res['success'] = $message;
+
             return $res;
-        }
-        catch(Exception $e)
-        {
-            //dd($e->getMessage());
+        } catch (Exception $e) {
         }
     }
 
@@ -207,40 +188,37 @@ class CallLogController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy($id)
     {
-        try 
-        {
-            $calllog=CallLog::where('id',$id)->first();
-            
+        try {
+            $calllog = CallLog::where('id', $id)->first();
+
             $calllog->delete();
-            
-            $message=trans('messages.delete_success_msg',['module' => 'Call Log']);
+
+            $message = trans('messages.delete_success_msg', ['module' => 'Call Log']);
 
             $data = [];
 
-            $data['user']       = SiteHelper::getAdmin(Auth::user()->school_id);
-            $data['details']    = trans('notification.delete_success_msg',['user' => Auth::user()->FullName , 'module' => 'Call Log']);
+            $data['user'] = SiteHelper::getAdmin(Auth::user()->school_id);
+            $data['details'] = trans('notification.delete_success_msg', ['user' => Auth::user()->FullName, 'module' => 'Call Log']);
 
             event(new SingleNotificationEvent($data));
 
-            $ip= $this->getRequestIP();
+            $ip = $this->getRequestIP();
             $this->doActivityLog(
                 $calllog,
                 Auth::user(),
-                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT'] ],
+                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT']],
                 LOGNAME_DELETE_CALL_LOG,
                 $message
             );
 
             $res['message'] = $message;
+
             return $res;
-        }
-        catch(Exception $e) 
-        {
-            //dd($e->getMessage());
+        } catch (Exception $e) {
         }
     }
 }

@@ -16,7 +16,7 @@ class CreatePayrollTemplatesTable extends Migration
         Schema::create('payroll_templates', function (Blueprint $table) {
             $table->increments('id');
             $table->bigInteger('school_id')->unsigned();
-            $table->foreign('school_id')->references('id')->on('schools'); 
+            $table->foreign('school_id')->references('id')->on('schools');
             $table->string('name');
             $table->boolean('status');
             $table->unsignedInteger('created_by');

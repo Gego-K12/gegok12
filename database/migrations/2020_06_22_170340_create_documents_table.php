@@ -20,7 +20,7 @@ class CreateDocumentsTable extends Migration
             $table->integer('user_id')->unsigned();
             $table->foreign('user_id')->references('id')->on('users');
             $table->integer('version')->default(1);
-            $table->enum('type',['certificates','id_proof','others']);
+            $table->enum('type', ['certificates', 'id_proof', 'others']);
             $table->string('name');
             $table->text('file_path');
             $table->unique(['user_id', 'name', 'version']);

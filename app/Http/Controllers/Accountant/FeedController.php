@@ -1,22 +1,23 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
  */
+
 namespace App\Http\Controllers\Accountant;
 
-use App\Http\Requests\Classwall\PostRequest;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use App\Models\StudentAcademic;
-use Illuminate\Http\Request;
-use App\Traits\LogActivity;
 use App\Helpers\SiteHelper;
-use App\Models\PostTag;
-use App\Traits\Common;
+use App\Http\Controllers\Controller;
 use App\Models\Post;
-use App\Models\Tag;
-use Exception;
+use App\Services\FeedReaderService;
+use App\Traits\Common;
+use App\Traits\LogActivity;
+use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Class FeedController
@@ -29,72 +30,80 @@ use Exception;
  * - Filter feeds by visibility
  * - Filter feeds by tags
  * - Prepare banner images for feed views
- *
- * @package App\Http\Controllers\Accountant
  */
 class FeedController extends Controller
 {
+    use Common;
+
     /**
      * Controller for account feed (classwall) listing and filtering.
      */
     use LogActivity;
-    use Common;
-  
+
+    public function __construct(protected FeedReaderService $feedReader) {}
+
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request)
-    {   
-        $feeds=Post::where('visibility','all_class')->orderBy('posted_at',DESC)->get();
-        
-        $birthday = $this->getFilePath('uploads/images/birthday.jpg');
-        $anniversary = $this->getFilePath('uploads/images/work_anniversary.jpg');
-        $exam = $this->getFilePath('uploads/images/exam-banner.jpg');
+    {
+        $schoolId = Auth::user()->school_id;
+        $academicYearId = SiteHelper::getAcademicYear($schoolId)->id;
 
-        return view('/accountant/feed/feed',['feeds'=>$feeds,'tags'=>$tags,'birthday'=>$birthday, 'anniversary'=>$anniversary,'exam'=>$exam]);
+        $feeds = $this->scopedFeedQuery($request, $schoolId, $academicYearId)
+            ->orderBy('posted_at', 'desc')
+            ->get();
+
+        $banners = $this->feedReader->bannerPaths();
+
+        return view('/accountant/feed/feed', [
+            'feeds' => $feeds,
+            'tags' => $this->feedReader->tagCloud($schoolId),
+            'birthday' => $banners['birthday'],
+            'anniversary' => $banners['anniversary'],
+            'exam' => $banners['exam'],
+        ]);
+    }
+
+    /**
+     * school_id/academic_year_id/is_posted-scoped Post query, with the
+     * `list`/`search` request filters applied on top. Accountant's
+     * default (no `list`/`search` given) is `visibility = all_class`.
+     */
+    private function scopedFeedQuery(Request $request, int $schoolId, int $academicYearId): Builder
+    {
+        $query = Post::query();
+        $this->feedReader->scopeToTenant($query, $schoolId, $academicYearId);
+
+        if (! $this->feedReader->applyListOrSearchFilter($query, $request->list, $request->search, $schoolId)) {
+            $query->where('visibility', 'all_class');
+        }
+
+        return $query;
     }
 
     /**
      * Filter posts by tag or visibility category and return the filtered view.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Contracts\View\View
+     * @return View
      */
     public function filter(Request $request)
     {
-        $tags = Tag::join('post_tag', 'tags.id', '=', 'post_tag.tag_id')
-        // group by tags.id in order to count number of rows in join and to get each tag only once
-        ->groupBy('tags.id')
-        // get only columns from tags table along with aggregate COUNT column    
-        ->select(['tags.*', \DB::raw('COUNT(*) as cnt')])
-        // order by count in descending order
-        ->orderBy('cnt', 'desc')
-        ->take(20)
-        ->get();
+        $schoolId = Auth::user()->school_id;
+        $academicYearId = SiteHelper::getAcademicYear($schoolId)->id;
 
-        $birthday = $this->getFilePath('uploads/images/birthday.jpg');
-        $anniversary = $this->getFilePath('uploads/images/work_anniversary.jpg');
-        $exam = $this->getFilePath('uploads/images/exam-banner.jpg');
-        if($request->list!='')
-        {
-            $category=$request->list;
+        $feeds = $this->scopedFeedQuery($request, $schoolId, $academicYearId)->get();
 
-            $feeds=Post::where('visibility',$category)->get();
-        }
-        elseif($request->search!='')
-        {
-            $category=$request->search;
+        $banners = $this->feedReader->bannerPaths();
 
-            $tags=Tag::where('tag_name',$category)->first();
-            
-            $post_tag=PostTag::where('tag_id',$tags->id)->pluck('post_id')->toArray();
-            
-            $feeds=Post::whereIn('id',$post_tag)->get();            
-
-        }
-
-        return view('/accountant/feed/filter',['feeds' => $feeds , 'tags' => $tags , 'birthday' => $birthday , 'anniversary' => $anniversary , 'exam' => $exam]);
+        return view('/accountant/feed/filter', [
+            'feeds' => $feeds,
+            'tags' => $this->feedReader->tagCloud($schoolId),
+            'birthday' => $banners['birthday'],
+            'anniversary' => $banners['anniversary'],
+            'exam' => $banners['exam'],
+        ]);
     }
 }

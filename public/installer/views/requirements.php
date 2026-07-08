@@ -5,10 +5,14 @@ $allRequirementsMet = true;
 $allPermissionsMet = true;
 
 foreach ($requirements as $req) {
-    if (!$req['status']) $allRequirementsMet = false;
+    if (! $req['status']) {
+        $allRequirementsMet = false;
+    }
 }
 foreach ($permissions as $perm) {
-    if (!$perm['status']) $allPermissionsMet = false;
+    if (! $perm['status']) {
+        $allPermissionsMet = false;
+    }
 }
 
 $canProceed = $allRequirementsMet && $allPermissionsMet;
@@ -39,30 +43,30 @@ $canProceed = $allRequirementsMet && $allPermissionsMet;
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
-                    <?php foreach ($requirements as $key => $req): ?>
+                    <?php foreach ($requirements as $key => $req) { ?>
                     <tr class="<?php echo $req['status'] ? '' : 'bg-red-50'; ?>">
                         <td class="px-4 py-3 text-sm text-gray-800"><?php echo htmlspecialchars($req['name']); ?></td>
                         <td class="px-4 py-3 text-sm text-gray-600"><?php echo htmlspecialchars($req['required']); ?></td>
                         <td class="px-4 py-3 text-sm text-gray-600"><?php echo htmlspecialchars($req['current']); ?></td>
                         <td class="px-4 py-3 text-center">
-                            <?php if ($req['status']): ?>
+                            <?php if ($req['status']) { ?>
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                                 </svg>
                                 Pass
                             </span>
-                            <?php else: ?>
+                            <?php } else { ?>
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
                                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                 </svg>
                                 Fail
                             </span>
-                            <?php endif; ?>
+                            <?php } ?>
                         </td>
                     </tr>
-                    <?php endforeach; ?>
+                    <?php } ?>
                 </tbody>
             </table>
         </div>
@@ -86,35 +90,35 @@ $canProceed = $allRequirementsMet && $allPermissionsMet;
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
-                    <?php foreach ($permissions as $key => $perm): ?>
+                    <?php foreach ($permissions as $key => $perm) { ?>
                     <tr class="<?php echo $perm['status'] ? '' : 'bg-red-50'; ?>">
                         <td class="px-4 py-3 text-sm text-gray-800 font-mono"><?php echo htmlspecialchars($perm['name']); ?></td>
                         <td class="px-4 py-3 text-sm text-gray-600"><?php echo htmlspecialchars($perm['current']); ?></td>
                         <td class="px-4 py-3 text-center">
-                            <?php if ($perm['status']): ?>
+                            <?php if ($perm['status']) { ?>
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                                 </svg>
                                 Writable
                             </span>
-                            <?php else: ?>
+                            <?php } else { ?>
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
                                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                 </svg>
                                 Not Writable
                             </span>
-                            <?php endif; ?>
+                            <?php } ?>
                         </td>
                     </tr>
-                    <?php endforeach; ?>
+                    <?php } ?>
                 </tbody>
             </table>
         </div>
     </div>
 
-    <?php if (!$canProceed): ?>
+    <?php if (! $canProceed) { ?>
     <div class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
         <div class="flex items-start">
             <svg class="w-5 h-5 text-red-500 mt-0.5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -131,7 +135,7 @@ $canProceed = $allRequirementsMet && $allPermissionsMet;
             </div>
         </div>
     </div>
-    <?php endif; ?>
+    <?php } ?>
 
     <div class="flex justify-between">
         <a href="?step=1" class="inline-flex items-center px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors">
@@ -141,7 +145,7 @@ $canProceed = $allRequirementsMet && $allPermissionsMet;
             Back
         </a>
 
-        <?php if ($canProceed): ?>
+        <?php if ($canProceed) { ?>
         <form method="POST" class="inline">
             <button type="submit" class="inline-flex items-center px-8 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-indigo-700 transition-all">
                 Continue
@@ -150,13 +154,13 @@ $canProceed = $allRequirementsMet && $allPermissionsMet;
                 </svg>
             </button>
         </form>
-        <?php else: ?>
+        <?php } else { ?>
         <button disabled class="inline-flex items-center px-8 py-3 bg-gray-300 text-gray-500 font-semibold rounded-xl cursor-not-allowed">
             Continue
             <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
             </svg>
         </button>
-        <?php endif; ?>
+        <?php } ?>
     </div>
 </div>

@@ -1,11 +1,14 @@
 <?php
+
 namespace App\Console\Commands\Test;
-use Illuminate\Console\Command;
+
 use App\Models\User;
-use Log;
-use App\Traits\SendPushNotification;
 use App\Notifications\SendDeviceNotification;
 use App\Notifications\SendTeacherNotification;
+use App\Traits\SendPushNotification;
+use Illuminate\Console\Command;
+use Log;
+
 class CheckPushNotification extends Command
 {
     /**
@@ -13,14 +16,17 @@ class CheckPushNotification extends Command
      *
      * @var string
      */
-   use SendPushNotification;
+    use SendPushNotification;
+
     protected $signature = 'gego:pushnotification';
+
     /**
      * The console command description.
      *
      * @var string
      */
     protected $description = 'Create a  Test Notification';
+
     /**
      * Create a new command instance.
      *
@@ -30,6 +36,7 @@ class CheckPushNotification extends Command
     {
         parent::__construct();
     }
+
     /**
      * Execute the console command.
      *
@@ -37,29 +44,26 @@ class CheckPushNotification extends Command
      */
     public function handle()
     {
-      try{
-        $user_id = $this->ask('Enter user id');
-        $user_id = intval($user_id);
-        $user = User::where('id',$user_id)->first();
-            $data=[];
-            $data['message']='Test Notification';
-            $data['type']       =   'homework';
-           // $data['type']       =   'notice';
-           // $data['platform_token']=$user->platform_token;
-           //  $this->sendNotification($data,$user->platform_token);
-            dump($user->platform_token);
-            if($user->usergroup_id==7)
-            {
-             $user->notify(new SendDeviceNotification($data,$user->platform_token));
+        try {
+            $user_id = $this->ask('Enter user id');
+            $user_id = intval($user_id);
+            $user = User::where('id', $user_id)->first();
+            $data = [];
+            $data['message'] = 'Test Notification';
+            $data['type'] = 'homework';
+            // $data['type']       =   'notice';
+            // $data['platform_token']=$user->platform_token;
+            //  $this->sendNotification($data,$user->platform_token);
+            $this->info('Platform token: '.$user->platform_token);
+            if ($user->usergroup_id == 7) {
+                $user->notify(new SendDeviceNotification($data, $user->platform_token));
             }
-             if($user->usergroup_id==5)
-            {
-             $user->notify(new SendTeacherNotification($data,$user->platform_token));
+            if ($user->usergroup_id == 5) {
+                $user->notify(new SendTeacherNotification($data, $user->platform_token));
             }
-        $this->info("Notification Send");
-    }
-    catch(Exception $e){
-        Log::info($e->getMesage());
-    }
+            $this->info('Notification Send');
+        } catch (Exception $e) {
+            Log::info($e->getMesage());
+        }
     }
 }

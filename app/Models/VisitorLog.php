@@ -1,12 +1,13 @@
 <?php
+
 // SPDX-License-Identifier: MIT
 // (c) 2025 GegoSoft Technologies and GegoK12 Contributors
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\StudentAcademic;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class VisitorLog
@@ -35,10 +36,11 @@ use App\Models\StudentAcademic;
  * @property \DateTime $created_at
  * @property \DateTime $updated_at
  * @property \DateTime $deleted_at
- * @property-read \App\Models\School $school
- * @property-read \App\Models\AcademicYear $academicYear
- * @property-read \App\Models\User $student
- * @property-read \App\Models\User $employee
+ * @property-read School $school
+ * @property-read AcademicYear $academicYear
+ * @property-read User $student
+ * @property-read User $employee
+ *
  * @mixin \Eloquent
  */
 class VisitorLog extends Model
@@ -59,7 +61,7 @@ class VisitorLog extends Model
      * @var array
      */
     protected $fillable = [
-       'school_id' , 'academic_year_id' , 'email' , 'name' , 'relation' , 'company_name' , 'contact_number' , 'address' , 'student_id' , 'relation_with_student' , 'relation_name' , 'number_of_visitors' , 'visiting_purpose' , 'employee_id' , 'date_of_visit' , 'entry_time' , 'exit_time' , 'remark'
+        'school_id', 'academic_year_id', 'email', 'name', 'relation', 'company_name', 'contact_number', 'address', 'student_id', 'relation_with_student', 'relation_name', 'number_of_visitors', 'visiting_purpose', 'employee_id', 'date_of_visit', 'entry_time', 'exit_time', 'remark',
     ];
 
     /**
@@ -67,46 +69,46 @@ class VisitorLog extends Model
      *
      * @var array
      */
-    protected $dates = ['deleted_at' , 'date_of_visit'];
+    protected $dates = ['deleted_at', 'date_of_visit'];
 
     /**
      * Get the school for this visitor log.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function school()
     {
-        return $this->belongsTo('App\Models\School','school_id');
+        return $this->belongsTo('App\Models\School', 'school_id');
     }
 
     /**
      * Get the academic year for this visitor log.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function academicYear()
     {
-        return $this->belongsTo('\App\Models\AcademicYear','academic_year_id');
+        return $this->belongsTo('\App\Models\AcademicYear', 'academic_year_id');
     }
 
     /**
      * Get the student being visited.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function student()
     {
-        return $this->belongsTo('\App\Models\User','student_id');
+        return $this->belongsTo('\App\Models\User', 'student_id');
     }
 
     /**
      * Get the employee recording this visitor log.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function employee()
     {
-      return $this->belongsTo('\App\Models\User','employee_id');
+        return $this->belongsTo('\App\Models\User', 'employee_id');
     }
 
     /**

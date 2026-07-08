@@ -2,11 +2,10 @@
 
 namespace Database\Seeders;
 
+use App\Models\AcademicYear;
+use App\Models\School;
 use DB;
 use Illuminate\Database\Seeder;
-use App\Models\AcademicYear;
-use App\Helpers\SiteHelper;
-use App\Models\School;
 
 class HolidaySeeder extends Seeder
 {
@@ -68,7 +67,7 @@ class HolidaySeeder extends Seeder
 
             $academic_year = AcademicYear::where([
                 ['school_id', $school->id],
-                ['status', 1]
+                ['status', 1],
             ])->first();
 
             foreach ([$holidays_2026, $holidays_2027] as $yearHolidays) {
@@ -79,13 +78,13 @@ class HolidaySeeder extends Seeder
                         'select_type' => 'school',
                         'title' => $h[0],
                         'category' => 'holidays',
-                        'start_date' => $h[1] . ' 00:00:00',
-                        'end_date' => $h[2] . ' 00:00:00',
+                        'start_date' => $h[1].' 00:00:00',
+                        'end_date' => $h[2].' 00:00:00',
                         'created_at' => now(),
-                        'updated_at' => now()
+                        'updated_at' => now(),
                     ]);
                 }
             }
-        }       
+        }
     }
 }

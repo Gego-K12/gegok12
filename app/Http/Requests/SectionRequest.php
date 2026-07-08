@@ -2,10 +2,10 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Section;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class SectionRequest extends FormRequest
 {
@@ -26,33 +26,31 @@ class SectionRequest extends FormRequest
      */
     public function rules()
     {
-        Validator::extend('check_unique_section',function($attribute,$value,$parameters,$validator)
-        {
-            $section=Section::where([['school_id',Auth::user()->school_id],['name','=',request('section')]])->exists();
-            if($section)
-            {
+        Validator::extend('check_unique_section', function ($attribute, $value, $parameters, $validator) {
+            $section = Section::where([['school_id', Auth::user()->school_id], ['name', '=', request('section')]])->exists();
+            if ($section) {
                 return false;
             }
+
             return true;
         });
 
-        Validator::extend('check_section',function($attribute,$value,$parameters,$validator)
-        {
-            return preg_match('/^[[:<:]][A-Za-z][[:>:]]+$/', request('section')) ;
+        Validator::extend('check_section', function ($attribute, $value, $parameters, $validator) {
+            return preg_match('/^[[:<:]][A-Za-z][[:>:]]+$/', request('section'));
         });
 
         return [
             //
-            'section'       => 'required|check_section|check_unique_section',
+            'section' => 'required|check_section|check_unique_section',
         ];
     }
 
     public function messages()
     {
-        return[
-            'section.required'                =>  'Section is required',
-            'section.check_section'           =>  'Enter a Valid Section Name',
-            'section.check_unique_section'    =>  'Section Name already Exists',
+        return [
+            'section.required' => 'Section is required',
+            'section.check_section' => 'Enter a Valid Section Name',
+            'section.check_unique_section' => 'Section Name already Exists',
         ];
     }
 }

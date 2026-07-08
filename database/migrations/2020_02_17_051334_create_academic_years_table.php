@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateAcademicYearsTable extends Migration
 {
@@ -22,10 +22,10 @@ class CreateAcademicYearsTable extends Migration
             $table->dateTime('start_date');
             $table->dateTime('end_date');
             $table->boolean('status')->default(true);
-           /* $table->integer('created_by')->unsigned()->nullable();
-            $table->foreign('created_by')->references('id')->on('users');
-            $table->integer('updated_by')->unsigned()->nullable();
-            $table->foreign('updated_by')->references('id')->on('users');*/
+            /* $table->integer('created_by')->unsigned()->nullable();
+             $table->foreign('created_by')->references('id')->on('users');
+             $table->integer('updated_by')->unsigned()->nullable();
+             $table->foreign('updated_by')->references('id')->on('users');*/
             $table->timestamps();
             $table->softDeletes();
         });

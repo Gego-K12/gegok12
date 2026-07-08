@@ -1,12 +1,14 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
  */
+
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Traits\Common;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class PostalRecord
@@ -29,16 +31,17 @@ use App\Traits\Common;
  * @property \DateTime $created_at
  * @property \DateTime $updated_at
  * @property string $attachment_path
+ *
  * @mixin \Eloquent
  */
 class PostalRecord extends Model
 {
-	use Common;
+    use Common;
 
     protected $table = 'postal_record';
 
     protected $fillable = [
-       'school_id','academic_year_id','type','reference_number','confidential','sender_title','sender_address','receiver_title','receiver_address','postal_date','description','entry_by'
+        'school_id', 'academic_year_id', 'type', 'reference_number', 'confidential', 'sender_title', 'sender_address', 'receiver_title', 'receiver_address', 'postal_date', 'description', 'entry_by',
     ];
 
     /**
@@ -50,7 +53,4 @@ class PostalRecord extends Model
     {
         return $this->getFilePath($this->attachment);
     }
-
-
-
 }

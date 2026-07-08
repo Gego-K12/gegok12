@@ -1,4 +1,5 @@
 <?php
+
 // SPDX-License-Identifier: MIT
 // (c) 2025 GegoSoft Technologies and GegoK12 Contributors
 /**
@@ -15,34 +16,36 @@
  * @property string $causer_type
  * @property array $properties
  * @property string|null $batch_uuid
- *
  * @property-read \App\Models\User $user
  *
  * @mixin \Eloquent
  */
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ActivityLog extends Model
 {
     //
 
-   protected $table = 'activity_log';
+    protected $table = 'activity_log';
 
     protected $fillable = [
-        'log_name', 'description', 'subject_id', 'subject_type', 'causer_id', 'causer_type', 'properties','batch_uuid'
-    ];
-   protected $casts=[
-    	'properties'=>'array'
+        'log_name', 'description', 'subject_id', 'subject_type', 'causer_id', 'causer_type', 'properties', 'batch_uuid',
     ];
 
-   protected $with = array('user');
+    protected $casts = [
+        'properties' => 'array',
+    ];
+
+    protected $with = ['user'];
 
     /**
      * Get the user who caused the activity.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function user()
     {

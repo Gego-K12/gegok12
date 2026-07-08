@@ -1,12 +1,14 @@
 <?php
+
 // SPDX-License-Identifier: MIT
 // (c) 2025 GegoSoft Technologies and GegoK12 Contributors
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Model;
 use App\Traits\Common;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Discipline
@@ -29,11 +31,12 @@ use App\Traits\Common;
  * @property \DateTime $updated_at
  * @property \DateTime $deleted_at
  * @property string $attachment_path
- * @property-read \App\Models\School $school
- * @property-read \App\Models\AcademicYear $academicYear
- * @property-read \App\Models\StandardLink $standardLink
- * @property-read \App\Models\User $user
- * @property-read \App\Models\User $teacher
+ * @property-read School $school
+ * @property-read AcademicYear $academicYear
+ * @property-read StandardLink $standardLink
+ * @property-read User $user
+ * @property-read User $teacher
+ *
  * @mixin \Eloquent
  */
 class Discipline extends Model
@@ -49,7 +52,7 @@ class Discipline extends Model
      * @var array
      */
     protected $fillable = [
-        'school_id' , 'academic_year_id' , 'user_id' ,'incident_date', 'reported_by', 'incident_detail','response','action_taken', 'attachments' , 'notify_parents' , 'is_seen'
+        'school_id', 'academic_year_id', 'user_id', 'incident_date', 'reported_by', 'incident_detail', 'response', 'action_taken', 'attachments', 'notify_parents', 'is_seen',
     ];
 
     /**
@@ -57,7 +60,7 @@ class Discipline extends Model
      *
      * @var array
      */
-    //protected $dates = ['deleted_at'];
+    // protected $dates = ['deleted_at'];
 
     protected $casts = [
         'incident_date' => 'datetime',
@@ -73,51 +76,51 @@ class Discipline extends Model
     /**
      * Get the school for this discipline record.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function school()
     {
-        return $this->belongsTo('App\Models\School','school_id');
+        return $this->belongsTo('App\Models\School', 'school_id');
     }
 
     /**
      * Get the academic year for this discipline record.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function academicYear()
     {
-        return $this->belongsTo('App\Models\AcademicYear','academic_year_id');
+        return $this->belongsTo('App\Models\AcademicYear', 'academic_year_id');
     }
 
     /**
      * Get the standard link for this discipline record.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function standardLink()
     {
-        return $this->belongsTo('\App\Models\StandardLink','standardLink_id');
+        return $this->belongsTo('\App\Models\StandardLink', 'standardLink_id');
     }
 
     /**
      * Get the student for this discipline record.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function user()
     {
-        return $this->belongsTo('App\Models\User','user_id');
+        return $this->belongsTo('App\Models\User', 'user_id');
     }
 
     /**
      * Get the teacher who reported this incident.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function teacher()
     {
-        return $this->belongsTo('App\Models\User','reported_by');
+        return $this->belongsTo('App\Models\User', 'reported_by');
     }
 
     /**

@@ -25,14 +25,13 @@ class TeacherNoteAddRequest extends FormRequest
     public function rules()
     {
 
-        Validator::extend('checknotes',function($attribute,$value,$parameters,$validator)
-        {
-            return preg_match('/^[A-Za-z0-9_~\-!@#\$%\^&*.,:(\)\s]+$/', request('notes')) ;
+        Validator::extend('checknotes', function ($attribute, $value, $parameters, $validator) {
+            return preg_match('/^[A-Za-z0-9_~\-!@#\$%\^&*.,:(\)\s]+$/', request('notes'));
         });
 
         return [
             //
-            'notes'                 => 'nullable|checknotes',
+            'notes' => 'nullable|checknotes',
         ];
     }
 
@@ -40,7 +39,7 @@ class TeacherNoteAddRequest extends FormRequest
     {
         return [
             //
-            'notes.checknotes'                          => 'Enter Valid Notes',
+            'notes.checknotes' => 'Enter Valid Notes',
         ];
     }
 }

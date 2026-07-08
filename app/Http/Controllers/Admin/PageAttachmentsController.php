@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
@@ -6,15 +7,14 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\ClassRoomPageAttachment;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 use App\Models\ClassRoomPage;
-use Illuminate\Http\Request;
-use App\Traits\LogActivity;
-use App\Helpers\SiteHelper;
+use App\Models\ClassRoomPageAttachment;
 use App\Traits\Common;
+use App\Traits\LogActivity;
 use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Class PageAttachmentsController
@@ -22,13 +22,11 @@ use Exception;
  * Handles uploading and deletion of classroom page attachments.
  * Includes file upload handling, media library integration,
  * authorization checks, and activity logging.
- *
- * @package App\Http\Controllers\Admin
  */
 class PageAttachmentsController extends Controller
 {
-    use LogActivity;
     use Common;
+    use LogActivity;
 
     /**
      * Store newly uploaded page attachments.
@@ -36,38 +34,34 @@ class PageAttachmentsController extends Controller
      * Handles multiple attachment uploads for a classroom page,
      * stores files, associates them with the page, and logs activity.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param int $page_id
+     * @param  int  $page_id
      * @return array|null
      */
     public function store(Request $request, $page_id)
     {
         //
-        try
-        {
+        try {
             $page = ClassRoomPage::where('id', $page_id)->first();
 
-            for ($i = 0; $i < $request->attachment_count; $i++)
-            {
+            for ($i = 0; $i < $request->attachment_count; $i++) {
                 $page_attachment = new ClassRoomPageAttachment;
 
                 $page_attachment->page_id = $page_id;
-                $page_attachment->status  = 1;
+                $page_attachment->status = 1;
 
-                $attachment = 'attachment_file' . $i;
+                $attachment = 'attachment_file'.$i;
 
                 $file = $request->file($attachment);
-                if ($file)
-                {
-                    $folder = Auth::user()->school->slug . '/pages/' . $page_id . '/attachments';
-                    $path   = $this->uploadFile($folder, $file);
+                if ($file) {
+                    $folder = Auth::user()->school->slug.'/pages/'.$page_id.'/attachments';
+                    $path = $this->uploadFile($folder, $file);
                     $page_attachment->attachment_file = $path;
                 }
 
                 $page_attachment->save();
 
                 $page->addMedia($file)
-                     ->toMediaCollection('page_attachments', env('FILESYSTEM_DISK'));
+                    ->toMediaCollection('page_attachments', env('FILESYSTEM_DISK'));
             }
 
             $message = trans('messages.add_success_msg', [':module' => 'Page Attachment']);
@@ -82,11 +76,9 @@ class PageAttachmentsController extends Controller
             );
 
             $res['success'] = $message;
+
             return $res;
-        }
-        catch (Exception $e)
-        {
-            //dd($e->getMessage());
+        } catch (Exception $e) {
         }
     }
 
@@ -96,18 +88,16 @@ class PageAttachmentsController extends Controller
      * Removes the specified page attachment after authorization
      * and logs the delete activity.
      *
-     * @param int $id
+     * @param  int  $id
      * @return array|null
      */
     public function destroy($id)
     {
         //
-        try
-        {
+        try {
             $page_attachment = ClassRoomPageAttachment::where('id', $id)->first();
 
-            if (Gate::allows('page_attachment', $page_attachment))
-            {
+            if (Gate::allows('page_attachment', $page_attachment)) {
                 $page_attachment->delete();
 
                 $message = trans('messages.delete_success_msg', ['module' => 'Page Attachment']);
@@ -122,16 +112,12 @@ class PageAttachmentsController extends Controller
                 );
 
                 $res['success'] = $message;
+
                 return $res;
-            }
-            else
-            {
+            } else {
                 abort(403);
             }
-        }
-        catch (Exception $e)
-        {
-            //dd($e->getMessage());
+        } catch (Exception $e) {
         }
     }
 }

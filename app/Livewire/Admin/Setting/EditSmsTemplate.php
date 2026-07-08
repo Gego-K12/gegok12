@@ -2,11 +2,13 @@
 
 namespace App\Livewire\Admin\Setting;
 
-use Livewire\Component;
-use Jantinnerezo\LivewireAlert\LivewireAlert;
-use Livewire\Attributes\Rule;
 use App\Models\Smstemplate;
 use Exception;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
+use Jantinnerezo\LivewireAlert\LivewireAlert;
+use Livewire\Attributes\Rule;
+use Livewire\Component;
 use Log;
 
 /**
@@ -21,8 +23,6 @@ use Log;
  * - Form validation
  * - Updating SMS template data
  * - Success alerts
- *
- * @package App\Livewire\Admin\Setting
  */
 class EditSmsTemplate extends Component
 {
@@ -65,7 +65,7 @@ class EditSmsTemplate extends Component
      * Loads SMS template details based on the provided ID
      * and populates the form fields.
      *
-     * @param int|string $id SMS template ID
+     * @param  int|string  $id  SMS template ID
      * @return void
      */
     public function mount($id)
@@ -75,8 +75,8 @@ class EditSmsTemplate extends Component
         $sms_template = Smstemplate::where('id', $this->sms_template_id)->first();
         if ($sms_template) {
             $this->template_id = $sms_template->template_id;
-            $this->template    = $sms_template->template;
-            $this->status      = $sms_template->status;
+            $this->template = $sms_template->template;
+            $this->status = $sms_template->status;
         }
     }
 
@@ -85,7 +85,7 @@ class EditSmsTemplate extends Component
      *
      * Displays the SMS template edit form.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function render()
     {
@@ -99,7 +99,7 @@ class EditSmsTemplate extends Component
      * displays a success alert, and redirects back
      * to the SMS template listing page.
      *
-     * @return \Illuminate\Http\RedirectResponse|void
+     * @return RedirectResponse|void
      */
     public function submitTemplate()
     {
@@ -108,8 +108,8 @@ class EditSmsTemplate extends Component
         try {
             $data = [
                 'template_id' => $this->template_id,
-                'template'    => $this->template,
-                'status'      => $this->status,
+                'template' => $this->template,
+                'status' => $this->status,
             ];
 
             Smstemplate::where('id', $this->sms_template_id)->update($data);

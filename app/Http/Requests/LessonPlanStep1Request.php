@@ -24,37 +24,33 @@ class LessonPlanStep1Request extends FormRequest
      */
     public function rules()
     {
-        Validator::extend('check_unit_name',function($attribute,$value,$parameters,$validator)
-        {
+        Validator::extend('check_unit_name', function ($attribute, $value, $parameters, $validator) {
             return preg_match('/^[A-Za-z\s]+$/', request('unit_name'));
         });
 
-        Validator::extend('check_title',function($attribute,$value,$parameters,$validator)
-        {
+        Validator::extend('check_title', function ($attribute, $value, $parameters, $validator) {
             return preg_match('/^[A-Za-z0-9_~\-!@#\$%\^&*.,:(\)\s]+$/', $attribute);
         });
 
-        Validator::extend('check_description',function($attribute,$value,$parameters,$validator)
-        {
+        Validator::extend('check_description', function ($attribute, $value, $parameters, $validator) {
             return preg_match('/^[A-Za-z0-9_~\-!@#\$%\^&*.,:(\)\s]+$/', $attribute);
         });
-        
+
         $rules =
         [
             //
-            'unit_no'               => 'required|numeric',
-            'unit_name'             => 'required|check_unit_name',
-            'duration'              => 'required|numeric',
-            'title'                 => 'required|check_title|max:50',
-            'description'           => 'required|check_description',
+            'unit_no' => 'required|numeric',
+            'unit_name' => 'required|check_unit_name',
+            'duration' => 'required|numeric',
+            'title' => 'required|check_title|max:50',
+            'description' => 'required|check_description',
             // 'start_date'            => 'required|date|after_or_equal:today',
             // 'end_date'              => 'required|date|after_or_equal:start_date',
         ];
 
-        if(request('type') == 'add')
-        {
-            $rules['standardLink_id']   = 'required';
-            $rules['subject_id']        = 'required';     
+        if (request('type') == 'add') {
+            $rules['standardLink_id'] = 'required';
+            $rules['subject_id'] = 'required';
         }
 
         return $rules;
@@ -63,25 +59,25 @@ class LessonPlanStep1Request extends FormRequest
     public function messages()
     {
         return [
-            'standardLink_id.required'                  => 'Class Is Required',
+            'standardLink_id.required' => 'Class Is Required',
 
-            'subject_id.required'                       => 'Subject Is Required',
+            'subject_id.required' => 'Subject Is Required',
 
-            'unit_no.required'                          => 'Unit Number Is Required',
-            'unit_no.numeric'                           => 'Unit Number Should Be Number',
+            'unit_no.required' => 'Unit Number Is Required',
+            'unit_no.numeric' => 'Unit Number Should Be Number',
 
-            'unit_name.required'                        => 'Unit Name Is Required',
-            'unit_name.check_unit_name'                 => 'Enter Valid Unit Name',
+            'unit_name.required' => 'Unit Name Is Required',
+            'unit_name.check_unit_name' => 'Enter Valid Unit Name',
 
-            'duration.required'                         => 'Duration Is Required',
-            'duration.numeric'                          => 'Duration Should Be Number',
+            'duration.required' => 'Duration Is Required',
+            'duration.numeric' => 'Duration Should Be Number',
 
-            'title.required'                            => 'Title Is Required',
-            'title.check_title'                         => 'Enter Valid Title',
-            'title.max'                                 => 'Title Cannot Be More Than 50 Characters',
+            'title.required' => 'Title Is Required',
+            'title.check_title' => 'Enter Valid Title',
+            'title.max' => 'Title Cannot Be More Than 50 Characters',
 
-            'description.required'                      => 'Unit Breakdown Is Required',
-            'description.check_description'             => 'Enter Valid Unit Breakdown',
+            'description.required' => 'Unit Breakdown Is Required',
+            'description.check_description' => 'Enter Valid Unit Breakdown',
         ];
     }
 }

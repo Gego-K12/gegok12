@@ -10,7 +10,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Traits\AuthenticatesUsers;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class LoginController extends Controller implements ShouldQueue
 {
@@ -36,9 +36,7 @@ class LoginController extends Controller implements ShouldQueue
      *
      * @return string The redirect path
      */
-
     protected $redirectTo = '/admin/dashboard';
-
 
     /**
      * Create a new controller instance.
@@ -53,7 +51,7 @@ class LoginController extends Controller implements ShouldQueue
     /**
      * Display the login form.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function showLoginForm()
     {

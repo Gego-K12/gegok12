@@ -1,12 +1,12 @@
 <?php
+
 // SPDX-License-Identifier: MIT
 // (c) 2025 GegoSoft Technologies and GegoK12 Contributors
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Conversation;
-use App\Models\User;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Class Message
@@ -19,44 +19,45 @@ use App\Models\User;
  * @property string $body
  * @property \DateTime $created_at
  * @property \DateTime $updated_at
- * @property-read \App\Models\Conversation $conversation
- * @property-read \App\Models\User $user
+ * @property-read Conversation $conversation
+ * @property-read User $user
+ *
  * @mixin \Eloquent
  */
 class Message extends Model
 {
-	protected $fillable = [
-		'user_id',
-		'body'
-	];
+    protected $fillable = [
+        'user_id',
+        'body',
+    ];
 
-	/**
-	 * Check if the message was created by the authenticated user.
-	 *
-	 * @return bool
-	 */
-	public function isOwn()
-	{
-		return $this->user_id === auth()->id();
-	}
+    /**
+     * Check if the message was created by the authenticated user.
+     *
+     * @return bool
+     */
+    public function isOwn()
+    {
+        return $this->user_id === auth()->id();
+    }
 
-	/**
-	 * Get the conversation this message belongs to.
-	 *
-	 * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-	 */
+    /**
+     * Get the conversation this message belongs to.
+     *
+     * @return BelongsTo
+     */
     public function conversation()
     {
-    	return $this->belongsTo('App\Models\Conversation');
+        return $this->belongsTo('App\Models\Conversation');
     }
 
     /**
      * Get the user who sent this message.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function user()
     {
-    	return $this->belongsTo('App\Models\User');
+        return $this->belongsTo('App\Models\User');
     }
 }

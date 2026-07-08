@@ -12,10 +12,9 @@
                         <div class="mb-2 flex items-center relative">
                             <VueDatePicker
                                 v-model="from_date"
-                                format="dd-MM-yyyy HH:mm:ss"
+                                format="dd-MM-yyyy"
                                 model-type="format"
-                                :enable-time-picker="true"
-                                :is-24="true"
+                                :time-config="{ enableTimePicker: false }"
                                 :auto-apply="true"
                                 input-class-name="w-full rounded"
                                 />
@@ -35,10 +34,9 @@
                         <div class="mb-2 flex items-center relative">
                             <VueDatePicker
                               v-model="to_date"
-                              format="dd-MM-yyyy HH:mm:ss"
+                              format="dd-MM-yyyy"
                               model-type="format"
-                              :enable-time-picker="true"
-                              :is-24="true"
+                              :time-config="{ enableTimePicker: false }"
                               :auto-apply="true"
                               input-class-name="w-full rounded"
                             />

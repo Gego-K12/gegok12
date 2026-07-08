@@ -2,10 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Models\LeaveType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Validator;
-use App\Helpers\SiteHelper;
-use App\Models\LeaveType;
 
 class LeaveTypeAddRequest extends FormRequest
 {
@@ -26,30 +25,28 @@ class LeaveTypeAddRequest extends FormRequest
      */
     public function rules()
     {
-        Validator::extend('check_unique_name',function($attribute,$value,$parameters,$validator)
-        {
+        Validator::extend('check_unique_name', function ($attribute, $value, $parameters, $validator) {
             $leaveType = LeaveType::where([
-                    ['school_id',$school_id],
-                    ['academic_year_id',$academic_year->id],
-                    ['name','LIKE','%'.request('name').'%']
-                ])->exists();
-            if(!$leaveType)
-            {
+                ['school_id', $school_id],
+                ['academic_year_id', $academic_year->id],
+                ['name', 'LIKE', '%'.request('name').'%'],
+            ])->exists();
+            if (! $leaveType) {
                 return true;
             }
+
             return false;
         });
 
-        Validator::extend('check_name',function($attribute,$value,$parameters,$validator)
-        {
+        Validator::extend('check_name', function ($attribute, $value, $parameters, $validator) {
             return preg_match('/^[A-Za-z_~\-!@#\$%\^&*.,:(\)\s]+$/', request('name'));
         });
 
         $rules =
         [
             //
-            'name'              => 'required|max:30|check_unique_name|check_name',
-            'max_no_of_days'    => 'required|numeric|max:100',
+            'name' => 'required|max:30|check_unique_name|check_name',
+            'max_no_of_days' => 'required|numeric|max:100',
         ];
 
         return $rules;
@@ -57,16 +54,16 @@ class LeaveTypeAddRequest extends FormRequest
 
     public function messages()
     {
-        $messages =         
+        $messages =
         [
-            'name.required'             => 'Title is required',
-            'name.max:30'               => 'Title should be atmost 30 characters',
-            'name.check_unique_name'    => 'Title Already Exists',
-            'name.check_name'           => 'Enter a Valid Title',
+            'name.required' => 'Title is required',
+            'name.max:30' => 'Title should be atmost 30 characters',
+            'name.check_unique_name' => 'Title Already Exists',
+            'name.check_name' => 'Enter a Valid Title',
 
-            'max_no_of_days.required'   => 'Max. No. Of Days is required',
-            'max_no_of_days.numeric'    => 'Max. No. Of Days should be numeric.',
-            'max_no_of_days.max:100'    => 'Enter a Valid Max. No. Of Days',
+            'max_no_of_days.required' => 'Max. No. Of Days is required',
+            'max_no_of_days.numeric' => 'Max. No. Of Days should be numeric.',
+            'max_no_of_days.max:100' => 'Enter a Valid Max. No. Of Days',
         ];
 
         return $messages;

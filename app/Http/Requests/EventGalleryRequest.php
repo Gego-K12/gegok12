@@ -4,7 +4,6 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-
 class EventGalleryRequest extends FormRequest
 {
     /**
@@ -27,20 +26,19 @@ class EventGalleryRequest extends FormRequest
 
         return [
 
-             //'image-upload' => 'required',
-             'path'   => 'size:2000K',
-            
+            // 'image-upload' => 'required',
+            'path' => 'size:2000K',
+
         ];
     }
 
-     public function messages()
-   {
-       return
-       [ 
-          // 'image-upload.required' =>'Select Atleast one file',
-           'path.size'       => 'Image size should be less than 2mb',
-        
-           
-       ];
-}
+    public function messages()
+    {
+        return
+        [
+            // 'image-upload.required' =>'Select Atleast one file',
+            'path.size' => 'Image size should be less than 2mb',
+
+        ];
+    }
 }

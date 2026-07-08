@@ -28,7 +28,7 @@ class CreatePayrollTransactionsTable extends Migration
             $table->foreign('payroll_id')->references('id')->on('payrolls')->onDelete('cascade');
             $table->date('transaction_date');
             $table->string('amount');
-            $table->enum('payment_method',['Cash','Cheque','Bank','Others']);
+            $table->enum('payment_method', ['Cash', 'Cheque', 'Bank', 'Others']);
             $table->text('transaction_detail')->nullable();
             $table->text('reference_number')->nullable();
             $table->string('attachment')->nullable();

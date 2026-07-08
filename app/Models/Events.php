@@ -1,12 +1,17 @@
 <?php
+
 // SPDX-License-Identifier: MIT
 // (c) 2025 GegoSoft Technologies and GegoK12 Contributors
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Model;
 use App\Traits\Common;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Events
@@ -38,22 +43,23 @@ use App\Traits\Common;
  * @property \DateTime $updated_at
  * @property \DateTime $deleted_at
  * @property string $image_path
- * @property-read \App\Models\School $school
- * @property-read \App\Models\AcademicYear $academicYear
- * @property-read \App\Models\StandardLink $standardlink
- * @property-read \App\Models\User $createdBy
- * @property-read \App\Models\User $updatedBy
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Notes[] $notes
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Reminder[] $eventreminder
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\EventGallery[] $eventgallery
+ * @property-read School $school
+ * @property-read AcademicYear $academicYear
+ * @property-read StandardLink $standardlink
+ * @property-read User $createdBy
+ * @property-read User $updatedBy
+ * @property-read Collection|Notes[] $notes
+ * @property-read Collection|Reminder[] $eventreminder
+ * @property-read Collection|EventGallery[] $eventgallery
+ *
  * @mixin \Eloquent
  */
 class Events extends Model
 {
-  use SoftDeletes;
-  use Common;
+    use Common;
+    use SoftDeletes;
 
-    protected $table    = 'events';
+    protected $table = 'events';
 
     /**
      * The attributes that are mass assignable.
@@ -61,7 +67,7 @@ class Events extends Model
      * @var array
      */
     protected $fillable = [
-        'school_id' , 'academic_year_id' , 'standard_id' , 'select_type' , 'title' , 'description' , 'repeats' , 'freq' , 'freq_term' , 'location' , 'category' , 'organised_by' , 'image' , 'start_date' , 'end_date' , 'allDay' , 'url' , 'created_by' , 'updated_by','status'
+        'school_id', 'academic_year_id', 'standard_id', 'select_type', 'title', 'description', 'repeats', 'freq', 'freq_term', 'location', 'category', 'organised_by', 'image', 'start_date', 'end_date', 'allDay', 'url', 'created_by', 'updated_by', 'status',
     ];
 
     /**
@@ -69,7 +75,7 @@ class Events extends Model
      *
      * @var array
      */
-    //protected $dates = ['start_date' ,  'end_date' , 'deleted_at'];
+    // protected $dates = ['start_date' ,  'end_date' , 'deleted_at'];
 
     protected $casts = [
         'start_date' => 'datetime',
@@ -80,94 +86,95 @@ class Events extends Model
     /**
      * Get the school for this event.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function school()
     {
-        return $this->belongsTo('App\Models\School','school_id');
+        return $this->belongsTo('App\Models\School', 'school_id');
     }
 
     /**
      * Get the academic year for this event.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function academicYear()
     {
-        return $this->belongsTo('\App\Models\AcademicYear','academic_year_id');
+        return $this->belongsTo('\App\Models\AcademicYear', 'academic_year_id');
     }
 
     /**
      * Get the standard link for this event.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function standardlink()
     {
-        return $this->belongsTo('App\Models\StandardLink','standard_id');
+        return $this->belongsTo('App\Models\StandardLink', 'standard_id');
     }
 
     /**
      * Get the user who created this event.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function createdBy()
     {
-      return $this->belongsTo('App\Models\User','created_by');
+        return $this->belongsTo('App\Models\User', 'created_by');
     }
 
     /**
      * Get the user who last updated this event.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function updatedBy()
     {
-      return $this->belongsTo('App\Models\User','updated_by');
+        return $this->belongsTo('App\Models\User', 'updated_by');
     }
 
     /**
      * Get notes related to this event.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function notes()
     {
-        return $this->hasMany('App\Models\Notes','entity_id','id');
+        return $this->hasMany('App\Models\Notes', 'entity_id', 'id');
     }
 
     /**
      * Scope to filter events by church.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param int $church_id
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param  Builder  $query
+     * @param  int  $church_id
+     * @return Builder
      */
-    public function scopeByChurch($query,$church_id)
+    public function scopeByChurch($query, $church_id)
     {
-        $query->where('church_id',$church_id);
+        $query->where('church_id', $church_id);
+
         return $query;
     }
 
     /**
      * Get event reminders.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function eventreminder()
     {
-        return $this->hasMany('App\Models\Reminder', 'entity_id','id')->where('entity_name','=','App\\Models\\Events');
+        return $this->hasMany('App\Models\Reminder', 'entity_id', 'id')->where('entity_name', '=', 'App\\Models\\Events');
     }
 
     /**
      * Get event gallery images.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function eventgallery()
     {
-        return $this->hasMany('App\Models\EventGallery','event_id','id');
+        return $this->hasMany('App\Models\EventGallery', 'event_id', 'id');
     }
 
     /**
@@ -177,54 +184,22 @@ class Events extends Model
      */
     public function getImagePathAttribute()
     {
-        if($this->image==null)
-        {
-            return $this->eventImagePath($this->category,$this->image);
+        if ($this->image == null) {
+            return $this->eventImagePath($this->category, $this->image);
         }
     }
 
     /**
      * Get count of photos in this event gallery.
      *
-     * @param int $id
-     * @param int $school_id
+     * @param  int  $id
+     * @param  int  $school_id
      * @return int
      */
-    public function getphotocount($id,$school_id)
+    public function getphotocount($id, $school_id)
     {
-       $count=EventGallery::where('school_id',$school_id)->where('event_id',$id)->count();
+        $count = EventGallery::where('school_id', $school_id)->where('event_id', $id)->count();
 
-       return $count;
-    }
-
-    /**
-     * Scope to filter events by date range.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param \DateTime $start_date
-     * @param \DateTime $end_date
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function scopeByDate($query,$start_date,$end_date)
-    {
-       $query->where(function ($q) use ($start_date, $end_date) {
-            $q->where('start_date', '>=', $start_date)
-               ->where('start_date', '<', $end_date);
-
-        })->orWhere(function ($q) use ($start_date, $end_date) {
-            $q->where('start_date', '<=', $start_date)
-               ->where('end_date', '>', $end_date);
-
-        })->orWhere(function ($q) use ($start_date, $end_date) {
-            $q->where('end_date', '>', $start_date)
-               ->where('end_date', '<=', $end_date);
-
-        })->orWhere(function ($q) use ($start_date, $end_date) {
-            $q->where('start_date', '>=', $start_date)
-               ->where('end_date', '<=', $end_date);
-
-        });
-
-        return $query;
+        return $count;
     }
 }

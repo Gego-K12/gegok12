@@ -15,28 +15,28 @@ class TransactionTypeTableSeeder extends Seeder
     public function run()
     {
         //
-         DB::table('transaction_types')->insert([
-            'name'          => 'Salary',
-            'created_at'    => date("Y-m-d H:i:s"),
-            'updated_at'    => date("Y-m-d H:i:s"), 
+        DB::table('transaction_types')->insert([
+            'name' => 'Salary',
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
         ]);
 
-         DB::table('transaction_types')->insert([
-            'name'          => 'Salary Advance',
-            'created_at'    => date("Y-m-d H:i:s"),
-            'updated_at'    => date("Y-m-d H:i:s"), 
+        DB::table('transaction_types')->insert([
+            'name' => 'Salary Advance',
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
         ]);
 
-         DB::table('transaction_types')->insert([
-            'name'          => 'Salary Return',
-            'created_at'    => date("Y-m-d H:i:s"),
-            'updated_at'    => date("Y-m-d H:i:s"), 
+        DB::table('transaction_types')->insert([
+            'name' => 'Salary Return',
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
         ]);
 
-         DB::table('transaction_types')->insert([
-            'name'          => 'Other payments',
-            'created_at'    => date("Y-m-d H:i:s"),
-            'updated_at'    => date("Y-m-d H:i:s"), 
+        DB::table('transaction_types')->insert([
+            'name' => 'Other payments',
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
         ]);
     }
 }

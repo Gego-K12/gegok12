@@ -1,29 +1,31 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
  */
+
 namespace App\Http\Controllers\Api\Teacher\Approval;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\AssignmentApprovalRequest;
-use Illuminate\Support\Facades\Auth;
-use App\Models\HomeworkApproval;
-use App\Models\Homework;
 use App\Events\Notification\ClassNotificationEvent;
 use App\Events\StandardPushEvent;
+use App\Helpers\SiteHelper;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\AssignmentApprovalRequest;
+use App\Models\Homework;
+use App\Models\HomeworkApproval;
+use App\Traits\Common;
 use App\Traits\EventProcess;
 use App\Traits\LogActivity;
-use App\Traits\Common;
-use App\Helpers\SiteHelper;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 use Log;
 
 class HomeworkApprovalController extends Controller
 {
+    use Common;
     use EventProcess;
     use LogActivity;
-    use Common;
 
     public function approve(AssignmentApprovalRequest $request, $id)
     {
@@ -33,10 +35,10 @@ class HomeworkApprovalController extends Controller
 
             $homeworkApproval = HomeworkApproval::where('homework_id', $id)->firstOrFail();
 
-            $homeworkApproval->comments     = $request->principal_comments;
-            $homeworkApproval->approved_by  = Auth::id();
-            $homeworkApproval->approved_at  = now()->format('Y-m-d');
-            $homeworkApproval->status       = 'approved';
+            $homeworkApproval->comments = $request->principal_comments;
+            $homeworkApproval->approved_by = Auth::id();
+            $homeworkApproval->approved_at = now()->format('Y-m-d');
+            $homeworkApproval->status = 'approved';
             $homeworkApproval->save();
 
             $homework = Homework::findOrFail($id);
@@ -49,18 +51,18 @@ class HomeworkApprovalController extends Controller
             $academic_year = SiteHelper::getAcademicYear($school_id);
 
             $data = [
-                'school_id'   => $school_id,
+                'school_id' => $school_id,
                 'standard_id' => $homework->standardLink_id,
-                'message'     => 'New Homework Added',
-                'type'        => 'homework'
+                'message' => 'New Homework Added',
+                'type' => 'homework',
             ];
 
             event(new StandardPushEvent($data));
 
             $array = [
-                'school_id'       => $school_id,
+                'school_id' => $school_id,
                 'standardLink_id' => $homework->standardLink_id,
-                'details'         => 'New Homework Added'
+                'details' => 'New Homework Added',
             ];
 
             event(new ClassNotificationEvent($array));
@@ -98,8 +100,8 @@ class HomeworkApprovalController extends Controller
                 $homeworkApproval,
                 Auth::user(),
                 [
-                    'ip'      => $this->getRequestIP(),
-                    'details' => request()->userAgent()
+                    'ip' => $this->getRequestIP(),
+                    'details' => request()->userAgent(),
                 ],
                 defined('LOGNAME_APPROVE_HOMEWORK')
                     ? LOGNAME_APPROVE_HOMEWORK
@@ -122,7 +124,7 @@ class HomeworkApprovalController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -135,10 +137,10 @@ class HomeworkApprovalController extends Controller
 
             $homeworkApproval = HomeworkApproval::where('homework_id', $id)->firstOrFail();
 
-            $homeworkApproval->comments     = $request->principal_comments;
-            $homeworkApproval->approved_by  = Auth::id();
-            $homeworkApproval->approved_at  = now()->format('Y-m-d');
-            $homeworkApproval->status       = 'rejected';
+            $homeworkApproval->comments = $request->principal_comments;
+            $homeworkApproval->approved_by = Auth::id();
+            $homeworkApproval->approved_at = now()->format('Y-m-d');
+            $homeworkApproval->status = 'rejected';
             $homeworkApproval->save();
 
             $message = trans(
@@ -150,8 +152,8 @@ class HomeworkApprovalController extends Controller
                 $homeworkApproval,
                 Auth::user(),
                 [
-                    'ip'      => $this->getRequestIP(),
-                    'details' => request()->userAgent()
+                    'ip' => $this->getRequestIP(),
+                    'details' => request()->userAgent(),
                 ],
                 defined('LOGNAME_REJECT_HOMEWORK')
                     ? LOGNAME_REJECT_HOMEWORK
@@ -174,7 +176,7 @@ class HomeworkApprovalController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }

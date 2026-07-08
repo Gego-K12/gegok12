@@ -1,14 +1,17 @@
 <?php
+
 // SPDX-License-Identifier: MIT
 // (c) 2025 GegoSoft Technologies and GegoK12 Contributors
 
 namespace App\Models;
 
+use App\Traits\Common;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laracasts\Presenter\PresentableTrait;
-use Illuminate\Database\Eloquent\Model;
-use App\Traits\Common;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * Class Userprofile
@@ -47,29 +50,32 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property \DateTime $updated_at
  * @property \DateTime $deleted_at
  * @property string $avatarPath
- * @property-read \App\Models\School $school
- * @property-read \App\Models\User $user
- * @property-read \App\Models\Usergroup $usergroup
- * @property-read \App\Models\Qualification $qualification
- * @property-read \App\Models\Country $country
- * @property-read \App\Models\State $state
- * @property-read \App\Models\City $city
+ * @property-read School $school
+ * @property-read User $user
+ * @property-read Usergroup $usergroup
+ * @property-read Qualification $qualification
+ * @property-read Country $country
+ * @property-read State $state
+ * @property-read City $city
+ *
  * @mixin \Eloquent
  */
 class Userprofile extends Model
 {
     use PresentableTrait;
+
     protected $presenter = "App\Presenters\UserprofilePresenter";
-    use SoftDeletes;
+
     use Common;
     use HasFactory;
+    use SoftDeletes;
 
     /**
      * The attributes that should be mutated to dates.
      *
      * @var array
      */
-    protected $dates = ['date_of_birth','joining_date','deleted_at'];
+    protected $dates = ['date_of_birth', 'joining_date', 'deleted_at'];
 
     /**
      * The table associated with the model.
@@ -84,13 +90,13 @@ class Userprofile extends Model
      * @var array
      */
     protected $fillable = [
-      'school_id' , 'user_id' , 'usergroup_id' , 'firstname' , 'lastname'  , 'alternate_no' , 'gender' , 'date_of_birth' , 'blood_group' , 'birth_place' , 'native_place' , 'mother_tongue' , 'caste' , 'address' , 'city_id' , 'state_id' , 'country_id' , 'pincode' , 'relation' , 'aadhar_number' , 'registration_number' , 'EMIS_number' , 'joining_date' , 'notes' , 'avatar' , 'marital_status' , 'status'
+        'school_id', 'user_id', 'usergroup_id', 'firstname', 'lastname', 'alternate_no', 'gender', 'date_of_birth', 'blood_group', 'birth_place', 'native_place', 'mother_tongue', 'caste', 'address', 'city_id', 'state_id', 'country_id', 'pincode', 'relation', 'aadhar_number', 'registration_number', 'EMIS_number', 'joining_date', 'relieved_at', 'notes', 'avatar', 'marital_status', 'status',
     ];
 
     /**
      * Get uppercase first name.
      *
-     * @param string $value
+     * @param  string  $value
      * @return string
      */
     public function getFirstNameAttribute($value)
@@ -101,108 +107,110 @@ class Userprofile extends Model
     /**
      * Get uppercase last name.
      *
-     * @param string $value
+     * @param  string  $value
      * @return string
      */
     public function getLastNameAttribute($value)
     {
-        return strtoupper((string)$value);
+        return strtoupper((string) $value);
     }
 
     /**
      * Get the school for this user.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function school()
     {
-      return $this->belongsTo('App\Models\School','school_id');
+        return $this->belongsTo('App\Models\School', 'school_id');
     }
 
     /**
      * Get the user for this profile.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function user()
     {
-      return $this->belongsTo('App\Models\User','user_id');
+        return $this->belongsTo('App\Models\User', 'user_id');
     }
 
     /**
      * Get the usergroup for this profile.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function usergroup()
     {
-      return $this->belongsTo('App\Models\Usergroup','usergroup_id');
+        return $this->belongsTo('App\Models\Usergroup', 'usergroup_id');
     }
 
     /**
      * Get the qualification for this user.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function qualification()
     {
-      return $this->belongsTo('\App\Models\Qualification','qualification_id');
+        return $this->belongsTo('\App\Models\Qualification', 'qualification_id');
     }
 
     /**
      * Get the country for this user.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function country()
     {
-      return $this->belongsTo('App\Models\Country','country_id');
+        return $this->belongsTo('App\Models\Country', 'country_id');
     }
 
     /**
      * Get the state for this user.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function state()
     {
-      return $this->belongsTo('App\Models\State','state_id');
+        return $this->belongsTo('App\Models\State', 'state_id');
     }
 
     /**
      * Get the city for this user.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function city()
     {
-      return $this->belongsTo('App\Models\City','city_id');
+        return $this->belongsTo('App\Models\City', 'city_id');
     }
 
     /**
      * Scope to filter by school.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param int $school_id
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param  Builder  $query
+     * @param  int  $school_id
+     * @return Builder
      */
-    public function scopeBySchool($query,$school_id)
+    public function scopeBySchool($query, $school_id)
     {
-      $query->where('school_id',$school_id);
-      return $query;
+        $query->where('school_id', $school_id);
+
+        return $query;
     }
 
     /**
      * Scope to filter by user role/group.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param int $usergroup_id
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param  Builder  $query
+     * @param  int  $usergroup_id
+     * @return Builder
      */
-    public function scopeByRole($query,$usergroup_id)
+    public function scopeByRole($query, $usergroup_id)
     {
-      $query->where('usergroup_id',$usergroup_id);
-      return $query;
+        $query->where('usergroup_id', $usergroup_id);
+
+        return $query;
     }
 
     /**
@@ -212,10 +220,18 @@ class Userprofile extends Model
      */
     public function getAvatarPathAttribute()
     {
-      if($this->avatar!=null)
-      {
-        return $this->getFilePath($this->avatar);
+        $defaultPaths = ['uploads/male.png', 'uploads/female.png', 'uploads/user/avatar/default-user.jpg'];
 
-      }
+        if ($this->avatar != null) {
+            return in_array($this->avatar, $defaultPaths) ? asset($this->avatar) : $this->getFilePath($this->avatar);
+        }
+
+        if ($this->gender == 'male') {
+            return asset('uploads/male.png');
+        } elseif ($this->gender == 'female') {
+            return asset('uploads/female.png');
+        }
+
+        return asset('uploads/user/avatar/default-user.jpg');
     }
 }

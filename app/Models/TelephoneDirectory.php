@@ -1,12 +1,15 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
  */
+
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class TelephoneDirectory
@@ -21,7 +24,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property \DateTime $created_at
  * @property \DateTime $updated_at
  * @property \DateTime $deleted_at
- * @property-read \App\Models\School $school
+ * @property-read School $school
+ *
  * @mixin \Eloquent
  */
 class TelephoneDirectory extends Model
@@ -42,7 +46,7 @@ class TelephoneDirectory extends Model
      * @var array
      */
     protected $fillable = [
-        'name' , 'school_id' , 'designation' ,'phone_number'
+        'name', 'school_id', 'designation', 'phone_number',
     ];
 
     /**
@@ -55,10 +59,10 @@ class TelephoneDirectory extends Model
     /**
      * Get the school for this telephone directory entry.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function school()
     {
-        return $this->belongsTo('App\Models\School','school_id');
+        return $this->belongsTo('App\Models\School', 'school_id');
     }
 }

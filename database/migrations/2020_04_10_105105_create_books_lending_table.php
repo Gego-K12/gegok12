@@ -23,7 +23,7 @@ class CreateBooksLendingTable extends Migration
             $table->date('return_date')->nullable();
             $table->integer('issued_by')->unsigned()->nullable();
             $table->foreign('issued_by')->references('id')->on('users');
-            $table->enum('status',['pending','returned','cancel']);
+            $table->enum('status', ['pending', 'returned', 'cancel']);
             $table->timestamps();
             $table->softDeletes();
         });

@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateDisciplinesTable extends Migration
 {
@@ -29,8 +29,8 @@ class CreateDisciplinesTable extends Migration
             $table->longText('incident_detail');
             $table->string('response')->nullable();
             $table->boolean('action_taken')->default(0);
-            $table->enum('type',['discipline','performance','others'])->nullable();
-            $table->enum('media_type',['video','audio','image'])->nullable();
+            $table->enum('type', ['discipline', 'performance', 'others'])->nullable();
+            $table->enum('media_type', ['video', 'audio', 'image'])->nullable();
             $table->string('attachments')->nullable();
             $table->boolean('notify_parents')->default(0);
             $table->boolean('is_seen')->default(0);

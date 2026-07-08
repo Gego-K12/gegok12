@@ -18,8 +18,6 @@ use Spatie\MediaLibrary\PathGenerator\PathGenerator;
  * - Generate paths for original media
  * - Generate paths for conversions
  * - Generate paths for responsive images
- *
- * @package App\Helpers
  */
 class EnvironmentPathGenerator implements PathGenerator
 {
@@ -49,39 +47,30 @@ class EnvironmentPathGenerator implements PathGenerator
         }
         */
 
-        $this->path = \Auth::user()->school->slug . '/files/small/';
+        $this->path = \Auth::user()->school->slug.'/files/small/';
     }
 
     /**
      * Get the base path for the given media.
-     *
-     * @param \Spatie\MediaLibrary\Models\Media $media
-     * @return string
      */
     public function getPath(Media $media): string
     {
-        return $this->path . $media->id . "/";
+        return $this->path.$media->id.'/';
     }
 
     /**
      * Get the path for media conversions.
-     *
-     * @param \Spatie\MediaLibrary\Models\Media $media
-     * @return string
      */
     public function getPathForConversions(Media $media): string
     {
-        return $this->getPath($media) . "conversions/";
+        return $this->getPath($media).'conversions/';
     }
 
     /**
      * Get the path for responsive images.
-     *
-     * @param \Spatie\MediaLibrary\Models\Media $media
-     * @return string
      */
     public function getPathForResponsiveImages(Media $media): string
     {
-        return $this->getPath($media) . "responsive/";
+        return $this->getPath($media).'responsive/';
     }
 }

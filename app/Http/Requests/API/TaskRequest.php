@@ -24,32 +24,29 @@ class TaskRequest extends FormRequest
      */
     public function rules()
     {
-        Validator::extend('check_task_date',function($attribute,$value,$parameters,$validator)
-        { 
-            $task_date = date('Y-m-d H:i:s',strtotime(request('task_date')));
-            if( $task_date > date('Y-m-d H:i:s') )
-            {
+        Validator::extend('check_task_date', function ($attribute, $value, $parameters, $validator) {
+            $task_date = date('Y-m-d H:i:s', strtotime(request('task_date')));
+            if ($task_date > date('Y-m-d H:i:s')) {
                 return true;
-            } 
+            }
+
             return false;
         });
 
-        Validator::extend('check_title',function($attribute,$value,$parameters,$validator)
-        {
-            return preg_match('/^[A-Za-z\s]+$/', request('title')) ;
+        Validator::extend('check_title', function ($attribute, $value, $parameters, $validator) {
+            return preg_match('/^[A-Za-z\s]+$/', request('title'));
         });
 
-        Validator::extend('check_to_do_list',function($attribute,$value,$parameters,$validator)
-        {
-            return preg_match('/^[A-Za-z0-9_~\-!@#\$%\^&*.,:(\)\s]+$/', request('to_do_list')) ;
+        Validator::extend('check_to_do_list', function ($attribute, $value, $parameters, $validator) {
+            return preg_match('/^[A-Za-z0-9_~\-!@#\$%\^&*.,:(\)\s]+$/', request('to_do_list'));
         });
 
         $rules = [
             //
-            'title'         =>  'required|max:25|check_title',
-            'to_do_list'    =>  'required|max:100|check_to_do_list',
-            'task_date'     =>  'required|date|check_task_date',
-            'reminder'      =>  'required',
+            'title' => 'required|max:25|check_title',
+            'to_do_list' => 'required|max:100|check_to_do_list',
+            'task_date' => 'required|date|check_task_date',
+            'reminder' => 'required',
         ];
 
         return $rules;
@@ -57,19 +54,19 @@ class TaskRequest extends FormRequest
 
     public function messages()
     {
-        return[
-            'title.required'                            =>  'Title Is Required',
-            'title.max'                                 =>  'Title Should Not Be Greater Than 25 Characters',
-            'title.check_title'                         =>  'Enter Valid Title',
+        return [
+            'title.required' => 'Title Is Required',
+            'title.max' => 'Title Should Not Be Greater Than 25 Characters',
+            'title.check_title' => 'Enter Valid Title',
 
-            'to_do_list.required'                       =>  'Description Is Required',
-            'to_do_list.max'                            =>  'Description Should Not Be Greater Than 100 Characters',
-            'to_do_list.check_to_do_list'               =>  'Enter Valid Description',
+            'to_do_list.required' => 'Description Is Required',
+            'to_do_list.max' => 'Description Should Not Be Greater Than 100 Characters',
+            'to_do_list.check_to_do_list' => 'Enter Valid Description',
 
-            'task_date.required'                        =>  'Task Date Is Required',
-            'task_date.check_task_date'                 =>  'Enter Valid Task Date', 
-            
-            'reminder.required'                         =>  'Reminder Is Required', 
+            'task_date.required' => 'Task Date Is Required',
+            'task_date.check_task_date' => 'Enter Valid Task Date',
+
+            'reminder.required' => 'Reminder Is Required',
         ];
     }
 }

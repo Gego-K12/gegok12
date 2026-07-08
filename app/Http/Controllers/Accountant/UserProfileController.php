@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
@@ -6,18 +7,16 @@
 
 namespace App\Http\Controllers\Accountant;
 
-use App\Http\Requests\TeacherAvatarAddRequest;
-use App\Http\Requests\ChangePasswordRequest;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\Userprofile;
-use App\Traits\LogActivity;
+use App\Http\Requests\ChangePasswordRequest;
+use App\Http\Requests\TeacherAvatarAddRequest;
+use App\Services\UserProfileReaderService;
+use App\Services\UserProfileWriterService;
 use App\Traits\Common;
-use App\Models\User;
-use Exception;
-use Hash;
-use Log;
+use App\Traits\LogActivity;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 /**
  * Class UserProfileController
@@ -29,61 +28,36 @@ use Log;
  * - Update profile avatar
  * - Fetch avatar details
  * - Log profile-related activities
- *
- * @package App\Http\Controllers\Accountant
  */
 class UserProfileController extends Controller
 {
-    use LogActivity;
     use Common;
+    use LogActivity;
+
+    public function __construct(
+        protected UserProfileReaderService $userProfileReader,
+        protected UserProfileWriterService $userProfileWriter
+    ) {}
 
     /**
      * Display the change password view.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function ChangePassword()
     {
         return view('/accountant/changepassword');
     }
- 
+
     /**
      * Update the password of the authenticated user.
      *
-     * @param  \App\Http\Requests\ChangePasswordRequest  $request
      * @return array<string, string>|null
      */
     public function updateChangePassword(ChangePasswordRequest $request)
     {
-        try
-        {
-            $user = User::find(Auth::id());
-            $hashedPassword = $user->password;
-
-            if ($hashedPassword != '')
-            { 
-                $user->password = Hash::make($request->newpassword);
-                $user->save();
-
-                $ip = $this->getRequestIP();
-                $this->doActivityLog(
-                    $user,
-                    Auth::user(),
-                    ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT']],
-                    LOGNAME_CHANGE_PASSWORD,
-                    'Changed Profile Password.'                        
-                );        
-            } 
-               
-            $res['message'] = __('admin_userprofile.password_update');
-            return $res;
-        }
-        catch (Exception $e)
-        {
-            Log::info($e->getMessage());
-            //dd($e->getMessage());
-        }
-    }  
+        return $this->userProfileWriter->changePassword(Auth::id(), $request->newpassword);
+    }
 
     /**
      * Get the authenticated user's avatar details.
@@ -92,76 +66,28 @@ class UserProfileController extends Controller
      */
     public function getavatar()
     {
-        $userprofile = Userprofile::where('user_id', Auth::id())->first();
-        $array = [];
-
-        if (Auth::user())
-        {
-            $array['avatar'] = $this->getFilePath($userprofile->avatar);
-            $array['id'] = $userprofile->id;
-        }
-
-        return $array;
+        return $this->userProfileReader->avatar(Auth::id());
     }
 
     /**
      * Display the change avatar view.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function changeavatar(Request $request)
-    {   
+    {
         return view('/accountant/changeavatar');
     }
- 
+
     /**
      * Update the avatar image of the authenticated user.
      *
      * Handles base64 image decoding and storage.
      *
-     * @param  \App\Http\Requests\TeacherAvatarAddRequest  $request
      * @return array<string, string>|null
      */
     public function updatechangeavatar(TeacherAvatarAddRequest $request)
     {
-        try
-        {
-            $userprofile = Userprofile::where('user_id', Auth::id())->first();
-
-            if ($request->avatar != '')
-            {
-                $image_parts    = explode(";base64,", $request->avatar);
-                $image_type_aux = explode("image/", $image_parts[0]);
-                $image_type     = $image_type_aux[1];
-                $image_base64   = base64_decode($image_parts[1]);
-                $location       = Auth::user()->school->slug . '/uploads/admin/teacher/avatar/';
-                $file           = uniqid() . '.jpg';
-                $upload_path    = $location . $file;
-
-                $this->putContents($upload_path, $image_base64);
-            
-                $userprofile->avatar = $upload_path;
-                $userprofile->save();
-
-                $res['message'] = __('admin_userprofile.update_avatar');
-            }
-
-            $ip = $this->getRequestIP();
-            $this->doActivityLog(
-                $userprofile,
-                Auth::user(),
-                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT']],
-                LOGNAME_CHANGE_AVATAR,
-                $res['message']
-            );  
-
-            return $res; 
-        }
-        catch (Exception $e)
-        {
-            Log::info($e->getMessage());
-            //dd($e->getMessage());
-        }
+        return $this->userProfileWriter->updateAvatarFromBase64(Auth::id(), $request->avatar);
     }
 }

@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\Post;
+use Illuminate\Console\Command;
 use Log;
 
 class CheckPost extends Command
@@ -40,27 +40,22 @@ class CheckPost extends Command
     public function handle()
     {
         //
-        try
-        {
+        try {
             $now = date('Y-m-d H:i:s');
-            $posts = Post::where('is_posted',0)->where('post_created_at','<=',$now)->get();
+            $posts = Post::where('is_posted', 0)->where('post_created_at', '<=', $now)->get();
 
-            foreach($posts as $post)
-            {
+            foreach ($posts as $post) {
                 $is_posted['is_posted'] = 1;
 
-                Post::where('id',$post->id)->update($is_posted);
+                Post::where('id', $post->id)->update($is_posted);
 
-                $posted_at['status'] = "posted";
+                $posted_at['status'] = 'posted';
                 $posted_at['posted_at'] = date('Y-m-d H:i:s');
 
-                Post::where('id',$post->id)->update($posted_at);
+                Post::where('id', $post->id)->update($posted_at);
             }
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 }

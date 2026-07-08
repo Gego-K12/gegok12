@@ -1095,7 +1095,7 @@ ul.course_tabs li.current p {
   transition: all 0.5s ease;
   left: 192px;
   display: none;
-  width: 200px;
+  width: 260px;
   top: 0;
   --tw-bg-opacity: 1;
   background-color: rgb(185 28 28 / var(--tw-bg-opacity, 1));

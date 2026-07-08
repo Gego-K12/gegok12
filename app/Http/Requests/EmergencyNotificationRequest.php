@@ -3,8 +3,6 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Input;
 
 class EmergencyNotificationRequest extends FormRequest
 {
@@ -25,15 +23,14 @@ class EmergencyNotificationRequest extends FormRequest
      */
     public function rules()
     {
-        $rules=[];
+        $rules = [];
 
-        $rules=[
-              'message_type'=>'required',
-              'message'=>'required|max:150',
+        $rules = [
+            'message_type' => 'required',
+            'message' => 'required|max:150',
         ];
-        if(request('message_type')=='specific')
-        {
-            $rules['standardLink_id']='required';
+        if (request('message_type') == 'specific') {
+            $rules['standardLink_id'] = 'required';
         }
 
         return $rules;

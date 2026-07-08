@@ -7,173 +7,172 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Resources\TeacherTimeTable as TeacherTimeTableResource;
-use App\Http\Resources\TeacherClasses as TeacherClassesResource;
-use App\Http\Resources\API\BookLending as BookLendingResource;
-use App\Http\Resources\TeacherDetail as TeacherDetailResource;
-use App\Http\Resources\LeaveHistory as LeaveHistoryResource;
-use App\Http\Resources\ActivityLog as ActivityLogResource;
-use App\Models\TeacherLeaveApplication;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use App\Models\Users\TeacherUser;
-use Illuminate\Http\Request;
-use App\Models\ActivityLog;
 use App\Helpers\SiteHelper;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\ActivityLog as ActivityLogResource;
+use App\Http\Resources\API\BookLending as BookLendingResource;
+use App\Http\Resources\LeaveHistory as LeaveHistoryResource;
+use App\Http\Resources\TeacherClasses as TeacherClassesResource;
+use App\Http\Resources\TeacherDetail as TeacherDetailResource;
+use App\Http\Resources\TeacherTimeTable as TeacherTimeTableResource;
+use App\Models\ActivityLog;
+use App\Models\TeacherLeaveApplication;
 use App\Models\User;
-use App\Models\AcademicYear;
+use App\Models\Users\TeacherUser;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use PDF;
 
 class TeacherShowController extends Controller
 {
-  /**
-   * Display the specified resource.
-   *
-   * @param  int  $id
-   * @return \Illuminate\Http\Response
-   */
-  public function showDetails($name)
-  {
-    //
-    $users = TeacherUser::with('standardLink')->where('name', $name)->get();
-    $users = TeacherDetailResource::collection($users);
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function showDetails($name)
+    {
+        //
+        $users = TeacherUser::with('standardLink')->where('name', $name)->get();
+        $users = TeacherDetailResource::collection($users);
 
-    return $users;
-  }
-
-  /**
-   * Display the specified resource.
-   *
-   * @param  int  $id
-   * @return \Illuminate\Http\Response
-   */
-  public function showTimetable($name)
-  {
-    //
-    $users = TeacherUser::with('teacherlink')->where('name', $name)->get();
-    if (count($users[0]['teacherlink']) > 0) {
-      $users = TeacherTimeTableResource::collection($users);
-    } else {
-      $users = null;
+        return $users;
     }
-    return $users;
-  }
 
-  /**
-   * Display the specified resource.
-   *
-   * @param  int  $id
-   * @return \Illuminate\Http\Response
-   */
-  public function showClasses($name)
-  {
-    //
-    $user = TeacherUser::with('teacherlink')->where('name', $name)->first();
-    $users = TeacherClassesResource::collection($user->teacherlink);
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function showTimetable($name)
+    {
+        //
+        $users = TeacherUser::with('teacherlink')->where('name', $name)->get();
+        if (count($users[0]['teacherlink']) > 0) {
+            $users = TeacherTimeTableResource::collection($users);
+        } else {
+            $users = null;
+        }
 
-    return $users;
-  }
+        return $users;
+    }
 
-  /**
-   * Display the specified resource.
-   *
-   * @param  int  $id
-   * @return \Illuminate\Http\Response
-   */
-  public function showClassTeacher($name)
-  {
-    //
-    $user = TeacherUser::with('standardLink')->where('name', $name)->first();
-    $array['standard']  = $user->standardLink->StandardName;
-    $array['section']   = $user->standardLink->section->name;
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function showClasses($name)
+    {
+        //
+        $user = TeacherUser::with('teacherlink')->where('name', $name)->first();
+        $users = TeacherClassesResource::collection($user->teacherlink);
 
-    return $array;
-  }
+        return $users;
+    }
 
-  /**
-   * Display the specified resource.
-   *
-   * @param  int  $id
-   * @return \Illuminate\Http\Response
-   */
-  public function showLeaveHistory($name)
-  {
-    //
-    $user = TeacherUser::where('name', $name)->first();
-    $school_id = Auth::user()->school_id;
-    $academic_year = SiteHelper::getAcademicYear($school_id);
-    $leave = TeacherLeaveApplication::where([
-      ['user_id', $user->id],
-      ['school_id', $school_id],
-      ['academic_year_id', $academic_year->id]
-    ])->paginate(5);
-    $leave = LeaveHistoryResource::collection($leave);
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function showClassTeacher($name)
+    {
+        //
+        $user = TeacherUser::with('standardLink')->where('name', $name)->first();
+        $array['standard'] = $user->standardLink->StandardName;
+        $array['section'] = $user->standardLink->section->name;
 
-    return $leave;
-  }
+        return $array;
+    }
 
-  public function showActivity($name)
-  {
-    //
-    $user = TeacherUser::with('userprofile')->where('name', $name)->first();
-    // dd($user->members[0]['id']);
-    $activitylog = ActivityLog::where('causer_id', $user->id)->orWhere('subject_id', $user->members[0]['id'])->paginate(5);
-    $activitylog = ActivityLogResource::collection($activitylog);
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function showLeaveHistory($name)
+    {
+        //
+        $user = TeacherUser::where('name', $name)->first();
+        $school_id = Auth::user()->school_id;
+        $academic_year = SiteHelper::getAcademicYear($school_id);
+        $leave = TeacherLeaveApplication::where([
+            ['user_id', $user->id],
+            ['school_id', $school_id],
+            ['academic_year_id', $academic_year->id],
+        ])->paginate(5);
+        $leave = LeaveHistoryResource::collection($leave);
 
-    return $activitylog;
-  }
+        return $leave;
+    }
 
-  public function showActivityLog($name)
-  {
-    //
-    $user = TeacherUser::with('userprofile')->where('name', $name)->first();
-    $activitylog = ActivityLog::where('causer_id', $user->userprofile->id)->orWhere('causer_id', $user->members[0]['id'])->paginate(5);
-    $activitylog = ActivityLogResource::collection($activitylog);
+    public function showActivity($name)
+    {
+        //
+        $user = TeacherUser::with('userprofile')->where('name', $name)->first();
+        $activitylog = ActivityLog::where('causer_id', $user->id)->orWhere('subject_id', $user->members[0]['id'])->paginate(5);
+        $activitylog = ActivityLogResource::collection($activitylog);
 
-    return $activitylog;
-  }
+        return $activitylog;
+    }
 
-  /**
-   * Display the specified resource.
-   *
-   * @param  int  $id
-   * @return \Illuminate\Http\Response
-   */
-  public function show($name)
-  {
-    //
-    $user = User::where('name', $name)->first();
+    public function showActivityLog($name)
+    {
+        //
+        $user = TeacherUser::with('userprofile')->where('name', $name)->first();
+        $activitylog = ActivityLog::where('causer_id', $user->userprofile->id)->orWhere('causer_id', $user->members[0]['id'])->paginate(5);
+        $activitylog = ActivityLogResource::collection($activitylog);
 
-    return view('/admin/teacher/show', ['user' => $user]);
-  }
+        return $activitylog;
+    }
 
-  public function showidcard($name)
-  {
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function show($name)
+    {
+        //
+        $user = TeacherUser::where('name', $name)->first();
 
-    $academic = SiteHelper::getAcademicYear(Auth::user()->school_id);
+        return view('/admin/teacher/show', ['user' => $user]);
+    }
 
-    $teacher = User::where('name', $name)->first();
+    public function showidcard($name)
+    {
 
-    return view('/admin/teacher/showidcard', ['teacher' => $teacher, 'academic' => $academic]);
-  }
+        $academic = SiteHelper::getAcademicYear(Auth::user()->school_id);
 
-  public function showprintidcard($name)
-  {
-    $academic = SiteHelper::getAcademicYear(Auth::user()->school_id);
-    $teacher = User::where('name', $name)->first();
+        $teacher = User::where('name', $name)->first();
 
-    $pdf = PDF::loadView('admin/teacher/show-idcardprint', ['teacher' => $teacher, 'academic' => $academic]);
+        return view('/admin/teacher/showidcard', ['teacher' => $teacher, 'academic' => $academic]);
+    }
 
-    return $pdf->stream('result.pdf', array('Attachment' => 0));
-  }
+    public function showprintidcard($name)
+    {
+        $academic = SiteHelper::getAcademicYear(Auth::user()->school_id);
+        $teacher = User::where('name', $name)->first();
 
-  public function showBookLent($name)
-  {
+        $pdf = PDF::loadView('admin/teacher/show-idcardprint', ['teacher' => $teacher, 'academic' => $academic]);
 
-    $teacher = User::with('lending')->where('name', $name)->first();
+        return $pdf->stream('result.pdf', ['Attachment' => 0]);
+    }
 
-    $lent = BookLendingResource::collection($teacher->lending);
+    public function showBookLent($name)
+    {
 
-    return $lent;
-  }
+        $teacher = User::with('lending')->where('name', $name)->first();
+
+        $lent = BookLendingResource::collection($teacher->lending);
+
+        return $lent;
+    }
 }

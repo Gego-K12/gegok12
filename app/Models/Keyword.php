@@ -1,4 +1,5 @@
 <?php
+
 // SPDX-License-Identifier: MIT
 // (c) 2025 GegoSoft Technologies and GegoK12 Contributors
 
@@ -15,6 +16,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $name
  * @property \DateTime $created_at
  * @property \DateTime $updated_at
+ *
  * @mixin \Eloquent
  */
 class Keyword extends Model
@@ -22,6 +24,6 @@ class Keyword extends Model
     protected $table = 'keywords';
 
     protected $fillable = [
-        'name'
+        'name',
     ];
 }

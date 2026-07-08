@@ -4,11 +4,11 @@ namespace App\Console\Commands;
 
 use App\Events\BirthdayPushEvent;
 use App\Events\SinglePushEvent;
-use Illuminate\Console\Command;
 use App\Models\Reminder;
 use App\Models\School;
 use App\Models\Task;
 use Exception;
+use Illuminate\Console\Command;
 use Log;
 
 class CheckNotification extends Command
@@ -32,8 +32,6 @@ class CheckNotification extends Command
      *
      * @return void
      */
-  
-    
     public function __construct()
     {
         parent::__construct();
@@ -46,51 +44,39 @@ class CheckNotification extends Command
      */
     public function handle()
     {
-        try
-        {
-            $now       = date('Y-m-d H:i:s');
-            $queuelist = Reminder::where([['queue_status','=','queue'],['via','=','notification']])->where('executed_at','=',$now)->get();
-            
-            foreach($queuelist as $queue)
-            {  
+        try {
+            $now = date('Y-m-d H:i:s');
+            $queuelist = Reminder::where([['queue_status', '=', 'queue'], ['via', '=', 'notification']])->where('executed_at', '=', $now)->get();
+
+            foreach ($queuelist as $queue) {
                 $school = School::IsActive($queue->school_id)->exists();
-                if($school == TRUE)
-                {
-                    $update['queue_status']='deliver';
-                    Reminder::where('id',$queue->id)->update($update);
+                if ($school == true) {
+                    $update['queue_status'] = 'deliver';
+                    Reminder::where('id', $queue->id)->update($update);
 
-                    if($queue->user->platform_token != null)
-                    {
-                        if($queue->entity_name == "App\\Models\\Task")
-                        {
+                    if ($queue->user->platform_token != null) {
+                        if ($queue->entity_name == 'App\\Models\\Task') {
                             $task_update['snooze'] = 0;
-                            Task::where('id',$queue->entity_id)->update($task_update);
+                            Task::where('id', $queue->entity_id)->update($task_update);
 
-                            $array=[];
+                            $array = [];
 
-                            $array['school_id']  =   $queue->school_id;
-                            $array['user_id']    =   $queue->user->id;
-                            $array['message']    =   $queue->data['message'];
-                            $array['type']       =   'task';
+                            $array['school_id'] = $queue->school_id;
+                            $array['user_id'] = $queue->user->id;
+                            $array['message'] = $queue->data['message'];
+                            $array['type'] = 'task';
 
                             event(new SinglePushEvent($array));
-                        }
-                        else
-                        {
+                        } else {
                             event(new BirthdayPushEvent($queue));
                         }
-                    }   
+                    }
+                } else {
+                    return false;
                 }
-                else
-                {
-                    return FALSE;
-                }
-            }   
-        }
-        catch(Exception $e)
-        {
+            }
+        } catch (Exception $e) {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
-    }        
+    }
 }

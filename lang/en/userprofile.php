@@ -13,7 +13,6 @@ return [
     |
     */
 
-    
     'profile_update' => ' Profile Updated ',
     'profile_failed' => 'Profile Update Failed',
 
@@ -23,22 +22,18 @@ return [
     'profile_update' => 'Profile Updated',
     'password_update' => 'Password Updated',
 
-    'oldpassword'           =>  'Old Password Is Required',
-    'oldpassword_err'       =>  'Enter Correct Old Password',
+    'oldpassword' => 'Old Password Is Required',
+    'oldpassword_err' => 'Enter Correct Old Password',
 
-    'newpassword'           =>  'New Password Is Required',
-    'newpassword_min'       =>  'Password Should Be Of Minimum 8 Character',
-    'check_new_password'    =>  'New Password Cannot Be Same As Old Password',
+    'newpassword' => 'New Password Is Required',
+    'newpassword_min' => 'Password Should Be Of Minimum 8 Character',
+    'check_new_password' => 'New Password Cannot Be Same As Old Password',
 
-    'confirmpassword'       =>  'Confirm Password Is Required',
-    'same_confirmpassword'  =>  'Password Mismatch',
+    'confirmpassword' => 'Confirm Password Is Required',
+    'same_confirmpassword' => 'Password Mismatch',
 
-    'firstname_required'=>'Firstname is required',
-    'lastname_required'=>'Lastname is required',
-    'country_required'=>'Country is required',
-
-    
-
-   
+    'firstname_required' => 'Firstname is required',
+    'lastname_required' => 'Lastname is required',
+    'country_required' => 'Country is required',
 
 ];

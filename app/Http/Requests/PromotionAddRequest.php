@@ -25,7 +25,7 @@ class PromotionAddRequest extends FormRequest
     {
         $rules = [
             'curr_academic_year_id' => 'required',
-            'curr_standardlink_id'  => 'required',
+            'curr_standardlink_id' => 'required',
         ];
         if (config('gexam.enabled', false)) {
             $rules['exam_id'] = 'required';
@@ -36,12 +36,12 @@ class PromotionAddRequest extends FormRequest
 
     public function messages()
     {
-        return 
+        return
         [
             //
-            'curr_academic_year_id.required'    =>  'Current Academic Year is required',
-            'curr_standardlink_id.required'     =>  'Class is required',
-            'exam_id.required'                  =>  'Exam is required',
+            'curr_academic_year_id.required' => 'Current Academic Year is required',
+            'curr_standardlink_id.required' => 'Class is required',
+            'exam_id.required' => 'Exam is required',
         ];
     }
 }

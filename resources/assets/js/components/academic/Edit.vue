@@ -88,8 +88,8 @@
             <th class="tw-form-label px-3 py-2 text-left">Subject<span class="text-red-500">*</span></th>
             <th class="tw-form-label px-3 py-2 text-left">Teacher<span class="text-red-500">*</span></th>
             
-            <th class="tw-form-label py-2" showv-if="this.standard_name != '12'">Subject Type<!-- <span class="text-red-500">*</span> --></th>
-          <th class="tw-form-label px-3 py-2 text-left">Number of periods<span class="text-red-500">*</span></th>
+            <!-- <th class="tw-form-label py-2" showv-if="this.standard_name != '12'">Subject Type<span class="text-red-500">*</span> </th> -->
+          <!-- <th class="tw-form-label px-3 py-2 text-left">Number of periods<span class="text-red-500">*</span></th> -->
             
             <th class="tw-form-label">Delete</th>
           </tr>
@@ -112,7 +112,7 @@
               <span v-if="errors['teacher_id'+index]" class="text-red-500 text-xs font-semibold">{{errors['teacher_id'+index][0]}}</span>
             </td>
 
-           <td class="py-3 px-2">
+           <!-- <td class="py-3 px-2">
                  <select id="subject_type" v-model="input.subject_type" name="subject_type[]" class="tw-form-control w-full">
               <option v-for="type in subject_type" v-bind:value="type.id">{{ type.name }}</option>
             </select>
@@ -122,7 +122,7 @@
             <td class="py-3 px-2">
                  <input type="text" v-model="input.no_of_periods" name="">
                  <span v-if="errors['no_of_periods'+index]" class="text-red-500 text-xs font-semibold">{{errors['no_of_periods'+index][0]}}</span>
-            </td>
+            </td> -->
 
             <td class="px-4">
               <a href="#" class="btn-times text-white px-1 py-1" @click="deleteRow(index)" title="Delete">

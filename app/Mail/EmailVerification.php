@@ -2,20 +2,18 @@
 
 namespace App\Mail;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Mail\Mailable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use App\Models\MailTemplate;
 use App\Models\User;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Mail\Mailable;
+use Illuminate\Queue\SerializesModels;
 
 /**
  * EmailVerification
  *
  * Mailable class for sending email verification messages.
  * Contains a verification link that users must click to verify their email address.
- *
- * @package App\Mail
  */
 class EmailVerification extends Mailable implements ShouldQueue
 {
@@ -31,12 +29,12 @@ class EmailVerification extends Mailable implements ShouldQueue
     /**
      * Create a new message instance.
      *
-     * @param User $user The user to verify email for
+     * @param  User  $user  The user to verify email for
      * @return void
      */
     public function __construct(User $user)
     {
-        $this->queue='emails';
+        $this->queue = 'emails';
         $this->user = $user;
     }
 
@@ -50,20 +48,20 @@ class EmailVerification extends Mailable implements ShouldQueue
      */
     public function build()
     {
-        $template = MailTemplate::where([['name','email_verification'],['status','active']])->first();
-        
+        $template = MailTemplate::where([['name', 'email_verification'], ['status', 'active']])->first();
+
         $url = url('/emailverification/'.$this->user->email_verification_code);
-  
-        $subject =  $template->subject;
+
+        $subject = $template->subject;
         $mail_content = $template->mail_content;
 
-        $mail_content=str_replace(":url",$url,$mail_content);
-        $mail_content = str_replace(":name",$this->user->name,$mail_content);
+        $mail_content = str_replace(':url', $url, $mail_content);
+        $mail_content = str_replace(':name', $this->user->name, $mail_content);
 
         return $this->markdown('emails.mailcontent')
-                    ->subject($subject)
-                    ->with([
-                        'content' => $mail_content,
-                        ]);
+            ->subject($subject)
+            ->with([
+                'content' => $mail_content,
+            ]);
     }
 }

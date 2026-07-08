@@ -1,115 +1,121 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
  */
+
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\SiteHelper;
+use App\Http\Controllers\Controller;
 use App\Http\Resources\API\ShowEvent as ShowEventResource;
 use App\Http\Resources\API\ShowHoliday as ShowHolidayResource;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Helpers\SiteHelper;
-use App\Models\Events;
 use App\Models\User;
-use Carbon\Carbon;
+use App\Services\EventReaderService;
+use App\Services\HolidaysReaderService;
 use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class EventsController extends Controller
 {
+    public function __construct(
+        protected EventReaderService $eventReader,
+        protected HolidaysReaderService $holidaysReader
+    ) {}
+
     public function show($id)
     {
-        $school_id      =   Auth::user()->school_id;
-        $academic_year  =   SiteHelper::getAcademicYear($school_id);
-        $event = Events::where([['school_id',$school_id],['id',$id],['academic_year_id',$academic_year->id],['category','!=','holidays']])->get();
-        $event= ShowEventResource::collection($event);
-        return $event; 
+        $school_id = Auth::user()->school_id;
+        $academic_year = SiteHelper::getAcademicYear($school_id);
+
+        return ShowEventResource::collection(
+            $this->eventReader->mobileFind($id, $school_id, $academic_year->id)
+        );
     }
 
     public function index()
     {
-        $school_id      =   Auth::user()->school_id;
-        $academic_year  =   SiteHelper::getAcademicYear($school_id);
-        $event = Events::where([['school_id',$school_id],['academic_year_id',$academic_year->id],['category','!=','holidays']])->get();
-        $event= ShowEventResource::collection($event);
-        return $event; 
+        $school_id = Auth::user()->school_id;
+        $academic_year = SiteHelper::getAcademicYear($school_id);
+
+        return ShowEventResource::collection(
+            $this->eventReader->mobileIndex($school_id, $academic_year->id)
+        );
     }
 
-    public  function upcoming(Request $request)
+    public function upcoming(Request $request)
     {
-        $school_id      =   Auth::user()->school_id;
-        $academic_year  =   SiteHelper::getAcademicYear($school_id);
-        $end_date = Carbon::now();
-        $event = Events::where([['school_id',$school_id],['end_date','>=',$end_date],['academic_year_id',$academic_year->id],['category','!=','holidays'],['status','active']])->get();
-        $upcomingevent= ShowEventResource::collection($event);
-        return $upcomingevent;
+        $school_id = Auth::user()->school_id;
+        $academic_year = SiteHelper::getAcademicYear($school_id);
+
+        return ShowEventResource::collection(
+            $this->eventReader->mobileUpcoming($school_id, $academic_year->id, requireActiveStatus: true)
+        );
     }
 
     public function showpast()
     {
-        try
-        {
-        $school_id      =   Auth::user()->school_id;
-        $academic_year  =   SiteHelper::getAcademicYear($school_id);
-        $end_date = Carbon::now();
-        $event = Events::has('eventgallery', '>' , 0)->where([['school_id',$school_id],['end_date','<',$end_date],['academic_year_id',$academic_year->id],['category','!=','holidays'],['category','!=','exam']])->get();
-        $pastevent= ShowEventResource::collection($event);
-        //return $pastevent;
-        return response()->json([
-            'success'   =>  true,
-            'message'   =>  'Past Event List',
-            'data'      =>  $pastevent,
-        ],200);
-        
-       }
-       catch(Exception $e)
-        {
-            dd($e->getMessage());
+        try {
+            $school_id = Auth::user()->school_id;
+            $academic_year = SiteHelper::getAcademicYear($school_id);
+            $pastevent = ShowEventResource::collection(
+                $this->eventReader->mobilePast($school_id, $academic_year->id)
+            );
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Past Event List',
+                'data' => $pastevent,
+            ], 200);
+
+        } catch (Exception $e) {
+            \Log::error($e->getMessage());
         }
     }
 
     public function school()
     {
-        $school_id      =   Auth::user()->school_id;
-        $academic_year  =   SiteHelper::getAcademicYear($school_id);
-        $event = Events::where([['school_id',$school_id],['academic_year_id',$academic_year->id],['category','!=','holidays']])->where('select_type','school')->get();
-        $schoolevent= ShowEventResource::collection($event);
-        return $schoolevent;
+        $school_id = Auth::user()->school_id;
+        $academic_year = SiteHelper::getAcademicYear($school_id);
+
+        return ShowEventResource::collection(
+            $this->eventReader->mobileSchoolWide($school_id, $academic_year->id)
+        );
     }
 
     public function class($student_id)
     {
-        $school_id      =   Auth::user()->school_id;
-        $academic_year  =   SiteHelper::getAcademicYear($school_id);
-        $student = User::where('id',$student_id)->first();
-        $event = Events::where([['school_id',$school_id],['select_type','class'],['standard_id',$student->studentAcademicLatest->standardLink_id],['academic_year_id',$academic_year->id],['category','!=','holidays']])->get();
-        $classevent= ShowEventResource::collection($event);
+        $school_id = Auth::user()->school_id;
+        $academic_year = SiteHelper::getAcademicYear($school_id);
+        $student = User::where('id', $student_id)->first();
+
+        $classevent = ShowEventResource::collection(
+            $this->eventReader->mobileForClasses($school_id, $academic_year->id, [$student->studentAcademicLatest->standardLink_id])
+        );
 
         return response()->json([
-            'success'   =>  true,
-            'message'   =>  'Class Event List',
-            'data'      =>  $classevent,
-        ],200);
+            'success' => true,
+            'message' => 'Class Event List',
+            'data' => $classevent,
+        ], 200);
     }
 
     public function holidaylist()
     {
-        $school_id      =   Auth::user()->school_id;
-        $academic_year  =   SiteHelper::getAcademicYear($school_id);
-        $holiday = Events::where([['school_id',$school_id],['academic_year_id',$academic_year->id],['category','=','holidays']])->get();
-        $holiday= ShowHolidayResource::collection($holiday);
+        $school_id = Auth::user()->school_id;
+        $academic_year = SiteHelper::getAcademicYear($school_id);
 
-        $count=count($holiday);
+        $holiday = ShowHolidayResource::collection(
+            $this->holidaysReader->list($school_id, $academic_year->id)
+        );
 
         return response()->json([
-            'success'   =>  true,
-            'message'   =>  'Holiday list',
-            'data'      =>  $holiday,
-            'count'     =>  $count
-        ],200);
-        //return $holiday; 
+            'success' => true,
+            'message' => 'Holiday list',
+            'data' => $holiday,
+            'count' => count($holiday),
+        ], 200);
     }
-
-
 }

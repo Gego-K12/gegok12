@@ -7,20 +7,20 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Resources\AcademicYear as AcademicYearResource;
-use App\Http\Requests\AcademicYearUpdateRequest;
+use App\Helpers\SiteHelper;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\AcademicYearAddRequest;
+use App\Http\Requests\AcademicYearUpdateRequest;
+use App\Http\Resources\AcademicYear as AcademicYearResource;
+use App\Models\AcademicYear;
+use App\Traits\Common;
+use App\Traits\LogActivity;
+use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\AcademicYear;
-use App\Traits\LogActivity;
-use App\Helpers\SiteHelper;
-use App\Traits\Common;
-use Carbon\Carbon;
-use Exception;
 use Log;
 
 /**
@@ -28,18 +28,16 @@ use Log;
  *
  * Controller for managing academic years: listing, creating,
  * updating and deleting academic year records for the school.
- *
- * @package App\Http\Controllers\Admin
  */
 class AcademicYearController extends Controller
 {
-    use LogActivity;
     use Common;
+    use LogActivity;
 
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function list()
     {
@@ -49,8 +47,8 @@ class AcademicYearController extends Controller
 
         $array = [];
 
-        $array['academic_years']    = AcademicYearResource::collection($academicYears);
-        $array['academic_year_id']  = $academic_year->id;
+        $array['academic_years'] = AcademicYearResource::collection($academicYears);
+        $array['academic_year_id'] = $academic_year->id;
 
         return $array;
     }
@@ -58,7 +56,7 @@ class AcademicYearController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index()
     {
@@ -71,14 +69,14 @@ class AcademicYearController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function createList()
     {
         //
         $array = [];
 
-        $array['statuslist'] =  SiteHelper::getAcademicYearStatusList();
+        $array['statuslist'] = SiteHelper::getAcademicYearStatusList();
 
         return $array;
     }
@@ -86,7 +84,7 @@ class AcademicYearController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create()
     {
@@ -97,8 +95,8 @@ class AcademicYearController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param  Request  $request
+     * @return Response
      */
     public function store(AcademicYearAddRequest $request)
     {
@@ -108,18 +106,18 @@ class AcademicYearController extends Controller
             $next_year = date('Y', strtotime($request->end_date));
             $academic = new AcademicYear;
 
-            $academic->school_id    = Auth::user()->school_id;
-            //$academic->name         = $request->name;
-            $academic->name         = $curr_year . '-' . $next_year;
-            $academic->description  = $request->description;
-            $academic->start_date   = date('Y-m-d', strtotime($request->start_date));
-            $academic->end_date     = date('Y-m-d', strtotime($request->end_date));
+            $academic->school_id = Auth::user()->school_id;
+            // $academic->name         = $request->name;
+            $academic->name = $curr_year.'-'.$next_year;
+            $academic->description = $request->description;
+            $academic->start_date = date('Y-m-d', strtotime($request->start_date));
+            $academic->end_date = date('Y-m-d', strtotime($request->end_date));
             if ($request->status == 'current') {
-                $academic->status       = 1;
+                $academic->status = 1;
             } elseif ($request->status == 'new') {
-                $academic->status       = 2;
+                $academic->status = 2;
             } elseif ($request->status == 'old') {
-                $academic->status       = 0;
+                $academic->status = 0;
             }
 
             $academic->save();
@@ -136,10 +134,10 @@ class AcademicYearController extends Controller
             );
 
             $res['success'] = $message;
+
             return $res;
         } catch (Exception $e) {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -147,7 +145,7 @@ class AcademicYearController extends Controller
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function editList($id)
     {
@@ -156,17 +154,17 @@ class AcademicYearController extends Controller
 
         $array = [];
 
-        $array['description']   = $academicYear->description;
-        $array['start_date']    = date('Y-m-d', strtotime($academicYear->start_date));
-        $array['end_date']      = date('Y-m-d', strtotime($academicYear->end_date));
+        $array['description'] = $academicYear->description;
+        $array['start_date'] = date('Y-m-d', strtotime($academicYear->start_date));
+        $array['end_date'] = date('Y-m-d', strtotime($academicYear->end_date));
         if ($academicYear->status == 1) {
-            $array['status']       = 'current';
+            $array['status'] = 'current';
         } elseif ($academicYear->status == 2) {
-            $array['status']       = 'new';
+            $array['status'] = 'new';
         } elseif ($academicYear->status == 0) {
-            $array['status']       = 'old';
+            $array['status'] = 'old';
         }
-        $array['statuslist'] =  SiteHelper::getAcademicYearStatusList();
+        $array['statuslist'] = SiteHelper::getAcademicYearStatusList();
 
         return $array;
     }
@@ -175,7 +173,7 @@ class AcademicYearController extends Controller
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function show($id)
     {
@@ -193,7 +191,7 @@ class AcademicYearController extends Controller
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit($id)
     {
@@ -210,9 +208,9 @@ class AcademicYearController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(AcademicYearUpdateRequest $request, $id)
     {
@@ -220,16 +218,16 @@ class AcademicYearController extends Controller
         try {
             $academic = AcademicYear::where('id', $id)->first();
 
-            //$academic->name         = $request->name;
-            $academic->description  = $request->description;
-            $academic->start_date   = date('Y-m-d', strtotime($request->start_date));
-            $academic->end_date     = date('Y-m-d', strtotime($request->end_date));
+            // $academic->name         = $request->name;
+            $academic->description = $request->description;
+            $academic->start_date = date('Y-m-d', strtotime($request->start_date));
+            $academic->end_date = date('Y-m-d', strtotime($request->end_date));
             if ($request->status == 'current') {
-                $academic->status       = 1;
+                $academic->status = 1;
             } elseif ($request->status == 'new') {
-                $academic->status       = 2;
+                $academic->status = 2;
             } elseif ($request->status == 'old') {
-                $academic->status       = 0;
+                $academic->status = 0;
             }
 
             $academic->save();
@@ -246,19 +244,18 @@ class AcademicYearController extends Controller
             );
 
             $res['success'] = $message;
+
             return $res;
         } catch (Exception $e) {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function updateStatus(Request $request)
     {
@@ -270,14 +267,13 @@ class AcademicYearController extends Controller
 
             $prev_current_academic_year->save();
 
-
             $new_current_academic_year = AcademicYear::where('id', $request->academic_year_id)->first();
 
             $new_current_academic_year->status = 1;
 
             $new_current_academic_year->save();
 
-            Cache::flush(); //reset cache to change all details of current academic year
+            Cache::flush(); // reset cache to change all details of current academic year
 
             $message = trans('messages.update_status_success_msg', ['module' => 'Academic Year']);
 
@@ -291,10 +287,10 @@ class AcademicYearController extends Controller
             );
 
             $res['success'] = $message;
+
             return $res;
         } catch (Exception $e) {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 
@@ -302,7 +298,7 @@ class AcademicYearController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy($id)
     {
@@ -324,13 +320,13 @@ class AcademicYearController extends Controller
                 );
 
                 $res['success'] = $message;
+
                 return $res;
             } else {
                 abort(403);
             }
         } catch (Exception $e) {
             Log::info($e->getMessage());
-            //dd($e->getMessage());
         }
     }
 }

@@ -2,7 +2,7 @@
     <div class="bg-white shadow px-4 py-3">
         <div>
             <flash-message :position="'right bottom'" :timeout="3000" class="myCustomClass"></flash-message>
-        
+
 	       <!--  <div v-if="this.success!=null" class="alert alert-success" id="success-alert">{{this.success}}</div> -->
 
             <div class="flex flex-col lg:flex-row md:flex-row">
@@ -14,10 +14,9 @@
                         <div class="mb-2 flex items-center relative">
                             <VueDatePicker
                               v-model="from_date"
-                              format="dd-MM-yyyy HH:mm:ss"
+                              format="dd-MM-yyyy"
                               model-type="format"
-                              :enable-time-picker="true"
-                              :is-24="true"
+                              :time-config="{ enableTimePicker: false }"
                               :auto-apply="true"
                               input-class-name="w-full rounded"
                             />
@@ -34,10 +33,9 @@
                         <div class="mb-2 flex items-center relative">
                             <VueDatePicker
                               v-model="to_date"
-                              format="dd-MM-yyyy HH:mm:ss"
+                              format="dd-MM-yyyy"
                               model-type="format"
-                              :enable-time-picker="true"
-                              :is-24="true"
+                              :time-config="{ enableTimePicker: false }"
                               :auto-apply="true"
                               input-class-name="w-full rounded"
                             />
@@ -95,7 +93,7 @@
                         <span v-if="errors.reason_id" class="text-red-500 text-xs font-semibold">{{errors.reason_id[0]}}</span>
                     </div>
                 </div>
-      
+
                 <div class="tw-form-group w-full lg:w-1/2 md:w-1/2">
                     <div class="lg:mr-8 md:mr-8">
                         <div class="mb-2">
@@ -109,13 +107,13 @@
                 </div>
             </div>
 
-            
 
-            
-    	
+
+
+
             <div class="my-6">
                 <a href="#" id="submit-btn" class="btn btn-submit blue-bg text-white rounded px-3 py-1 mr-3 text-sm font-medium" @click="submitForm()">Submit</a>
-    		    <a href="#" class="btn btn-reset bg-gray-100 text-gray-700 border rounded px-3 py-1 mr-3 text-sm font-medium" @click="resetForm()">Reset</a>	
+    		    <a href="#" class="btn btn-reset bg-gray-100 text-gray-700 border rounded px-3 py-1 mr-3 text-sm font-medium" @click="resetForm()">Reset</a>
             </div>
 	   </div>
     </div>
@@ -150,7 +148,7 @@
                 success:null,
             }
         },
-        
+
         methods:
         {
             getList()
@@ -169,33 +167,31 @@
                 this.from_date='';
                 this.to_date='';
                 this.reason_id='';
-                this.remarks='';  
-                this.leave_type_id='';  
-                this.session='';   
-            }, 
+                this.remarks='';
+                this.leave_type_id='';
+                this.session='';
+            },
 
             submitForm()
-            {       
+            {
                 this.errors=[];
-                this.success=null; 
+                this.success=null;
 
                 let formData=new FormData();
-                
-                formData.append('from_date',this.from_date);  
-                formData.append('to_date',this.to_date);                
-                formData.append('reason_id',this.reason_id);                
-                formData.append('remarks',this.remarks); 
-                formData.append('session',this.session);          
-                formData.append('leave_type_id',this.leave_type_id);          
-                     
-                axios.post('/teacher/leave/add',formData,{headers: {'Content-Type': 'multipart/form-data'}}).then(response => {     
+
+                formData.append('from_date',this.from_date);
+                formData.append('to_date',this.to_date);
+                formData.append('reason_id',this.reason_id);
+                formData.append('remarks',this.remarks);
+                formData.append('session',this.session);
+                formData.append('leave_type_id',this.leave_type_id);
+
+                axios.post('/teacher/leave/add',formData,{headers: {'Content-Type': 'multipart/form-data'}}).then(response => {
                     this.success = response.data.success;
                     this.resetForm();
-                    // this.flash(this.success,'success',{timeout: 3000});
                     window.location.href = "/teacher/leaves";
                 }).catch(error => {
                     this.errors = error.response.data.errors;
-                    // this.flash('Please fill all fields ☹','error',{timeout: 3000});
                 });
             },
         },

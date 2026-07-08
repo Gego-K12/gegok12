@@ -23,15 +23,15 @@ class CreateAdmissionsTable extends Migration
             $table->foreign('standard_id')->references('id')->on('standards');
             $table->string('name');
             $table->date('date_of_birth');
-            $table->enum('gender',['male','female']);
+            $table->enum('gender', ['male', 'female']);
             $table->string('height');
             $table->string('weight');
             $table->text('birth_place')->nullable();
             $table->text('nationality')->nullable();
             $table->string('avatar')->nullable();
             $table->text('religion')->nullable();
-            $table->string('community')->nullable();           
-            $table->text('mother_tongue')->nullable();           
+            $table->string('community')->nullable();
+            $table->text('mother_tongue')->nullable();
             $table->string('identification_marks')->nullable();
             $table->string('aadhar_number')->nullable();
             $table->string('blood_group')->nullable();
@@ -39,14 +39,14 @@ class CreateAdmissionsTable extends Migration
             $table->longText('reason_for_leaving');
             $table->longText('permanent_address');
             $table->longText('address_for_communication');
-            $table->enum('siblings',['yes','no'])->nullable();
+            $table->enum('siblings', ['yes', 'no'])->nullable();
             $table->string('half_yearly_mark_details');
-            $table->enum('board_of_education',['CBSE','Matric','ICSE','State Board','Anglo Indian','Others'])->nullable(); 
-            $table->enum('choice_of_language',['Tamil','English','Sanskrit','French'])->nullable(); 
+            $table->enum('board_of_education', ['CBSE', 'Matric', 'ICSE', 'State Board', 'Anglo Indian', 'Others'])->nullable();
+            $table->enum('choice_of_language', ['Tamil', 'English', 'Sanskrit', 'French'])->nullable();
             $table->longText('group_selection')->nullable();
             $table->string('board_registration_number')->nullable();
 
-            //parent details
+            // parent details
             $table->string('father_name');
             $table->integer('father_qualification_id')->unsigned()->nullable();
             $table->foreign('father_qualification_id')->references('id')->on('qualifications');
@@ -77,22 +77,22 @@ class CreateAdmissionsTable extends Migration
             $table->string('emergency_contact_2');
             $table->string('relation_with_student_2');
 
-            $table->enum('medical_history',['yes','no'])->nullable();
+            $table->enum('medical_history', ['yes', 'no'])->nullable();
             $table->string('medical_details')->nullable();
 
-            $table->enum('extra_curricular_activities',['yes','no'])->nullable();
+            $table->enum('extra_curricular_activities', ['yes', 'no'])->nullable();
             $table->string('activities')->nullable();
 
-            $table->enum('mode_of_transport',['auto','car','city_bus','cycle','rickshaw','school_bus','taxi','walking'])->nullable();
+            $table->enum('mode_of_transport', ['auto', 'car', 'city_bus', 'cycle', 'rickshaw', 'school_bus', 'taxi', 'walking'])->nullable();
 
             $table->longText('transport_details')->nullable();
             $table->string('application_no');
-            $table->enum('application_status',['Draft','Approved','Pending','Rejected']);
+            $table->enum('application_status', ['Draft', 'Approved', 'Pending', 'Rejected']);
             $table->integer('section_id')->unsigned()->nullable();
             $table->foreign('section_id')->references('id')->on('sections');
             $table->string('payment_status');
             $table->integer('fee_group_id')->unsigned()->nullable();
-          //  $table->foreign('fee_group_id')->references('id')->on('fee_group');//imp
+            //  $table->foreign('fee_group_id')->references('id')->on('fee_group');//imp
             $table->longText('remarks');
             $table->timestamps();
             $table->softDeletes();

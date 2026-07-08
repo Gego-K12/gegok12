@@ -2,8 +2,9 @@
 
 namespace App\Livewire\Admin\Setting;
 
-use Livewire\Component;
 use App\Models\City;
+use Illuminate\View\View;
+use Livewire\Component;
 use Livewire\WithPagination;
 
 /**
@@ -17,8 +18,6 @@ use Livewire\WithPagination;
  * - Search cities by city name
  * - Search cities by related state name
  * - Paginated results
- *
- * @package App\Livewire\Admin\Setting
  */
 class Cities extends Component
 {
@@ -37,7 +36,7 @@ class Cities extends Component
      * Builds the city query with optional search filters
      * and returns paginated results to the Blade view.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function render()
     {
@@ -45,17 +44,17 @@ class Cities extends Component
 
         if ($this->search) {
             $cities = $cities->where(function ($query) {
-                $query->where('name', 'like', '%' . $this->search . '%')
-                      ->orWhereHas('state', function ($q) {
-                          $q->where('name', 'like', '%' . $this->search . '%');
-                      });
+                $query->where('name', 'like', '%'.$this->search.'%')
+                    ->orWhereHas('state', function ($q) {
+                        $q->where('name', 'like', '%'.$this->search.'%');
+                    });
             });
         }
 
         $cities = $cities->paginate(10);
 
         return view('livewire.admin.setting.cities', [
-            'cities' => $cities
+            'cities' => $cities,
         ]);
     }
 

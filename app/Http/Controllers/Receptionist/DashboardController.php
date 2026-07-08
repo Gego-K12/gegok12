@@ -1,26 +1,31 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
  */
+
 namespace App\Http\Controllers\Receptionist;
 
-use App\Http\Resources\Receptionist\Task as TaskResource;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Helpers\SiteHelper;
+use App\Http\Resources\Receptionist\Task as TaskResource;
+use App\Services\DashboardReaderService;
 use App\Traits\Dashboard;
-use App\Models\Task;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
     use Dashboard;
 
+    public function __construct(protected DashboardReaderService $dashboardReader) {}
+
     /**
      * Display the receptionist dashboard view.
      *
-     * @return \Illuminate\Contracts\View\View
+     * @return View
      */
     public function index()
     {
@@ -35,23 +40,12 @@ class DashboardController extends Controller
     /**
      * Return a list of tasks for the given flag.
      *
-     * @param  Request  $request
      * @param  mixed  $task_flag
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @return AnonymousResourceCollection
      */
     public function list(Request $request, $task_flag)
     {
-        $tasks = Task::where([
-            ['school_id', Auth::user()->school_id],
-            ['task_status', 0],
-            ['task_flag', $task_flag],
-        ])->ByType('to_me', Auth::id());
-
-        if ($request->q != null) {
-            $tasks = $tasks->where('title', 'LIKE', '%' . $request->q . '%');
-        }
-
-        $tasks = $tasks->get();
+        $tasks = $this->dashboardReader->taskWidgetList(Auth::user()->school_id, Auth::id(), $task_flag, $request->q);
 
         return TaskResource::collection($tasks);
     }
@@ -63,16 +57,6 @@ class DashboardController extends Controller
      */
     public function listCount()
     {
-        $tasks = Task::where([
-            ['school_id', Auth::user()->school_id],
-            ['user_id', Auth::id()],
-            ['task_status', 0],
-        ])->ByType('to_me', Auth::id())->get()->groupBy('Flag');
-
-        foreach ($tasks as $key => $value) {
-            $tasks[$key] = count($value);
-        }
-
-        return $tasks;
+        return $this->dashboardReader->taskWidgetCounts(Auth::user()->school_id, Auth::id());
     }
 }

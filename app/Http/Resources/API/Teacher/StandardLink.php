@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\API\Teacher;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class StandardLink extends JsonResource
@@ -9,19 +10,19 @@ class StandardLink extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return array
      */
     public function toArray($request)
     {
-        return 
+        return
         [
             //
-            'id'                =>  $this->id,
-            'standardLink_id'   =>  $this->id,
-            'standard_name'     =>  $this->StandardName,
-            'section_name'      =>  $this->section->name,
-            'standard_section'  =>  $this->StandardSection,
+            'id' => $this->id,
+            'standardLink_id' => $this->id,
+            'standard_name' => $this->StandardName,
+            'section_name' => $this->section->name,
+            'standard_section' => $this->StandardSection,
         ];
     }
 }

@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
 use App\Models\Group;
+use Illuminate\Foundation\Http\FormRequest;
 
 class GroupStoreRequest extends FormRequest
 {
@@ -33,7 +33,7 @@ class GroupStoreRequest extends FormRequest
 
             'standards_link_id' => [
                 'required',
-                'exists:standards_link,id'
+                'exists:standards_link,id',
             ],
         ];
     }

@@ -1,65 +1,66 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
  */
+
 namespace App\Http\Controllers\Api\Teacher\Approval;
 
-use App\Http\Resources\API\Teacher\StudentHomework as StudentHomeworkResource;
-use App\Http\Resources\API\Teacher\StandardLink as StandardLinkResource;
-use App\Http\Resources\API\Teacher\TeacherLink as TeacherLinkResource;
-use App\Http\Resources\API\Teacher\Homework as HomeworkResource;
-use App\Http\Resources\API\Teacher\Subject as SubjectResource;
-use App\Events\Notification\SingleNotificationEvent;
 use App\Events\Notification\ClassNotificationEvent;
-use App\Http\Requests\HomeworkRequest;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use App\Models\HomeworkApproval;
-use App\Models\StudentHomework;
-use Illuminate\Http\Request;
-use App\Models\StandardLink;
-use App\Traits\LogActivity;
-use App\Models\Teacherlink;
+use App\Events\Notification\SingleNotificationEvent;
 use App\Helpers\SiteHelper;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\HomeworkRequest;
+use App\Http\Resources\API\Teacher\Homework as HomeworkResource;
+use App\Http\Resources\API\Teacher\StandardLink as StandardLinkResource;
+use App\Http\Resources\API\Teacher\StudentHomework as StudentHomeworkResource;
+use App\Http\Resources\API\Teacher\TeacherLink as TeacherLinkResource;
 use App\Models\Homework;
-use App\Traits\Common;
+use App\Models\HomeworkApproval;
+use App\Models\StandardLink;
+use App\Models\StudentHomework;
+use App\Models\Teacherlink;
 use App\Models\User;
+use App\Traits\Common;
+use App\Traits\LogActivity;
 use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Log;
 
 class HomeworkController extends Controller
 {
+    use Common;
     //
     use LogActivity;
-    use Common;
 
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function pendingList(Request $request)
     {
         //
-        $school_id      =   Auth::user()->school_id;
-        $academic_year  =   SiteHelper::getAcademicYear($school_id);
-       /* $homework = Homework::where([['school_id',Auth::user()->school_id],['academic_year_id',$academic_year->id],['teacher_id',Auth::id()],['date','>=',date('Y-m-d')]])->orderBy('date','DESC')->whereHas('homeworkApproval' ,function ($query) {
-            $query->where('status','approved');
-        })->get();*/
+        $school_id = Auth::user()->school_id;
+        $academic_year = SiteHelper::getAcademicYear($school_id);
+        /* $homework = Homework::where([['school_id',Auth::user()->school_id],['academic_year_id',$academic_year->id],['teacher_id',Auth::id()],['date','>=',date('Y-m-d')]])->orderBy('date','DESC')->whereHas('homeworkApproval' ,function ($query) {
+             $query->where('status','approved');
+         })->get();*/
         /*->whereHas('standardLink' , function ($query){
             $query->where('class_teacher_id',Auth::id());
         })*/ // code for class teacher
         $query = Homework::where([
-            ['school_id',Auth::user()->school_id],
-            ['academic_year_id',$academic_year->id],
+            ['school_id', Auth::user()->school_id],
+            ['academic_year_id', $academic_year->id],
             // ['teacher_id',Auth::id()],
-            ['date','>=',date('Y-m-d')]
+            ['date', '>=', date('Y-m-d')],
         ]);
 
-        if(!Auth::user()->hasRole('principal'))
-        {
-            $query = $query->where('teacher_id',Auth::id());
+        if (! Auth::user()->hasRole('principal')) {
+            $query = $query->where('teacher_id', Auth::id());
         }
 
         //  Filter by standardLink_id (dynamic)
@@ -71,148 +72,144 @@ class HomeworkController extends Controller
         if (isset($request->status)) {
             $query->where('status', $request->status);
         }
-        
-        //date filter  
+
+        // date filter
         if (isset($request->date)) {
             $query->whereDate('date', $request->date);
         }
 
-        //subject filter  
+        // subject filter
         if (isset($request->subject_id)) {
             $query->where('subject_id', $request->subject_id);
         }
 
-
-        $homework = $query->orderBy('id','desc')->paginate(10);
+        $homework = $query->orderBy('id', 'desc')->paginate(10);
 
         $homeworklist = HomeworkResource::collection($homework);
-        
+
         return $homeworklist;
     }
-    
+
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function pendingApprovalList()
     {
         //
-        $school_id      =   Auth::user()->school_id;
-        $academic_year  =   SiteHelper::getAcademicYear($school_id);
+        $school_id = Auth::user()->school_id;
+        $academic_year = SiteHelper::getAcademicYear($school_id);
         $homework = Homework::where([
-            ['school_id',Auth::user()->school_id],
-            ['academic_year_id',$academic_year->id],
-            ['teacher_id',Auth::id()]
+            ['school_id', Auth::user()->school_id],
+            ['academic_year_id', $academic_year->id],
+            ['teacher_id', Auth::id()],
         ])
-        ->orderBy('date','DESC')
-        ->whereHas('homeworkApproval' ,function ($query) {
-            $query->where('status','pending');
-        })->get();
+            ->orderBy('date', 'DESC')
+            ->whereHas('homeworkApproval', function ($query) {
+                $query->where('status', 'pending');
+            })->get();
         /*->whereHas('standardLink' , function ($query){
             $query->where('class_teacher_id',Auth::id());
         })*/ // code for class teacher
 
         $homeworklist = HomeworkResource::collection($homework);
-        
+
         return $homeworklist;
     }
 
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function rejectedApprovalList()
     {
         //
-        $school_id      =   Auth::user()->school_id;
-        $academic_year  =   SiteHelper::getAcademicYear($school_id);
-        $homework = Homework::where([['school_id',Auth::user()->school_id],['academic_year_id',$academic_year->id],['teacher_id',Auth::id()]])->orderBy('date','DESC')->whereHas('homeworkApproval' ,function ($query) {
-            $query->where('status','rejected');
+        $school_id = Auth::user()->school_id;
+        $academic_year = SiteHelper::getAcademicYear($school_id);
+        $homework = Homework::where([['school_id', Auth::user()->school_id], ['academic_year_id', $academic_year->id], ['teacher_id', Auth::id()]])->orderBy('date', 'DESC')->whereHas('homeworkApproval', function ($query) {
+            $query->where('status', 'rejected');
         })->get();
         /*->whereHas('standardLink' , function ($query){
             $query->where('class_teacher_id',Auth::id());
         })*/ // code for class teacher
 
         $homeworklist = HomeworkResource::collection($homework);
-        
+
         return $homeworklist;
     }
-    
+
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request)
     {
-        $school_id      =   Auth::user()->school_id;
-        $academic_year  =   SiteHelper::getAcademicYear($school_id);
+        $school_id = Auth::user()->school_id;
+        $academic_year = SiteHelper::getAcademicYear($school_id);
 
         $query = Homework::where([
-            ['school_id',Auth::user()->school_id],
-            ['academic_year_id',$academic_year->id],
+            ['school_id', Auth::user()->school_id],
+            ['academic_year_id', $academic_year->id],
             // ['teacher_id',Auth::id()],
         ]);
 
-        if(!Auth::user()->hasRole('principal'))
-        {
-            $query = $query->where('teacher_id',Auth::id());
+        if (! Auth::user()->hasRole('principal')) {
+            $query = $query->where('teacher_id', Auth::id());
 
         }
 
         // // Optional: status filter (if needed)
-        if (isset($request->status)) 
-        {
+        if (isset($request->status)) {
             $query->where('status', $request->status);
 
-            if($request->status=='publish' && empty($request->date))
-            {
-                $query->where('date','<',date('Y-m-d'));
+            if ($request->status == 'publish' && empty($request->date)) {
+                $query->where('date', '<', date('Y-m-d'));
 
             }
-        
+
         }
-        
-        // //date filter  
+
+        // //date filter
         if (isset($request->date)) {
             $query->whereDate('date', $request->date);
         }
 
-        $homework = $query->orderBy('id','desc')->get(); 
+        $homework = $query->orderBy('id', 'desc')->get();
 
         $grouped = $homework->groupBy('standardLink_id')->map(function ($standardGroup) {
-            
+
             return [
                 'standard_id' => $standardGroup->first()->standardLink_id,
                 'standard_name' => $standardGroup->first()->standardLink->StandardSection ?? '--', // relation
-                
+
                 'subjects' => $standardGroup->groupBy('subject_id')->map(function ($subjectGroup) {
-                    
+
                     return [
                         'subject_id' => $subjectGroup->first()->subject_id,
                         'subject_name' => optional($subjectGroup->first()->subject)->name, // relation
-                        
-                        'homeworks' => HomeworkResource::collection($subjectGroup->values())
+
+                        'homeworks' => HomeworkResource::collection($subjectGroup->values()),
                     ];
-                })->values()
+                })->values(),
             ];
         })->values();
 
         return response()->json([
-            'status'  => true,
+            'status' => true,
             'message' => 'Completed homework list',
-            'data'    => [
-                'standards' => $grouped
-            ]
+            'data' => [
+                'standards' => $grouped,
+            ],
         ]);
     }
 
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create()
     {
@@ -222,20 +219,20 @@ class HomeworkController extends Controller
         $academic_year = SiteHelper::getAcademicYear($school_id);
 
         $standardLinks = StandardLink::where([
-                ['school_id',$school_id],
-                ['academic_year_id',$academic_year->id],
-                ['class_teacher_id',Auth::id()]
-            ])->pluck('id')->toArray();
+            ['school_id', $school_id],
+            ['academic_year_id', $academic_year->id],
+            ['class_teacher_id', Auth::id()],
+        ])->pluck('id')->toArray();
 
         $teacherlinks = Teacherlink::where([
-            ['school_id',$school_id],
-            ['academic_year_id',$academic_year->id],
-            ['teacher_id',Auth::id()]
+            ['school_id', $school_id],
+            ['academic_year_id', $academic_year->id],
+            ['teacher_id', Auth::id()],
         ])->pluck('standardLink_id')->toArray();
 
-        $standards = array_merge($standardLinks,$teacherlinks);
+        $standards = array_merge($standardLinks, $teacherlinks);
 
-        $standardLink = StandardLink::whereIn('id',$standards)->get();
+        $standardLink = StandardLink::whereIn('id', $standards)->get();
 
         $standards = StandardLinkResource::collection($standardLink);
 
@@ -245,78 +242,75 @@ class HomeworkController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function subjectList($standardLink_id)
     {
         //
         $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
         $teacherLink = Teacherlink::where([
-                ['school_id',Auth::user()->school_id],
-                ['academic_year_id',$academic_year->id],
-                ['teacher_id',Auth::id()],
-                ['standardLink_id',$standardLink_id]
-            ])->get();
+            ['school_id', Auth::user()->school_id],
+            ['academic_year_id', $academic_year->id],
+            ['teacher_id', Auth::id()],
+            ['standardLink_id', $standardLink_id],
+        ])->get();
         $subjectlist = TeacherLinkResource::collection($teacherLink);
 
         return response()->json([
-            'success'   =>  true,
-            'message'   =>  'Subject List',
-            'data'      =>  $subjectlist
-        ],200);
+            'success' => true,
+            'message' => 'Subject List',
+            'data' => $subjectlist,
+        ], 200);
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param  Request  $request
+     * @return Response
      */
     public function store(HomeworkRequest $request)
     {
         //
-        try
-        {
+        try {
             $school_id = Auth::user()->school_id;
             $academic_year = SiteHelper::getAcademicYear($school_id);
-          
+
             $work = new Homework;
 
-            $work->school_id            =   $school_id;
-            $work->academic_year_id     =   $academic_year->id;
-            $work->standardLink_id      =   $request->standardLink_id;
-            $work->subject_id           =   $request->subject_id;
-            $work->teacher_id           =   Auth::id();
-            $work->description          =   $request->description;
-            $work->date                 = $request->date ? date('Y-m-d', strtotime($request->date)) : null;
+            $work->school_id = $school_id;
+            $work->academic_year_id = $academic_year->id;
+            $work->standardLink_id = $request->standardLink_id;
+            $work->subject_id = $request->subject_id;
+            $work->teacher_id = Auth::id();
+            $work->description = $request->description;
+            $work->date = $request->date ? date('Y-m-d', strtotime($request->date)) : null;
 
-            $work->submission_date      = $request->submission_date ? date('Y-m-d', strtotime($request->submission_date)) : null;
+            $work->submission_date = $request->submission_date ? date('Y-m-d', strtotime($request->submission_date)) : null;
 
-            $work->status               =   $request->status;
+            $work->status = $request->status;
 
             $file = $request->file('attachment');
-            if($file)
-            {
-                $folder=Auth::user()->school->slug.'/homework';
-                $path = $this->uploadFile($folder,$file);
-                $work->attachment = $path; 
+            if ($file) {
+                $folder = Auth::user()->school->slug.'/homework';
+                $path = $this->uploadFile($folder, $file);
+                $work->attachment = $path;
             }
-            
+
             $work->save();
 
             $admin = User::BySchool(Auth::user()->school_id)->ByRole(3)->first();
 
             $homeworkapproval = new HomeworkApproval;
 
-            $homeworkapproval->homework_id    = $work->id;
+            $homeworkapproval->homework_id = $work->id;
             // $homeworkapproval->status         = 'pending';
-            $status_approval='approved';
+            $status_approval = 'approved';
 
-            if(config('settings.homework_status') == 1)
-            {
-                $status_approval='pending';
+            if (config('settings.homework_status') == 1) {
+                $status_approval = 'pending';
             }
-            $homeworkapproval->status         = $status_approval;
+            $homeworkapproval->status = $status_approval;
 
             $homeworkapproval->save();
 
@@ -324,31 +318,28 @@ class HomeworkController extends Controller
 
             $admin = User::BySchool(Auth::user()->school_id)->ByRole(3)->first();
 
-            $data['user']       =   $admin;
-            $data['details']    =   trans('notification.homework_add_success_msg');
+            $data['user'] = $admin;
+            $data['details'] = trans('notification.homework_add_success_msg');
 
             event(new SingleNotificationEvent($data));
 
-            $message = trans('messages.add_success_msg',['module' => 'Homeworks']);
+            $message = trans('messages.add_success_msg', ['module' => 'Homeworks']);
 
-            $ip= $this->getRequestIP();
+            $ip = $this->getRequestIP();
             $this->doActivityLog(
                 $work,
                 Auth::user(),
-                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT'] ],
+                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT']],
                 LOGNAME_ADD_HOMEWORK,
                 $message
-            ); 
-            
+            );
+
             return response()->json([
-                'success'   =>  true,
-                'message'   =>  $message,
-            ],200);  
-        }
-        catch(Exception $e)
-        {
+                'success' => true,
+                'message' => $message,
+            ], 200);
+        } catch (Exception $e) {
             Log::info($e->getMessage());
-            dd($e->getMessage());
         }
     }
 
@@ -356,12 +347,12 @@ class HomeworkController extends Controller
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function show($id)
     {
         //
-        $studentHomeworks = StudentHomework::where('homework_id',$id)->paginate(10);
+        $studentHomeworks = StudentHomework::where('homework_id', $id)->paginate(10);
 
         $studentHomeworks = StudentHomeworkResource::collection($studentHomeworks);
 
@@ -372,112 +363,102 @@ class HomeworkController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit($id)
     {
         //
-        $homework = Homework::where('id',$id)->first();
-        if($homework)
-        {
-            $array=[];
+        $homework = Homework::where('id', $id)->first();
+        if ($homework) {
+            $array = [];
 
-            $array['standardLink_id']   =   $homework->standardLink_id;
-            $array['subject_id']        =   $homework->subject_id;
-            $array['description']       =   $homework->description;
+            $array['standardLink_id'] = $homework->standardLink_id;
+            $array['subject_id'] = $homework->subject_id;
+            $array['description'] = $homework->description;
 
-            $array['date']              =   $homework->date ? date('d-m-Y', strtotime($homework->date)) : '';
+            $array['date'] = $homework->date ? date('d-m-Y', strtotime($homework->date)) : '';
 
-            $array['attachment']        =   $homework->attachment == null ? '':$homework->AttachmentPath;
-            $array['pending_count']     =   $homework->PendingCount;
+            $array['attachment'] = $homework->attachment == null ? '' : $homework->AttachmentPath;
+            $array['pending_count'] = $homework->PendingCount;
 
-            $array['submission_date']   =   $homework->submission_date ? date('d-m-Y', strtotime($homework->submission_date)) : '';
-            
-            $array['status']            =   $homework->status;
+            $array['submission_date'] = $homework->submission_date ? date('d-m-Y', strtotime($homework->submission_date)) : '';
+
+            $array['status'] = $homework->status;
 
             return $array;
-        }
-        else
-        {
+        } else {
             return response()->json([
-                'success'   =>  false,
-                'message'   =>  'Unauthorized',
-            ],401); 
+                'success' => false,
+                'message' => 'Unauthorized',
+            ], 401);
         }
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(HomeworkRequest $request, $id)
     {
         //
-        try
-        {
-            $work = Homework::where('id',$id)->first();
+        try {
+            $work = Homework::where('id', $id)->first();
             // if( $work->homeworkApproval->status == 'pending' )
             // {
-                $work->standardLink_id      =   $request->standardLink_id;
-                $work->subject_id           =   $request->subject_id;
-                $work->teacher_id           =   Auth::id();
-                $work->description          =   $request->description;
-                $work->date                 = $request->date ? date('Y-m-d', strtotime($request->date)) : null;
+            $work->standardLink_id = $request->standardLink_id;
+            $work->subject_id = $request->subject_id;
+            $work->teacher_id = Auth::id();
+            $work->description = $request->description;
+            $work->date = $request->date ? date('Y-m-d', strtotime($request->date)) : null;
 
-                $work->submission_date      = $request->submission_date ? date('Y-m-d', strtotime($request->submission_date)) : null;
+            $work->submission_date = $request->submission_date ? date('Y-m-d', strtotime($request->submission_date)) : null;
 
-                $work->status               =   $request->status;
+            $work->status = $request->status;
 
-                $file = $request->file('attachment');
-                if($file)
-                {
-                    $folder=Auth::user()->school->slug.'/homework';
-                    $path = $this->uploadFile($folder,$file);
-                    $work->attachment = $path; 
-                }
-                else
-                {
-                    $work->attachment=$work->attachment; 
-                }
-                
-                $work->save();
+            $file = $request->file('attachment');
+            if ($file) {
+                $folder = Auth::user()->school->slug.'/homework';
+                $path = $this->uploadFile($folder, $file);
+                $work->attachment = $path;
+            } else {
+                $work->attachment = $work->attachment;
+            }
 
-                $admin = User::BySchool(Auth::user()->school_id)->ByRole(3)->first();
-                $data = [];
+            $work->save();
 
-                $data['user']       =   $admin;
-                $data['details']    =   trans('notification.homework_update_success_msg');
+            $admin = User::BySchool(Auth::user()->school_id)->ByRole(3)->first();
+            $data = [];
 
-                event(new SingleNotificationEvent($data));
+            $data['user'] = $admin;
+            $data['details'] = trans('notification.homework_update_success_msg');
 
-                $message = trans('messages.update_success_msg',['module' => 'Homeworks']);
+            event(new SingleNotificationEvent($data));
 
-                $ip= $this->getRequestIP();
-                $this->doActivityLog(
-                    $work,
-                    Auth::user(),
-                    ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT'] ],
-                    LOGNAME_EDIT_HOMEWORK,
-                    $message
-                );
+            $message = trans('messages.update_success_msg', ['module' => 'Homeworks']);
+
+            $ip = $this->getRequestIP();
+            $this->doActivityLog(
+                $work,
+                Auth::user(),
+                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT']],
+                LOGNAME_EDIT_HOMEWORK,
+                $message
+            );
             // }
             // else
             // {
             //     $message = trans('messages.approval_done_msg',['module' => 'Homework']);
             // }
-            
+
             return response()->json([
-                'success'   =>  true,
-                'message'   =>  $message,
-            ],200); 
-        }
-        catch(Exception $e)
-        {
+                'success' => true,
+                'message' => $message,
+            ], 200);
+        } catch (Exception $e) {
             Log::info($e->getMessage());
-            dd($e->getMessage());
         }
     }
 
@@ -485,55 +466,51 @@ class HomeworkController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy($id)
     {
         //
-        try
-        {
-            $homework = Homework::where('id',$id)->first();
-            if($homework)
-            {
-                if(\Gate::allows('homework',$homework))
-                {                    
+        try {
+            $homework = Homework::where('id', $id)->first();
+            if ($homework) {
+                if (\Gate::allows('homework', $homework)) {
                     // if( $homework->homeworkApproval->status == 'pending' )
                     // {
-                        $homework->delete();
+                    $homework->delete();
 
-                        $admin = User::BySchool(Auth::user()->school_id)->ByRole(3)->first();
+                    $admin = User::BySchool(Auth::user()->school_id)->ByRole(3)->first();
 
-                        if($admin->id != Auth::id())
-                        {
-                            $data = [];
+                    if ($admin->id != Auth::id()) {
+                        $data = [];
 
-                            $data['user']       =   $admin;
-                            $data['details']    =   trans('notification.homework_delete_success_msg');
+                        $data['user'] = $admin;
+                        $data['details'] = trans('notification.homework_delete_success_msg');
 
-                            event(new SingleNotificationEvent($data));
+                        event(new SingleNotificationEvent($data));
 
-                            /*$array=[];
+                        /*$array=[];
 
-                            $array['school_id'] =  Auth::user()->school_id;
-                            $array['user_id']   =  $admin->id;
-                            $array['message']   = 'Assignment Deleted';
-                            $array['type']      = 'assignment';
-                                    
-                            event(new SinglePushEvent($array));*/
-                        }
+                        $array['school_id'] =  Auth::user()->school_id;
+                        $array['user_id']   =  $admin->id;
+                        $array['message']   = 'Assignment Deleted';
+                        $array['type']      = 'assignment';
 
-                        $message=trans('messages.delete_success_msg',['module' => 'Homework']); 
+                        event(new SinglePushEvent($array));*/
+                    }
 
-                        event(new ClassNotificationEvent($array));
+                    $message = trans('messages.delete_success_msg', ['module' => 'Homework']);
 
-                        $ip= $this->getRequestIP();
-                        $this->doActivityLog(
-                            $homework,
-                            Auth::user(),
-                            ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT'] ],
-                            LOGNAME_DELETE_HOMEWORK,
-                            $message
-                        );
+                    event(new ClassNotificationEvent($array));
+
+                    $ip = $this->getRequestIP();
+                    $this->doActivityLog(
+                        $homework,
+                        Auth::user(),
+                        ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT']],
+                        LOGNAME_DELETE_HOMEWORK,
+                        $message
+                    );
                     // }
                     // else
                     // {
@@ -541,27 +518,21 @@ class HomeworkController extends Controller
                     // }
                     $success = true;
                     $error_code = 200;
-                }
-                else
-                {
+                } else {
                     abort(403);
                 }
+            } else {
+                $success = false;
+                $message = 'Unauthorized';
+                $error_code = 401;
             }
-            else
-            {
-                $success    =   false;
-                $message    =   'Unauthorized';
-                $error_code =   401; 
-            }
+
             return response()->json([
-                'success'   =>  $success,
-                'message'   =>  $message,
-            ],$error_code); 
-        }
-        catch(Exception $e)
-        {
+                'success' => $success,
+                'message' => $message,
+            ], $error_code);
+        } catch (Exception $e) {
             Log::info($e->getMessage());
-            dd($e->getMessage());
         }
     }
 }

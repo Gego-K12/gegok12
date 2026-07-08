@@ -1,78 +1,86 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
  */
+
 namespace App\Http\Controllers\Receptionist;
 
+use App\Helpers\SiteHelper;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\TaskRequest;
 use App\Http\Resources\Receptionist\Task as TaskResource;
 use App\Http\Resources\Teacher as TeacherResource;
 use App\Http\Resources\User as UserResource;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Controller;
-use App\Http\Requests\TaskRequest;
-use App\Traits\TodolistProcess;
-use App\Models\TaskAssignee;
-use Illuminate\Http\Request;
-use App\Traits\LogActivity;
-use App\Helpers\SiteHelper;
-use App\Traits\Common;
 use App\Models\Task;
+use App\Models\TaskAssignee;
 use App\Models\User;
+use App\Services\TaskReaderService;
+use App\Traits\Common;
+use App\Traits\LogActivity;
+use App\Traits\TodolistProcess;
 use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Log;
 
 class TaskController extends Controller
 {
-    use TodolistProcess;
-    use LogActivity;
     use Common;
+    use LogActivity;
+    use TodolistProcess;
+
+    public function __construct(protected TaskReaderService $taskReader) {}
 
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function showlist(Request $request)
     {
         $school_id = Auth::user()->school_id;
-        $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
+        $academic_year = SiteHelper::getAcademicYear($school_id);
 
-        $tasks = Task::where([
-                ['school_id',$school_id],
-                ['academic_year_id',$academic_year->id]
-            ])->ByType($request->type,Auth::id())->ByStatus($request->status)->get();
+        $tasks = $this->taskReader->listByType(
+            schoolId: $school_id,
+            academicYearId: $academic_year->id,
+            type: $request->type,
+            userId: Auth::id(),
+            status: $request->status,
+        );
 
         $tasks = TaskResource::collection($tasks)->groupby('task_flag');
-        
+
         return $tasks;
     }
 
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function list(Request $request)
     {
         // $array = [];
 
         // $array['task_date'] = date('Y-m-d');
-        
+
         // return $array;
-        $tasks = []; 
+        $tasks = [];
 
         return response()->json($tasks);
     }
 
     public function changestatus(Request $request)
     {
-        try
-        {
+        try {
             $task = $this->updatestatus($request);
             // if($request->selectedTaskCount > 0 )
             // {
-            //     foreach ($request->task_completed as $task_id) 
+            //     foreach ($request->task_completed as $task_id)
             //     {
             //         $task = Task::where('id',$task_id)->first();
 
@@ -89,60 +97,56 @@ class TaskController extends Controller
             //             ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT'] ],
             //             LOGNAME_MARK_TASK_COMPLETE,
             //             $message
-            //         ); 
+            //         );
             //     }
 
-                // $res['success'] = $message;
-                return $task;
+            // $res['success'] = $message;
+            return $task;
             // }
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
             Log::info($e->getMessage());
-            dd($e->getMessage());
-        }   
+        }
     }
 
     public function index()
-    { 
+    {
         $query = \Request::getQueryString();
-        return view('/reception/todolist/index',['query' => $query]);
+
+        return view('/reception/todolist/index', ['query' => $query]);
     }
 
     public function create()
-    { 
+    {
         $query = \Request::getQueryString();
-        return view('/reception/todolist/create',['query' => $query]);
+
+        return view('/reception/todolist/create', ['query' => $query]);
     }
 
     public function store(TaskRequest $request)
     {
-        try 
-        {
+        try {
             $school_id = Auth::user()->school_id;
             $academic_year = SiteHelper::getAcademicYear($school_id);
             $auth_id = Auth::id();
 
-            $task = $this->addTaskAssignee( $request , $school_id , $academic_year->id , $auth_id );
+            $task = $this->addTaskAssignee($request, $school_id, $academic_year->id, $auth_id);
 
-            $message = trans('messages.add_success_msg',['module' => 'Task']);
+            $message = trans('messages.add_success_msg', ['module' => 'Task']);
 
-            $ip= $this->getRequestIP();
+            $ip = $this->getRequestIP();
             $this->doActivityLog(
                 $task,
                 Auth::user(),
-                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT'] ],
+                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT']],
                 LOGNAME_ADD_TASK,
                 $message
-            ); 
+            );
 
             $res['success'] = $message;
+
             return $res;
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
             Log::info($e->getMessage());
-            dd($e->getMessage());
         }
     }
 
@@ -150,82 +154,70 @@ class TaskController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function show($id)
     {
-        //
-        $task = Task::where('id',$id)->first(); 
-        $task_assignees = TaskAssignee::where('task_id',$id)->get();
-        
-        foreach ($task_assignees as $key => $task_assignee) 
-        {
-            if($task->type == 'teacher')
-            {
-                $selected_teachers[$key] = $task_assignee->user_id;
-            }
-            elseif($task->type == 'student')
-            {
-                $selectedUsers[$key] = $task_assignee->user_id;
-                $standardLink_id = $task_assignee->standardLink_id;
-                $class = $task_assignee->standardLink->StandardSection;
-            }
-            elseif ($task->type == 'class') 
-            {
-                $class = $task_assignee->standardLink->StandardSection;
-            }
-        }
-        $array = [];
+        $task = $this->taskReader->find($id, Auth::user()->school_id);
 
-        if($task->type == 'student')
-        {
-            $selected_students = User::whereIn('id',$selectedUsers)->get();
-            $selected_students = UserResource::collection($selected_students);
+        if (! $task) {
+            abort(404);
         }
-        if($task->type == 'teacher')
-        {
-            $selected_teachers  = User::whereIn('id',$selected_teachers)->get();
-            $selected_teachers  = TeacherResource::collection($selected_teachers);
+
+        $assignees = $this->taskReader->resolveAssignees($task);
+        $selected_students = null;
+        $selected_teachers = null;
+
+        if ($task->type == 'student') {
+            $selected_students = UserResource::collection(User::whereIn('id', $assignees['selectedUsers'])->get());
         }
-        $array['task_id']           =  $task->id;
-        $array['task_assignee_id']  =  $task_assignee->id;
-        $array['title']             =  $task->title;
-        $array['to_do_list']        =  $task->to_do_list;
-        $array['task_date']         =  date('d-m-Y H:i:s',strtotime($task->task_date));
-        $array['assignee_display']  =  ucwords($task->type);
-        $array['assignee']          =  $task->type;
-        $array['reminder_date']     =  date('d-m-Y H:i:s',strtotime($task->ReminderValue));
-        $array['selectedUsers']     =  $selected_students;
-        $array['standardLink_id']   =  $standardLink_id;
-        $array['class']             =  $class;
-        $array['teachers']          =  $selected_teachers;
-    
-        return $array;
+        if ($task->type == 'teacher') {
+            $selected_teachers = TeacherResource::collection(User::whereIn('id', $assignees['selectedTeachers'])->get());
+        }
+
+        return [
+            'task_id' => $task->id,
+            'task_assignee_id' => $assignees['lastTaskAssigneeId'],
+            'title' => $task->title,
+            'to_do_list' => $task->to_do_list,
+            'task_date' => date('d-m-Y H:i:s', strtotime($task->task_date)),
+            'assignee_display' => ucwords($task->type),
+            'assignee' => $task->type,
+            'reminder_date' => date('d-m-Y H:i:s', strtotime($task->ReminderValue)),
+            'selectedUsers' => $selected_students,
+            'standardLink_id' => $assignees['standardLinkId'],
+            'class' => $assignees['className'],
+            'teachers' => $selected_teachers,
+        ];
     }
 
     /**
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-    public function editList(Request $request,$id)
+    public function editList(Request $request, $id)
     {
-        //
-        $task = Task::where('id',$id)->first(); 
-        $task_assignees = TaskAssignee::where('task_id',$id)->get();
-        
+        $task = $this->taskReader->find($id, Auth::user()->school_id);
+
+        if (! $task) {
+            abort(404);
+        }
+
+        $assignees = $this->taskReader->resolveAssignees($task);
+
         $array = [];
 
-        $array['task_date']         =  date('Y-m-d'); 
-        $array['task_id']           =  $task->id;
-        $array['task_assignee_id']  =  $task_assignee->id;
-        $array['title']             =  $task->title;
-        $array['to_do_list']        =  $task->to_do_list;
-        $array['task_date']         =  date('d-m-Y H:i:s',strtotime($task->task_date));
-        $array['assignee']          =  $task->type;
-        $array['reminder']          =  $task->reminder;
-    
+        $array['task_date'] = date('Y-m-d');
+        $array['task_id'] = $task->id;
+        $array['task_assignee_id'] = $assignees['lastTaskAssigneeId'];
+        $array['title'] = $task->title;
+        $array['to_do_list'] = $task->to_do_list;
+        $array['task_date'] = date('d-m-Y H:i:s', strtotime($task->task_date));
+        $array['assignee'] = $task->type;
+        $array['reminder'] = $task->reminder;
+
         return $array;
     }
 
@@ -233,96 +225,100 @@ class TaskController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit($id)
     {
-        //
-        $task = Task::where('id',$id)->first(); 
-        return view('/reception/todolist/edit' , ['task' => $task]);
+        $task = $this->taskReader->find($id, Auth::user()->school_id);
+
+        if (! $task) {
+            abort(404);
+        }
+
+        return view('/reception/todolist/edit', ['task' => $task]);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(TaskRequest $request, $id)
     {
-        try
-        {
-            $school_id = Auth::user()->school_id;
+        $school_id = Auth::user()->school_id;
+
+        if (! $this->taskReader->find($id, $school_id)) {
+            abort(404);
+        }
+
+        try {
             $academic_year = SiteHelper::getAcademicYear($school_id);
             $auth_id = Auth::id();
 
-            $task = $this->editTaskAssignee( $request , $auth_id , $id);
+            $task = $this->editTaskAssignee($request, $auth_id, $id, $school_id);
 
-            $message=trans('messages.update_success_msg',['module' => 'Task']);
+            $message = trans('messages.update_success_msg', ['module' => 'Task']);
 
-            $ip= $this->getRequestIP();
+            $ip = $this->getRequestIP();
             $this->doActivityLog(
                 $task,
                 Auth::user(),
-                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT'] ],
+                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT']],
                 LOGNAME_EDIT_TASK,
                 $message
             );
 
             $res['success'] = $message;
+
             return $res;
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
             Log::info($e->getMessage());
-            dd($e->getMessage());
         }
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function snooze(Request $request, $id)
     {
-        try
-        {
-            $school_id = Auth::user()->school_id;
+        $school_id = Auth::user()->school_id;
+        $task = $this->taskReader->find($id, $school_id);
+
+        if (! $task) {
+            abort(404);
+        }
+
+        try {
             $academic_year = SiteHelper::getAcademicYear($school_id);
             $auth_id = Auth::id();
-            $task = Task::where('id',$id)->first();
-            if($task->snooze == 0)
-            {
-                $task = $this->snoozeTask( $request , $auth_id , $id);
+            if ($task->snooze == 0) {
+                $task = $this->snoozeTask($request, $auth_id, $id, $school_id);
 
                 $mins = env('SNOOZE_TIME') / 60;
-                $message=trans('messages.task_snooze_msg',['mins' => $mins]);
-            }
-            else
-            {
-                $message=trans('messages.task_snooze_exists_msg');
+                $message = trans('messages.task_snooze_msg', ['mins' => $mins]);
+            } else {
+                $message = trans('messages.task_snooze_exists_msg');
             }
 
-            $ip= $this->getRequestIP();
+            $ip = $this->getRequestIP();
             $this->doActivityLog(
                 $task,
                 Auth::user(),
-                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT'] ],
+                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT']],
                 LOGNAME_SNOOZE_TASK,
                 $message
             );
 
             $res['success'] = $message;
+
             return $res;
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
             Log::info($e->getMessage());
-            dd($e->getMessage());
         }
     }
 
@@ -330,34 +326,40 @@ class TaskController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy($id)
     {
-        try 
-        {
-            $task = Task::where('id',$id)->first();
-            
-            $task->delete();       
+        $task = $this->taskReader->find($id, Auth::user()->school_id);
 
-            $message=trans('messages.delete_success_msg',['module' => 'Task']);
+        if (! $task) {
+            abort(404);
+        }
 
-            $ip= $this->getRequestIP();
+        try {
+            $task_assignees = TaskAssignee::where('task_id', $task->id)->get();
+            foreach ($task_assignees as $task_assignee) {
+                $task_assignee->delete();
+            }
+
+            $task->delete();
+
+            $message = trans('messages.delete_success_msg', ['module' => 'Task']);
+
+            $ip = $this->getRequestIP();
             $this->doActivityLog(
                 $task,
                 Auth::user(),
-                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT'] ],
+                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT']],
                 LOGNAME_DELETE_TASK,
                 $message
             );
 
             $res['success'] = $message;
+
             return $res;
-        }
-        catch(Exception $e) 
-        {
+        } catch (Exception $e) {
             Log::info($e->getMessage());
-            dd($e->getMessage());
         }
     }
 }

@@ -1,12 +1,14 @@
 <?php
+
 // SPDX-License-Identifier: MIT
 // (c) 2025 GegoSoft Technologies and GegoK12 Contributors
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Model;
 use App\Traits\Common;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Document
@@ -25,14 +27,15 @@ use App\Traits\Common;
  * @property \DateTime $updated_at
  * @property \DateTime $deleted_at
  * @property string $path
- * @property-read \App\Models\School $school
- * @property-read \App\Models\User $user
+ * @property-read School $school
+ * @property-read User $user
+ *
  * @mixin \Eloquent
  */
 class Document extends Model
 {
-    use SoftDeletes;
     use Common;
+    use SoftDeletes;
 
     protected $table = 'documents';
 
@@ -42,7 +45,7 @@ class Document extends Model
      * @var array
      */
     protected $fillable = [
-        'school_id' , 'user_id' , 'version' , 'type' , 'name' , 'file_path', 'status'
+        'school_id', 'user_id', 'version', 'type', 'name', 'file_path', 'status',
     ];
 
     /**
@@ -55,21 +58,21 @@ class Document extends Model
     /**
      * Get the school for this document.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function school()
     {
-        return $this->belongsTo('App\Models\School','school_id');
+        return $this->belongsTo('App\Models\School', 'school_id');
     }
 
     /**
      * Get the user who uploaded this document.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function user()
     {
-        return $this->belongsTo('App\Models\User','user_id');
+        return $this->belongsTo('App\Models\User', 'user_id');
     }
 
     /**
@@ -79,6 +82,6 @@ class Document extends Model
      */
     public function getPathAttribute()
     {
-      return $this->getFilePath($this->file_path);
+        return $this->getFilePath($this->file_path);
     }
 }

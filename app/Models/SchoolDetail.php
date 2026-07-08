@@ -1,11 +1,13 @@
 <?php
+
 // SPDX-License-Identifier: MIT
 // (c) 2025 GegoSoft Technologies and GegoK12 Contributors
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Traits\Common;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Class SchoolDetail
@@ -19,49 +21,49 @@ use App\Traits\Common;
  * @property \DateTime $created_at
  * @property \DateTime $updated_at
  * @property string $logoPath
- * @property-read \App\Models\School $school
+ * @property-read School $school
+ *
  * @mixin \Eloquent
  */
 class SchoolDetail extends Model
 {
-	use Common;
+    use Common;
 
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table='school_details';
+    protected $table = 'school_details';
 
-     /**
+    /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-	protected $fillable = [
-	    'school_id','meta_key','meta_value',
-	];
+    protected $fillable = [
+        'school_id', 'meta_key', 'meta_value',
+    ];
 
     /**
      * Get the school for this detail.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function school()
     {
-        return $this->belongsTo('App\Models\School','school_id');
+        return $this->belongsTo('App\Models\School', 'school_id');
     }
 
-	/**
-	 * Get the logo file path if this is a logo meta key.
-	 *
-	 * @return string
-	 */
-	public function getLogoPathAttribute()
+    /**
+     * Get the logo file path if this is a logo meta key.
+     *
+     * @return string
+     */
+    public function getLogoPathAttribute()
     {
-    	if($this->meta_key=='school_logo')
-    	{
-          return $this->getFilePath($this->meta_value);
+        if ($this->meta_key == 'school_logo') {
+            return $this->getFilePath($this->meta_value);
         }
     }
 }

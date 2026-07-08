@@ -1,11 +1,14 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
  */
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Class SendMail
@@ -32,10 +35,11 @@ use Illuminate\Database\Eloquent\Model;
  * @property \DateTime $created_at
  * @property \DateTime $updated_at
  * @property \DateTime $deleted_at
- * @property-read \App\Models\School $school
- * @property-read \App\Models\AcademicYear $academicYear
- * @property-read \App\Models\User $user
- * @property-read \App\Models\User|null $student
+ * @property-read School $school
+ * @property-read AcademicYear $academicYear
+ * @property-read User $user
+ * @property-read User|null $student
+ *
  * @mixin \Eloquent
  */
 class SendMail extends Model
@@ -54,7 +58,7 @@ class SendMail extends Model
      * @var array
      */
     protected $fillable = [
-        'school_id' , 'academic_year_id' , 'user_id' , 'from_address' , 'from' , 'to' , 'subject' , 'message' , 'attachments' , 'status' , 'type' , 'message_id' , 'executed_at' , 'is_executed' , 'fired_at' , 'read_at'
+        'school_id', 'academic_year_id', 'user_id', 'from_address', 'from', 'to', 'subject', 'message', 'attachments', 'status', 'type', 'message_id', 'executed_at', 'is_executed', 'fired_at', 'read_at',
     ];
 
     /**
@@ -62,46 +66,45 @@ class SendMail extends Model
      *
      * @var array
      */
-    protected $dates = ['executed_at' , 'fired_at' , 'read_at' , 'deleted_at'];
+    protected $dates = ['executed_at', 'fired_at', 'read_at', 'deleted_at'];
 
     /**
      * Get the school for this mail.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function school()
     {
-        return $this->belongsTo('App\Models\School','school_id');
+        return $this->belongsTo('App\Models\School', 'school_id');
     }
 
     /**
      * Get the academic year for this mail.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function academicYear()
     {
-        return $this->belongsTo('App\Models\AcademicYear','academic_year_id');
+        return $this->belongsTo('App\Models\AcademicYear', 'academic_year_id');
     }
 
     /**
      * Get the user who initiated this mail.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function user()
     {
-        return $this->belongsTo('App\Models\User','user_id');
+        return $this->belongsTo('App\Models\User', 'user_id');
     }
 
     /**
      * Get the student recipient for this mail.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function student()
     {
-        return $this->belongsTo('App\Models\User','student_id');
+        return $this->belongsTo('App\Models\User', 'student_id');
     }
-
 }

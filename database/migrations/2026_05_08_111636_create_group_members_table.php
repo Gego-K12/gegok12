@@ -13,16 +13,16 @@ return new class extends Migration
     {
         Schema::create('group_members', function (Blueprint $table) {
             $table->id();
-             $table->unsignedBigInteger('group_id');
+            $table->unsignedBigInteger('group_id');
 
             $table->foreign('group_id')
-                  ->references('id')
-                  ->on('groups')
-                  ->onDelete('cascade');
+                ->references('id')
+                ->on('groups')
+                ->onDelete('cascade');
             $table->unsignedBigInteger('member_id');
 
-            $table->enum('member_type', ['student', 'teacher','non_teaching'])
-                  ->default('student');
+            $table->enum('member_type', ['student', 'teacher', 'non_teaching'])
+                ->default('student');
             $table->timestamps();
             $table->softDeletes();
         });

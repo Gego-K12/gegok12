@@ -1,10 +1,12 @@
 <?php
+
 // SPDX-License-Identifier: MIT
 // (c) 2025 GegoSoft Technologies and GegoK12 Contributors
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Class PermissionUser
@@ -18,8 +20,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property \DateTime $created_at
  * @property \DateTime $updated_at
  * @property \DateTime $deleted_at
- * @property-read \App\Models\Permission $permission
- * @property-read \App\Models\User $user
+ * @property-read Permission $permission
+ * @property-read User $user
+ *
  * @mixin \Eloquent
  */
 class PermissionUser extends Model
@@ -38,7 +41,7 @@ class PermissionUser extends Model
      * @var array
      */
     protected $fillable = [
-        'permission_id' , 'user_id' , 'user_type'
+        'permission_id', 'user_id', 'user_type',
     ];
 
     /**
@@ -51,20 +54,20 @@ class PermissionUser extends Model
     /**
      * Get the permission for this user.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function permission()
     {
-        return $this->belongsTo('App\\Models\\Permission','permission_id');
+        return $this->belongsTo('App\\Models\\Permission', 'permission_id');
     }
 
     /**
      * Get the user for this permission.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function user()
     {
-        return $this->belongsTo('App\\Models\\User','user_id');
+        return $this->belongsTo('App\\Models\\User', 'user_id');
     }
 }

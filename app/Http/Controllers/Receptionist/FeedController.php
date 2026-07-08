@@ -1,51 +1,50 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
  */
+
 namespace App\Http\Controllers\Receptionist;
 
-use App\Http\Requests\Classwall\PostRequest;
+use App\Helpers\SiteHelper;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
-use App\Traits\LogActivity;
-use App\Models\PostTag;
-use App\Traits\Common;
 use App\Models\Post;
-use App\Models\Tag;
+use App\Services\FeedReaderService;
+use App\Traits\Common;
+use App\Traits\LogActivity;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 
 class FeedController extends Controller
 {
+    use Common;
+
     //
     use LogActivity;
-    use Common;
+
+    public function __construct(protected FeedReaderService $feedReader) {}
 
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request)
-    {       
-        $feeds=Post::where('visibility','all_class')->orderBy('posted_at','DESC')->get();
-        
-        if($request->list!='')
-        {
-            $category=$request->list;
+    {
+        $schoolId = Auth::user()->school_id;
+        $academicYearId = SiteHelper::getAcademicYear($schoolId)->id;
 
-            $feeds=Post::where('visibility',$category)->get();
-        }
-        elseif($request->search!='')
-        {
-            $category=$request->search;
+        $query = Post::query();
+        $this->feedReader->scopeToTenant($query, $schoolId, $academicYearId);
 
-            $tags=Tag::where('tag_name',$category)->first();
-            
-            $post_tag=PostTag::where('tag_id',$tags->id)->pluck('post_id')->toArray();
-                  
-            $feeds=Post::whereIn('id',$post_tag)->get();            
+        if (! $this->feedReader->applyListOrSearchFilter($query, $request->list, $request->search, $schoolId)) {
+            $query->where('visibility', 'all_class');
         }
-        return view('/reception/feed/feed',['feeds'=>$feeds]);
+
+        $feeds = $query->orderBy('posted_at', 'desc')->get();
+
+        return view('/reception/feed/feed', ['feeds' => $feeds]);
     }
 }

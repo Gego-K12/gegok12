@@ -28,7 +28,7 @@
                         <p class="font-semibold text-xs">From Date</p>
                     </td>
                     <td class="py-3 px-10">
-                        <p class="text-xs">{{ date('d-m-Y H:i:s',strtotime($leave->from_date)) }}</p>
+                        <p class="text-xs">{{ date('d-m-Y',strtotime($leave->from_date)) }}</p>
                     </td>
                 </tr>
                 <tr class="border-b">
@@ -36,7 +36,7 @@
                         <p class="font-semibold text-xs">To Date</p>
                     </td>
                     <td class="py-3 px-10">
-                        <p class="text-xs">{{ date('d-m-Y H:i:s',strtotime($leave->to_date)) }}</p>
+                        <p class="text-xs">{{ date('d-m-Y',strtotime($leave->to_date)) }}</p>
                     </td>
                 </tr>
                 <tr class="border-b">

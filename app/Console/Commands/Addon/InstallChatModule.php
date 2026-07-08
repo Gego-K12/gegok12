@@ -2,10 +2,10 @@
 
 namespace App\Console\Commands\Addon;
 
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Validator;
-use Exception;
 use Log;
 
 class InstallChatModule extends Command
@@ -16,52 +16,54 @@ class InstallChatModule extends Command
 
     public function handle()
     {
-        try{
+        try {
 
-           // Step 1: Get options or prompt
-           // $repo = $this->ask('Enter the repository URL');
-            //$package = $this->ask('Enter the composer package name');
+            // Step 1: Get options or prompt
+            // $repo = $this->ask('Enter the repository URL');
+            // $package = $this->ask('Enter the composer package name');
             $username = $this->ask('Enter your Git username');
-            $token =$this->secret('Enter your Git token');
-            $repo='https://github.com/gego-k12/chat.git';
-            $package='gegok12/chat:v1.0.x-dev';
+            $token = $this->secret('Enter your Git token');
+            $repo = 'https://github.com/gego-k12/chat.git';
+            $package = 'gegok12/chat:v1.0.x-dev';
 
             // Step 2: Validate
             $validator = Validator::make([
-               // 'repo' => $repo,
-               // 'package' => $package,
+                // 'repo' => $repo,
+                // 'package' => $package,
                 'username' => $username,
                 'token' => $token,
             ], [
-              //  'repo' => ['required', 'url'],
-               // 'package' => ['required', 'string'],
+                //  'repo' => ['required', 'url'],
+                // 'package' => ['required', 'string'],
                 'username' => ['required', 'string'],
                 'token' => ['required', 'string'],
-            ] ,[
-                    //'repo.required' => 'The repository URL is required.',
-                   // 'repo.url' => 'The repository URL must be a valid URL.',
-                   // 'package.required' => 'The package name is required.',
-                    'username.required' => 'Git username is required.',
-                    'token.required' => 'Git token is required.',
-                ]);
+            ], [
+                // 'repo.required' => 'The repository URL is required.',
+                // 'repo.url' => 'The repository URL must be a valid URL.',
+                // 'package.required' => 'The package name is required.',
+                'username.required' => 'Git username is required.',
+                'token.required' => 'Git token is required.',
+            ]);
 
             if ($validator->fails()) {
                 foreach ($validator->errors()->all() as $error) {
                     $this->error($error);
                 }
+
                 return Command::FAILURE;
             }
 
-           /* if (!$repo || !$package || !$username || !$token) {
-                $this->error('Missing one or more required options.');
-                return 1;
-            }*/
+            /* if (!$repo || !$package || !$username || !$token) {
+                 $this->error('Missing one or more required options.');
+                 return 1;
+             }*/
 
             // Step 1: Configure global Composer auth
             $cmd = "composer config --global github-oauth.github.com {$token}";
             exec($cmd, $output, $status);
             if ($status !== 0) {
-                $this->error("Failed to configure Composer auth: " . implode("\n", $output));
+                $this->error('Failed to configure Composer auth: '.implode("\n", $output));
+
                 return 1;
             }
 
@@ -71,17 +73,18 @@ class InstallChatModule extends Command
             $composerPath = base_path('composer.json');
             $composer = json_decode(file_get_contents($composerPath), true);
 
-            $alreadyExists = collect($composer['repositories'] ?? [])->contains(fn($r) => $r['url'] === $repo);
-            if (!$alreadyExists) {
+            $alreadyExists = collect($composer['repositories'] ?? [])->contains(fn ($r) => $r['url'] === $repo);
+            if (! $alreadyExists) {
                 $composer['repositories'][] = ['type' => 'vcs', 'url' => $authUrl];
                 file_put_contents($composerPath, json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-                $this->info("Added repository to composer.json");
+                $this->info('Added repository to composer.json');
             }
 
             // Step 3: Install package
             exec("composer require {$package}", $output, $status);
             if ($status !== 0) {
-                $this->error("Composer require failed: " . implode("\n", $output));
+                $this->error('Composer require failed: '.implode("\n", $output));
+
                 return 1;
             }
             $this->info("Package installed: {$package}");
@@ -96,13 +99,13 @@ class InstallChatModule extends Command
             // Step 5: Update route loader
             $routesPath = base_path('routes/web.php');
             $customRoutes = [
-                "if (file_exists(base_path('routes/gchat.php'))) {\n    require base_path('routes/gchat.php');\n}"
+                "if (file_exists(base_path('routes/gchat.php'))) {\n    require base_path('routes/gchat.php');\n}",
             ];
 
             foreach ($customRoutes as $line) {
-                if (!str_contains(file_get_contents($routesPath), trim($line))) {
+                if (! str_contains(file_get_contents($routesPath), trim($line))) {
                     file_put_contents($routesPath, "\n{$line}\n", FILE_APPEND);
-                    $this->info("Appended to routes/web.php");
+                    $this->info('Appended to routes/web.php');
                 }
             }
 
@@ -113,14 +116,15 @@ class InstallChatModule extends Command
             //     $this->info("Updated app.js");
             // }
             $appJsPath = resource_path('assets/js/custom_addon.js');
-            if (!file_exists($appJsPath)) {
-                $this->error("custom_addon.js not found!");
+            if (! file_exists($appJsPath)) {
+                $this->error('custom_addon.js not found!');
+
                 return 1;
             }
             $content = file_get_contents($appJsPath);
             $importLine = "import { registerChat } from './gchat'";
 
-            if (!str_contains($content, $importLine)) {
+            if (! str_contains($content, $importLine)) {
 
                 if (preg_match('/^import .*$/m', $content)) {
 
@@ -133,12 +137,12 @@ class InstallChatModule extends Command
 
                 } else {
 
-                    $content = $importLine . "\n\n" . $content;
+                    $content = $importLine."\n\n".$content;
 
                 }
             }
 
-            if (!str_contains($content, "registerChat(app)")) {
+            if (! str_contains($content, 'registerChat(app)')) {
 
                 $content = preg_replace(
                     '/export default function registerCustomAddon\(app\)\s*\{/',
@@ -148,23 +152,23 @@ class InstallChatModule extends Command
 
             }
             file_put_contents($appJsPath, $content);
-            $this->info("✔ custom_addon.js updated successfully");
+            $this->info('✔ custom_addon.js updated successfully');
 
             // Step 7: NPM install/build
             if ($this->confirm('Do you want to run NPM install and build?', true)) {
                 exec('npm install', $npmOut, $npmStatus);
                 exec('npm run dev', $devOut, $devStatus);
-                $this->info("NPM build complete");
+                $this->info('NPM build complete');
             } else {
-                $this->warn("Skipped NPM install/build");
+                $this->warn('Skipped NPM install/build');
             }
 
             // Step 8: Migrate
             if ($this->confirm('Do you want to run database migrations?', true)) {
-                 exec("php artisan migrate --force", $output);
-                $this->info("Database migrated");
+                exec('php artisan migrate --force', $output);
+                $this->info('Database migrated');
             } else {
-                $this->warn("Skipped migrations");
+                $this->warn('Skipped migrations');
             }
 
             // Artisan::call('cache:clear');
@@ -172,11 +176,10 @@ class InstallChatModule extends Command
             // Artisan::call('route:clear');
             // Artisan::call('config:clear');
 
-            $this->info("Module installed successfully!");
+            $this->info('Module installed successfully!');
+
             return 0;
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
             Log::info($e->getMessage());
         }
 

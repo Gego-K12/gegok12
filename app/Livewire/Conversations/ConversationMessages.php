@@ -2,10 +2,11 @@
 
 namespace App\Livewire\Conversations;
 
-use Livewire\Component;
-use App\Models\Message;
 use App\Models\Conversation;
+use App\Models\Message;
 use Illuminate\Support\Collection;
+use Illuminate\View\View;
+use Livewire\Component;
 
 /**
  * Class ConversationMessages
@@ -18,15 +19,13 @@ use Illuminate\Support\Collection;
  * - Initial message collection injection
  * - Listening for real-time message creation events
  * - Prepending new messages to the message list
- *
- * @package App\Livewire\Conversations
  */
 class ConversationMessages extends Component
 {
     /**
      * Collection of conversation messages.
      *
-     * @var \Illuminate\Support\Collection
+     * @var Collection
      */
     public $messages;
 
@@ -43,8 +42,6 @@ class ConversationMessages extends Component
      * Injects the conversation instance and
      * the initial message collection.
      *
-     * @param \App\Models\Conversation $conversation
-     * @param \Illuminate\Support\Collection $messages
      * @return void
      */
     public function mount(Conversation $conversation, Collection $messages)
@@ -67,8 +64,7 @@ class ConversationMessages extends Component
     {
         return [
             'message.created' => 'prependMessage',
-            "echo-private:conversations.{$this->conversationId},Conversations\\MessageAdded"
-                => 'prependMessageFromBroadcast',
+            "echo-private:conversations.{$this->conversationId},Conversations\\MessageAdded" => 'prependMessageFromBroadcast',
         ];
     }
 
@@ -78,7 +74,7 @@ class ConversationMessages extends Component
      * Fetches the message by ID and
      * adds it to the beginning of the collection.
      *
-     * @param int|string $id Message ID
+     * @param  int|string  $id  Message ID
      * @return void
      */
     public function prependMessage($id)
@@ -92,7 +88,7 @@ class ConversationMessages extends Component
      * Extracts the message ID from the payload
      * and prepends the message to the list.
      *
-     * @param array $payload Broadcast event payload
+     * @param  array  $payload  Broadcast event payload
      * @return void
      */
     public function prependMessageFromBroadcast($payload)
@@ -105,7 +101,7 @@ class ConversationMessages extends Component
      *
      * Displays the conversation messages list.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function render()
     {

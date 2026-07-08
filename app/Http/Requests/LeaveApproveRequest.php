@@ -24,13 +24,13 @@ class LeaveApproveRequest extends FormRequest
      */
     public function rules()
     {
-        Validator::extend('check_comments',function($attribute,$value,$parameters,$validator)
-        {
-            return preg_match('/^[A-Za-z_~\-!@#\$%\^&*.,:(\)\s]+$/', request('comments')) ;
+        Validator::extend('check_comments', function ($attribute, $value, $parameters, $validator) {
+            return preg_match('/^[A-Za-z_~\-!@#\$%\^&*.,:(\)\s]+$/', request('comments'));
         });
+
         return [
             //
-            'comments'  =>  'nullable|check_comments',
+            'comments' => 'nullable|check_comments',
         ];
     }
 
@@ -38,7 +38,7 @@ class LeaveApproveRequest extends FormRequest
     {
         return [
             //
-            'comments.check_comments'   =>'Enter Valid Comments',
+            'comments.check_comments' => 'Enter Valid Comments',
         ];
     }
 }

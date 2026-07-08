@@ -2,14 +2,13 @@
 
 namespace App\Console\Commands\Test;
 
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Console\Command;
 use App\Mail\TestMail;
 use Exception;
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Mail;
 
 class CheckTest extends Command
 {
-  
     /**
      * The name and signature of the console command.
      *
@@ -29,8 +28,6 @@ class CheckTest extends Command
      *
      * @return void
      */
-  
-    
     public function __construct()
     {
         parent::__construct();
@@ -43,14 +40,11 @@ class CheckTest extends Command
      */
     public function handle()
     {
-        try
-        {
-            $to= $this->argument('email');               
-            Mail::to($to)->queue(new TestMail()); 
-        }
-        catch(Exception $e)
-        {
-            dd($e->getMessage());
+        try {
+            $to = $this->argument('email');
+            Mail::to($to)->queue(new TestMail);
+        } catch (Exception $e) {
+            $this->error($e->getMessage());
         }
     }
 }

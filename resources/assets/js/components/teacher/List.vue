@@ -4,55 +4,64 @@
     <div class="my-4 filter-alphabet">
       <ul class="list-reset flex flex-wrap">
         <li v-for="alphabet in alphabets">
-          <a href="#" id="filter" class="block font-bold p-2 bg-grey-light border border-grey mx-2 ni" v-bind:class="letter === alphabet?'active':'text-blue'" v-text="alphabet"  @click="sortMembers(alphabet)"> </a>   
+          <a href="#" id="filter" class="block font-bold p-2 bg-grey-light border border-grey mx-2 ni" v-bind:class="letter === alphabet?'active':'text-blue'" v-text="alphabet"  @click="sortMembers(alphabet)"> </a>
         </li>
         <li>
-          <a href="#" class="block font-bold p-2 bg-grey-light border border-grey mx-2 ni" @click="clearAll()">Clear All</a>   
+          <a href="#" class="block font-bold p-2 bg-grey-light border border-grey mx-2 ni" @click="clearAll()">Clear All</a>
         </li>
       </ul>
       <div class="my-4" v-if="!filteredNames.length">No names for this letter</div>
       <div class="" v-if="filteredNames.length"></div>
     </div>
+    <ul class="list-reset flex text-xs profile-tab flex-wrap">
+      <li class="px-2 mx-1 py-1" :class="{'active': view === 'current'}">
+        <a href="#" class="text-gray-700 font-medium" @click.prevent="filterByView('current')">Current Staff</a>
+      </li>
+      <li class="px-2 mx-1 py-1" :class="{'active': view === 'exit'}">
+        <a href="#" class="text-gray-700 font-medium" @click.prevent="filterByView('exit')">Relieved Staff</a>
+      </li>
+    </ul>
     <div>
-      <teacherdetails :url="this.url"></teacherdetails>
       <div class="my-8">
-        <div class="w-full flex flex-wrap items-center justify-between mb-4">
-          <div class="flex flex-wrap items-center text-sm">
-            <div class="px-3 border-r" v-if="this.selectedUsersCount > 0">
-              {{ parseInt(this.selectedUsersCount) }} teachers selected
-            </div>
-            <div class="px-3 border-r relative">
-              <input class="opacity-0 absolute w-full h-full cursor-pointer" type="checkbox" @click="selectAll($event)" v-model="allSelected"><span>Select All</span>
-            </div>
-            <div class="px-3 relative" v-if="this.selectedUsersCount > 0">
-              <input class="opacity-0 absolute w-full h-full cursor-pointer" type="checkbox" @click="selectNone($event)" v-model="noneSelected"><span>Select None</span>
-            </div>
-          </div> 
-          <div class="relative flex items-center w-full lg:w-1/4 md:w-1/4 lg:justify-end mx-3 lg:mx-0 md:mx-0 my-2 lg:my-0 md:my-0" v-if="this.selectedUsersCount > 0">
+        <vue-good-table
+          :columns="tableColumns"
+          :rows="users"
+          :select-options="{ enabled: true, selectOnCheckboxOnly: true, selectionText: selectionText, clearSelectionText: 'clear' }"
+          :pagination-options="{ enabled: true, perPage: 20 }"
+          @selected-rows-change="onSelectionChanged"
+        >
+          <template #selected-row-actions>
             <a href="#" class="btn btn-submit blue-bg text-white rounded px-3 py-1 text-sm font-medium" @click="sendMessage()">Send Message</a>
-          </div>
-        </div>
-
-        <div class="grid lg:grid-cols-4 md:grid-cols-2 gap-4 flex flex-wrap">
-          <template class="" v-for="user in users">
-            <div class="w-full lg:w-full md:w-full my-2 relative p-2">
-              <div class="person-card  border rounded flex justify-between relative" v-bind:class="[user['status']=='active' ? 'bg-white': 'bg-red-300' ]">
-                <div class="grow w-full flex p-2 cursor-pointer hover:shadow" :id="user['id']" @click="enableform(user['name'])">
-                  <img :src="user['avatar']" class="w-16 h-16">
-                  <div class="grow px-2">
-                    <h2 class="font-bold text-base text-gray-700">{{user['fullname']}}</h2>
-                    <p class="text-sm">{{user['designation_name']}}</p>
-                    <p v-if="birthday == 'true'">{{ user['date_of_birth'] }}</p>
-                  </div>
-                </div>
-                <div class="student_select">
-                  <input class="absolute w-5 h-5" v-if="user.status=='active'" type="checkbox" v-model="selected" :value="user['id']" @click="selectedCount(user['id'],$event)" >
-                  <label></label>
-                </div>
+          </template>
+          <template #table-row="props">
+            <div v-if="props.column.field == 'fullname'">
+              <teacher-name-cell :url="url" show-path="/admin/teacher/show/" :name="props.row.name" :avatar="props.row.avatar" :title="props.row.title" :fullname="props.row.fullname" :employee-id="props.row.employee_id" :joining-date="props.row.joining_date" :relieved-at="props.row.relieved_at"></teacher-name-cell>
+            </div>
+            <div v-else-if="props.column.field == 'designation_name'">
+              {{ props.row.designation_name }}
+            </div>
+            <div v-else-if="props.column.field == 'status'">
+              <span class="rounded-full px-2 py-1 text-xs font-semibold" v-bind:class="statusBadgeClass(props.row.status)">{{ statusLabel(props.row.status) }}</span>
+            </div>
+            <div v-else-if="props.column.field == 'class_teacher_of'">
+              <span v-if="props.row.class_teacher_of">Class Teacher to: {{ props.row.class_teacher_of }}</span>
+              <span v-else class="text-gray-400">&mdash;</span>
+            </div>
+            <div v-else-if="props.column.field == 'subject_teacher_of'">
+              <div v-if="props.row.subject_teacher_of && props.row.subject_teacher_of.length">
+                <div class="text-xs" v-for="item in props.row.subject_teacher_of" :key="item">{{ item }}</div>
               </div>
+              <span v-else class="text-gray-400">&mdash;</span>
+            </div>
+            <div v-else-if="props.column.field == 'date_of_birth'">
+              {{ props.row.date_of_birth }}
+            </div>
+            <div v-else-if="props.column.field == 'last_login_at'">
+              <span v-if="props.row.last_login_at" class="text-gray-700">{{ props.row.last_login_at }}</span>
+              <span v-else class="rounded-full px-2 py-1 text-xs font-semibold bg-gray-100 text-gray-500">Never Logged In</span>
             </div>
           </template>
-        </div>
+        </vue-good-table>
       </div>
     </div>
     <div v-if="this.send == 1" class="modal modal-mask">
@@ -67,7 +76,7 @@
           </div>
           <div class="modal-body">
             <div class="flex flex-col lg:flex-row md:flex-row  lg:items-center">
-              <div class="w-full lg:w-1/4"> 
+              <div class="w-full lg:w-1/4">
                 <label for="subject" class="tw-form-label">Subject</label>
               </div>
               <div class="my-2 w-full lg:w-3/4">
@@ -93,10 +102,10 @@
               <div class="w-6">
                 <input type="checkbox" name="send_later" v-model="send_later" class="tw-form-control w-full" @click="enableDate($event)">
               </div>
-              <div class="mx-1"> 
+              <div class="mx-1">
                 <label for="subject" class="tw-form-label">Send Later</label>
               </div>
-            
+
             </div>
           </div>
           <div class="modal-body hidden" id="show_date">
@@ -122,10 +131,11 @@
 
 <script>
 
-  import { bus } from "../../app";
-  import teacherdetails from './Detail';
+  import teacherNameCell from './NameCell';
   import { VueDatePicker } from '@vuepic/vue-datepicker'
   import '@vuepic/vue-datepicker/dist/main.css'
+  import { VueGoodTable } from 'vue-good-table-next'
+  import 'vue-good-table-next/dist/vue-good-table-next.css'
   export default {
     props:['url','searchquery','letter','birthday'],
       data(){
@@ -137,12 +147,10 @@
           ],
           selectedLetter: undefined,
           active: false,
+          view: 'current',
           selected: [],
-          selectedUsers:[],
           selectedUsersCount:0,
           send_later:'',
-          allSelected: false,
-          noneSelected:false,
           subject:'',
           message:'',
           executed_at:'',
@@ -152,21 +160,19 @@
         }
       },
 
-      created() 
+      created()
       {
-        axios.get('/admin/teachers/find?'+this.searchquery).then(response => {
-          this.users = response.data.data;
-        });
+        this.getData();
         this.getUrl();
       },
 
-      computed: 
+      computed:
       {
-        filteredNames () 
+        filteredNames ()
         {
           let users = this.users
           //console.log(users);
-          if (this.selectedLetter) 
+          if (this.selectedLetter)
           {
             users = users.filter((name) => {
             let firstLetter = name.charAt(0).toUpperCase()
@@ -174,44 +180,87 @@
           })
         }
         return users
-      }
+      },
+
+      tableColumns()
+      {
+        var columns = [
+          { label: 'Name', field: 'fullname', filterOptions: { enabled: true, placeholder: 'Search name' } },
+          { label: 'Designation', field: 'designation_name', filterOptions: { enabled: true, placeholder: 'Search designation' } },
+          { label: 'Status', field: 'status' },
+          { label: 'Last Login', field: 'last_login_at', sortable: false },
+          { label: 'Primary Role', field: 'class_teacher_of' },
+          { label: 'Subject Teacher to', field: 'subject_teacher_of', sortable: false },
+        ];
+        if (this.birthday == 'true')
+        {
+          columns.push({ label: 'Date of Birth', field: 'date_of_birth' });
+        }
+        return columns;
+      },
     },
 
     components:
     {
-      teacherdetails,
+      'teacher-name-cell': teacherNameCell,
       VueDatePicker,
+      VueGoodTable,
     },
 
     methods:
     {
+      getData()
+      {
+        var viewQuery = this.view == 'exit' ? '&view=exit' : '';
+        axios.get('/admin/teachers/find?'+this.searchquery+viewQuery).then(response => {
+          this.users = response.data.data;
+        });
+      },
+
+      filterByView(view)
+      {
+        this.view = view;
+        this.getData();
+      },
+
+      statusLabel(status)
+      {
+        if (status == 'exit')
+        {
+          return 'Relieved';
+        }
+        return status == 'active' ? 'Active' : 'Inactive';
+      },
+
+      statusBadgeClass(status)
+      {
+        if (status == 'exit')
+        {
+          return 'bg-red-100 text-red-700';
+        }
+        return status == 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600';
+      },
+
       clearAll()
       {
         window.location.href = '/admin/teachers';
       },
-      
-      enableform(val)
-      {
-        this.success=null;
-        $('#show-detail').removeClass('hide-menu').addClass('block');
-        bus.emit("dataMemberName", val);
-      },
-        
+
       sortMembers(name)
       {
-        this.selectedLetter= name; 
-        this.active = true; 
+        this.selectedLetter= name;
+        this.active = true;
         var q='alphabet='+this.selectedLetter;
-        //var url = window.location.href; 
-        var url = this.currenturl;  
+        //var url = window.location.href;
+        var url = this.currenturl;
 
-        if (window.location.search.indexOf('alphabet=') > -1) 
+        if (window.location.search.indexOf('alphabet=') > -1)
         {
-          var href = new URL(url); 
+          var href = new URL(url);
           href.searchParams.set('alphabet', this.selectedLetter);
-          url=href.toString();       
-        } 
-        else 
+          url=href.toString();
+        }
+        else
         {
           if (url.indexOf('?') > -1)
           {
@@ -229,59 +278,24 @@
 
       getUrl()
       {
-        this.currenturl =  this.url+"/admin/teachers/"; 
+        this.currenturl =  this.url+"/admin/teachers/";
         if(this.searchquery!='')
         {
           this.currenturl =  this.currenturl+'?'+this.searchquery;
         }
       },
 
-      selectAll(e) 
-      { 
-        var selected = [];
-        if (e.target.checked) 
-        {
-          $('.member-list').addClass('student_selected');
-          if(this.allSelected == false) 
-          {
-            this.users.forEach(function (user) 
-            {
-              selected.push(user.id);
-            });
-            this.selected = selected;
-            this.selectedUsersCount = selected.length;
-            this.allSelected = true;
-          }
-        }
-        else
-        {
-          this.users.forEach(function (user) 
-          {
-            selected.splice(user.id);
-          });
-          this.selected = selected;
-          this.selectedUsersCount = selected.length;
-          this.noneSelected = false;
-          $('.member-list').removeClass('student_selected');
-        }
+      selectionText(count)
+      {
+        return count + (count == 1 ? ' teacher selected' : ' teachers selected');
       },
 
-      selectNone(e) 
-      { 
-        var selected = [];
-        if (e.target.checked) 
-        {
-          $('.member-list').removeClass('student_selected');
-          this.users.forEach(function (user) 
-          {
-            selected.splice(user.id);
-          });
-          this.selected = selected;
-          this.selectedUsersCount = selected.length;
-          this.noneSelected = false;
-        }
+      onSelectionChanged(params)
+      {
+        this.selected = params.selectedRows.map(function (row) { return row.id; });
+        this.selectedUsersCount = this.selected.length;
       },
-      
+
       sendMessage()
       {
         if(this.selectedUsersCount > 0)
@@ -298,9 +312,9 @@
       {
         this.errors=[];
         axios.post('/admin/teacher/sendMessageToAll',{
-          selected:this.selected, 
+          selected:this.selected,
           subject:this.subject,
-          message:this.message, 
+          message:this.message,
           send_later:this.send_later,
           executed_at:this.executed_at,
         }).then(response => {
@@ -319,7 +333,7 @@
 
       enableDate(e)
       {
-        if (e.target.checked) 
+        if (e.target.checked)
         {
           this.send_later = 1;
           if($('#show_date').hasClass('hidden'))
@@ -335,24 +349,6 @@
             $('#show_date').removeClass('block').addClass('hidden');
           }
         }
-      },
-
-      selectedCount(id,e) 
-      { 
-        if (e.target.checked) 
-        {
-          if (!this.selected.includes(id)) {
-            this.selected.push(id);
-          }
-          $('#'+id).addClass('student_selected');
-        }
-        else
-        {
-          this.selected = this.selected.filter(item => item !== id);
-          $('#'+id).removeClass('student_selected');
-        }
-
-        this.selectedUsersCount = this.selected.length;
       },
     }
   }

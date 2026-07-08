@@ -23,33 +23,31 @@ class PerformanceAddRequest extends FormRequest
      */
     public function rules()
     {
-        $rules=[];
-        $rules =[
-            
+        $rules = [];
+        $rules = [
+
             //
-            'student_id'        =>  'required',
-            'incident_detail'   =>  'required',
-            'type'              =>  'required',
-            'media_type'        =>  'required',
-            'attachments'       =>  'required',
-    
+            'student_id' => 'required',
+            'incident_detail' => 'required',
+            'type' => 'required',
+            'media_type' => 'required',
+            'attachments' => 'required',
+
         ];
 
-        if(request('media_type')=='image')
-        {
-            $rules['attachments']       =  'required|mimes:png,jpg,jpeg';
+        if (request('media_type') == 'image') {
+            $rules['attachments'] = 'required|mimes:png,jpg,jpeg';
         }
 
-        if(request('media_type')=='audio')
-        {
-            $rules['attachments']       =  'required|mimes:mp3';
+        if (request('media_type') == 'audio') {
+            $rules['attachments'] = 'required|mimes:mp3';
         }
 
-        if(request('media_type')=='video')
-        {
-            $rules['attachments']       =  'required|mimes:mp4,mov,ogg | max:20000';
+        if (request('media_type') == 'video') {
+            $rules['attachments'] = 'required|mimes:mp4,mov,ogg | max:20000';
         }
-      return $rules;
+
+        return $rules;
 
     }
 
@@ -57,11 +55,10 @@ class PerformanceAddRequest extends FormRequest
     {
         return [
             //
-            'student_id.required'                   =>  'Please Select Student',
-            'type.required'                         =>  'Please Select type',
-            'media_type.required'                   =>  'Please Select media_type',
-            'incident_detail.required'              =>  ' Type incident_detail',
-
+            'student_id.required' => 'Please Select Student',
+            'type.required' => 'Please Select type',
+            'media_type.required' => 'Please Select media_type',
+            'incident_detail.required' => ' Type incident_detail',
 
         ];
     }

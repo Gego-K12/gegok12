@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
@@ -6,32 +7,32 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Resources\ParentDetail as ParentDetailResource;
-use App\Http\Resources\ActivityLog as ActivityLogResource;
-use App\Http\Resources\Feedback as FeedbackResource;
-use App\Http\Resources\Children as ChildrenResource;
-use App\Http\Resources\User as UserResource;
-use App\Http\Requests\ParentUpdateRequest;
-use App\Http\Requests\ParentAddRequest;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Gate;
-use App\Http\Controllers\Controller;
-use App\Models\StudentParentLink;
-use App\Models\Users\ParentUser;
-use App\Models\Qualification;
-use App\Traits\MemberProcess;
-use Illuminate\Http\Request;
-use App\Traits\RegisterUser;
-use App\Models\Subscription;
 use App\Helpers\SiteHelper;
-use App\Traits\LogActivity;
-use App\Models\Userprofile;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\ParentAddRequest;
+use App\Http\Requests\ParentUpdateRequest;
+use App\Http\Resources\ActivityLog as ActivityLogResource;
+use App\Http\Resources\Children as ChildrenResource;
+use App\Http\Resources\Feedback as FeedbackResource;
+use App\Http\Resources\User as UserResource;
 use App\Models\ActivityLog;
 use App\Models\Feedback;
-use App\Traits\Common;
+use App\Models\StudentParentLink;
+use App\Models\Subscription;
 use App\Models\User;
+use App\Models\Userprofile;
+use App\Models\Users\ParentUser;
+use App\Traits\Common;
+use App\Traits\LogActivity;
+use App\Traits\MemberProcess;
+use App\Traits\RegisterUser;
 use Exception;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\View\View;
 use Log;
 
 /**
@@ -40,20 +41,17 @@ use Log;
  * Handles parent management including listing, creation,
  * viewing, editing, updating, deletion, and related resources
  * such as children, feedback, and activity logs.
- *
- * @package App\Http\Controllers\Admin
  */
 class ParentController extends Controller
 {
+    use Common;
+    use LogActivity;
     use MemberProcess;
     use RegisterUser;
-    use LogActivity;
-    use Common;
 
     /**
      * Get filtered list of parents.
      *
-     * @param \Illuminate\Http\Request $request
      * @return mixed
      */
     public function list(Request $request)
@@ -65,42 +63,42 @@ class ParentController extends Controller
     /**
      * Display parent index page.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function index()
     {
         //
         $query = \Request::getQueryString();
+
         return view('/admin/parent/index', ['query' => $query]);
     }
 
     /**
      * Show parent creation form.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function create()
     {
         //
         $ref_name = Request('ref_name') ? Request('ref_name') : '';
         $count = User::where('school_id', Auth::user()->school_id)
-                     ->where('usergroup_id', 6)
-                     ->orWhere('usergroup_id', 7)
-                     ->count();
+            ->where('usergroup_id', 6)
+            ->orWhere('usergroup_id', 7)
+            ->count();
 
         $subscription = Subscription::where('school_id', Auth::user()->school_id)->first();
 
         return view('admin/parent/create', [
-            'ref_name'     => $ref_name,
-            'count'        => $count,
-            'subscription' => $subscription
+            'ref_name' => $ref_name,
+            'count' => $count,
+            'subscription' => $subscription,
         ]);
     }
 
     /**
      * Get parent add form related lists.
      *
-     * @param \Illuminate\Http\Request $request
      * @return array
      */
     public function addList(Request $request)
@@ -108,14 +106,13 @@ class ParentController extends Controller
         $array = [];
 
         $array['qualificationlist'] = SiteHelper::getQualifications();
-        $array['standardLinklist']  = SiteHelper::getStandardLinkList(Auth::user()->school_id);
+        $array['standardLinklist'] = SiteHelper::getStandardLinkList(Auth::user()->school_id);
 
-        if ($request->standardLink_id != null)
-        {
+        if ($request->standardLink_id != null) {
             $parent = ParentUser::where('school_id', Auth::user()->school_id)
-                          ->ByRole(7)
-                          ->ByStandardLinkParentList($request->standardLink_id)
-                          ->get();
+                ->ByRole(7)
+                ->ByStandardLinkParentList($request->standardLink_id)
+                ->get();
 
             $array['parent'] = UserResource::collection($parent);
         }
@@ -126,7 +123,6 @@ class ParentController extends Controller
     /**
      * Validate parent creation request.
      *
-     * @param \App\Http\Requests\ParentAddRequest $request
      * @return void
      */
     public function validationParent(ParentAddRequest $request)
@@ -137,14 +133,12 @@ class ParentController extends Controller
     /**
      * Store a newly created parent.
      *
-     * @param \App\Http\Requests\ParentAddRequest $request
      * @return mixed
      */
     public function store(ParentAddRequest $request)
     {
         //
-        try
-        {
+        try {
             $school_id = Auth::user()->school_id;
             $student_id = '';
 
@@ -159,19 +153,16 @@ class ParentController extends Controller
                 trans('messages.add_success_msg', ['module' => 'Parent'])
             );
 
-            if ($request->parent == 'add')
-            {
+            if ($request->parent == 'add') {
                 \Session::put('successmessage', trans('messages.add_success_msg', ['module' => 'Parent']));
+
                 return redirect()->back();
-            }
-            else
-            {
+            } else {
                 $res['success'] = trans('messages.add_success_msg', ['module' => 'Parent']);
+
                 return $res;
             }
-        }
-        catch (Exception $e)
-        {
+        } catch (Exception $e) {
             Log::info($e->getMessage());
         }
     }
@@ -179,8 +170,8 @@ class ParentController extends Controller
     /**
      * Display parent details.
      *
-     * @param string $name
-     * @return \Illuminate\View\View
+     * @param  string  $name
+     * @return View
      */
     public function show($name)
     {
@@ -190,30 +181,31 @@ class ParentController extends Controller
         $parentprofile = $user->getParentDetails();
 
         return view('/admin/parent/show', [
-            'user'          => $user,
-            'userprofile'   => $userprofile,
-            'parentprofile' => $parentprofile
+            'user' => $user,
+            'userprofile' => $userprofile,
+            'parentprofile' => $parentprofile,
         ]);
     }
 
     /**
      * Display children of a parent.
      *
-     * @param string $name
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @param  string  $name
+     * @return AnonymousResourceCollection
      */
     public function showChildren($name)
     {
         //
         $parent = ParentUser::where('name', $name)->first();
+
         return ChildrenResource::collection($parent->children);
     }
 
     /**
      * Display feedback conversations for a parent.
      *
-     * @param string $name
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @param  string  $name
+     * @return AnonymousResourceCollection
      */
     public function showFeedbacks($name)
     {
@@ -227,21 +219,19 @@ class ParentController extends Controller
     /**
      * Display activity logs of a parent.
      *
-     * @param string $name
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @param  string  $name
+     * @return AnonymousResourceCollection
      */
     public function showActivityLog($name)
     {
         //
         $user = ParentUser::with('userprofile')->where('name', $name)->first();
 
-        if (Gate::allows('member', $user))
-        {
+        if (Gate::allows('member', $user)) {
             $activitylog = ActivityLog::where('subject_id', $user->id)->paginate(5);
+
             return ActivityLogResource::collection($activitylog);
-        }
-        else
-        {
+        } else {
             abort(403);
         }
     }
@@ -249,7 +239,7 @@ class ParentController extends Controller
     /**
      * Get parent data for edit form.
      *
-     * @param string $name
+     * @param  string  $name
      * @return array
      */
     public function editList($name)
@@ -261,19 +251,19 @@ class ParentController extends Controller
 
         $array = [];
 
-        $array['firstname']          = $userprofile->firstname;
-        $array['lastname']           = $userprofile->lastname;
-        $array['alternate_no']       = $userprofile->alternate_no ?? '';
-        $array['profession']         = $parentprofile['profession'] ?? '';
-        $array['sub_occupation']     = $parentprofile['sub_occupation'] ?? '';
-        $array['designation']        = $parentprofile['designation'] ?? '';
-        $array['organization_name']  = $parentprofile['organization_name'] ?? '';
-        $array['official_address']   = $parentprofile['official_address'] ?? '';
-        $array['annual_income']      = $parentprofile['annual_income'] ?? '';
-        $array['relation']           = $parentprofile['relation'] ?? '';
-        $array['qualification_id']   = $parentprofile['qualification_id'] ?? '';
+        $array['firstname'] = $userprofile->firstname;
+        $array['lastname'] = $userprofile->lastname;
+        $array['alternate_no'] = $userprofile->alternate_no ?? '';
+        $array['profession'] = $parentprofile['profession'] ?? '';
+        $array['sub_occupation'] = $parentprofile['sub_occupation'] ?? '';
+        $array['designation'] = $parentprofile['designation'] ?? '';
+        $array['organization_name'] = $parentprofile['organization_name'] ?? '';
+        $array['official_address'] = $parentprofile['official_address'] ?? '';
+        $array['annual_income'] = $parentprofile['annual_income'] ?? '';
+        $array['relation'] = $parentprofile['relation'] ?? '';
+        $array['qualification_id'] = $parentprofile['qualification_id'] ?? '';
         $array['qualification_name'] = $parentprofile['qualification_name'] ?? '';
-        $array['qualificationlist']  = SiteHelper::getQualifications();
+        $array['qualificationlist'] = SiteHelper::getQualifications();
 
         return $array;
     }
@@ -281,8 +271,8 @@ class ParentController extends Controller
     /**
      * Show parent edit form.
      *
-     * @param string $name
-     * @return \Illuminate\View\View
+     * @param  string  $name
+     * @return View
      */
     public function edit($name)
     {
@@ -293,18 +283,17 @@ class ParentController extends Controller
         $parentprofile = $user->getParentDetails();
 
         return view('/admin/parent/edit', [
-            'ref_name'      => $ref_name,
-            'user'          => $user,
-            'userprofile'   => $userprofile,
-            'parentprofile' => $parentprofile
+            'ref_name' => $ref_name,
+            'user' => $user,
+            'userprofile' => $userprofile,
+            'parentprofile' => $parentprofile,
         ]);
     }
 
     /**
      * Validate parent update request.
      *
-     * @param \App\Http\Requests\ParentUpdateRequest $request
-     * @param string $name
+     * @param  string  $name
      * @return void
      */
     public function editValidationUser(ParentUpdateRequest $request, $name)
@@ -315,15 +304,13 @@ class ParentController extends Controller
     /**
      * Update parent details.
      *
-     * @param \App\Http\Requests\ParentUpdateRequest $request
-     * @param string $name
-     * @return \Illuminate\Http\RedirectResponse
+     * @param  string  $name
+     * @return RedirectResponse
      */
     public function update(ParentUpdateRequest $request, $name)
     {
         //
-        try
-        {
+        try {
             $user = ParentUser::where('name', $name)->first();
             $school_id = Auth::user()->school_id;
 
@@ -339,10 +326,9 @@ class ParentController extends Controller
             );
 
             \Session::put('successmessage', trans('messages.update_success_msg', ['module' => 'Parent']));
+
             return redirect()->back();
-        }
-        catch (Exception $e)
-        {
+        } catch (Exception $e) {
             Log::info($e->getMessage());
         }
     }
@@ -350,20 +336,18 @@ class ParentController extends Controller
     /**
      * Delete a parent.
      *
-     * @param string $name
-     * @return \Illuminate\Http\RedirectResponse
+     * @param  string  $name
+     * @return RedirectResponse
      */
     public function destroy($name)
     {
         \DB::beginTransaction();
 
-        try
-        {
+        try {
             $user = ParentUser::where('name', $name)->first();
             $studentparentlink = StudentParentLink::where('parent_id', $user->id)->first();
 
-            if ($studentparentlink)
-            {
+            if ($studentparentlink) {
                 $studentparentlink->delete();
             }
 
@@ -386,9 +370,7 @@ class ParentController extends Controller
             \DB::commit();
 
             return redirect('/admin/parents');
-        }
-        catch (Exception $e)
-        {
+        } catch (Exception $e) {
             \DB::rollBack();
         }
     }

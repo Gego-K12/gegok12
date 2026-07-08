@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SPDX-License-Identifier: MIT
  * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
@@ -6,30 +7,29 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Requests\StandardRequest;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Controller;
-use App\Traits\AcademicProcess;
-use Illuminate\Http\Request;
 use App\Helpers\SiteHelper;
-use App\Traits\LogActivity;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\StandardRequest;
 use App\Models\Standard;
+use App\Traits\AcademicProcess;
 use App\Traits\Common;
+use App\Traits\LogActivity;
 use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Class StandardController
  *
  * Handles standard (class) creation and setup
  * operations for the admin module.
- *
- * @package App\Http\Controllers\Admin
  */
 class StandardController extends Controller
 {
     use AcademicProcess;
-    use LogActivity;
     use Common;
+    use LogActivity;
 
     /**
      * Store a newly created standard.
@@ -37,25 +37,23 @@ class StandardController extends Controller
      * Creates a standard for the authenticated
      * school and logs the activity.
      *
-     * @param StandardRequest $request
      * @return array
      */
     public function store(StandardRequest $request)
-    { 
+    {
         //
-        try
-        {
+        try {
             $school_id = Auth::user()->school_id;
-          
-            $standard = $this->createStandard($school_id , $request);
 
-            $message = trans('messages.add_success_msg',['module' => 'Standard']);
+            $standard = $this->createStandard($school_id, $request);
+
+            $message = trans('messages.add_success_msg', ['module' => 'Standard']);
 
             $ip = $this->getRequestIP();
             $this->doActivityLog(
                 $standard,
                 Auth::user(),
-                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT'] ],
+                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT']],
                 LOGNAME_ADD_STANDARD,
                 $message
             );
@@ -63,10 +61,7 @@ class StandardController extends Controller
             $res['success'] = $message;
 
             return $res;
-        }
-        catch(Exception $e)
-        {
-            //dd($e->getMessage());
+        } catch (Exception $e) {
         }
     }
 
@@ -76,7 +71,7 @@ class StandardController extends Controller
      * Loads current academic year details
      * for standard creation.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create()
     {
@@ -95,17 +90,15 @@ class StandardController extends Controller
      * Used in standard setup flow and logs
      * the setup activity.
      *
-     * @param Request $request
      * @return array
      */
     public function add(Request $request)
-    { 
+    {
         //
-        try
-        {
+        try {
             $school_id = Auth::user()->school_id;
-          
-            $standard = $this->addStandard($school_id , $request);
+
+            $standard = $this->addStandard($school_id, $request);
 
             $message = trans('messages.standard_setup_success_msg');
 
@@ -113,7 +106,7 @@ class StandardController extends Controller
             $this->doActivityLog(
                 $standard,
                 Auth::user(),
-                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT'] ],
+                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT']],
                 LOGNAME_ADD_STANDARD_SETUP,
                 $message
             );
@@ -121,10 +114,7 @@ class StandardController extends Controller
             $res['success'] = $message;
 
             return $res;
-        }
-        catch(Exception $e)
-        {
-            //dd($e->getMessage());
+        } catch (Exception $e) {
         }
     }
 }

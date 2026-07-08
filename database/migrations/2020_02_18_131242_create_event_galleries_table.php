@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateEventGalleriesTable extends Migration
 {
@@ -19,11 +19,11 @@ class CreateEventGalleriesTable extends Migration
             $table->foreign('school_id')->references('id')->on('schools');
             $table->integer('event_id')->unsigned();
             $table->foreign('event_id')->references('id')->on('events');
-            $table->longText('path')->nullable(); 
+            $table->longText('path')->nullable();
             $table->integer('created_by')->unsigned();
             $table->foreign('created_by')->references('id')->on('users');
             $table->integer('updated_by')->unsigned();
-            $table->foreign('updated_by')->references('id')->on('users'); 
+            $table->foreign('updated_by')->references('id')->on('users');
             $table->timestamps();
         });
     }

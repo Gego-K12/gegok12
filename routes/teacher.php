@@ -427,3 +427,7 @@ Route::get('/notice/list', 'NoticeBoardController@noticelist');
 // Group
 Route::get('groups/{standardLinkId}', 'GroupController@index');
 
+
+if (file_exists(base_path('routes/gworkpermission-teacher.php'))) {
+    require base_path('routes/gworkpermission-teacher.php');
+}

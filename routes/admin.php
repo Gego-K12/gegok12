@@ -825,3 +825,7 @@ Route::get('setting/standard/create', function () {
 Route::get('setting/edit/standard/{id}', function ($id) {
     return view('admin.standard.edit_form',compact('id'));
 })->name('admin.setting.standards.update');
+
+if (file_exists(base_path('routes/gworkpermission-admin.php'))) {
+    require base_path('routes/gworkpermission-admin.php');
+}

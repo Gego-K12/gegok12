@@ -1,4 +1,4 @@
-export function registerWorkPermission(app) {
+export function registerWorkpermission(app) {
     app.component('workpermission-create', () =>
         import('./components/workpermission/teacher/Create.vue').then(m => m.default)
     );

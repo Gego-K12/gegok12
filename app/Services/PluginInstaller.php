@@ -401,10 +401,12 @@ class PluginInstaller
      * dashboard.blade.php equivalents, which @includeIf these paths). A
      * has_tools_menu plugin instead publishes a single, portal-agnostic
      * resources/views/plugins/{slug}/tools-menu.blade.php, since the Tools
-     * flyout only exists in the Admin portal. A missing partial doesn't fail
-     * the install (the @includeIf just silently renders nothing), but it's
-     * almost certainly a plugin-author mistake worth surfacing in the log
-     * rather than staying silent forever.
+     * flyout only exists in the Admin portal. Same for has_profile_tab's
+     * resources/views/plugins/{slug}/profile-tab.blade.php, rendered by the
+     * ProfileExtraTabs Livewire component on the Admin teacher/staff profile
+     * pages. A missing partial doesn't fail the install (the @includeIf just
+     * silently renders nothing), but it's almost certainly a plugin-author
+     * mistake worth surfacing in the log rather than staying silent forever.
      */
     private function checkHookPartials(Plugin $plugin): void
     {
@@ -420,6 +422,10 @@ class PluginInstaller
 
         if ($plugin->has_tools_menu && ! view()->exists($plugin->toolsMenuViewName())) {
             $plugin->appendLog("WARNING: has_tools_menu is true but resources/views/plugins/{$plugin->slug}/tools-menu.blade.php was not published.");
+        }
+
+        if ($plugin->has_profile_tab && ! view()->exists($plugin->profileTabViewName())) {
+            $plugin->appendLog("WARNING: has_profile_tab is true but resources/views/plugins/{$plugin->slug}/profile-tab.blade.php was not published.");
         }
     }
 

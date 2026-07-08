@@ -141,6 +141,8 @@
             <div id="teacherprofile" class="p-4"></div>
         </div>
 
+        @livewire('admin.profile-extra-tabs', ['entityId' => $user->id, 'scope' => 'teacher'])
+
         {{-- Deactivate confirmation modal --}}
         <div id="deactivate-confirm-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 px-4">
             <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6">

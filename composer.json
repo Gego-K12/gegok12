@@ -14,6 +14,7 @@
         "aws/aws-sdk-php-laravel": "^3.11",
         "barryvdh/laravel-dompdf": "v3.1.1",
         "filament/tables": "^3.2",
+        "gegok12/work-permission": "1.0.0",
         "guzzlehttp/guzzle": "^7.8",
         "jantinnerezo/livewire-alert": "^3.0-stable",
         "kreait/laravel-firebase": "^6.1",
@@ -128,5 +129,11 @@
         }
     },
     "minimum-stability": "stable",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "repositories": [
+        {
+            "type": "path",
+            "url": "custompackages/gegok12/workpermission"
+        }
+    ]
 }

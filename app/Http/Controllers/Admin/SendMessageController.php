@@ -184,8 +184,7 @@ class SendMessageController extends Controller
                         $path = '';
                         $usergroup_id = '9';
 
-                        // Alumni profile creation intentionally commented
-                        // $alumniprofile = $this->CreateAlumni($data, $path, $usergroup_id, $school_id, $user);
+                        $alumniprofile = $this->CreateAlumni($data, $path, $usergroup_id, $school_id, $user);
                     }
                 }
             }

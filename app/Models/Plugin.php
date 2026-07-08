@@ -29,6 +29,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property bool $has_menu
  * @property bool $has_dashboard_widget
  * @property bool $has_tools_menu
+ * @property bool $has_profile_tab
+ * @property string $profile_tab_label
+ * @property string $profile_tab_scope
  * @property string $status
  * @property string $log
  * @property int $requested_by
@@ -43,7 +46,8 @@ class Plugin extends Model
     protected $fillable = [
         'slug', 'name', 'version', 'source_type', 'source_ref', 'composer_package',
         'provider_class', 'seeder_class', 'portal', 'has_menu', 'has_dashboard_widget',
-        'has_tools_menu', 'status', 'log', 'requested_by', 'installed_at',
+        'has_tools_menu', 'has_profile_tab', 'profile_tab_label', 'profile_tab_scope',
+        'status', 'log', 'requested_by', 'installed_at',
     ];
 
     protected $casts = [
@@ -51,6 +55,7 @@ class Plugin extends Model
         'has_menu' => 'boolean',
         'has_dashboard_widget' => 'boolean',
         'has_tools_menu' => 'boolean',
+        'has_profile_tab' => 'boolean',
     ];
 
     /**
@@ -112,6 +117,21 @@ class Plugin extends Model
     }
 
     /**
+     * Plugins that should render a tab on the Admin teacher/staff profile
+     * page for the given scope — published to
+     * resources/views/plugins/{slug}/profile-tab.blade.php. A plugin
+     * declares profile_tab_scope as 'teacher', 'staff', or 'both'.
+     */
+    public function scopeWithProfileTabFor($query, string $scope)
+    {
+        return $query->where('status', 'installed')
+            ->where('has_profile_tab', true)
+            ->where(function ($q) use ($scope) {
+                $q->where('profile_tab_scope', $scope)->orWhere('profile_tab_scope', 'both');
+            });
+    }
+
+    /**
      * View name for this plugin's menu hook in the given portal — always
      * namespaced by portal so a plugin targeting several portals can render
      * different content (e.g. different links/labels) in each one.
@@ -136,6 +156,16 @@ class Plugin extends Model
     public function toolsMenuViewName(): string
     {
         return "plugins.{$this->slug}.tools-menu";
+    }
+
+    /**
+     * The profile-tab hook isn't portal-namespaced (it's not tied to the
+     * plugin's own `portal` list at all — it's keyed by profile_tab_scope
+     * instead), so like toolsMenuViewName this is a single, fixed name.
+     */
+    public function profileTabViewName(): string
+    {
+        return "plugins.{$this->slug}.profile-tab";
     }
 
     public function requestedByUser(): BelongsTo

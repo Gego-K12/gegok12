@@ -95,7 +95,28 @@
                     <label class="flex items-center text-sm">
                         <input type="checkbox" wire:model="has_tools_menu" @disabled($manifestDetected) class="mr-2"> Has Admin Tools menu entry
                     </label>
+                    <label class="flex items-center text-sm">
+                        <input type="checkbox" wire:model.live="has_profile_tab" @disabled($manifestDetected) class="mr-2"> Has teacher/staff profile tab
+                    </label>
                 </div>
+                @if($has_profile_tab)
+                    <p class="text-xs text-gray-500 mt-2 mb-2">Publishes resources/views/plugins/{slug}/profile-tab.blade.php — shown as a tab on the Admin teacher/staff profile page for whichever record is being viewed.</p>
+                    <div class="flex gap-4 items-start">
+                        <div class="w-full lg:w-1/3">
+                            <label class="tw-form-label">Tab label</label>
+                            <input type="text" wire:model="profile_tab_label" @disabled($manifestDetected) class="tw-form-control w-full @if($manifestDetected) bg-gray-50 @endif" placeholder="e.g. Work Permissions">
+                            @error('profile_tab_label') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                        </div>
+                        <div class="w-full lg:w-1/3">
+                            <label class="tw-form-label">Show on</label>
+                            <select wire:model="profile_tab_scope" @disabled($manifestDetected) class="tw-form-control w-full @if($manifestDetected) bg-gray-50 @endif">
+                                <option value="both">Teacher &amp; Staff</option>
+                                <option value="teacher">Teacher only</option>
+                                <option value="staff">Staff only</option>
+                            </select>
+                        </div>
+                    </div>
+                @endif
             </div>
 
             <div class="my-6">

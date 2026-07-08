@@ -48,6 +48,12 @@ class PluginConsole extends Component
 
     public $has_tools_menu = false;
 
+    public $has_profile_tab = false;
+
+    public $profile_tab_label = '';
+
+    public $profile_tab_scope = 'both';
+
     public $git_url = '';
 
     public $zip;
@@ -90,6 +96,9 @@ class PluginConsole extends Component
         $this->has_menu = (bool) ($manifest['has_menu'] ?? false);
         $this->has_dashboard_widget = (bool) ($manifest['has_dashboard_widget'] ?? false);
         $this->has_tools_menu = (bool) ($manifest['has_tools_menu'] ?? false);
+        $this->has_profile_tab = (bool) ($manifest['has_profile_tab'] ?? false);
+        $this->profile_tab_label = $manifest['profile_tab_label'] ?? $this->profile_tab_label;
+        $this->profile_tab_scope = $manifest['profile_tab_scope'] ?? $this->profile_tab_scope;
         $this->manifestDetected = true;
     }
 
@@ -114,6 +123,9 @@ class PluginConsole extends Component
             'has_menu' => 'boolean',
             'has_dashboard_widget' => 'boolean',
             'has_tools_menu' => 'boolean',
+            'has_profile_tab' => 'boolean',
+            'profile_tab_label' => 'nullable|string|max:100|required_if:has_profile_tab,true',
+            'profile_tab_scope' => 'nullable|in:teacher,staff,both',
         ];
 
         if ($this->source_type === 'git') {
@@ -146,12 +158,16 @@ class PluginConsole extends Component
             'has_menu' => $this->has_menu,
             'has_dashboard_widget' => $this->has_dashboard_widget,
             'has_tools_menu' => $this->has_tools_menu,
+            'has_profile_tab' => $this->has_profile_tab,
+            'profile_tab_label' => $this->profile_tab_label ?: null,
+            'profile_tab_scope' => $this->profile_tab_scope,
             'status' => 'staged',
             'requested_by' => Auth::id(),
         ]);
 
-        $this->reset(['slug', 'name', 'version', 'composer_package', 'provider_class', 'seeder_class', 'git_url', 'zip', 'manifestDetected', 'manifestUnreadable', 'has_menu', 'has_dashboard_widget', 'has_tools_menu']);
+        $this->reset(['slug', 'name', 'version', 'composer_package', 'provider_class', 'seeder_class', 'git_url', 'zip', 'manifestDetected', 'manifestUnreadable', 'has_menu', 'has_dashboard_widget', 'has_tools_menu', 'has_profile_tab', 'profile_tab_label']);
         $this->portals = ['admin'];
+        $this->profile_tab_scope = 'both';
         $this->source_type = 'git';
 
         session()->flash('successmessage', 'Plugin staged for install — it will be processed within a minute.');

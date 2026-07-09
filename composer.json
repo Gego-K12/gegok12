@@ -34,6 +34,7 @@
         "predis/predis": "v3.0.0-alpha1",
         "pusher/pusher-php-server": "7.2",
         "santigarcor/laratrust": "^8.5",
+        "simplesoftwareio/simple-qrcode": "^4.2",
         "spatie/laravel-activitylog": "4.10.2",
         "spatie/laravel-ignition": "^2.0",
         "spatie/laravel-medialibrary": "^11.17.0",

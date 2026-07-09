@@ -140,7 +140,7 @@ export default {
       }).then(function(isConfirm) {
         if (isConfirm) 
         {
-          axios.get('/teacher/postalrecord/delete/'+id).then(response => {
+          axios.delete('/teacher/postalrecord/delete/'+id).then(response => {
              thisswal.success    = response.data.message;
              thisswal.getlist();
           });  

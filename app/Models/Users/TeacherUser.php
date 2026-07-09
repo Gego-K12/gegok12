@@ -113,6 +113,8 @@ class TeacherUser extends User
             $array['employee_id'] = $teacher->employee_id;
             $array['ug_degree'] = $teacher->ug_degree;
             $array['pg_degree'] = $teacher->pg_degree;
+            $array['ug_degree_name'] = optional($teacher->ugDegree)->display_name;
+            $array['pg_degree_name'] = optional($teacher->pgDegree)->display_name;
             $array['specialization'] = $teacher->specialization;
             $array['job_type'] = $teacher->job_type;
             $array['interested_in'] = $teacher->interested_in;

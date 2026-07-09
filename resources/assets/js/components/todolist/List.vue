@@ -480,7 +480,7 @@
                     dangerMode: true,
                 }).then(function(isConfirm) {
                     if (isConfirm) {
-                        axios.get('/' + thisswal.mode + '/task/' + id + '/delete').then(response => {
+                        axios.delete('/' + thisswal.mode + '/task/' + id + '/delete').then(response => {
                             thisswal.success = response.data.success;
                             thisswal.getlist();
                         });

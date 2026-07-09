@@ -24,7 +24,6 @@ use App\Traits\Common;
 use App\Traits\LogActivity;
 use App\Traits\MemberProcess;
 use App\Traits\RegisterUser;
-use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -265,21 +264,6 @@ class StudentController extends Controller
         $array['mode_of_transport'] = $studentAcademic->mode_of_transport;
         $array['driver_name'] = $studentAcademic->transport_details['driver_name'];
         $array['driver_contact_number'] = $studentAcademic->transport_details['driver_contact_number'];
-        $array['siblings'] = $studentAcademic->siblings;
-        $array['siblings_count'] = $studentAcademic->siblings_count;
-
-        for ($i = 0; $i < $studentAcademic->siblings_count; $i++) {
-            $array['sibling_details'][$i]['sibling_relation'] = $studentAcademic->sibling_details[$i]['sibling_relation'];
-            $array['sibling_details'][$i]['sibling_name'] = $studentAcademic->sibling_details[$i]['sibling_name'];
-            // $array['sibling_details'][$i]['sibling_date_of_birth']  = date('Y-m-d',strtotime($studentAcademic->sibling_details[$i]['sibling_date_of_birth']));
-            $dateValue = $studentAcademic->sibling_details[$i]['sibling_date_of_birth'];
-
-            $array['sibling_details'][$i]['sibling_date_of_birth'] =
-                Carbon::parse(is_array($dateValue) ? $dateValue['date'] : $dateValue)
-                    ->format('Y-m-d');
-
-            $array['sibling_details'][$i]['sibling_standard'] = $studentAcademic->sibling_details[$i]['sibling_standard'];
-        }
 
         $array['countrylist'] = SiteHelper::getCountries();
         $array['statelist'] = SiteHelper::getStates();

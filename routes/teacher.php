@@ -320,6 +320,7 @@ Route::get('/student/show/{name}', 'StudentDetailsController@show');
 Route::get('/student/show/details/{name}', 'StudentDetailsController@showDetails');
 Route::get('/student/show/relations/{name}', 'StudentDetailsController@showRelations');
 Route::get('/student/show/siblings/{name}', 'StudentDetailsController@showSiblings');
+Route::get('/student/show/siblingdetails/{name}', 'StudentDetailsController@showSiblingDetails');
 Route::get('/student/show/activity/{name}', 'StudentDetailsController@showActivity');
 Route::get('/student/show/discipline/{name}', 'StudentDetailsController@showDisciplines');
 Route::get('/student/show/attendance/{name}', 'StudentDetailsController@showAttendance');

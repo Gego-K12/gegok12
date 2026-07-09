@@ -275,112 +275,6 @@
     </div>
 
     <div class="flex flex-col lg:flex-row">
-      <div class="tw-form-group w-full lg:w-1/6">
-        <div class="lg:mr-8 md:mr-8">
-          <div class="mb-2">
-            <label for="siblings" class="tw-form-label">Siblings<span class="text-red-500">*</span></label>
-          </div>
-          <div class="mb-2">
-            <select class="tw-form-control w-full" id="siblings" v-model="siblings" name="siblings">
-              <option value="" disabled>Select Sibling</option>
-              <option value="yes">Yes</option>
-              <option value="no">No</option>
-            </select>
-          </div>
-          <span v-if="errors.siblings" class="text-red-500 text-xs font-semibold">{{errors.siblings[0]}}</span>
-        </div> 
-      </div>
-
-      <div class="tw-form-group w-full lg:w-1/6" v-if="this.siblings == 'yes'">
-        <div class="lg:mr-8 md:mr-8">
-          <div class="mb-2">
-            <label for="siblings" class="tw-form-label">Siblings Count<span class="text-red-500">*</span></label>
-          </div>
-          <div class="mb-2">
-            <input type="text" class="tw-form-control w-full" id="siblings_count" v-model="siblings_count" name="siblings_count" placeholder="Siblings Count">
-          </div>
-          <span v-if="errors.siblings_count" class="text-red-500 text-xs font-semibold">{{errors.siblings_count[0]}}</span>
-        </div> 
-      </div>
-      
-      <div class="tw-form-group w-full lg:w-4/6" v-if="this.siblings == 'yes'">
-        <div class="flex flex-col lg:flex-row" v-for="(input,index) in inputs">
-          <div class="w-full lg:w-1/4">
-            <div class="lg:mr-8 md:mr-8">
-              <div class="mb-2">
-                <label for="sibling_relation" class="tw-form-label">Sibling Relation<span class="text-red-500">*</span></label>
-              </div>
-              <div class="mb-2">
-                <select v-model="input.sibling_relation" name="sibling_relation[]" id="sibling_relation" class="tw-form-control w-full">
-                  <option value="" disabled>Select Relation</option>
-                  <option v-for="sibling in siblinglist" v-bind:value="sibling.id">{{ sibling.name }}</option>
-                </select>
-              </div>
-              <span v-if="errors['sibling_relation'+index]" class="text-red-500 text-xs font-semibold">{{errors['sibling_relation'+index]}}</span>
-            </div> 
-          </div>
-
-          <div class="w-full lg:w-1/4">
-            <div class="lg:mr-8 md:mr-8">
-              <div class="mb-2">
-                <label for="sibling_name" class="tw-form-label">Sibling Name<span class="text-red-500">*</span></label>
-              </div>
-              <div class="mb-2">
-                <input type="text" v-model="input.sibling_name" name="sibling_name[]" id="sibling_name" class="tw-form-control w-full" placeholder="Sibling Name">
-              </div>
-              <span v-if="errors['sibling_name'+index]" class="text-red-500 text-xs font-semibold">{{errors['sibling_name'+index]}}</span>
-            </div> 
-          </div>
-
-          <div class="w-full lg:w-1/4">
-            <div class="lg:mr-8 md:mr-8">
-              <div class="mb-2">
-                <label for="sibling_date_of_birth" class="tw-form-label">Sibling Date Of Birth<span class="text-red-500">*</span></label>
-              </div>
-              <div class="mb-2">
-                <input type="date" v-model="input.sibling_date_of_birth" name="sibling_date_of_birth[]" id="sibling_date_of_birth" class="tw-form-control w-full">
-              </div>
-              <span v-if="errors['sibling_date_of_birth'+index]" class="text-red-500 text-xs font-semibold">{{errors['sibling_date_of_birth'+index]}}</span>
-            </div> 
-          </div>
-
-          <div class="w-full lg:w-1/4">
-            <div class="lg:mr-8 md:mr-8">
-              <div class="mb-2">
-                <label for="sibling_standard" class="tw-form-label">Sibling Class</label>
-              </div>
-              <div class="mb-2">
-                <select class="tw-form-control w-full" id="sibling_standard" v-model="input.sibling_standard" name="sibling_standard[]">
-                  <option value="" disabled>Select Class</option>
-                  <option value="" v-for="standardLink in standardLinklist" v-bind:value="standardLink.id">{{ standardLink.standard_section }}</option>
-                </select>
-              </div>
-              <span v-if="errors['sibling_standard'+index]" class="text-red-500 text-xs font-semibold">{{errors['sibling_standard'+index]}}</span>
-            </div> 
-          </div> 
-          <a href="#" class="py-8" @click="deleteRow(index)">
-            <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 512 512" xml:space="preserve" class="w-4 h-4 fill-current text-black-600"><g><g><g><polygon points="353.574,176.526 313.496,175.056 304.807,412.34 344.885,413.804"></polygon><rect x="235.948" y="175.791" width="40.104" height="237.285"></rect><polygon points="207.186,412.334 198.497,175.049 158.419,176.52 167.109,413.804"></polygon> <path d="M17.379,76.867v40.104h41.789L92.32,493.706C93.229,504.059,101.899,512,112.292,512h286.74 c10.394,0,19.07-7.947,19.972-18.301l33.153-376.728h42.464V76.867H17.379z M380.665,471.896H130.654L99.426,116.971h312.474 L380.665,471.896z"></path></g></g></g> <g><g><path d="M321.504,0H190.496c-18.428,0-33.42,14.992-33.42,33.42v63.499h40.104V40.104h117.64v56.815h40.104V33.42 C354.924,14.992,339.932,0,321.504,0z"></path></g></g></svg>
-          </a> 
-        </div>
-        
-        <div class="w-full lg:w-1/4">
-          <div class="lg:mr-8 md:mr-8">
-            <div class="mb-2">
-              <label for="add_siblings" class="tw-form-label">Add Sibling</label>
-            </div>
-            <div class="mb-2">
-              <a href="#" class="tw-form-control w-full" @click="addRow">+ </a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div v-if="this.inputs != null">
-      <input type="hidden" name="count" v-bind:value="this.inputs.length">
-    </div>
-
-    <div class="flex flex-col lg:flex-row">      
       <div class="tw-form-group w-full lg:w-1/2">
         <div class="lg:mr-8 md:mr-8">
           <div class="mb-2">
@@ -538,12 +432,6 @@ export default {
       mode_of_transport:'',
       driver_name:'',
       driver_contact_number:'',
-      siblings:'',
-      siblings_count:'',
-      sibling_relation:'',
-      sibling_name:'',
-      sibling_date_of_birth:'',
-      sibling_standard:'',
       notes:'',
       avatar:'',
       avatar_display:'',
@@ -552,17 +440,10 @@ export default {
       statelist:[],
       citylist:[],
       standardLinklist:[],
-      inputs:[{
-        sibling_relation:'',
-        sibling_name:'',
-        sibling_date_of_birth:'',
-        sibling_standard:'',
-      }],
       blood_groups:[],
       castelist:[],
       transportlist:[],
       lists:['auto','rickshaw','taxi'],
-      siblinglist:[{id:'brother' , name:'Brother'} , {id:'sister' , name:'Sister'}],
       errors:[],
       success:null,
     }
@@ -610,13 +491,7 @@ export default {
         this.mode_of_transport          = this.user.mode_of_transport;
         this.driver_name                = this.user.driver_name;
         this.driver_contact_number      = this.user.driver_contact_number;
-        this.siblings                   = this.user.siblings;
-        this.siblings_count             = this.user.siblings_count;
-        if( this.user.siblings_count != null)
-        {
-          this.inputs                     = this.user.sibling_details;
-        }
-          
+
         this.countrylist      = this.user.countrylist;
         this.statelist        = this.user.statelist;
         this.citylist         = this.user.citylist;
@@ -658,57 +533,13 @@ export default {
       formData.append('id_card_number',this.id_card_number);  
       formData.append('board_registration_number',this.board_registration_number);  
       formData.append('mode_of_transport',this.mode_of_transport);  
-      formData.append('driver_name',this.driver_name);  
-      formData.append('driver_contact_number',this.driver_contact_number);  
-      formData.append('siblings',this.siblings);    
-      formData.append('siblings_count',this.siblings_count);    
-      formData.append('notes',this.notes);          
+      formData.append('driver_name',this.driver_name);
+      formData.append('driver_contact_number',this.driver_contact_number);
+      formData.append('notes',this.notes);
       formData.append('avatar',this.avatar);
       formData.append('address', this.address);
-      
-      if(this.siblings == 'yes')
-      {
-        for(let i=0 ; i < this.inputs.length ; i++)
-        {
-          if(typeof this.inputs[i]['sibling_relation'] !== "undefined")
-          {
-            formData.append('sibling_relation'+i,this.inputs[i]['sibling_relation']);
-          }
-          else
-          {
-            formData.append('sibling_relation'+i,'');
-          }
 
-          if(typeof this.inputs[i]['sibling_name'] !== "undefined")
-          {
-            formData.append('sibling_name'+i,this.inputs[i]['sibling_name']);
-          }
-          else
-          {
-            formData.append('sibling_name'+i,'');
-          }
-
-          if(typeof this.inputs[i]['sibling_date_of_birth'] !== "undefined")
-          {
-            formData.append('sibling_date_of_birth'+i,this.inputs[i]['sibling_date_of_birth']);
-          }
-          else
-          {
-            formData.append('sibling_date_of_birth'+i,'');
-          }
-
-          if(typeof this.inputs[i]['sibling_standard'] !== "undefined")
-          {
-            formData.append('sibling_standard'+i,this.inputs[i]['sibling_standard']);
-          }
-          else
-          {
-            formData.append('sibling_standard'+i,'');
-          }
-        }
-      }
-        
-      axios.post('/admin/student/edit/validationUser/'+this.student_name,formData,{headers: {'Content-Type': 'multipart/form-data'}}).then(response => {     
+      axios.post('/admin/student/edit/validationUser/'+this.student_name,formData,{headers: {'Content-Type': 'multipart/form-data'}}).then(response => {
         $('#real-submit-btn').click(); 
       }).catch(error => {
         this.errors = error.response.data.errors;
@@ -720,27 +551,12 @@ export default {
       this.avatar = event.target.files[0];
     },
 
-    checkInArray(array,value) 
+    checkInArray(array,value)
     {
       if( array.includes(value) )
       {
         return true;
       }
-    },
-
-    addRow() 
-    {
-      this.inputs.push({
-        sibling_relation:'',
-        sibling_name:'',
-        sibling_date_of_birth:this.today,
-        sibling_standard:'',
-      });
-    },
-
-    deleteRow(index) 
-    {
-      this.inputs.splice(index,1);
     },
   },
     

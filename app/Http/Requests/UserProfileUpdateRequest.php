@@ -113,7 +113,6 @@ class UserProfileUpdateRequest extends FormRequest
             'roll_number' => 'required|numeric',
             'id_card_number' => 'nullable|numeric',
             'mode_of_transport' => 'nullable',
-            'siblings' => 'required',
             'board_registration_number' => 'nullable|numeric',
         ];
 
@@ -131,27 +130,6 @@ class UserProfileUpdateRequest extends FormRequest
         if ((request('mode_of_transport') == 'auto') || (request('mode_of_transport') == 'rickshaw') || (request('mode_of_transport') == 'taxi')) {
             $rules['driver_name'] = 'required|check_driver_name';
             $rules['driver_contact_number'] = 'required|numeric|digits:10';
-        }
-
-        for ($i = 0; $i < Request('count'); $i++) {
-            Validator::extend('check_sibling_name', function ($attribute, $value, $parameters, $validator) {
-                return preg_match('/^[A-Za-z\s]+$/', $value);
-            });
-
-            Validator::extend('check_sibling_date_of_birth', function ($attribute, $value, $parameters, $validator) {
-                if (($value <= date('Y-m-d')) && ($value >= '2000-01-01')) {
-                    return true;
-                }
-
-                return false;
-            });
-
-            if (request('siblings') == 'yes') {
-                $rules['sibling_relation'.$i] = 'required';
-                $rules['sibling_name'.$i] = 'required|check_sibling_name';
-                $rules['sibling_date_of_birth'.$i] = 'required|check_sibling_date_of_birth';
-                $rules['sibling_standard'.$i] = 'nullable';
-            }
         }
 
         return $rules;
@@ -237,23 +215,7 @@ class UserProfileUpdateRequest extends FormRequest
             'driver_contact_number.numeric' => 'Driver Contact Number Should Be Numeric',
             'driver_contact_number.digits:10' => 'Driver Contact Number Should Be 10 Digits',
             'driver_contact_number.check_unique_mobile' => 'Contact Number Already In Use. Enter Different Contact Number',
-
-            'siblings.required' => 'Siblings Is Required',
         ];
-
-        for ($i = 0; $i < Request('count'); $i++) {
-            $messages['sibling_relation'.$i.'.required'] = 'Sibling Relation Is Required';
-
-            $messages['sibling_name'.$i.'.required'] = 'Sibling Name Is Required';
-
-            $messages['sibling_name'.$i.'.check_sibling_name'] = 'Enter Valid Sibling Name';
-
-            $messages['sibling_date_of_birth'.$i.'.required'] = 'Sibling Date Of Birth Is Required';
-
-            $messages['sibling_date_of_birth'.$i.'.check_sibling_date_of_birth'] = 'Enter Valid Sibling Date Of Birth';
-
-            $messages['sibling_standard'.$i.'.required'] = 'Sibling Class Is Required';
-        }
 
         return $messages;
     }

@@ -17,6 +17,7 @@ use App\Http\Resources\Feedback as FeedbackResource;
 use App\Http\Resources\User as UserResource;
 use App\Models\ActivityLog;
 use App\Models\Feedback;
+use App\Models\StudentAcademic;
 use App\Models\StudentParentLink;
 use App\Models\Subscription;
 use App\Models\User;
@@ -264,6 +265,39 @@ class ParentController extends Controller
         $array['qualification_id'] = $parentprofile['qualification_id'] ?? '';
         $array['qualification_name'] = $parentprofile['qualification_name'] ?? '';
         $array['qualificationlist'] = SiteHelper::getQualifications();
+        $array['standardLinklist'] = SiteHelper::getStandardLinkList(Auth::user()->school_id);
+
+        $ref_name = Request('ref_name') ? Request('ref_name') : '';
+
+        if ($ref_name != '') {
+            $student = User::where('name', $ref_name)->first();
+        } else {
+            $link = StudentParentLink::where('parent_id', $user->id)->orderByDesc('id')->first();
+            $student = $link != null ? User::where('id', $link->student_id)->first() : null;
+        }
+
+        $array['siblings'] = '';
+        $array['siblings_count'] = '';
+        $array['sibling_details'] = [];
+
+        if ($student != null) {
+            $academic = StudentAcademic::where('user_id', $student->id)->orderByDesc('id')->first();
+
+            if (($academic != null) && ($academic->siblings == 'yes') && ($academic->sibling_details != null)) {
+                $array['siblings'] = $academic->siblings;
+                $array['siblings_count'] = $academic->siblings_count;
+
+                foreach ($academic->sibling_details as $i => $sibling) {
+                    $array['sibling_details'][$i]['sibling_relation'] = $sibling['sibling_relation'];
+                    $array['sibling_details'][$i]['sibling_name'] = $sibling['sibling_name'];
+                    $array['sibling_details'][$i]['sibling_date_of_birth'] =date('Y-m-d', strtotime($sibling['sibling_date_of_birth'][0]));
+                    $array['sibling_details'][$i]['sibling_standard'] = $sibling['sibling_standard'];
+                }
+            } elseif ($academic != null) {
+                $array['siblings'] = $academic->siblings ?? '';
+                $array['siblings_count'] = $academic->siblings_count ?? '';
+            }
+        }
 
         return $array;
     }

@@ -140,21 +140,6 @@ trait RegisterUser
                 $academic->transport_details = $array;
             }
 
-            $academic->siblings = $data->siblings;
-            $academic->siblings_count = $data->siblings_count;
-            if ($data->siblings == 'yes') {
-                $array = [];
-
-                for ($i = 0; $i < $data->siblings_count; $i++) {
-                    $array[$i]['sibling_relation'] = $data->sibling_relation[$i];
-                    $array[$i]['sibling_name'] = $data->sibling_name[$i];
-                    $array[$i]['sibling_date_of_birth'] = date('Y-m-d', strtotime($data->sibling_date_of_birth[$i]));
-                    $array[$i]['sibling_standard'] = $data->sibling_standard[$i];
-                }
-
-                $academic->sibling_details = $array;
-            }
-
             $academic->save();
 
             \DB::commit();
@@ -247,6 +232,11 @@ trait RegisterUser
 
             $userprofile->save();
 
+            $previousAcademic = StudentAcademic::where('user_id', $user_id)->orderByDesc('id')->first();
+            $previousSiblings = $previousAcademic->siblings ?? null;
+            $previousSiblingsCount = $previousAcademic->siblings_count ?? null;
+            $previousSiblingDetails = $previousAcademic->sibling_details ?? null;
+
             $studentAcademic = StudentAcademic::where('user_id', $user_id)->get();
 
             foreach ($studentAcademic as $academics) {
@@ -270,20 +260,10 @@ trait RegisterUser
                 $academic->transport_details = $array;
             }
 
-            $academic->siblings = $data->siblings;
-            $academic->siblings_count = $data->siblings_count;
-            if ($data->siblings == 'yes') {
-                $array = [];
-
-                for ($i = 0; $i < $data->siblings_count; $i++) {
-                    $array[$i]['sibling_relation'] = $data->sibling_relation[$i];
-                    $array[$i]['sibling_name'] = $data->sibling_name[$i];
-                    $array[$i]['sibling_date_of_birth'] = date('Y-m-d', strtotime($data->sibling_date_of_birth[$i]));
-                    $array[$i]['sibling_standard'] = $data->sibling_standard[$i];
-                }
-
-                $academic->sibling_details = $array;
-            }
+            // Siblings are captured via the parent add/edit forms, not this form; carry the existing values forward.
+            $academic->siblings = $previousSiblings;
+            $academic->siblings_count = $previousSiblingsCount;
+            $academic->sibling_details = $previousSiblingDetails;
 
             $academic->save();
 
@@ -394,6 +374,28 @@ trait RegisterUser
                 $link->save();
             }
 
+            $academic = StudentAcademic::where('user_id', $student->id)->orderByDesc('id')->first();
+
+            if ($academic != null) {
+                $academic->siblings = $data->siblings;
+                $academic->siblings_count = $data->siblings_count;
+
+                if ($data->siblings == 'yes') {
+                    $array = [];
+
+                    for ($i = 0; $i < $data->siblings_count; $i++) {
+                        $array[$i]['sibling_relation'] = $data->sibling_relation[$i];
+                        $array[$i]['sibling_name'] = $data->sibling_name[$i];
+                        $array[$i]['sibling_date_of_birth'] = date('Y-m-d', strtotime($data->sibling_date_of_birth[$i]));
+                        $array[$i]['sibling_standard'] = $data->sibling_standard[$i];
+                    }
+
+                    $academic->sibling_details = $array;
+                }
+
+                $academic->save();
+            }
+
             \DB::commit();
 
             return $user;
@@ -445,7 +447,7 @@ trait RegisterUser
                     $parent->sub_occupation = $data->sub_occupation;
                     $parent->designation = $data->designation;
                     $parent->organization_name = $data->organization_name;
-                    $parent->official_address = $data->address;
+                    $parent->official_address = $data->official_address;
                     $parent->relation = $data->relation;
                     $parent->annual_income = $data->annual_income;
 
@@ -460,11 +462,44 @@ trait RegisterUser
                 $parent->sub_occupation = $data->sub_occupation;
                 $parent->designation = $data->designation;
                 $parent->organization_name = $data->organization_name;
-                $parent->official_address = $data->address;
+                $parent->official_address = $data->official_address;
                 $parent->relation = $data->relation;
                 $parent->annual_income = $data->annual_income;
 
                 $parent->save();
+            }
+
+            if ($student_id != null) {
+                $student = User::where('id', $student_id)->first();
+            } elseif (! empty($data->ref_name)) {
+                $student = User::where('name', $data->ref_name)->first();
+            } else {
+                $link = StudentParentLink::where('parent_id', $user_id)->orderByDesc('id')->first();
+                $student = $link != null ? User::where('id', $link->student_id)->first() : null;
+            }
+
+            if ($student != null) {
+                $academic = StudentAcademic::where('user_id', $student->id)->orderByDesc('id')->first();
+
+                if ($academic != null) {
+                    $academic->siblings = $data->siblings;
+                    $academic->siblings_count = $data->siblings_count;
+
+                    if ($data->siblings == 'yes') {
+                        $array = [];
+
+                        for ($i = 0; $i < $data->siblings_count; $i++) {
+                            $array[$i]['sibling_relation'] = $data->sibling_relation[$i];
+                            $array[$i]['sibling_name'] = $data->sibling_name[$i];
+                            $array[$i]['sibling_date_of_birth'] = date('Y-m-d', strtotime($data->sibling_date_of_birth[$i]));
+                            $array[$i]['sibling_standard'] = $data->sibling_standard[$i];
+                        }
+
+                        $academic->sibling_details = $array;
+                    }
+
+                    $academic->save();
+                }
             }
 
             \DB::commit();

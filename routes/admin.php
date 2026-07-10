@@ -842,3 +842,7 @@ if (file_exists(base_path('routes/galumni-admin.php'))) {
 if (file_exists(base_path('routes/gcertificate-admin.php'))) {
     require base_path('routes/gcertificate-admin.php');
 }
+
+if (file_exists(base_path('routes/gchat-admin.php'))) {
+    require base_path('routes/gchat-admin.php');
+}

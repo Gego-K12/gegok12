@@ -16,6 +16,7 @@
         "filament/tables": "^3.2",
         "gegok12/alumni": "1.0.0",
         "gegok12/certificate": "1.0.0",
+        "gegok12/chat": "1.0.0",
         "gegok12/fee": "v1.0.x-dev",
         "gegok12/short-term-courses": "1.0.0",
         "gegok12/work-permission": "1.0.0",
@@ -143,6 +144,10 @@
         {
             "type": "path",
             "url": "custompackages/gegok12/certificate"
+        },
+        {
+            "type": "path",
+            "url": "custompackages/gegok12/chat"
         },
         {
             "type": "vcs",

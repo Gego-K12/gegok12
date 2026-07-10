@@ -19,6 +19,8 @@ export default function registerCustomAddon(app) {
 
     registerQuiz(app)
 
+    registerVideoroom(app)
+
     registerShortTermCourses(app)
 
     registerWorkpermission(app)

@@ -8,9 +8,9 @@
 namespace App\Services;
 
 use App\Models\Plugin;
+use App\Services\Process\ProcessRunner;
 use Exception;
 use Illuminate\Support\Str;
-use Symfony\Component\Process\Process;
 use ZipArchive;
 
 /**
@@ -30,6 +30,35 @@ class PluginInstaller
     private const MAX_ZIP_UNCOMPRESSED_BYTES = 50 * 1024 * 1024;
 
     private const VALID_PORTALS = ['web', 'admin', 'teacher', 'student', 'api'];
+
+    /**
+     * Path overrides exist only so tests can redirect every filesystem write
+     * (composer.json, custompackages/, routes/*.php, custom_addon.js) into a
+     * throwaway temp tree instead of mutating this project's real source
+     * files. Production code never passes these — the container-resolved
+     * instance always gets the real base_path()/storage_path()/resource_path().
+     */
+    public function __construct(
+        private readonly ProcessRunner $processRunner,
+        private readonly ?string $basePathOverride = null,
+        private readonly ?string $storagePathOverride = null,
+        private readonly ?string $resourcePathOverride = null,
+    ) {}
+
+    private function basePath(string $path = ''): string
+    {
+        return $this->basePathOverride !== null ? rtrim($this->basePathOverride.'/'.$path, '/') : base_path($path);
+    }
+
+    private function storagePath(string $path = ''): string
+    {
+        return $this->storagePathOverride !== null ? rtrim($this->storagePathOverride.'/'.$path, '/') : storage_path($path);
+    }
+
+    private function resourcePath(string $path = ''): string
+    {
+        return $this->resourcePathOverride !== null ? rtrim($this->resourcePathOverride.'/'.$path, '/') : resource_path($path);
+    }
 
     /**
      * Read plugin.json out of a zip WITHOUT extracting anything — used by the
@@ -150,7 +179,7 @@ class PluginInstaller
             return;
         }
 
-        $zipPath = storage_path('app/'.$plugin->source_ref);
+        $zipPath = $this->storagePath('app/'.$plugin->source_ref);
 
         if (! file_exists($zipPath)) {
             throw new Exception("Uploaded zip not found at {$plugin->source_ref}");
@@ -180,7 +209,7 @@ class PluginInstaller
             }
         }
 
-        $quarantineDir = storage_path('app/plugin-quarantine/'.Str::uuid());
+        $quarantineDir = $this->storagePath('app/plugin-quarantine/'.Str::uuid());
         mkdir($quarantineDir, 0755, true);
 
         $zip->extractTo($quarantineDir);
@@ -200,7 +229,7 @@ class PluginInstaller
         }
 
         $vendor = $manifest['vendor'];
-        $destination = base_path("custompackages/{$vendor}/{$plugin->slug}");
+        $destination = $this->basePath("custompackages/{$vendor}/{$plugin->slug}");
 
         if (! is_dir(dirname($destination))) {
             mkdir(dirname($destination), 0755, true);
@@ -220,7 +249,7 @@ class PluginInstaller
      */
     private function findExistingExtraction(string $slug): ?array
     {
-        foreach (glob(base_path('custompackages/*/'.$slug), GLOB_ONLYDIR) ?: [] as $dir) {
+        foreach (glob($this->basePath('custompackages/*/'.$slug), GLOB_ONLYDIR) ?: [] as $dir) {
             if (! file_exists($dir.'/plugin.json')) {
                 continue;
             }
@@ -304,7 +333,7 @@ class PluginInstaller
 
     private function addRepository(Plugin $plugin, array $repository): void
     {
-        $composerPath = base_path('composer.json');
+        $composerPath = $this->basePath('composer.json');
         $composer = json_decode(file_get_contents($composerPath), true);
 
         $alreadyExists = collect($composer['repositories'] ?? [])
@@ -328,7 +357,7 @@ class PluginInstaller
      */
     private function runComposerRemove(Plugin $plugin): void
     {
-        $composer = json_decode(file_get_contents(base_path('composer.json')), true);
+        $composer = json_decode(file_get_contents($this->basePath('composer.json')), true);
 
         if (! array_key_exists($plugin->composer_package, $composer['require'] ?? [])) {
             $plugin->appendLog("{$plugin->composer_package} is already absent from composer.json — skipping composer remove.");
@@ -345,7 +374,7 @@ class PluginInstaller
      */
     private function removeRepositoryEntry(Plugin $plugin): void
     {
-        $composerPath = base_path('composer.json');
+        $composerPath = $this->basePath('composer.json');
         $composer = json_decode(file_get_contents($composerPath), true);
 
         if (empty($composer['repositories'])) {
@@ -479,7 +508,7 @@ class PluginInstaller
             $publishedRouteFile = $this->publishedRouteFileFor($plugin, $portal);
             $guard = "if (file_exists(base_path('{$publishedRouteFile}'))) {\n    require base_path('{$publishedRouteFile}');\n}";
 
-            $path = base_path($routeFile);
+            $path = $this->basePath($routeFile);
             $contents = file_get_contents($path);
 
             if (! str_contains($contents, $publishedRouteFile)) {
@@ -502,7 +531,7 @@ class PluginInstaller
             $publishedRouteFile = $this->publishedRouteFileFor($plugin, $portal);
             $guard = "if (file_exists(base_path('{$publishedRouteFile}'))) {\n    require base_path('{$publishedRouteFile}');\n}";
 
-            $path = base_path($routeFile);
+            $path = $this->basePath($routeFile);
             if (! file_exists($path)) {
                 continue;
             }
@@ -519,7 +548,7 @@ class PluginInstaller
 
     private function patchCustomAddonJs(Plugin $plugin): void
     {
-        $path = resource_path('assets/js/custom_addon.js');
+        $path = $this->resourcePath('assets/js/custom_addon.js');
         if (! file_exists($path)) {
             throw new Exception('custom_addon.js not found.');
         }
@@ -553,7 +582,7 @@ class PluginInstaller
      */
     private function unpatchCustomAddonJs(Plugin $plugin): void
     {
-        $path = resource_path('assets/js/custom_addon.js');
+        $path = $this->resourcePath('assets/js/custom_addon.js');
         if (! file_exists($path)) {
             return;
         }
@@ -595,12 +624,11 @@ class PluginInstaller
 
     private function runProcess(Plugin $plugin, array $command, int $timeout = 120): void
     {
-        $process = new Process($command, base_path(), null, null, $timeout);
-        $process->run();
+        $result = $this->processRunner->run($command, $this->basePath(), $timeout);
 
-        $plugin->appendLog('$ '.implode(' ', $command)."\n".$process->getOutput().$process->getErrorOutput());
+        $plugin->appendLog('$ '.implode(' ', $command)."\n".$result->output.$result->errorOutput);
 
-        if (! $process->isSuccessful()) {
+        if (! $result->successful) {
             throw new Exception('Command failed: '.implode(' ', $command));
         }
     }

@@ -113,3 +113,9 @@ public/uploads/reports/*
 composer.lock
 public/demo-school
 custompackages/gegok12/*
+
+# Plugin views get physically published (vendor:publish) into this
+# directory at install time - excluded for the same reason as
+# custompackages/gegok12/* above, so a gegok12 plugin's UI doesn't leak
+# into the open-source repo via its rendered view fragments.
+resources/views/plugins/*

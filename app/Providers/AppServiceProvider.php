@@ -24,6 +24,8 @@ use App\Observers\TaskObserver;
 use App\Observers\TeacherProfileObserver;
 use App\Observers\UserObserver;
 use App\Observers\UserprofileObserver;
+use App\Services\Process\ProcessRunner;
+use App\Services\Process\SymfonyProcessRunner;
 use Config;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Validator;
@@ -122,5 +124,8 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register() {}
+    public function register()
+    {
+        $this->app->bind(ProcessRunner::class, SymfonyProcessRunner::class);
+    }
 }

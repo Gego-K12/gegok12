@@ -27,6 +27,8 @@
             style="box-sizing: border-box;"
           />
 
+          <input type="hidden" :name="fieldName" :value="localAddress" />
+
           <!-- Search Icon — sits inside the input on the right -->
           <button
             type="button"
@@ -75,7 +77,11 @@ export default {
   props: {
     address: String,
     latitude: Number,
-    longitude: Number
+    longitude: Number,
+    fieldName: {
+      type: String,
+      default: 'address'
+    }
   },
 
   emits: ['update:address', 'update:latitude', 'update:longitude'],

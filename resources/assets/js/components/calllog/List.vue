@@ -139,7 +139,7 @@ export default {
       }).then(function(isConfirm) {
         if (isConfirm) 
         {
-          axios.get(thisswal.url+'/'+thisswal.mode+'/calllog/delete/'+id).then(response => {
+          axios.delete(thisswal.url+'/'+thisswal.mode+'/calllog/delete/'+id).then(response => {
              thisswal.success    = response.data.message;
              //thisswal.getlist();
              window.location.reload();

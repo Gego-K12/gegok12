@@ -50,7 +50,7 @@
 
         <!-- Actions -->
         <span v-else-if="props.column.field === 'action'">
-          <div class="flex items-center gap-2">
+          <div v-if="props.row.type === 'telephone_directory'" class="flex items-center gap-2">
 
             <a :href="'/' + mode + '/phonenumber/edit/' + props.row.id">
               Edit
@@ -143,7 +143,7 @@ export default {
       if (!confirm("Are you sure you want to delete?")) return;
 
       try {
-        await axios.get(
+        await axios.delete(
           this.url + "/" + this.mode + "/phonenumber/delete/" + id
         );
         this.getData(); // refresh table without reload

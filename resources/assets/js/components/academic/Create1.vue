@@ -717,7 +717,7 @@ export default {
             {
                 thisswal.inputs.splice(index,1); 
 
-                axios.get('/admin/subject/delete/'+subject_id).then(response => {
+                axios.delete('/admin/subject/delete/'+subject_id).then(response => {
           this.success = response.data.success;
         //console.log(this.list)
          

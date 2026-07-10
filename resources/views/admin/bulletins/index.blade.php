@@ -90,7 +90,7 @@
                     $.ajax({
                         url: link,
                         data: { status: status },
-                        type: "GET",
+                        type: "DELETE",
                         headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                         success:function(data)
                         {

@@ -50,7 +50,7 @@
        <li class="px-2 mx-3 py-2" v-bind:class="[{'active' : profile_tab === '13'}]">
         <a href="#" class="text-gray-700 font-medium" @click="setProfileTab('13')">Bank Details</a>
       </li>
-      <li class="px-2 mx-3 py-2" v-bind:class="[{'active' : profile_tab === '14'}]">
+      <li class="px-2 mx-3 py-2" v-bind:class="[{'active' : profile_tab === '14'}]" v-if="this.mode == 'admin'">
       <a href="#" class="text-gray-700 font-medium" @click="setProfileTab('14')">Tags</a>
     </li>
 

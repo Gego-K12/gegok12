@@ -14,7 +14,7 @@
     @include('partials.message')
     <form method="POST" action="{{url('/admin/parent/edit/'.$user->name)}}" enctype="multipart/form-data">
         @csrf
-        <edit-parent url="{{ url('/') }}" name="{{ $user->name }}"></edit-parent>
+        <edit-parent url="{{ url('/') }}" name="{{ $user->name }}" ref_name="{{ $ref_name }}"></edit-parent>
       </form>
       </div>
     </div>

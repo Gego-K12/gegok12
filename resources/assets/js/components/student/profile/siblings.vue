@@ -22,7 +22,19 @@
           <td>{{ user.standard_section }}</td>
         </tr>
       </tbody>
-      <tbody v-else>
+      <tbody v-if="this.siblingDetails.length > 0">
+        <tr v-for="sibling in siblingDetails">
+          <td>
+            <div class="flex items-center">
+              <span class="mx-2">{{ sibling.fullname }}</span>
+            </div>
+          </td>
+          <td>{{ sibling.relation }}</td>
+          <td>{{ sibling.date_of_birth }}</td>
+          <td>{{ sibling.standard_section }}</td>
+        </tr>
+      </tbody>
+      <tbody v-if="(this.users == '') && (this.siblingDetails.length == 0)">
         <tr>
           <td colspan="4">
             <p class="font-semibold text-s" style="text-align: center">No Records Found</p>
@@ -43,8 +55,9 @@
       return {
         profile_tab:'',
         users:[],
+        siblingDetails:[],
         errors:[],
-        success:null, 
+        success:null,
       }
     },
 
@@ -53,22 +66,30 @@
       getData()
       {
         axios.get('/'+this.mode+'/student/show/siblings/'+this.name).then(response => {
-          this.users = response.data.data; 
-          //console.log(this.users) 
+          this.users = response.data.data;
+          //console.log(this.users)
+        });
+      },
+
+      getSiblingDetails()
+      {
+        axios.get('/'+this.mode+'/student/show/siblingdetails/'+this.name).then(response => {
+          this.siblingDetails = response.data;
         });
       },
     },
-  
+
     created()
-    {       
+    {
       this.getData();
+      this.getSiblingDetails();
 
       bus.on("dataProfileTab", data => {
         if(data!='')
         {
-          this.profile_tab=data;                   
+          this.profile_tab=data;
         }
-      });   
+      });
     }
-  } 
+  }
 </script>

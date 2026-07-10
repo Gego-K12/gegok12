@@ -287,7 +287,7 @@ export default {
       }).then(function(isConfirm) {
         if (isConfirm) 
         {
-          axios.get('/teacher/task/'+id+'/delete').then(response => {
+          axios.delete('/teacher/task/'+id+'/delete').then(response => {
              thisswal.success    = response.data.message;
              thisswal.getlist();
           });  

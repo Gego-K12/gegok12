@@ -177,7 +177,7 @@
                 }).then(function(isConfirm) {
                     if (isConfirm) 
                     {
-                        axios.get(thisswal.url+'/'+thisswal.mode+'/visitorlog/delete/'+id).then(response => {
+                        axios.delete(thisswal.url+'/'+thisswal.mode+'/visitorlog/delete/'+id).then(response => {
                             thisswal.success    = response.data.message;
                             window.location.reload();
                         });  

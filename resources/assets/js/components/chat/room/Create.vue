@@ -1,7 +1,6 @@
 <template>
     <div class="bg-white shadow border px-4 py-4">
         <div v-if="this.success!=null" class="alert alert-success" id="success-alert">{{ this.success }}</div>
-    <flash-message :position="'right bottom'" :timeout="3000" class="myCustomClass"></flash-message>
         <div class="my-5">
             <div class="">
                 <div class="w-full lg:w-1/4">
@@ -46,9 +45,6 @@
 </template>
 
 <script>
-    import 'vue-flash-message/dist/vue-flash-message.min.css';
-    import VueFlashMessage from 'vue-flash-message';
-    Vue.use(VueFlashMessage);
     export default {
         props:[],
         data(){

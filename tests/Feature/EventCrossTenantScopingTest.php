@@ -143,7 +143,7 @@ class EventCrossTenantScopingTest extends TestCase
     {
         [$admin, $event] = $this->adminAndAnotherSchoolsEvent();
 
-        $this->actingAs($admin)->get('/admin/events/delete/'.$event->id)->assertNotFound();
+        $this->actingAs($admin)->delete('/admin/events/delete/'.$event->id)->assertNotFound();
 
         $this->assertNotNull($event->fresh());
     }
@@ -165,7 +165,7 @@ class EventCrossTenantScopingTest extends TestCase
         $this->actingAs($admin)->get('/admin/event/approve/'.$event->id)->assertRedirect('/admin/dashboard');
         $this->assertSame('active', $event->fresh()->status);
 
-        $this->actingAs($admin)->get('/admin/events/delete/'.$event->id)->assertRedirect('/admin/events');
+        $this->actingAs($admin)->delete('/admin/events/delete/'.$event->id)->assertRedirect('/admin/events');
         $this->assertSoftDeleted('events', ['id' => $event->id]);
     }
 

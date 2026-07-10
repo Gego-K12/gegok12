@@ -95,7 +95,7 @@ class TaskCrossTenantScopingTest extends TestCase
 
         $this->actingAs($admin)->get('/admin/task/show/'.$otherTask->id)->assertNotFound();
         $this->actingAs($admin)->get('/admin/task/edit/'.$otherTask->id)->assertNotFound();
-        $this->actingAs($admin)->get('/admin/task/'.$otherTask->id.'/delete')->assertNotFound();
+        $this->actingAs($admin)->delete('/admin/task/'.$otherTask->id.'/delete')->assertNotFound();
 
         $this->assertNotNull($otherTask->fresh());
     }
@@ -140,7 +140,7 @@ class TaskCrossTenantScopingTest extends TestCase
         $task = $this->createSelfTask($school, $year, $admin);
 
         $this->actingAs($admin)->get('/admin/task/show/'.$task->id)->assertOk();
-        $this->actingAs($admin)->get('/admin/task/'.$task->id.'/delete')->assertOk();
+        $this->actingAs($admin)->delete('/admin/task/'.$task->id.'/delete')->assertOk();
         $this->assertSoftDeleted('task', ['id' => $task->id]);
     }
 

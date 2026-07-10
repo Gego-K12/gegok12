@@ -222,3 +222,7 @@ Route::get('/get/state/{id}','Api\UserprofileController@state');
 Route::get('/get/city/{id}','Api\UserprofileController@city');
 
 Route::get('/events/show/details/{id}','Api\EventsController@showdetails');
+
+if (file_exists(base_path('routes/gfeeapi.php'))) {
+    require base_path('routes/gfeeapi.php');
+}

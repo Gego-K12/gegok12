@@ -1,5 +1,6 @@
 import { registerWorkpermission } from './gworkpermission'
 import { registerShortTermCourses } from './gshort-term-courses'
+import { registerFees } from './gfees'
 
 // later you can import:
 
@@ -9,5 +10,6 @@ export default function registerCustomAddon(app) {
 
     registerWorkpermission(app)
 
+    registerFees(app)
 
 }

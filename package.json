@@ -32,6 +32,7 @@
     "dependencies": {
         "@ckeditor/ckeditor5-build-classic": "^41.4.2",
         "@ckeditor/ckeditor5-vue": "^5.1.0",
+        "@fortawesome/fontawesome-free": "^7.3.0",
         "@fullcalendar/core": "^6.1.10",
         "@fullcalendar/daygrid": "^6.1.10",
         "@fullcalendar/interaction": "^6.1.10",

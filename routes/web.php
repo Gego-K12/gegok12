@@ -1,8 +1,9 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Plugin;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 
 /*Route::get('/', function () {
   return redirect()->route('login');
@@ -38,7 +39,11 @@ Route::group(['middleware' => ['auth', 'siteadmin']], function () {
         return view('siteadmin.plugins.index');
     });
 
-    Route::get('/plugins/{plugin}/log', function (\App\Models\Plugin $plugin) {
+    Route::get('/plugins/stage', function () {
+        return view('siteadmin.plugins.stage');
+    });
+
+    Route::get('/plugins/{plugin}/log', function (Plugin $plugin) {
         return view('siteadmin.plugins.log', ['plugin' => $plugin]);
     });
 });

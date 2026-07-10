@@ -63,6 +63,26 @@ class UserFactory extends Factory
     }
 
     /**
+     * State: Site Admin
+     *
+     * Creates a user with Site Admin role (usergroup_id = 1) — the
+     * platform-level operator login, not tied to any school.
+     * Automatically ensures the SiteAdmin usergroup exists in database.
+     *
+     * @return Factory
+     */
+    public function siteAdmin()
+    {
+        return $this->state(function (array $attributes) {
+            Usergroup::firstOrCreate(['id' => User::SITEADMIN_USERGROUP_ID], ['name' => 'SiteAdmin']);
+
+            return [
+                'usergroup_id' => User::SITEADMIN_USERGROUP_ID,
+            ];
+        });
+    }
+
+    /**
      * State: School Admin
      *
      * Creates a user with School Admin role (usergroup_id = 3).

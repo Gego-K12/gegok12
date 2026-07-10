@@ -33,6 +33,7 @@ class DatabaseSeeder extends Seeder
         $this->call(StandardsTableSeeder::class);
         $this->call(SubjectsTableSeeder::class);
         // $this->call(UsersTableSeeder::class);  //test
+        $this->call(UsersSiteAdminTableSeeder::class);
         $this->call(UsersSchoolAdminTableSeeder::class);
         // $this->call(UsersTeacherTableSeeder::class);  // test
         // $this->call(StandardsLinkTableSeeder::class); // test //

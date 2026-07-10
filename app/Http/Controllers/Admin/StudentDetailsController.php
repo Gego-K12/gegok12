@@ -107,6 +107,42 @@ class StudentDetailsController extends Controller
     }
 
     /**
+     * Display sibling details manually recorded during admission/parent creation
+     * (including siblings not enrolled at this school).
+     *
+     * @param  string  $name
+     * @return array
+     */
+    public function showSiblingDetails($name)
+    {
+        //
+        $student = User::where('name', $name)->first();
+        $academic = StudentAcademic::where('user_id', $student->id)->orderByDesc('id')->first();
+
+        $siblings = [];
+
+        if (($academic != null) && ($academic->siblings == 'yes') && ($academic->sibling_details != null)) {
+            foreach ($academic->sibling_details as $sibling) {
+                $standard_section = 'Not Studying In This School';
+
+                if ($sibling['sibling_standard'] != 'not_studying') {
+                    $standardLink = StandardLink::where('id', $sibling['sibling_standard'])->first();
+                    $standard_section = $standardLink->StandardSection ?? '';
+                }
+
+                $siblings[] = [
+                    'fullname' => ucfirst($sibling['sibling_name']),
+                    'relation' => ucfirst($sibling['sibling_relation']),
+                    'date_of_birth' => date('d-m-Y', strtotime($sibling['sibling_date_of_birth'])),
+                    'standard_section' => $standard_section,
+                ];
+            }
+        }
+
+        return $siblings;
+    }
+
+    /**
      * Show activity logs where student is subject.
      *
      * @param  string  $name

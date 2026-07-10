@@ -75,6 +75,18 @@ class ParentAddRequest extends FormRequest
             return preg_match('/^[0-9]+$/', request('annual_income'));
         });
 
+        Validator::extend('check_sibling_name', function ($attribute, $value, $parameters, $validator) {
+            return preg_match('/^[A-Za-z\s]+$/', $value);
+        });
+
+        Validator::extend('check_sibling_date_of_birth', function ($attribute, $value, $parameters, $validator) {
+            if (($value <= date('Y-m-d')) && ($value >= '2000-01-01')) {
+                return true;
+            }
+
+            return false;
+        });
+
         if (request('parent') == 'select') {
             $rules['select_id'] = 'required';
         } else {
@@ -100,6 +112,19 @@ class ParentAddRequest extends FormRequest
 
             for ($i = 0; $i < request('count'); $i++) {
                 $rules['qualification_id'.$i] = 'nullable';
+            }
+        }
+
+        $rules['siblings'] = 'required';
+
+        if (request('siblings') == 'yes') {
+            $rules['siblings_count'] = 'required|numeric';
+
+            for ($i = 0; $i < request('sibling_row_count'); $i++) {
+                $rules['sibling_relation'.$i] = 'required';
+                $rules['sibling_name'.$i] = 'required|check_sibling_name';
+                $rules['sibling_date_of_birth'.$i] = 'required|check_sibling_date_of_birth';
+                $rules['sibling_standard'.$i] = 'nullable';
             }
         }
 
@@ -150,10 +175,24 @@ class ParentAddRequest extends FormRequest
             'annual_income.numeric' => 'Annual Income Should Be Numeric',
             'annual_income.check_annual_income' => 'Annual Income Should Be Greater Than 3 Digits And Lesser Than 9 Digits',
             'annual_income.check_annual_income_value' => 'Enter Valid Annual Income',
+
+            'siblings.required' => 'Siblings Is Required',
+            'siblings_count.required' => 'Siblings Count Is Required',
+            'siblings_count.numeric' => 'Siblings Count Should Be Numeric',
         ];
 
         for ($i = 0; $i < request('count'); $i++) {
             $messages['qualification_id'.$i.'.required'] = 'Qualification Is Required';
+        }
+
+        for ($i = 0; $i < request('sibling_row_count'); $i++) {
+            $messages['sibling_relation'.$i.'.required'] = 'Sibling Relation Is Required';
+
+            $messages['sibling_name'.$i.'.required'] = 'Sibling Name Is Required';
+            $messages['sibling_name'.$i.'.check_sibling_name'] = 'Enter Valid Sibling Name';
+
+            $messages['sibling_date_of_birth'.$i.'.required'] = 'Sibling Date Of Birth Is Required';
+            $messages['sibling_date_of_birth'.$i.'.check_sibling_date_of_birth'] = 'Enter Valid Sibling Date Of Birth';
         }
 
         return $messages;

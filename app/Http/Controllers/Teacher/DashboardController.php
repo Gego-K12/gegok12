@@ -34,7 +34,14 @@ class DashboardController extends Controller
 
         $dashboard = $this->teacherDashboard($school_id, $teacher_id);
 
-        return view('/teacher/dashboard/dashboard', ['dashboard' => $dashboard]);
+       $qrCode= json_encode([
+            'domain_name' => request()->getHost(),
+        ]);
+
+        return view('/teacher/dashboard/dashboard', [
+            'dashboard' => $dashboard,
+            'qrCode' => $qrCode
+        ]);
     }
 
     /**

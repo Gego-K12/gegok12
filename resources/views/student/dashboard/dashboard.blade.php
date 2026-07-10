@@ -282,8 +282,76 @@
             <div class="w-full lg:w-1/3 md:w-full">
                 <dashboard-task url="{{ url('/') }}" mode="student"></dashboard-task>
             </div>
+            <div class="w-full lg:w-1/2 px-1 my-3 lg:my-0 md:my-2">
+    <div class="bg-white custom-shadow border rounded-lg overflow-hidden h-full">
+
+        <div class="bg-gradient-to-r from-indigo-500 to-purple-600 px-5 py-3 flex justify-between items-center">
+            <h2 class="text-white font-semibold text-lg flex items-center gap-2">
+                <svg class="w-5 h-5 fill-current text-white" viewBox="0 0 24 24"><path d="M3 3h8v8H3V3zm2 2v4h4V5H5zm8-2h8v8h-8V3zm2 2v4h4V5h-4zM3 13h8v8H3v-8zm2 2v4h4v-4H5zm10-2h2v2h-2v-2zm4 0h2v2h-2v-2zm-4 4h2v2h-2v-2zm4 0h2v2h-2v-2zm-4 4h2v2h-2v-2zm4 0h2v2h-2v-2z"/></svg>
+                School QR Code
+            </h2>
+
+            <span class="bg-white/20 text-white px-3 py-1 rounded-full text-xs font-medium">
+                Mobile App
+            </span>
+        </div>
+
+        <div class="p-5 flex flex-col lg:flex-row md:flex-row items-stretch gap-5">
+
+            <!-- left: QR code -->
+            <div class="w-full lg:w-1/2 md:w-1/2 flex flex-col items-center justify-center text-center border-b lg:border-b-0 md:border-b-0 lg:border-r md:border-r border-dashed border-gray-200 pb-5 lg:pb-0 md:pb-0 lg:pr-5 md:pr-5">
+                <div class="p-3 bg-white border-2 border-dashed border-indigo-200 rounded-xl">
+                    {!! QrCode::size(150)->generate($qrCode) !!}
+                </div>
+
+                <h3 class="font-bold text-gray-800 mt-4">
+                    {{ $school->school_name }}
+                </h3>
+
+                <p class="text-xs text-gray-400 mt-1 flex items-center justify-center gap-1">
+                    <svg class="w-3.5 h-3.5 fill-current text-gray-400" viewBox="0 0 24 24"><path d="M7 2C5.9 2 5 2.9 5 4v16c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2H7zm5 18c-.83 0-1.5-.67-1.5-1.5S11.17 17 12 17s1.5.67 1.5 1.5S12.83 20 12 20zM17 16H7V5h10v11z"/></svg>
+                    Scan with the GegoK12 Mobile App
+                </p>
+            </div>
+
+            <!-- right: instructions -->
+            <div class="w-full lg:w-1/2 md:w-1/2 flex flex-col justify-center">
+                <p class="text-sm font-semibold text-gray-700 mb-3">How to scan</p>
+
+                <div class="relative pl-9">
+                    <span class="absolute left-3.5 top-1 bottom-1 border-l-2 border-dashed border-indigo-100"></span>
+
+                    <div class="relative flex items-start gap-3 pb-4">
+                        <span class="absolute text-black text-md font-bold" style="left:-35px">1)</span>
+                        <p class="text-sm text-gray-600">Open the mobile app on your phone</p>
+                    </div>
+
+                    <div class="relative flex items-start gap-3 pb-4">
+                        <span class="absolute text-black text-md font-bold" style="left:-35px">2)</span>
+                        <p class="text-sm text-gray-600">Tap the <span class="font-semibold text-gray-800">QR Scanner</span> icon on the home screen</p>
+                    </div>
+
+                    <div class="relative flex items-start gap-3 pb-4">
+                        <span class="absolute text-black text-md font-bold" style="left:-35px">3)</span>
+                        <p class="text-sm text-gray-600">Point your camera at the QR code shown on the left</p>
+                    </div>
+
+                    <div class="relative flex items-start gap-3">
+                        <span class="absolute flex items-center justify-center w-5 h-5 rounded-full bg-green-500 text-white" style="left:-35px">
+                            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>
+                        </span>
+                        <p class="text-sm text-gray-600">You're all set! You'll be signed in to your school instantly</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
         </div>
         <!--end-->
+
     </div>
     <!--end-->
 

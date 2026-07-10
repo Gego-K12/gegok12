@@ -102,7 +102,17 @@
                     <a href="#" onclick="editevent()" id="edit" title="Edit" class="text-white text-xs flex items-center blue-bg rounded px-2 py-1 ml-2 font-medium"><!-- <img src="{{url('uploads/icons/profile-edit.svg')}}" class="w-3 h-3"> --><span class="mx-1">Edit</span></a>
                 @endif
 
-                <a href="{{url('/admin/events/delete/'.$event->id)}}" title="Delete" class=" text-white text-xs flex items-center blue-bg rounded px-2 py-1 ml-2 font-medium"><!-- <img src="{{url('uploads/icons/p-delete.svg')}}" class="w-3 h-3"> --><span class="mx-1">Delete</span></a>
+                <form action="{{ url('/admin/events/delete/'.$event->id) }}" method="POST"
+                  onsubmit="return confirm('Are you sure you want to delete this event?');"
+                  style="display:inline;">
+                @csrf
+                @method('DELETE')
+
+                <button type="submit"
+                    class="text-white text-xs flex items-center blue-bg rounded px-2 py-1 ml-2 font-medium">
+                    Delete
+                </button>
+            </form>
             </div>
 
             <div class="bg-white shadow my-5">

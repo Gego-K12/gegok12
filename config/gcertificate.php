@@ -1,0 +1,4 @@
+<?php
+return [
+        'enabled' => 'true',
+];

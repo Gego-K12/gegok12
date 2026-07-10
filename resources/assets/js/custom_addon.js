@@ -1,6 +1,7 @@
 import { registerAlumni } from './galumni'
 import { registerCertificate } from './gcertificate'
 import { registerChat } from './gchat'
+import { registerQuiz } from './gquiz'
 import { registerWorkpermission } from './gworkpermission'
 import { registerShortTermCourses } from './gshort-term-courses'
 import { registerFees } from './gfees'
@@ -14,6 +15,8 @@ export default function registerCustomAddon(app) {
     registerCertificate(app)
 
     registerChat(app)
+
+    registerQuiz(app)
 
     registerShortTermCourses(app)
 

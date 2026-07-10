@@ -18,6 +18,7 @@
         "gegok12/certificate": "1.0.0",
         "gegok12/chat": "1.0.0",
         "gegok12/fee": "v1.0.x-dev",
+        "gegok12/quiz": "1.0.0",
         "gegok12/short-term-courses": "1.0.0",
         "gegok12/work-permission": "1.0.0",
         "guzzlehttp/guzzle": "^7.8",
@@ -152,6 +153,10 @@
         {
             "type": "vcs",
             "url": "https://github.com/gego-k12/fee.git"
+        },
+        {
+            "type": "path",
+            "url": "custompackages/gegok12/quiz"
         },
         {
             "type": "path",

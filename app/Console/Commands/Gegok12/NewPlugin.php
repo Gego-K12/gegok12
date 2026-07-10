@@ -37,6 +37,12 @@ class NewPlugin extends Command
         $name = $this->ask('Display name', Str::title(str_replace(['-', '_'], ' ', $slug)));
         $vendor = $this->ask('Vendor', 'gegok12');
         $version = $this->ask('Version', '1.0.0');
+        $description = (string) $this->ask('Short description (one line, shown if this plugin is ever listed in a catalog)', '');
+        $authorName = (string) $this->ask('Author name', 'GegoSoft Technologies');
+        $authorEmail = $this->askAuthorEmail();
+        $license = (string) $this->ask('License (SPDX identifier)', 'MIT');
+        $thumbnail = (string) $this->ask('Thumbnail image path, relative to the plugin (optional, e.g. resources/assets/thumbnail.png)', '');
+        $coverImage = (string) $this->ask('Cover image path, relative to the plugin (optional)', '');
 
         $portals = $this->choice('Which portals should this plugin target? (comma-separate for more than one)', self::VALID_PORTALS, 0, null, true);
 
@@ -45,14 +51,17 @@ class NewPlugin extends Command
         $hasToolsMenu = in_array('admin', $portals, true)
             ? $this->confirm('Add an entry to the Admin Tools submenu (has_tools_menu)?')
             : false;
-        $hasProfileTab = $this->confirm('Add a tab to the Admin teacher/staff profile page (has_profile_tab)?');
+        $hasProfileTab = $this->confirm('Add a row to the Admin teacher/staff/student/class/event "Additional Info" panel (has_profile_tab)?');
 
         $profileTabLabel = null;
         $profileTabScope = null;
         if ($hasProfileTab) {
-            $profileTabLabel = $this->ask('Profile tab label', $name);
-            $profileTabScope = $this->choice('Show the profile tab on', ['both', 'teacher', 'staff'], 0);
+            $profileTabLabel = $this->ask('Row label', $name);
+            $profileTabScope = $this->choice('Show on', ['both', 'teacher', 'staff', 'student', 'class', 'event'], 0);
         }
+
+        $hasBeforeContent = $this->confirm('Add a before-content hook (renders before every page in this plugin\'s portals)?');
+        $hasAfterContent = $this->confirm('Add an after-content hook (renders after every page in this plugin\'s portals)?');
 
         $requestedBy = $this->askRequestedBy();
 
@@ -63,6 +72,12 @@ class NewPlugin extends Command
             'vendorStudly' => Str::studly($vendor),
             'name' => $name,
             'version' => $version,
+            'description' => $description,
+            'author_name' => $authorName,
+            'author_email' => $authorEmail,
+            'license' => $license,
+            'thumbnail' => $thumbnail,
+            'cover_image' => $coverImage,
             'portals' => $portals,
             'has_menu' => $hasMenu,
             'has_dashboard_widget' => $hasDashboardWidget,
@@ -70,6 +85,8 @@ class NewPlugin extends Command
             'has_profile_tab' => $hasProfileTab,
             'profile_tab_label' => $profileTabLabel,
             'profile_tab_scope' => $profileTabScope,
+            'has_before_content' => $hasBeforeContent,
+            'has_after_content' => $hasAfterContent,
         ];
 
         $destination = base_path("custompackages/{$vendor}/{$slug}");
@@ -92,6 +109,8 @@ class NewPlugin extends Command
             'has_profile_tab' => $hasProfileTab,
             'profile_tab_label' => $profileTabLabel,
             'profile_tab_scope' => $profileTabScope,
+            'has_before_content' => $hasBeforeContent,
+            'has_after_content' => $hasAfterContent,
             'status' => 'staged',
             'requested_by' => $requestedBy,
         ]);
@@ -111,7 +130,7 @@ class NewPlugin extends Command
                 }
             }
             $this->comment("Edit the plugin at: {$destination}");
-            $this->comment('Moving it to ~/Code/gegok12-plugins for real distribution is still a TODO — see _todo/pluginTodo.md.');
+            $this->comment("Ready to distribute it? Run: php artisan gegok12:extractPlugin {$slug}");
         } else {
             $this->error("Install did not complete (status: {$plugin->status}). See the log above.");
         }
@@ -144,6 +163,19 @@ class NewPlugin extends Command
         }
     }
 
+    private function askAuthorEmail(): string
+    {
+        while (true) {
+            $email = (string) $this->ask('Author support email (optional)', '');
+
+            if ($email === '' || filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                return $email;
+            }
+
+            $this->error('Not a valid email address — leave blank to skip.');
+        }
+    }
+
     private function askRequestedBy(): int
     {
         $siteAdmin = User::where('usergroup_id', User::SITEADMIN_USERGROUP_ID)->first();
@@ -171,6 +203,14 @@ class NewPlugin extends Command
 
             if ($d['has_dashboard_widget']) {
                 $this->put("{$destination}/resources/views/plugins/{$d['slug']}/{$portal}/dashboard-widget.blade.php", $this->dashboardWidgetHookView($d));
+            }
+
+            if ($d['has_before_content']) {
+                $this->put("{$destination}/resources/views/plugins/{$d['slug']}/{$portal}/before-content.blade.php", $this->beforeAfterContentHookView($d, $portal, 'before'));
+            }
+
+            if ($d['has_after_content']) {
+                $this->put("{$destination}/resources/views/plugins/{$d['slug']}/{$portal}/after-content.blade.php", $this->beforeAfterContentHookView($d, $portal, 'after'));
             }
         }
 
@@ -242,6 +282,19 @@ class NewPlugin extends Command
             $extra .= ",\n    \"profile_tab_label\": \"{$d['profile_tab_label']}\"";
             $extra .= ",\n    \"profile_tab_scope\": \"{$d['profile_tab_scope']}\"";
         }
+        if ($d['has_before_content']) {
+            $extra .= ",\n    \"has_before_content\": true";
+        }
+        if ($d['has_after_content']) {
+            $extra .= ",\n    \"has_after_content\": true";
+        }
+
+        $description = $this->jsonString($d['description']);
+        $authorName = $this->jsonString($d['author_name']);
+        $authorEmail = $this->jsonString($d['author_email']);
+        $license = $this->jsonString($d['license']);
+        $thumbnail = $this->jsonString($d['thumbnail']);
+        $coverImage = $this->jsonString($d['cover_image']);
 
         return <<<JSON
         {
@@ -249,6 +302,12 @@ class NewPlugin extends Command
             "name": "{$d['name']}",
             "version": "{$d['version']}",
             "vendor": "{$d['vendor']}",
+            "description": {$description},
+            "author_name": {$authorName},
+            "author_email": {$authorEmail},
+            "license": {$license},
+            "thumbnail": {$thumbnail},
+            "cover_image": {$coverImage},
             "composer_package": "{$d['vendor']}/{$d['slug']}",
             "provider_class": "{$d['vendorStudly']}\\\\{$d['studly']}\\\\{$d['studly']}ServiceProvider",
             "portal": [{$portals}]{$extra}
@@ -257,10 +316,23 @@ class NewPlugin extends Command
         JSON;
     }
 
+    /**
+     * These fields are free text (description/author name/etc.) rather than
+     * the slug-like identifiers the rest of this template interpolates
+     * unescaped — json_encode() so a quote or backslash in one can't break
+     * the generated plugin.json.
+     */
+    private function jsonString(string $value): string
+    {
+        return json_encode($value);
+    }
+
     private function readme(array $d): string
     {
         return <<<MD
         # {$d['name']}
+
+        {$d['description']}
 
         Scaffolded by `php artisan gegok12:newPlugin`. Lives at
         `custompackages/{$d['vendor']}/{$d['slug']}` for local development,
@@ -268,16 +340,26 @@ class NewPlugin extends Command
 
         Portals: {$this->list($d['portals'])}.
 
+        Author: {$d['author_name']}{$this->authorEmailSuffix($d['author_email'])} · License: {$d['license']}
+
         To distribute this plugin for real (git or zip install elsewhere),
-        it needs to move out of the host app's custompackages/ into its own
-        repository — see `_todo/pluginTodo.md` for the current thinking on
-        that (a Plugin Registry/Marketplace, not built yet).
+        extract it into its own standalone git repository:
+
+            php artisan gegok12:extractPlugin {$d['slug']}
+
+        See `php artisan gegok12:extractPlugin --help` for pushing it
+        straight to a remote (e.g. under the Gego-K12 GitHub org).
         MD;
     }
 
     private function list(array $items): string
     {
         return implode(', ', $items);
+    }
+
+    private function authorEmailSuffix(string $email): string
+    {
+        return $email === '' ? '' : " ({$email})";
     }
 
     private function serviceProvider(array $d): string
@@ -448,7 +530,31 @@ class NewPlugin extends Command
     private function profileTabHookView(array $d): string
     {
         return <<<BLADE
-        <p class="text-sm text-gray-600 px-3 py-3">Hello from the {$d['name']} plugin! (entityId: {{ \$entityId }})</p>
+        <p class="text-sm text-gray-600">Hello from the {$d['name']} plugin! (entityId: {{ \$entityId }})</p>
+        BLADE;
+    }
+
+    /**
+     * This view runs on EVERY page of this plugin's portals, not just one —
+     * unlike menu/dashboard-widget/profile-tab, there's no separate "which
+     * page" field. Scope it to a specific page from inside the view itself
+     * via request()->is(), checked FIRST, before any real work, since this
+     * file executes on every page load in the portal regardless of whether
+     * the condition matches.
+     */
+    private function beforeAfterContentHookView(array $d, string $portal, string $position): string
+    {
+        $examplePath = $portal === 'web' ? "{$d['slug']}*" : "{$portal}/{$d['slug']}*";
+
+        return <<<BLADE
+        @if(request()->is('{$examplePath}'))
+            {{-- Defaults to this plugin's own page — narrow it to any page you want,
+                 e.g. request()->is('admin/teacher/show/*'), or remove the @if entirely
+                 to render on every page in this portal. --}}
+            <div class="bg-white shadow px-4 py-3 my-4">
+                <p class="text-sm text-gray-600">{$d['name']} — {$position}-content hook.</p>
+            </div>
+        @endif
         BLADE;
     }
 

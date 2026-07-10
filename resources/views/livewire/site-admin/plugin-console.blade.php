@@ -96,14 +96,25 @@
                         <input type="checkbox" wire:model="has_tools_menu" @disabled($manifestDetected) class="mr-2"> Has Admin Tools menu entry
                     </label>
                     <label class="flex items-center text-sm">
-                        <input type="checkbox" wire:model.live="has_profile_tab" @disabled($manifestDetected) class="mr-2"> Has teacher/staff profile tab
+                        <input type="checkbox" wire:model.live="has_profile_tab" @disabled($manifestDetected) class="mr-2"> Has Additional Info row (teacher/staff/student)
+                    </label>
+                    <label class="flex items-center text-sm">
+                        <input type="checkbox" wire:model="has_before_content" @disabled($manifestDetected) class="mr-2"> Has before-content hook
+                    </label>
+                    <label class="flex items-center text-sm">
+                        <input type="checkbox" wire:model="has_after_content" @disabled($manifestDetected) class="mr-2"> Has after-content hook
                     </label>
                 </div>
+                @if($has_before_content || $has_after_content)
+                    <p class="text-xs text-gray-500 mt-2 mb-2">
+                        Publishes resources/views/plugins/{slug}/{portal}/before-content.blade.php and/or after-content.blade.php — included on every page of each of this plugin's portals, wrapping the page's own content. There's no separate "which page" setting: scope it to a specific page from inside the view itself, e.g. <code>@@if(request()-&gt;is('admin/teacher/show/*'))</code> — check the condition first, before any real work, since the view runs on every page load in the portal.
+                    </p>
+                @endif
                 @if($has_profile_tab)
-                    <p class="text-xs text-gray-500 mt-2 mb-2">Publishes resources/views/plugins/{slug}/profile-tab.blade.php — shown as a tab on the Admin teacher/staff profile page for whichever record is being viewed.</p>
+                    <p class="text-xs text-gray-500 mt-2 mb-2">Publishes resources/views/plugins/{slug}/profile-tab.blade.php — shown as a row in the "Additional Info" panel on the Admin teacher/staff/student/class/event detail page for whichever record is being viewed.</p>
                     <div class="flex gap-4 items-start">
                         <div class="w-full lg:w-1/3">
-                            <label class="tw-form-label">Tab label</label>
+                            <label class="tw-form-label">Row label</label>
                             <input type="text" wire:model="profile_tab_label" @disabled($manifestDetected) class="tw-form-control w-full @if($manifestDetected) bg-gray-50 @endif" placeholder="e.g. Work Permissions">
                             @error('profile_tab_label') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
@@ -113,6 +124,9 @@
                                 <option value="both">Teacher &amp; Staff</option>
                                 <option value="teacher">Teacher only</option>
                                 <option value="staff">Staff only</option>
+                                <option value="student">Student only</option>
+                                <option value="class">Class only</option>
+                                <option value="event">Event only</option>
                             </select>
                         </div>
                     </div>
@@ -147,10 +161,14 @@
                         <td class="py-2 px-2">{{ $plugin->name }}</td>
                         <td class="py-2 px-2">{{ ucfirst($plugin->source_type) }}</td>
                         <td class="py-2 px-2 text-xs text-gray-600">
-                            @if($plugin->has_menu) Menu @endif
-                            @if($plugin->has_menu && $plugin->has_dashboard_widget) &middot; @endif
-                            @if($plugin->has_dashboard_widget) Dashboard @endif
-                            @if(! $plugin->has_menu && ! $plugin->has_dashboard_widget) -- @endif
+                            {{ implode(' · ', array_filter([
+                                $plugin->has_menu ? 'Menu' : null,
+                                $plugin->has_dashboard_widget ? 'Dashboard' : null,
+                                $plugin->has_tools_menu ? 'Tools' : null,
+                                $plugin->has_profile_tab ? 'Additional Info' : null,
+                                $plugin->has_before_content ? 'Before Content' : null,
+                                $plugin->has_after_content ? 'After Content' : null,
+                            ])) ?: '--' }}
                         </td>
                         <td class="py-2 px-2">
                             <span class="text-xs font-semibold rounded px-2 py-1

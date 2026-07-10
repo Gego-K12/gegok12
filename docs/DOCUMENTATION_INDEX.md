@@ -14,6 +14,13 @@
 -   [DOCUMENTATION_SETUP.md](DOCUMENTATION_SETUP.md) - Detailed setup instructions
 -   [phpdoc.xml](../phpdoc.xml) - PHPDocumentor configuration
 
+### 🔌 Plugin System
+
+-   [PLUGIN_ARCHITECTURE.md](PLUGIN_ARCHITECTURE.md) - Full architecture, hook
+    reference, and step-by-step guide for building a new plugin
+    (`app/Models/Plugin.php`, `app/Services/PluginInstaller.php`,
+    `gegok12:newPlugin`, `gegok12:extractPlugin`)
+
 ### 🚀 Scripts
 
 -   `./view-docs.sh` - Open documentation in browser

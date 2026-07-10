@@ -109,6 +109,8 @@
                 <event-tab url="{{ url('/') }}" id="{{ $event->id }}" event_id="{{ $event->event_id }}" entity_id="{{ $event->id }}" entity_name="event" school_id="{{ $event->school_id }}"></event-tab>
                 <div id="events"></div>
             </div>
+
+            @livewire('admin.profile-extra-tabs', ['entityId' => $event->id, 'scope' => 'event'])
         @endif
     </div>
     <edit-event url="{{ url('/') }}"></edit-event>

@@ -32,6 +32,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property bool $has_profile_tab
  * @property string $profile_tab_label
  * @property string $profile_tab_scope
+ * @property bool $has_before_content
+ * @property bool $has_after_content
  * @property string $status
  * @property string $log
  * @property int $requested_by
@@ -47,6 +49,7 @@ class Plugin extends Model
         'slug', 'name', 'version', 'source_type', 'source_ref', 'composer_package',
         'provider_class', 'seeder_class', 'portal', 'has_menu', 'has_dashboard_widget',
         'has_tools_menu', 'has_profile_tab', 'profile_tab_label', 'profile_tab_scope',
+        'has_before_content', 'has_after_content',
         'status', 'log', 'requested_by', 'installed_at',
     ];
 
@@ -56,6 +59,8 @@ class Plugin extends Model
         'has_dashboard_widget' => 'boolean',
         'has_tools_menu' => 'boolean',
         'has_profile_tab' => 'boolean',
+        'has_before_content' => 'boolean',
+        'has_after_content' => 'boolean',
     ];
 
     /**
@@ -117,18 +122,50 @@ class Plugin extends Model
     }
 
     /**
-     * Plugins that should render a tab on the Admin teacher/staff profile
-     * page for the given scope — published to
-     * resources/views/plugins/{slug}/profile-tab.blade.php. A plugin
-     * declares profile_tab_scope as 'teacher', 'staff', or 'both'.
+     * Plugins that should render a row in the "Additional Info" panel on
+     * the Admin teacher/staff/student/class/event detail page for the
+     * given scope — published to resources/views/plugins/{slug}/profile-tab.blade.php.
+     * A plugin declares profile_tab_scope as 'teacher', 'staff', 'student',
+     * 'class', 'event', or 'both' ('both' means teacher + staff, same as
+     * it always has — there's no single value meaning "every scope").
      */
     public function scopeWithProfileTabFor($query, string $scope)
     {
         return $query->where('status', 'installed')
             ->where('has_profile_tab', true)
             ->where(function ($q) use ($scope) {
-                $q->where('profile_tab_scope', $scope)->orWhere('profile_tab_scope', 'both');
+                $q->where('profile_tab_scope', $scope);
+
+                // 'both' only ever meant teacher+staff — must NOT also match
+                // a 'student' (or any future) scope query, or it silently
+                // starts showing teacher/staff plugins on the student page.
+                if (in_array($scope, ['teacher', 'staff'], true)) {
+                    $q->orWhere('profile_tab_scope', 'both');
+                }
             });
+    }
+
+    /**
+     * Plugins that should render before/after the main content of every
+     * page in the given portal — published to
+     * resources/views/plugins/{slug}/{portal}/before-content.blade.php (or
+     * after-content.blade.php). Unlike menu/dashboard-widget there's no
+     * separate "which page" scoping field: a plugin narrows itself to a
+     * specific page from inside its own view, e.g.
+     * `@if(request()->is('admin/teacher/show/*'))`, the same as any other
+     * Blade view would.
+     */
+    public function scopeWithBeforeContentFor($query, string $portal)
+    {
+        return $this->filterByPortal($query, $portal)->where('status', 'installed')->where('has_before_content', true);
+    }
+
+    /**
+     * Same as scopeWithBeforeContentFor, for the {portal}/after-content.blade.php hook.
+     */
+    public function scopeWithAfterContentFor($query, string $portal)
+    {
+        return $this->filterByPortal($query, $portal)->where('status', 'installed')->where('has_after_content', true);
     }
 
     /**
@@ -166,6 +203,24 @@ class Plugin extends Model
     public function profileTabViewName(): string
     {
         return "plugins.{$this->slug}.profile-tab";
+    }
+
+    /**
+     * View name for this plugin's before-content hook in the given portal —
+     * portal-namespaced like menuViewName(), since a plugin targeting
+     * several portals may want different content in each.
+     */
+    public function beforeContentViewName(string $portal): string
+    {
+        return "plugins.{$this->slug}.{$portal}.before-content";
+    }
+
+    /**
+     * Same as beforeContentViewName, for the after-content hook.
+     */
+    public function afterContentViewName(string $portal): string
+    {
+        return "plugins.{$this->slug}.{$portal}.after-content";
     }
 
     public function requestedByUser(): BelongsTo

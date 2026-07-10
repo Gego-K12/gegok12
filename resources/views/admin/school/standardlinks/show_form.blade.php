@@ -111,6 +111,8 @@
     <div id="notes"></div>
   </div>
 
+  @livewire('admin.profile-extra-tabs', ['entityId' => $standardLink->id, 'scope' => 'class'])
+
   <div id="groupModal" class="hidden fixed inset-0 bg-black bg-opacity-50 items-center justify-center">
     
     <div class="bg-white p-6 rounded-lg w-full max-w-lg shadow-lg">

@@ -467,6 +467,14 @@ class PluginInstaller
             if ($plugin->has_dashboard_widget && ! view()->exists($plugin->dashboardWidgetViewName($portal))) {
                 $plugin->appendLog("WARNING: has_dashboard_widget is true but resources/views/plugins/{$plugin->slug}/{$portal}/dashboard-widget.blade.php was not published.");
             }
+
+            if ($plugin->has_before_content && ! view()->exists($plugin->beforeContentViewName($portal))) {
+                $plugin->appendLog("WARNING: has_before_content is true but resources/views/plugins/{$plugin->slug}/{$portal}/before-content.blade.php was not published.");
+            }
+
+            if ($plugin->has_after_content && ! view()->exists($plugin->afterContentViewName($portal))) {
+                $plugin->appendLog("WARNING: has_after_content is true but resources/views/plugins/{$plugin->slug}/{$portal}/after-content.blade.php was not published.");
+            }
         }
 
         if ($plugin->has_tools_menu && ! view()->exists($plugin->toolsMenuViewName())) {

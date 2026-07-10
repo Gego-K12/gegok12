@@ -54,6 +54,10 @@ class PluginConsole extends Component
 
     public $profile_tab_scope = 'both';
 
+    public $has_before_content = false;
+
+    public $has_after_content = false;
+
     public $git_url = '';
 
     public $zip;
@@ -99,6 +103,8 @@ class PluginConsole extends Component
         $this->has_profile_tab = (bool) ($manifest['has_profile_tab'] ?? false);
         $this->profile_tab_label = $manifest['profile_tab_label'] ?? $this->profile_tab_label;
         $this->profile_tab_scope = $manifest['profile_tab_scope'] ?? $this->profile_tab_scope;
+        $this->has_before_content = (bool) ($manifest['has_before_content'] ?? false);
+        $this->has_after_content = (bool) ($manifest['has_after_content'] ?? false);
         $this->manifestDetected = true;
     }
 
@@ -125,7 +131,9 @@ class PluginConsole extends Component
             'has_tools_menu' => 'boolean',
             'has_profile_tab' => 'boolean',
             'profile_tab_label' => 'nullable|string|max:100|required_if:has_profile_tab,true',
-            'profile_tab_scope' => 'nullable|in:teacher,staff,both',
+            'profile_tab_scope' => 'nullable|in:teacher,staff,student,class,event,both',
+            'has_before_content' => 'boolean',
+            'has_after_content' => 'boolean',
         ];
 
         if ($this->source_type === 'git') {
@@ -161,11 +169,13 @@ class PluginConsole extends Component
             'has_profile_tab' => $this->has_profile_tab,
             'profile_tab_label' => $this->profile_tab_label ?: null,
             'profile_tab_scope' => $this->profile_tab_scope,
+            'has_before_content' => $this->has_before_content,
+            'has_after_content' => $this->has_after_content,
             'status' => 'staged',
             'requested_by' => Auth::id(),
         ]);
 
-        $this->reset(['slug', 'name', 'version', 'composer_package', 'provider_class', 'seeder_class', 'git_url', 'zip', 'manifestDetected', 'manifestUnreadable', 'has_menu', 'has_dashboard_widget', 'has_tools_menu', 'has_profile_tab', 'profile_tab_label']);
+        $this->reset(['slug', 'name', 'version', 'composer_package', 'provider_class', 'seeder_class', 'git_url', 'zip', 'manifestDetected', 'manifestUnreadable', 'has_menu', 'has_dashboard_widget', 'has_tools_menu', 'has_profile_tab', 'profile_tab_label', 'has_before_content', 'has_after_content']);
         $this->portals = ['admin'];
         $this->profile_tab_scope = 'both';
         $this->source_type = 'git';

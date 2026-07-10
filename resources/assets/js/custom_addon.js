@@ -1,3 +1,4 @@
+import { registerAlumni } from './galumni'
 import { registerWorkpermission } from './gworkpermission'
 import { registerShortTermCourses } from './gshort-term-courses'
 import { registerFees } from './gfees'
@@ -5,6 +6,8 @@ import { registerFees } from './gfees'
 // later you can import:
 
 export default function registerCustomAddon(app) {
+
+    registerAlumni(app)
 
     registerShortTermCourses(app)
 

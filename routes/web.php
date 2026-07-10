@@ -68,3 +68,7 @@ Route::post('/{slug}/admission-form/validationPersonalDetail', 'AdmissionControl
 if (file_exists(base_path('routes/gfee.php'))) {
     require base_path('routes/gfee.php');
 }
+
+if (file_exists(base_path('routes/galumni-web.php'))) {
+    require base_path('routes/galumni-web.php');
+}

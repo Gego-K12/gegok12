@@ -834,3 +834,7 @@ if (file_exists(base_path('routes/gworkpermission-admin.php'))) {
 if (file_exists(base_path('routes/gshort-term-courses-admin.php'))) {
     require base_path('routes/gshort-term-courses-admin.php');
 }
+
+if (file_exists(base_path('routes/galumni-admin.php'))) {
+    require base_path('routes/galumni-admin.php');
+}

@@ -14,6 +14,7 @@
         "aws/aws-sdk-php-laravel": "^3.11",
         "barryvdh/laravel-dompdf": "v3.1.1",
         "filament/tables": "^3.2",
+        "gegok12/alumni": "1.0.0",
         "gegok12/fee": "v1.0.x-dev",
         "gegok12/short-term-courses": "1.0.0",
         "gegok12/work-permission": "1.0.0",
@@ -134,6 +135,10 @@
     "minimum-stability": "stable",
     "prefer-stable": true,
     "repositories": [
+        {
+            "type": "path",
+            "url": "custompackages/gegok12/alumni"
+        },
         {
             "type": "vcs",
             "url": "https://github.com/gego-k12/fee.git"

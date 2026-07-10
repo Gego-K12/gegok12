@@ -1,22 +1,22 @@
   
-  <div>
+  <div class="p-6">
 
-    <div class="flex items-center py-3">
-        <div class="bg-gray-200 p-1 rounded-full">
-            <a href="{{ url('admin/setting/countries') }}">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-        </svg></a>
+    <div class="bg-white shadow-lg rounded-xl border overflow-hidden">
+        <div class="flex items-center px-6 py-4 border-b bg-gray-50">
+            <div class="bg-gray-200 p-1 rounded-full">
+                <a href="{{ url('admin/setting/countries') }}">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+            </svg></a>
+            </div>
+
+            <div class="text-xl ml-3 font-bold">
+                 Update Country
+            </div>
         </div>
 
-        <div class="text-xl ml-3 font-bold">
-             Update Country
-        </div>
-    </div>
+    <div class="p-6">
 
-
-    <div class="bg-white shadow px-4 py-3">
-   
  <form wire:submit.prevent="submitCountry" method="POST" class="">
         @csrf 
 
@@ -123,8 +123,9 @@
     </div>
       <a href="#" class="btn btn-reset reset-btn">Reset</a>
     </div>
-    
+
   </div>
 </form>
+</div>
 </div>
 </div>

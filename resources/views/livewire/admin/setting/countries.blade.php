@@ -6,10 +6,10 @@
                 {{ session('message') }}
             </div>
         @endif
-      <section class="section">
-        <div class="w-full">
-            <div class="flex items-center justify-between">
-			    <h1 class="admin-h1 my-3">Countries</h1>
+      <section class="section p-6">
+        <div class="w-full bg-white shadow-lg rounded-xl border overflow-hidden">
+            <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
+			    <h1 class="admin-h1">Countries</h1>
 
 			    <a href="{{ url('admin/setting/country/create') }}"
 			       class="px-4 py-2 bg-green-600 text-white text-sm rounded
@@ -23,7 +23,7 @@
 			    </a>
 			</div>
 
-            <div class="p-4 bg-white shadow-lg">
+            <div class="p-6">
 
                 <div class="w-full">
                     @include('partials.message')

@@ -812,6 +812,7 @@
 
 
     <!-- question end -->
+    
     @php
       $class='';
       $array=array('chapters','chapter','pattern','test');
@@ -820,7 +821,8 @@
         $class='active';
       }
     @endphp
-    {{-- <li class="relative py-3 px-3 hover:bg-red-900 {{$class}}">
+    @if(config('gquiz.enabled', false))
+    <li class="relative py-3 px-3 hover:bg-red-900 {{$class}}">
       <a href="#" class="flex items-center">
         <svg class="w-5 h-5 fill-current text-white" id="Layer_1" enable-background="new 0 0 512 512" height="512" viewBox="0 0 512 512" width="512" xmlns="http://www.w3.org/2000/svg"><g id="XMLID_1153_"><g id="XMLID_452_"><path id="XMLID_957_" d="m469.885 359.996c23.343-.714 42.115-19.912 42.115-43.424v-253.084c0-23.963-19.495-43.458-43.458-43.458h-167.479c-5.522 0-10 4.477-10 10s4.478 10 10 10h167.479c12.935 0 23.458 10.523 23.458 23.458v253.084c0 12.487-9.808 22.723-22.124 23.417-2.993-24.73-24.097-43.959-49.622-43.959-25.539 0-46.652 19.25-49.627 44h-64.872c-2.975-24.75-24.089-44-49.627-44s-46.652 19.25-49.627 44h-64.872c-2.975-24.75-24.089-44-49.627-44-25.529 0-46.636 19.236-49.624 43.973-12.436-.568-22.378-10.859-22.378-23.431v-253.084c0-12.935 10.523-23.458 23.458-23.458h167.605c5.522 0 10-4.477 10-10s-4.478-10-10-10h-167.605c-23.963 0-43.458 19.495-43.458 43.458v253.084c0 23.598 18.909 42.849 42.369 43.43 1.437 12.009 7.141 22.72 15.557 30.572-33.909 13.57-57.926 46.759-57.926 85.456v6c0 5.523 4.478 10 10 10h492c5.522 0 10-4.477 10-10v-6c0-38.629-23.933-71.769-57.748-85.383 8.459-7.859 14.194-18.602 15.633-30.651zm-79.631-13.966c0-16.542 13.458-30 30-30s30 13.458 30 30v8c0 16.542-13.458 30-30 30s-30-13.458-30-30zm-100.091 44.581c8.43-7.849 14.147-18.564 15.591-30.581h64.872c1.438 11.961 7.11 22.633 15.477 30.472-20.849 8.292-37.973 23.996-48.104 43.841-10.086-19.76-27.108-35.412-47.836-43.732zm-64.036-44.581c0-16.542 13.458-30 30-30s30 13.458 30 30v8c0 16.542-13.458 30-30 30s-30-13.458-30-30zm-4.112 44.508c-20.808 8.301-37.899 23.988-48.015 43.805-10.101-19.789-27.158-35.458-47.926-43.769 8.409-7.846 14.111-18.547 15.553-30.545h64.873c1.44 11.981 7.127 22.667 15.515 30.509zm-160.015-36.508v-8c0-16.542 13.458-30 30-30s30 13.458 30 30v8c0 16.542-13.458 30-30 30s-30-13.458-30-30zm-41.891 118c2.083-37.847 33.532-68 71.891-68s69.808 30.153 71.891 68zm164 0c2.083-37.847 33.532-68 71.891-68s69.808 30.153 71.891 68zm307.782 0h-143.782c2.083-37.847 33.532-68 71.891-68s69.808 30.153 71.891 68z"/><path id="XMLID_1515_" d="m151.855 98.03c-5.522 0-10 4.477-10 10v16.127h-16.755c-5.522 0-10 4.477-10 10s4.478 10 10 10h16.756v16.756c0 5.523 4.478 10 10 10s10-4.477 10-10v-16.756h16.127c5.522 0 10-4.477 10-10s-4.478-10-10-10h-16.127v-16.127c-.001-5.523-4.478-10-10.001-10z"/><path id="XMLID_1623_" d="m81.1 191.609c5.522 0 10-4.477 10-10v-80c0-5.523-4.478-10-10-10h-17.1c-5.522 0-10 4.477-10 10s4.478 10 10 10h7.1v70c0 5.523 4.477 10 10 10z"/><path id="XMLID_1852_" d="m194.884 101.609c0 5.523 4.478 10 10 10h7.099v70c0 5.523 4.478 10 10 10s10-4.477 10-10v-80c0-5.523-4.478-10-10-10h-17.099c-5.523 0-10 4.477-10 10z"/><path id="XMLID_1853_" d="m288.333 184.03h159.667c5.522 0 10-4.477 10-10s-4.478-10-10-10h-159.667c-5.522 0-10 4.477-10 10s4.478 10 10 10z"/><path id="XMLID_1921_" d="m288.333 116.03h159.667c5.522 0 10-4.477 10-10s-4.478-10-10-10h-159.667c-5.522 0-10 4.477-10 10s4.478 10 10 10z"/><path id="XMLID_1922_" d="m64 252.03h384c5.522 0 10-4.477 10-10s-4.478-10-10-10h-384c-5.522 0-10 4.477-10 10s4.478 10 10 10z"/><path id="XMLID_1923_" d="m256.06 39.97c2.63 0 5.21-1.07 7.07-2.93 1.87-1.86 2.93-4.44 2.93-7.07 0-2.64-1.06-5.21-2.93-7.07-1.86-1.87-4.43-2.93-7.07-2.93-2.63 0-5.21 1.06-7.069 2.93-1.86 1.86-2.931 4.43-2.931 7.07 0 2.63 1.07 5.21 2.931 7.07 1.859 1.86 4.439 2.93 7.069 2.93z"/></g></g></svg>
         <span class="mx-3 whitespace-no-wrap">Question generator</span>
@@ -839,8 +841,9 @@
           </a>
         </li>
       </ul>
-    </li>--}}
+    </li>
   <!--end -->
+  @endif
 
     @php
         $class='';
@@ -934,38 +937,7 @@
         </li>
 
 
-            <li class="py-3 px-3 hover:font-semibold{{Request::segment ('3') == 'countries' ? 'active':''}} && {{Request::segment ('3') == 'country' ? 'active':''}}">
-                <a href="{{ url('/admin/setting/countries') }}" class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
-                         viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                              d="M12 3v18M3 12h18M5.6 5.6a9 9 0 0112.8 12.8 9 9 0 01-12.8-12.8z"/>
-                    </svg>
-                    <span class="mx-3 whitespace-no-wrap">Countries</span>
-                </a>
-            </li>
-
-            <li class="py-3 px-3 hover:font-semibold{{Request::segment ('3') == 'states' ? 'active':''}} && {{Request::segment ('3') == 'state' ? 'active':''}}">
-                <a href="{{ url('/admin/setting/states') }}" class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
-                         viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                              d="M9 20l-5.447-2.724A2 2 0 013 15.382V6.618a2 2 0 011.553-1.894L9 3m0 17l6-3m-6 3V3m6 14l5.447-2.724A2 2 0 0021 12.382V3.618a2 2 0 00-1.553-1.894L15 3m0 14V3"/>
-                    </svg>
-                    <span class="mx-3 whitespace-no-wrap">States</span>
-                </a>
-            </li>
-            <li class="py-3 px-3 hover:font-semibold {{Request::segment ('3') == 'cities' ? 'active':''}} && {{Request::segment ('3') == 'city' ? 'active':''}}">
-                <a href="{{ url('/admin/setting/cities') }}" class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
-                         viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                              d="M3 21h18M4 21V7l8-4 8 4v14M9 21v-6h6v6"/>
-                    </svg>
-                    <span class="mx-3 whitespace-no-wrap">Cities</span>
-                </a>
-            </li>
-            <li class="py-3 px-3 hover:font-semibold {{Request::segment ('3') == 'cities' ? 'active':''}} && {{Request::segment ('3') == 'city' ? 'active':''}}">
+            <li class="py-3 px-3 hover:font-semibold {{ in_array(Request::segment('3'), ['generalsettings', 'seodetailsettings', 'maintenancesettings', 'securitysettings', 'countries', 'country', 'states', 'state', 'cities', 'city']) ? 'active':''}}">
                 <a href="{{ url('/admin/settings/generalsettings') }}" class="flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                      stroke-width="1.5" stroke="currentColor" class="w-5 h-5">

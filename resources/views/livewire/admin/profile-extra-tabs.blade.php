@@ -1,3 +1,4 @@
+<div>
 @if($plugins->isNotEmpty())
     <div class="bg-white rounded-lg shadow border border-gray-100 mt-4">
         <ul class="list-reset flex text-xs profile-tab flex-wrap">
@@ -17,3 +18,4 @@
         </div>
     </div>
 @endif
+</div>

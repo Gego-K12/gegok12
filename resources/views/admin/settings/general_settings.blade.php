@@ -1,7 +1,3 @@
-@extends('layouts.app')
-
-@section('content')
-
 <div class="container mx-auto">
     <div class="max-w-5xl mx-auto my-6">
 
@@ -166,5 +162,3 @@
 </div>
 
 </div>
-
-@endsection

@@ -767,6 +767,10 @@ ul.course_tabs li.current p {
   font-size: 0.875rem;
 }
 
+.settings-sidebar li a {
+  display: block;
+}
+
 /*settings sidebar*/
 /*success message*/
 .alert-success {

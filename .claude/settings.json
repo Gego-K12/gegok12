@@ -52,7 +52,39 @@
       "Bash(node check_small_calendar.js)",
       "Bash(python3 -c ' *)",
       "Bash(node check_widen.js)",
-      "Bash(grep -viE \"^\\\\+\\\\s*$\")"
+      "Bash(grep -viE \"^\\\\+\\\\s*$\")",
+      "Bash(git checkout *)",
+      "Bash(grep -n 'Auth::user\\(\\)->school\\\\|$school' resources/views/layouts/partials/navigation.blade.php)",
+      "Bash(git status *)",
+      "Bash(zip -r /private/tmp/claude-502/-Users-karthick-Code-gegok12-opensource/d03f855c-4b63-4258-8d75-99360d63421d/scratchpad/hello-teachers.zip . -x .*)",
+      "Bash(unzip -l /private/tmp/claude-502/-Users-karthick-Code-gegok12-opensource/d03f855c-4b63-4258-8d75-99360d63421d/scratchpad/hello-teachers.zip)",
+      "Bash(git log *)",
+      "Bash(composer remove *)",
+      "Bash(php -l /Users/karthick/Code/gegok12-opensource/custompackages/gegok12/work-permission/resources/views/plugins/workpermission/menu.blade.php)",
+      "Bash(composer validate *)",
+      "Bash(git -C /Users/karthick/Code/gegok12-opensource mv custompackages/gegok12/work-permission/routes/web.php custompackages/gegok12/work-permission/routes/teacher.php)",
+      "Bash(jobs)",
+      "Bash(mv /Users/karthick/Code/gegok12-opensource/custompackages/gegok12/work-permission /Users/karthick/Code/gegok12-plugins/work-permission *)",
+      "Bash(grep -n 'map.*Routes\\\\|// $this->map')",
+      "Bash(php -l /Users/karthick/Code/gegok12-opensource/app/Http/Controllers/Admin/SendMessageController.php)",
+      "Bash(php -l app/Console/Commands/Gegok12/NewPlugin.php)",
+      "Bash(cd /Users/karthick/Code/gegok12-opensource *)",
+      "Bash(echo \"clean: $?\")",
+      "Bash(git push *)",
+      "Bash(git fetch *)",
+      "Bash(git show *)",
+      "Bash(cp /tmp/composer.head.json /Users/karthick/Code/gegok12-opensource/composer.json *)",
+      "Bash(git init *)",
+      "Bash(git reset *)",
+      "Bash(git restore *)",
+      "Bash(gh repo *)",
+      "Bash(curl -s https://api.github.com/repos/Gego-K12/gegok12)"
+    ],
+    "additionalDirectories": [
+      "/Users/karthick/Code/gegok12-plugins/hello-teachers",
+      "/Users/karthick/Code/gegok12-plugins",
+      "/tmp",
+      "/private/tmp"
     ]
   }
 }

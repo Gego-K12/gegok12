@@ -31,7 +31,7 @@ class NewPlugin extends Command
 
     private const PORTALS_WITH_LAYOUTS = ['admin', 'teacher', 'student'];
 
-    public function handle()
+    public function handle(PluginInstaller $installer)
     {
         $slug = $this->askSlug();
         $name = $this->ask('Display name', Str::title(str_replace(['-', '_'], ' ', $slug)));
@@ -98,7 +98,7 @@ class NewPlugin extends Command
 
         $this->info('Installing (composer require, publish, route wiring, npm build, migrate)... this can take a minute.');
 
-        (new PluginInstaller())->install($plugin);
+        $installer->install($plugin);
         $plugin->refresh();
 
         $this->line($plugin->clean_log);

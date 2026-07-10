@@ -17,9 +17,9 @@
          <script>
         window.User = {!! json_encode(optional(auth()->user())->only('id')) !!}
     </script>
-   
+
     <!-- <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script> -->
-    
+
     <!-- new -->
     <script>
        window.AppConfig = {
@@ -33,7 +33,7 @@
           gvideoroom_enabled: @json(config('gvideoroom.enabled')),
           galumni_enabled: @json(config('galumni.enabled')),
           gfee_enabled: @json(config('gfee.enabled'))
-          
+
        };
     </script>
     <!-- end -->
@@ -48,7 +48,7 @@
                 <div class="sidebar min-h-full">
                     @yield('base-sidebar')
                 </div>
-                <div class="bg-gray-200 grow w-full px-4" style="width: calc(100vw - 195px);">
+                <div class="bg-gray-200 grow w-full px-4 py-8" style="width: calc(100vw - 195px);">
                     @yield('base-content')
                 </div>
             </main>
@@ -67,7 +67,7 @@
         <livewire:scripts>
             <!-- <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script> -->
             <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-        <script src="{{ asset('vendor/livewire-alert/livewire-alert.js') }}"></script> 
+        <script src="{{ asset('vendor/livewire-alert/livewire-alert.js') }}"></script>
 
         <script>
    window.addEventListener('alert', event => {

@@ -444,3 +444,7 @@ if (file_exists(base_path('routes/gchat-teacher.php'))) {
 if (file_exists(base_path('routes/gquiz-teacher.php'))) {
     require base_path('routes/gquiz-teacher.php');
 }
+
+if (file_exists(base_path('routes/gvideoroom-teacher.php'))) {
+    require base_path('routes/gvideoroom-teacher.php');
+}

@@ -226,3 +226,7 @@ Route::get('/events/show/details/{id}','Api\EventsController@showdetails');
 if (file_exists(base_path('routes/gfeeapi.php'))) {
     require base_path('routes/gfeeapi.php');
 }
+
+if (file_exists(base_path('routes/gvideoroom-api.php'))) {
+    require base_path('routes/gvideoroom-api.php');
+}

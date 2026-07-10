@@ -850,3 +850,7 @@ if (file_exists(base_path('routes/gchat-admin.php'))) {
 if (file_exists(base_path('routes/gquiz-admin.php'))) {
     require base_path('routes/gquiz-admin.php');
 }
+
+if (file_exists(base_path('routes/gvideoroom-admin.php'))) {
+    require base_path('routes/gvideoroom-admin.php');
+}

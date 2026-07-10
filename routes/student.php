@@ -146,3 +146,7 @@ if (file_exists(base_path('routes/gchat-student.php'))) {
 if (file_exists(base_path('routes/gquiz-student.php'))) {
     require base_path('routes/gquiz-student.php');
 }
+
+if (file_exists(base_path('routes/gvideoroom-student.php'))) {
+    require base_path('routes/gvideoroom-student.php');
+}

@@ -19,6 +19,7 @@
         "gegok12/chat": "1.0.0",
         "gegok12/fee": "v1.0.x-dev",
         "gegok12/quiz": "1.0.0",
+        "gegok12/videoroom": "1.0.0",
         "gegok12/short-term-courses": "1.0.0",
         "gegok12/work-permission": "1.0.0",
         "guzzlehttp/guzzle": "^7.8",
@@ -157,6 +158,10 @@
         {
             "type": "path",
             "url": "custompackages/gegok12/quiz"
+        },
+        {
+            "type": "path",
+            "url": "custompackages/gegok12/videoroom"
         },
         {
             "type": "path",

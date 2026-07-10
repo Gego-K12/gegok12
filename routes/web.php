@@ -72,3 +72,7 @@ if (file_exists(base_path('routes/gfee.php'))) {
 if (file_exists(base_path('routes/galumni-web.php'))) {
     require base_path('routes/galumni-web.php');
 }
+
+if (file_exists(base_path('routes/gvideoroom-web.php'))) {
+    require base_path('routes/gvideoroom-web.php');
+}

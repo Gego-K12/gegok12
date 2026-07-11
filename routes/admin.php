@@ -854,3 +854,7 @@ if (file_exists(base_path('routes/gquiz-admin.php'))) {
 if (file_exists(base_path('routes/gvideoroom-admin.php'))) {
     require base_path('routes/gvideoroom-admin.php');
 }
+
+if (file_exists(base_path('routes/ginventory-admin.php'))) {
+    require base_path('routes/ginventory-admin.php');
+}

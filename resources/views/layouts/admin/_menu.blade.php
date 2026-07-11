@@ -75,30 +75,6 @@ $coreMenu = [
         ],
     ],
 
-    [
-        'label' => 'Inventory', 'icon' => 'fa-solid fa-warehouse', 'route' => '#',
-        'match' => ['category', 'vendor', 'location', 'product'], 'hoverClass' => '',
-        'visible' => ['config' => 'ginventory.enabled'],
-        'children' => [
-            ['label' => 'Categories', 'icon' => 'fa-solid fa-tags', 'route' => '/admin/category/show', 'match' => ['category', 'categoryvendor'], 'hoverClass' => ''],
-            ['label' => 'Vendors', 'icon' => 'fa-solid fa-truck-field', 'route' => '/admin/vendor/show', 'match' => ['vendor'], 'hoverClass' => ''],
-            ['label' => 'Locations', 'icon' => 'fa-solid fa-location-dot', 'route' => '/admin/location/show', 'match' => ['location'], 'hoverClass' => ''],
-            ['label' => 'Products', 'icon' => 'fa-solid fa-box', 'route' => '/admin/product/show', 'match' => ['product'], 'hoverClass' => ''],
-        ],
-    ],
-
-    [
-        'label' => 'Stocks', 'icon' => 'fa-solid fa-boxes-stacked', 'route' => '#',
-        'match' => ['products', 'purchase', 'sales', 'return', 'stockproduct'], 'hoverClass' => '',
-        'visible' => ['config' => 'ginventory.enabled'],
-        'children' => [
-            ['label' => 'Products', 'icon' => 'fa-solid fa-box', 'route' => '/admin/stockproduct/show', 'match' => ['product'], 'hoverClass' => 'hover:font-semibold'],
-            ['label' => 'Purchases', 'icon' => 'fa-solid fa-bag-shopping', 'route' => '/admin/purchase/show', 'match' => ['purchase'], 'hoverClass' => 'hover:font-semibold'],
-            ['label' => 'Sales', 'icon' => 'fa-solid fa-money-bill-wave', 'route' => '/admin/sales/show', 'match' => ['sales'], 'hoverClass' => 'hover:font-semibold'],
-            ['label' => 'Returns', 'icon' => 'fa-solid fa-rotate-left', 'route' => '/admin/returnorder/show', 'match' => ['returnorder'], 'hoverClass' => 'hover:font-semibold'],
-        ],
-    ],
-
     ['label' => 'Telephone Directory', 'icon' => 'fa-solid fa-address-book', 'route' => '/admin/phonenumbers', 'match' => ['phonenumbers'], 'hoverClass' => ''],
 
     [

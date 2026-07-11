@@ -3,6 +3,7 @@ import { registerCertificate } from './gcertificate'
 import { registerChat } from './gchat'
 import { registerQuiz } from './gquiz'
 import { registerVideoroom } from './gvideoroom'
+import { registerInventory } from './ginventory'
 import { registerWorkpermission } from './gworkpermission'
 import { registerShortTermCourses } from './gshort-term-courses'
 import { registerFees } from './gfees'
@@ -20,6 +21,8 @@ export default function registerCustomAddon(app) {
     registerQuiz(app)
 
     registerVideoroom(app)
+
+    registerInventory(app)
 
     registerShortTermCourses(app)
 

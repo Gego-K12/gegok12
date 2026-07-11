@@ -4,6 +4,7 @@ import { registerChat } from './gchat'
 import { registerQuiz } from './gquiz'
 import { registerVideoroom } from './gvideoroom'
 import { registerInventory } from './ginventory'
+import { registerTimetable } from './gtimetable'
 import { registerWorkpermission } from './gworkpermission'
 import { registerShortTermCourses } from './gshort-term-courses'
 import { registerFees } from './gfees'
@@ -23,6 +24,8 @@ export default function registerCustomAddon(app) {
     registerVideoroom(app)
 
     registerInventory(app)
+
+    registerTimetable(app)
 
     registerShortTermCourses(app)
 

@@ -65,10 +65,6 @@ Route::post('/{slug}/admission-form/validationAcademicDetail', 'AdmissionControl
 Route::post('/{slug}/admission-form/validationParentDetail', 'AdmissionController@validationParentDetail');
 Route::post('/{slug}/admission-form/validationPersonalDetail', 'AdmissionController@validationPersonalDetail');
 
-if (file_exists(base_path('routes/gfee.php'))) {
-    require base_path('routes/gfee.php');
-}
-
 if (file_exists(base_path('routes/galumni-web.php'))) {
     require base_path('routes/galumni-web.php');
 }

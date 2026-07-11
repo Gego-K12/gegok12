@@ -866,3 +866,7 @@ if (file_exists(base_path('routes/gtimetable-admin.php'))) {
 if (file_exists(base_path('routes/gtransport-admin.php'))) {
     require base_path('routes/gtransport-admin.php');
 }
+
+if (file_exists(base_path('routes/gfee-admin.php'))) {
+    require base_path('routes/gfee-admin.php');
+}

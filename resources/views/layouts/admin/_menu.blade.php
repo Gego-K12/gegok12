@@ -51,8 +51,6 @@ $coreMenu = [
         ],
     ],
 
-    ['label' => 'Fee Record', 'icon' => 'fa-solid fa-money-check-dollar', 'route' => '/admin/fees', 'match' => ['fees', 'fee', 'feedetail'], 'hoverClass' => 'hover:bg-red-900', 'visible' => ['config' => 'gfee.enabled']],
-
     [
         'label' => 'Records', 'icon' => 'fa-solid fa-folder', 'route' => '#',
         'match' => ['discipline', 'disciplines'], 'hoverClass' => '',

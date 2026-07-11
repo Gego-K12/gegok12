@@ -17,7 +17,7 @@
         "gegok12/alumni": "1.0.0",
         "gegok12/certificate": "1.0.0",
         "gegok12/chat": "1.0.0",
-        "gegok12/fee": "v1.0.x-dev",
+        "gegok12/fee": "1.0.0",
         "gegok12/inventory": "1.0.0",
         "gegok12/quiz": "1.0.0",
         "gegok12/videoroom": "1.0.0",
@@ -155,8 +155,8 @@
             "url": "custompackages/gegok12/chat"
         },
         {
-            "type": "vcs",
-            "url": "https://github.com/gego-k12/fee.git"
+            "type": "path",
+            "url": "custompackages/gegok12/fee"
         },
         {
             "type": "path",

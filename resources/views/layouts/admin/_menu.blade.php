@@ -116,22 +116,6 @@ $coreMenu = [
         ],
     ],
 
-    [
-        'label' => 'Transport', 'icon' => 'fa-solid fa-bus', 'route' => '#',
-        // Bug fix: original checked segment(1), which is always 'admin' for this portal and so
-        // could never be true. Corrected to segment(2), matching every other admin dropdown parent.
-        'match' => ['transport'], 'hoverClass' => 'hover:bg-red-900',
-        'visible' => ['config' => 'gtransport.enabled'],
-        'children' => [
-            ['label' => 'Stoppage', 'icon' => 'fa-solid fa-location-dot', 'route' => 'admin/transport/stoppage', 'segment' => 3, 'match' => ['stoppage'], 'hoverClass' => 'hover:font-semibold'],
-            ['label' => 'Route', 'icon' => 'fa-solid fa-route', 'route' => 'admin/transport/route', 'segment' => 3, 'match' => ['route'], 'hoverClass' => 'hover:font-semibold'],
-            ['label' => 'Vehicle', 'icon' => 'fa-solid fa-car-side', 'route' => 'admin/transport/vehicle', 'segment' => 3, 'match' => ['vehicle'], 'hoverClass' => 'hover:font-semibold'],
-            ['label' => 'Service', 'icon' => 'fa-solid fa-screwdriver-wrench', 'route' => 'admin/transport/service', 'segment' => 3, 'match' => ['service'], 'hoverClass' => 'hover:font-semibold'],
-            ['label' => 'Route Student', 'icon' => 'fa-solid fa-child-reaching', 'route' => 'admin/transport/studentroute/create', 'segment' => 3, 'match' => ['studentroute'], 'hoverClass' => 'hover:font-semibold'],
-            ['label' => 'Driver List', 'icon' => 'fa-solid fa-id-badge', 'route' => 'admin/transport/driverlist', 'segment' => 3, 'match' => ['driverlist'], 'hoverClass' => 'hover:font-semibold'],
-            ['label' => 'Attendance List', 'icon' => 'fa-solid fa-clipboard-check', 'route' => 'admin/transport/studentsattendance/list', 'segment' => 3, 'match' => ['studentsattendance'], 'hoverClass' => 'hover:font-semibold'],
-        ],
-    ],
 ];
 @endphp
 <ul class="list-reset text-sm">

@@ -5,6 +5,7 @@ import { registerQuiz } from './gquiz'
 import { registerVideoroom } from './gvideoroom'
 import { registerInventory } from './ginventory'
 import { registerTimetable } from './gtimetable'
+import { registerTransport } from './gtransport'
 import { registerWorkpermission } from './gworkpermission'
 import { registerShortTermCourses } from './gshort-term-courses'
 import { registerFees } from './gfees'
@@ -26,6 +27,8 @@ export default function registerCustomAddon(app) {
     registerInventory(app)
 
     registerTimetable(app)
+
+    registerTransport(app)
 
     registerShortTermCourses(app)
 

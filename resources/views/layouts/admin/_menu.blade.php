@@ -24,20 +24,6 @@ $coreMenu = [
 
     ['label' => 'Groups', 'icon' => 'fa-solid fa-layer-group', 'route' => '/admin/groups', 'match' => ['groups'], 'hoverClass' => ''],
 
-    [
-        'label' => 'TimeTable', 'icon' => 'fa-solid fa-clock', 'route' => '#',
-        'match' => ['timetable'], 'hoverClass' => '',
-        'visible' => ['config' => 'gtimetable.enabled'],
-        'children' => [
-            ['label' => 'Teacher Detail', 'icon' => 'fa-solid fa-id-card', 'route' => '/admin/timetable/detail', 'segment' => 3, 'match' => ['detail'], 'hoverClass' => ''],
-            ['label' => 'TimeTable Creator', 'icon' => 'fa-solid fa-pen-to-square', 'route' => '/admin/timetable/creator', 'segment' => 3, 'match' => ['creator'], 'hoverClass' => ''],
-            ['label' => 'Teacher', 'icon' => 'fa-solid fa-chalkboard-user', 'route' => '/admin/timetable/teacher', 'segment' => 3, 'match' => ['teacher'], 'hoverClass' => ''],
-            ['label' => 'Class', 'icon' => 'fa-solid fa-chalkboard', 'route' => '/admin/timetable/class', 'segment' => 3, 'match' => ['class'], 'hoverClass' => ''],
-            ['label' => 'Day', 'icon' => 'fa-solid fa-calendar-day', 'route' => '/admin/timetable/day', 'segment' => 3, 'match' => ['day'], 'hoverClass' => ''],
-            ['label' => 'Work Allotment', 'icon' => 'fa-solid fa-list-ol', 'route' => '/admin/timetable/work_allotment', 'segment' => 3, 'match' => ['work_allotment'], 'hoverClass' => ''],
-        ],
-    ],
-
     ['label' => 'Home Works', 'icon' => 'fa-solid fa-book', 'route' => '/admin/homeworks', 'match' => ['homeworks', 'homework'], 'hoverClass' => ''],
 
     ['label' => 'Exam', 'icon' => 'fa-solid fa-file-pen', 'route' => '/admin/exam', 'match' => ['exam'], 'hoverClass' => '', 'visible' => ['config' => 'gexam.enabled']],

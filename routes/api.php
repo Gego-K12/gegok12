@@ -230,3 +230,7 @@ if (file_exists(base_path('routes/gfeeapi.php'))) {
 if (file_exists(base_path('routes/gvideoroom-api.php'))) {
     require base_path('routes/gvideoroom-api.php');
 }
+
+if (file_exists(base_path('routes/gtimetable-api.php'))) {
+    require base_path('routes/gtimetable-api.php');
+}

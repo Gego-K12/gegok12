@@ -2,6 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 
+// Sections moved here from the admin portal, one at a time -- see each
+// block's own comment for why.
+
 // Master data (Countries/States/Cities) -- global reference tables, not
 // scoped to any school, so they moved here from admin's Settings section
 // (school admins have no use for them). Same Livewire components as
@@ -62,3 +65,25 @@ Route::get('setting/state/update/{id}', function ($id) {
 Route::get('setting/state/detail/{id}', function ($id) {
     return view('admin.setting.statedetail', compact('id'));
 })->name('admin.setting.states.detail');
+
+// Addons (moved from admin's "Upgrades" -- Purchase Modules catalog +
+// Purchase History). Note: PurchaseHistory's Livewire component queries an
+// external API keyed by the logged-in user's own email/domain, not a
+// school_id column, so a site admin viewing this sees data tied to their
+// own account, not a specific school's -- moved anyway per explicit
+// instruction, despite that mismatch.
+Route::get('/addon', function () {
+    return view('admin.addon.index');
+});
+
+Route::get('/addon/{slug}/detail', function ($slug) {
+    return view('admin.addon.detail', compact('slug'));
+});
+
+Route::get('/payment/razorpay/checkout', function () {
+    return view('admin.addon.razorpay');
+});
+
+Route::get('/purchase/addon/histories', function () {
+    return view('admin.addon.purchase-history');
+});

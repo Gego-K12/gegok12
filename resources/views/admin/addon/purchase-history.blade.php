@@ -1,4 +1,4 @@
-@extends('layouts.admin.layout')
+@extends('layouts.siteadmin.layout')
 
 @section('content')
 <div class="relative">

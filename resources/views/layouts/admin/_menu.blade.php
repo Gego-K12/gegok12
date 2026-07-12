@@ -78,14 +78,8 @@ $coreMenu = [
 
     ['label' => 'Activity Log', 'icon' => 'fa-solid fa-clock-rotate-left', 'route' => '/admin/activity', 'match' => ['activity'], 'hoverClass' => ''],
 
-    [
-        'label' => 'Upgrades', 'icon' => 'fa-solid fa-cloud-arrow-up', 'route' => '#',
-        'match' => ['addon'], 'hoverClass' => '',
-        'children' => [
-            ['label' => 'Purchase Modules', 'icon' => 'fa-solid fa-cart-shopping', 'route' => 'admin/addon', 'match' => ['addon'], 'hoverClass' => 'hover:font-semibold'],
-            ['label' => 'Purchase History', 'icon' => 'fa-solid fa-receipt', 'route' => 'admin/purchase/addon/histories', 'match' => ['purchase'], 'hoverClass' => 'hover:font-semibold'],
-        ],
-    ],
+    // Upgrades (Purchase Modules/Purchase History) moved to the siteadmin
+    // portal -- see routes/siteadmin.php.
 
     [
         // Single flat link (not a dropdown) -- clicking it lands on a

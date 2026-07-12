@@ -96,6 +96,37 @@ class PortalLayoutConsolidationTest extends TestCase
         $response->assertRedirect('/admin/dashboard');
     }
 
+    public function test_siteadmin_can_reach_purchase_modules_and_sees_it_in_their_own_sidebar()
+    {
+        $user = User::factory()->siteAdmin()->create();
+
+        $response = $this->actingAs($user)->get('/siteadmin/addon');
+
+        $response->assertOk();
+        $response->assertSee('Purchase Modules');
+        $response->assertSee('bg-gray-900');
+    }
+
+    public function test_schooladmin_can_no_longer_reach_addon_under_the_old_admin_prefix()
+    {
+        $school = School::factory()->create();
+        $admin = User::factory()->schoolAdmin()->for($school)->create();
+
+        $response = $this->actingAs($admin)->get('/admin/addon');
+
+        $response->assertNotFound();
+    }
+
+    public function test_schooladmin_hitting_the_new_siteadmin_addon_url_is_redirected_away()
+    {
+        $school = School::factory()->create();
+        $admin = User::factory()->schoolAdmin()->for($school)->create();
+
+        $response = $this->actingAs($admin)->get('/siteadmin/addon');
+
+        $response->assertRedirect('/admin/dashboard');
+    }
+
     public function test_alumni_portal_uses_alumniprofile_relation_and_edit_profile_link()
     {
         $school = School::factory()->create();

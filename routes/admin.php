@@ -733,23 +733,7 @@ Route::get('/student/{id}/tags', 'StudentTagController@show');
 Route::post('/student/{id}/tags', 'StudentTagController@sync');
 Route::post('/tags/add-students', 'StudentTagController@addStudents');
 
-// Addons
-
-Route::get('/addon', function () {
-    return view('admin.addon.index');
-});
-
-Route::get('/addon/{slug}/detail', function ($slug) {
-    return view('admin.addon.detail', compact('slug'));
-});
-
-Route::get('/payment/razorpay/checkout', function () {
-    return view('admin.addon.razorpay');
-});
-
-Route::get('/purchase/addon/histories', function () {
-    return view('admin.addon.purchase-history');
-});
+// Addons moved to routes/siteadmin.php.
 // Setting
 // Countries/States/Cities moved to routes/siteadmin.php -- global master
 // data, not school-scoped, school admins have no use for them.

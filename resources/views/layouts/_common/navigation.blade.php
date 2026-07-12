@@ -1,10 +1,7 @@
 {{--
     Shared top navbar for every portal. Included with a $portal config array
     (see resources/views/layouts/_common/portal-config.php via
-    App\Support\PortalConfig::for($key)) from each portal's own
-    layout.blade.php:
-
-        @include('layouts._common.navigation', ['portal' => \App\Support\PortalConfig::for('teacher')])
+    App\Support\PortalConfig::for($key)) from layouts/_common/layout.blade.php.
 --}}
 @if($portal['minimal'] ?? false)
     {{-- siteadmin: no auth guard, no school logo/notification/guest fallback,

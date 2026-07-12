@@ -1,10 +1,8 @@
 {{--
     Shared sidebar wrapper for every portal. Included with a $portal config
-    array and the portal key (see resources/views/layouts/_common/portal-config.php):
+    array and the portal key from layouts/_common/layout.blade.php.
 
-        @include('layouts._common.sidebar', ['portal' => \App\Support\PortalConfig::for('teacher'), 'portalKey' => 'teacher'])
-
-    Renders two wrapping divs (desktop + mobile), each @include-ing that
+    Renders two wrapping divs (desktop + mobile), each including that
     portal's own _menu.blade.php (the data-driven Font Awesome sidebar item
     list from an earlier, unrelated session) -- unchanged by this consolidation.
 --}}

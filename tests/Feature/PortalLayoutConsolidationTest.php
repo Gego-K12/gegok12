@@ -55,13 +55,14 @@ class PortalLayoutConsolidationTest extends TestCase
     {
         $user = User::factory()->siteAdmin()->create();
 
-        $response = $this->actingAs($user)->get('/plugins');
+        $response = $this->actingAs($user)->withSession(['successmessage' => 'FLASH-MARKER-TEST'])->get('/plugins');
 
         $response->assertOk();
         $response->assertDontSee('<notification', false);
         $response->assertSee('Logout');
         $response->assertDontSee('Change Avatar');
         $response->assertSee('bg-gray-900');
+        $response->assertSee('FLASH-MARKER-TEST');
     }
 
     public function test_alumni_portal_uses_alumniprofile_relation_and_edit_profile_link()

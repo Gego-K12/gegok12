@@ -229,4 +229,50 @@ class PortalLayoutConsolidationTest extends TestCase
         $response->assertSee('GegoK12 app');
         $response->assertDontSee('<notification', false);
     }
+
+    public function test_stock_keeper_landing_on_admin_dashboard_gets_redirected_to_stock_portal()
+    {
+        $school = School::factory()->create();
+        $stockKeeper = User::factory()->stockKeeper()->for($school)->create();
+
+        $response = $this->actingAs($stockKeeper)->get('/admin/dashboard');
+
+        $response->assertRedirect('/stock/stockproduct/show');
+    }
+
+    public function test_stock_keeper_sees_their_own_chrome_not_admins()
+    {
+        $school = School::factory()->create();
+        $stockKeeper = User::factory()->stockKeeper()->for($school)->create();
+
+        $response = $this->actingAs($stockKeeper)->get('/stock/stockproduct/show');
+
+        $response->assertOk();
+        $response->assertSee('librarian-sidebar');
+        $response->assertSee('mode="stock"', false);
+        $response->assertDontSee('admin-sidebar');
+    }
+
+    public function test_admin_still_sees_admin_chrome_on_the_same_shared_stock_view()
+    {
+        $school = School::factory()->create();
+        $this->satisfyAdminOnboarding($school);
+        $admin = User::factory()->schoolAdmin()->for($school)->create();
+
+        $response = $this->actingAs($admin)->get('/admin/stockproduct/show');
+
+        $response->assertOk();
+        $response->assertSee('admin-sidebar');
+        $response->assertSee('mode="admin"', false);
+    }
+
+    public function test_stock_keeper_cannot_reach_the_admin_prefixed_stock_route()
+    {
+        $school = School::factory()->create();
+        $stockKeeper = User::factory()->stockKeeper()->for($school)->create();
+
+        $response = $this->actingAs($stockKeeper)->get('/admin/stockproduct/show');
+
+        $response->assertRedirect('/stock/stockproduct/show');
+    }
 }

@@ -1,4 +1,4 @@
-@extends('layouts.admin.layout')
+@extends(request()->is('stock/*') ? 'layouts.stock.layout' : 'layouts.admin.layout')
 
 @section('content')
 <div>

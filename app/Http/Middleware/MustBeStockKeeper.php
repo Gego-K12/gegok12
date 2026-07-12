@@ -18,7 +18,6 @@ class MustBeStockKeeper
 
         if (\Auth::user()->isStockKeeper()) {
             return $next($request);
-            // return redirect('/stock/dashboard');
         }
 
         if (\Auth::user()->isAdmin()) {

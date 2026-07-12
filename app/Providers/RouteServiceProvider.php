@@ -34,6 +34,11 @@ class RouteServiceProvider extends ServiceProvider
 
     protected $parentNamespace = 'App\Http\Controllers\Parent';
 
+    // Bare [Controller::class, 'method'] array syntax in routes/stock.php
+    // bypasses this namespace, same as inventory's own routes/admin.php --
+    // the Stock controllers live in the inventory package's own namespace.
+    protected $stockNamespace = 'Gegok12\Inventory\Http\Controllers\Admin';
+
     // public const HOME = '/dashboard';
 
     /**
@@ -68,6 +73,7 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapNonTeachingRoutes();
         $this->mapPayrollRoutes();
         $this->mapParentRoutes();
+        $this->mapStockRoutes();
     }
 
     /**
@@ -184,5 +190,13 @@ class RouteServiceProvider extends ServiceProvider
             ->middleware(['web', 'auth', 'parent'])
             ->namespace($this->parentNamespace)
             ->group(base_path('routes/parent.php'));
+    }
+
+    protected function mapStockRoutes()
+    {
+        Route::prefix('stock')
+            ->middleware(['web', 'auth', 'stockkeeper'])
+            ->namespace($this->stockNamespace)
+            ->group(base_path('routes/stock.php'));
     }
 }

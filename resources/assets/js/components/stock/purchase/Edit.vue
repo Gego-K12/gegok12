@@ -132,15 +132,15 @@
            getcategory()
           {
             
-            axios.get(this.url+'/'+this.mode+'/product/category/list').then(response=>{
+            axios.get(this.url+'/'+this.mode+'/stockproduct/category/list').then(response=>{
                   //console.log(response);
                   this.subcategories=response.data;
                  });
           },
           getvendor()
           {
-            
-            axios.get(this.url+'/'+this.mode+'/product/vendor/'+this.category_id+'/list').then(response=>{
+
+            axios.get(this.url+'/'+this.mode+'/stockproduct/vendor/'+this.category_id+'/list').then(response=>{
                   //console.log(response);
                   this.vendors=response.data;
                  });

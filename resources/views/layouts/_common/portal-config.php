@@ -283,4 +283,30 @@ return [
         ],
     ],
 
+    'stock' => [
+        'urlPrefix' => 'stock',
+        'dashboardUrl' => '/stock/stockproduct/show',
+        'toggleSidebarId' => 'res_sidebar',
+        'notificationMode' => null,
+        'avatarRelation' => 'userprofile',
+        'avatarNullField' => 'avatar',
+        'avatarPathField' => 'AvatarPath',
+        'avatarWrap' => 'bare',
+        'minimal' => false,
+        'features' => [
+            'registerLink' => false,
+            'changePassword' => false,
+            'changeAvatar' => false,
+            'editProfile' => false,
+            'impersonateStop' => false,
+            'nameFallback' => false,
+        ],
+        'sidebar' => [
+            'desktopClass' => 'bg-blue-700 text-white h-full librarian-sidebar',
+            'mobileOuterClass' => '',
+            'mobileInnerClass' => 'bg-red-800 text-white',
+            'mobileId' => 'res_sidebar',
+        ],
+    ],
+
 ];

@@ -44,7 +44,7 @@ class MustBeSchoolAdmin
             return redirect('/accountant/dashboard');
         }
         if (\Auth::user()->isStockKeeper()) {
-            return redirect('/stock/dashboard');
+            return redirect('/stock/stockproduct/show');
         }
 
         if (\Auth::user()->isNonTeachingStaff()) {

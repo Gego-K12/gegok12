@@ -1,6 +1,6 @@
-@extends('layouts.admin.layout')
+@extends(request()->is('stock/*') ? 'layouts.stock.layout' : 'layouts.admin.layout')
 
 @section('content')
-    <add-return-order url="{{ url('/') }}" product_id="{{$product_id}}" mode="admin"  ></add-return-order>
+    <add-return-order url="{{ url('/') }}" product_id="{{$product_id}}" mode="{{ request()->is('stock/*') ? 'stock' : 'admin' }}"  ></add-return-order>
  
  @endsection

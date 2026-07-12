@@ -217,10 +217,17 @@ return [
             'impersonateStop' => false,
             'nameFallback' => false,
         ],
+        // siteadmin-sidebar is a hand-authored class (resources/assets/sass/adminstyle.scss)
+        // rather than Tailwind bg-gray-900/800 utilities -- those two shades were never
+        // referenced by any scanned .blade.php file, so Tailwind's content-based JIT scan
+        // never generated them and they silently painted nothing. siteadmin-sidebar also
+        // sets min-height:100vh directly so the sidebar's background always reaches the
+        // bottom of the viewport even on short-content pages, instead of stopping wherever
+        // the last menu item ends.
         'sidebar' => [
-            'desktopClass' => 'bg-gray-900 text-white h-full',
+            'desktopClass' => 'text-white siteadmin-sidebar',
             'mobileOuterClass' => '',
-            'mobileInnerClass' => 'bg-gray-800 text-white',
+            'mobileInnerClass' => 'text-white siteadmin-sidebar',
             'mobileId' => 'res_sidebar',
         ],
     ],

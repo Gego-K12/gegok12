@@ -61,7 +61,7 @@ class PortalLayoutConsolidationTest extends TestCase
         $response->assertDontSee('<notification', false);
         $response->assertSee('Logout');
         $response->assertDontSee('Change Avatar');
-        $response->assertSee('bg-gray-900');
+        $response->assertSee('siteadmin-sidebar');
         $response->assertSee('FLASH-MARKER-TEST');
     }
 
@@ -73,7 +73,7 @@ class PortalLayoutConsolidationTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Countries');
-        $response->assertSee('bg-gray-900');
+        $response->assertSee('siteadmin-sidebar');
     }
 
     public function test_schooladmin_can_no_longer_reach_countries_under_the_old_admin_prefix()
@@ -104,7 +104,7 @@ class PortalLayoutConsolidationTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Purchase Modules');
-        $response->assertSee('bg-gray-900');
+        $response->assertSee('siteadmin-sidebar');
     }
 
     public function test_schooladmin_can_no_longer_reach_addon_under_the_old_admin_prefix()

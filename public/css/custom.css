@@ -1498,6 +1498,16 @@ body {
   background-color: #319795 !important;
 }
 
+.siteadmin-sidebar {
+  background-color: #1e293b;
+  min-height: 100vh;
+}
+
+.siteadmin-sidebar li.active,
+.siteadmin-sidebar li:hover {
+  background-color: #2563eb !important;
+}
+
 .subject-table td,
 .subject-table th {
   padding: 0.5rem !important;

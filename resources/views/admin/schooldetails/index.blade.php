@@ -1,4 +1,4 @@
-@extends('layouts.admin.layout')
+@extends('layouts.admin.settings-layout')
 @section('content')
     <div class="school-info-page">
         <div class="flex justify-between">

@@ -88,28 +88,15 @@ $coreMenu = [
     ],
 
     [
-        'label' => 'Settings', 'icon' => 'fa-solid fa-gear', 'route' => '#',
-        'match' => ['schooldetails', 'academics', 'academic', 'promotion', 'leavetypes', 'leavetype', 'examrules', 'holidays', 'holiday', 'admissions', 'admission', 'setting'],
+        // Single flat link (not a dropdown) -- clicking it lands on a
+        // dedicated settings-layout page whose own sidebar
+        // (layouts/admin/settings-menu.blade.php) replaces this one for the
+        // whole Settings section (School Details, Academic Years,
+        // Admissions, Holidays, Promotions, Leave Master, SMS Templates,
+        // Countries/States/Cities, General/SEO/Maintenance Settings, Standards).
+        'label' => 'Settings', 'icon' => 'fa-solid fa-gear', 'route' => '/admin/schooldetails',
+        'match' => ['schooldetails', 'academics', 'academic', 'promotion', 'leavetypes', 'leavetype', 'examrules', 'holidays', 'holiday', 'admissions', 'admission', 'setting', 'settings'],
         'hoverClass' => '',
-        'children' => [
-            ['label' => 'School Details', 'icon' => 'fa-solid fa-school', 'route' => '/admin/schooldetails', 'match' => ['schooldetails'], 'hoverClass' => 'hover:font-semibold'],
-            ['label' => 'Academic Years', 'icon' => 'fa-solid fa-graduation-cap', 'route' => 'admin/academics', 'match' => ['academics', 'academic'], 'hoverClass' => 'hover:font-semibold'],
-            ['label' => 'Admissions', 'icon' => 'fa-solid fa-file-signature', 'route' => 'admin/admissions', 'match' => ['admissions', 'admission'], 'hoverClass' => 'hover:font-semibold'],
-            ['label' => 'Holidays List', 'icon' => 'fa-solid fa-umbrella-beach', 'route' => 'admin/holidays', 'match' => ['holidays', 'holiday'], 'hoverClass' => 'hover:font-semibold'],
-            ['label' => 'Exam Rules', 'icon' => 'fa-solid fa-scale-balanced', 'route' => '/admin/examrules', 'match' => ['examrules'], 'hoverClass' => 'hover:font-semibold', 'visible' => ['config' => 'gexam.enabled']],
-            ['label' => 'Exam Grade', 'icon' => 'fa-solid fa-ranking-star', 'route' => '/admin/exam/grade', 'segment' => 3, 'match' => ['grade'], 'hoverClass' => 'hover:font-semibold', 'visible' => ['config' => 'gexam.enabled']],
-            ['label' => 'Promotions', 'icon' => 'fa-solid fa-arrow-up-right-dots', 'route' => '/admin/promotion/create', 'match' => ['promotion'], 'hoverClass' => 'hover:font-semibold'],
-            ['label' => 'Leave Master', 'icon' => 'fa-solid fa-calendar-minus', 'route' => '/admin/leavetypes', 'match' => ['leavetypes', 'leavetype'], 'hoverClass' => 'hover:font-semibold'],
-            ['label' => 'SMS Templates', 'icon' => 'fa-solid fa-message', 'route' => '/admin/setting/smstemplates', 'segment' => 3, 'match' => ['smstemplates'], 'hoverClass' => 'hover:font-semibold'],
-            ['label' => 'Countries', 'icon' => 'fa-solid fa-earth-americas', 'route' => '/admin/setting/countries', 'segment' => 3, 'match' => ['countries', 'country'], 'hoverClass' => 'hover:font-semibold'],
-            ['label' => 'States', 'icon' => 'fa-solid fa-map', 'route' => '/admin/setting/states', 'segment' => 3, 'match' => ['states', 'state'], 'hoverClass' => 'hover:font-semibold'],
-            ['label' => 'Cities', 'icon' => 'fa-solid fa-city', 'route' => '/admin/setting/cities', 'segment' => 3, 'match' => ['cities', 'city'], 'hoverClass' => 'hover:font-semibold'],
-            // Bug fix: original checked segment(3) in ['cities','city'] here (copy-pasted from the
-            // Cities item above), so this item could never actually show as active. Corrected to
-            // match its own route segment.
-            ['label' => 'Settings', 'icon' => 'fa-solid fa-sliders', 'route' => '/admin/settings/generalsettings', 'segment' => 3, 'match' => ['generalsettings'], 'hoverClass' => 'hover:font-semibold'],
-            ['label' => 'Standards', 'icon' => 'fa-solid fa-list-ol', 'route' => '/admin/settings/standards', 'segment' => 3, 'match' => ['standards'], 'hoverClass' => 'hover:font-semibold'],
-        ],
     ],
 
 ];

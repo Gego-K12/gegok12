@@ -9,10 +9,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Helpers\SiteHelper;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\API\ExamScheduleAPI as ExamScheduleResource;
-use App\Models\Exam;
 use App\Models\User;
 use Exception;
+use Gegok12\Exam\Http\Resources\API\ExamScheduleAPI as ExamScheduleResource;
+use Gegok12\Exam\Models\Exam;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;

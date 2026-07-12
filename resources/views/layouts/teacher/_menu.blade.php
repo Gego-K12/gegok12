@@ -13,7 +13,6 @@ $coreMenu = [
 
     ['label' => 'Holiday', 'icon' => 'fa-solid fa-umbrella-beach', 'route' => '/teacher/holidays', 'match' => ['holidays', 'holiday'], 'hoverClass' => 'hover:bg-purple-900'],
     ['label' => 'Lesson Plans', 'icon' => 'fa-solid fa-person-chalkboard', 'route' => 'teacher/lessonplans', 'match' => ['lessonplan', 'lessonplans'], 'hoverClass' => 'hover:bg-purple-900'],
-    ['label' => 'Exam', 'icon' => 'fa-solid fa-file-circle-check', 'route' => '/teacher/exam', 'match' => ['exam'], 'hoverClass' => 'hover:bg-purple-900', 'visible' => ['config' => 'gexam.enabled']],
     ['label' => 'To Do List', 'icon' => 'fa-solid fa-list-check', 'route' => '/teacher/tasks', 'match' => ['tasks', 'task'], 'hoverClass' => 'hover:bg-purple-900'],
     [
         'label' => 'Class Wall', 'icon' => 'fa-solid fa-chalkboard', 'route' => '#', 'segment' => 3, 'match' => ['pages', 'page', 'posts', 'post'], 'hoverClass' => 'hover:bg-purple-900',

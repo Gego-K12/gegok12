@@ -448,3 +448,7 @@ if (file_exists(base_path('routes/gquiz-teacher.php'))) {
 if (file_exists(base_path('routes/gvideoroom-teacher.php'))) {
     require base_path('routes/gvideoroom-teacher.php');
 }
+
+if (file_exists(base_path('routes/gexam-teacher.php'))) {
+    require base_path('routes/gexam-teacher.php');
+}

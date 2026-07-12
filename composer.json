@@ -17,6 +17,7 @@
         "gegok12/alumni": "1.0.0",
         "gegok12/certificate": "1.0.0",
         "gegok12/chat": "1.0.0",
+        "gegok12/exam": "1.0.0",
         "gegok12/fee": "1.0.0",
         "gegok12/inventory": "1.0.0",
         "gegok12/quiz": "1.0.0",
@@ -153,6 +154,10 @@
         {
             "type": "path",
             "url": "custompackages/gegok12/chat"
+        },
+        {
+            "type": "path",
+            "url": "custompackages/gegok12/exam"
         },
         {
             "type": "path",

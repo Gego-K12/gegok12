@@ -238,3 +238,7 @@ if (file_exists(base_path('routes/gtimetable-api.php'))) {
 if (file_exists(base_path('routes/gtransport-api.php'))) {
     require base_path('routes/gtransport-api.php');
 }
+
+if (file_exists(base_path('routes/gexam-api.php'))) {
+    require base_path('routes/gexam-api.php');
+}

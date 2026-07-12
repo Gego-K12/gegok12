@@ -9,13 +9,13 @@ namespace App\Http\Controllers\Student;
 
 use App\Helpers\SiteHelper;
 use App\Http\Controllers\Controller;
-use App\Models\Exam;
-use App\Models\ExamSchedule;
 use App\Models\Subject;
 use App\Models\Subscription;
 use App\Services\EventReaderService;
 use App\Traits\Common;
 use Carbon\Carbon;
+use Gegok12\Exam\Models\Exam;
+use Gegok12\Exam\Models\ExamSchedule;
 use Illuminate\Support\Facades\Auth;
 
 class EventsController extends Controller

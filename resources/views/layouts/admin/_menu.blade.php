@@ -26,8 +26,6 @@ $coreMenu = [
 
     ['label' => 'Home Works', 'icon' => 'fa-solid fa-book', 'route' => '/admin/homeworks', 'match' => ['homeworks', 'homework'], 'hoverClass' => ''],
 
-    ['label' => 'Exam', 'icon' => 'fa-solid fa-file-pen', 'route' => '/admin/exam', 'match' => ['exam'], 'hoverClass' => '', 'visible' => ['config' => 'gexam.enabled']],
-
     ['label' => 'Calendar', 'icon' => 'fa-solid fa-calendar-days', 'route' => 'admin/events', 'match' => ['events', 'event'], 'hoverClass' => ''],
 
     ['label' => 'Notice Board', 'icon' => 'fa-solid fa-bullhorn', 'route' => '/admin/notices', 'match' => ['notices', 'notice'], 'hoverClass' => ''],

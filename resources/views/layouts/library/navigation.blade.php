@@ -59,7 +59,7 @@
                     @endif
                     <div>
                       <div>
-                        <a id="navbarDropdown" class="nav-link dropdown-toggle text-sm  no-underline text-black px-2" href="{{url('/teacher/dashboard')}}">
+                        <a id="navbarDropdown" class="nav-link dropdown-toggle text-sm  no-underline text-black px-2" href="{{url('/library/dashboard')}}">
                           {{ Auth::user()->FullName }} <span class="caret"></span>
                         </a>
                       </div>

@@ -81,7 +81,7 @@
                     </li>
                     @if(Auth::user()->isImpersonating())
                       <li class="hover:bg-gray-200">
-                        <a href="{{ url('/receptionist/impersonate/stop') }}" class="text-sm no-underline text-black flex px-2 py-1">
+                        <a href="{{ url('/teacher/impersonate/stop') }}" class="text-sm no-underline text-black flex px-2 py-1">
                           <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 65.518 65.518" style="enable-background:new 0 0 65.518 65.518;" xml:space="preserve" width="512px" height="512px" class="w-4 h-4  mx-2 my-1"><g><g><path d="M32.759,0C14.696,0,0,14.695,0,32.759s14.695,32.759,32.759,32.759s32.759-14.695,32.759-32.759S50.822,0,32.759,0z    M6,32.759C6,18.004,18.004,6,32.759,6c6.648,0,12.734,2.443,17.419,6.472L12.472,50.178C8.443,45.493,6,39.407,6,32.759z    M32.759,59.518c-5.948,0-11.447-1.953-15.895-5.248l37.405-37.405c3.295,4.448,5.248,9.947,5.248,15.895   C59.518,47.514,47.514,59.518,32.759,59.518z" data-original="#000000" class="active-path" fill="#000000"/></g></g> </svg>
                           <span>Stop</span>
                         </a>

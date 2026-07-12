@@ -325,6 +325,9 @@ Route::delete('/events/delete/{id}', 'EventsController@destroy');
 Route::get('/event/approve/{id}', 'EventsController@eventapprove');
 
 // Settings
+Route::get('/settings', function () {
+    return redirect('/admin/schooldetails');
+});
 Route::get('/settings/generalsettings', 'Setting\GeneralController@create');
 Route::post('/settings/generalsettings', 'Setting\GeneralController@store');
 Route::get('/settings/maintenancesettings', 'Setting\MaintenanceController@create');

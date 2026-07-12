@@ -94,7 +94,7 @@ $coreMenu = [
         // whole Settings section (School Details, Academic Years,
         // Admissions, Holidays, Promotions, Leave Master, SMS Templates,
         // Countries/States/Cities, General/SEO/Maintenance Settings, Standards).
-        'label' => 'Settings', 'icon' => 'fa-solid fa-gear', 'route' => '/admin/schooldetails',
+        'label' => 'Settings', 'icon' => 'fa-solid fa-gear', 'route' => '/admin/settings',
         'match' => ['schooldetails', 'academics', 'academic', 'promotion', 'leavetypes', 'leavetype', 'examrules', 'holidays', 'holiday', 'admissions', 'admission', 'setting', 'settings'],
         'hoverClass' => '',
     ],

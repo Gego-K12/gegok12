@@ -55,6 +55,10 @@ class MustBeSchoolAdmin
             return redirect('/plugins');
         }
 
+        if (\Auth::user()->isParent()) {
+            return redirect('/parent/dashboard');
+        }
+
         abort(404);
     }
 }

@@ -32,6 +32,8 @@ class RouteServiceProvider extends ServiceProvider
 
     protected $payrollNamespace = 'App\Http\Controllers\Payroll';
 
+    protected $parentNamespace = 'App\Http\Controllers\Parent';
+
     // public const HOME = '/dashboard';
 
     /**
@@ -65,6 +67,7 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapAccountantRoutes();
         $this->mapNonTeachingRoutes();
         $this->mapPayrollRoutes();
+        $this->mapParentRoutes();
     }
 
     /**
@@ -173,5 +176,13 @@ class RouteServiceProvider extends ServiceProvider
             ->middleware(['web', 'auth', 'adminaccountant'])
             ->namespace($this->payrollNamespace)
             ->group(base_path('routes/payroll.php'));
+    }
+
+    protected function mapParentRoutes()
+    {
+        Route::prefix('parent')
+            ->middleware(['web', 'auth', 'parent'])
+            ->namespace($this->parentNamespace)
+            ->group(base_path('routes/parent.php'));
     }
 }

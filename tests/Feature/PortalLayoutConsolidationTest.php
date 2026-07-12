@@ -207,4 +207,26 @@ class PortalLayoutConsolidationTest extends TestCase
         $response->assertSee('Edit Profile');
         $response->assertSee('admin-sidebar');
     }
+
+    public function test_parent_landing_on_admin_dashboard_gets_redirected_to_parent_dashboard()
+    {
+        $school = School::factory()->create();
+        $parent = User::factory()->parent()->for($school)->create();
+
+        $response = $this->actingAs($parent)->get('/admin/dashboard');
+
+        $response->assertRedirect('/parent/dashboard');
+    }
+
+    public function test_parent_dashboard_tells_them_to_use_the_app()
+    {
+        $school = School::factory()->create();
+        $parent = User::factory()->parent()->for($school)->create();
+
+        $response = $this->actingAs($parent)->get('/parent/dashboard');
+
+        $response->assertOk();
+        $response->assertSee('GegoK12 app');
+        $response->assertDontSee('<notification', false);
+    }
 }

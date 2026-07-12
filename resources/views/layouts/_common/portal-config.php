@@ -253,4 +253,34 @@ return [
         ],
     ],
 
+    'parent' => [
+        'urlPrefix' => 'parent',
+        'dashboardUrl' => '/parent/dashboard',
+        'toggleSidebarId' => 'res_sidebar',
+        'notificationMode' => null,
+        'avatarRelation' => null,
+        'avatarNullField' => null,
+        'avatarPathField' => null,
+        'avatarWrap' => 'bare',
+        // Parents have no real web portal -- /parent/dashboard only exists so
+        // logging in with a parent account doesn't 404; it just tells them to
+        // use the mobile app instead. Reuses siteadmin's minimal navbar shape
+        // (no notification/dropdown-links, static avatar, just Logout).
+        'minimal' => true,
+        'features' => [
+            'registerLink' => false,
+            'changePassword' => false,
+            'changeAvatar' => false,
+            'editProfile' => false,
+            'impersonateStop' => false,
+            'nameFallback' => false,
+        ],
+        'sidebar' => [
+            'desktopClass' => 'bg-gray-900 text-white h-full',
+            'mobileOuterClass' => '',
+            'mobileInnerClass' => 'bg-gray-800 text-white',
+            'mobileId' => 'res_sidebar',
+        ],
+    ],
+
 ];

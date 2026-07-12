@@ -235,6 +235,25 @@ class UserFactory extends Factory
     }
 
     /**
+     * State: Alumni
+     *
+     * Creates a user with Alumni role (usergroup_id = 9).
+     * Automatically ensures the Alumni usergroup exists in database.
+     *
+     * @return Factory
+     */
+    public function alumni()
+    {
+        return $this->state(function (array $attributes) {
+            Usergroup::firstOrCreate(['id' => User::ALUMNI_USERGROUP_ID], ['name' => 'Alumni']);
+
+            return [
+                'usergroup_id' => User::ALUMNI_USERGROUP_ID,
+            ];
+        });
+    }
+
+    /**
      * State: Non-Teaching Staff
      *
      * Creates a user with Non-Teaching Staff role (usergroup_id = 13),

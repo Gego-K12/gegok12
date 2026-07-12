@@ -143,12 +143,28 @@ class PortalLayoutConsolidationTest extends TestCase
     public function test_accountant_usergroup_sees_its_own_navigation_and_sidebar()
     {
         $school = School::factory()->create();
-        $user = User::factory()->accountant()->for($school)->create();
+        $admin = User::factory()->schoolAdmin()->for($school)->create();
+        $accountant = User::factory()->accountant()->for($school)->create();
+        $admin->setImpersonating($accountant->id);
 
-        $response = $this->actingAs($user)->get('/accountant/dashboard');
+        $response = $this->actingAs($accountant)->get('/accountant/dashboard');
 
         $response->assertOk();
         $response->assertSee('accountant-sidebar');
+        $response->assertSee(url('/teacher/impersonate/stop'), false);
+        $response->assertDontSee(url('/accountant/impersonate/stop'), false);
+    }
+
+    public function test_accountant_impersonate_stop_redirects_to_accountant_dashboard()
+    {
+        $school = School::factory()->create();
+        $admin = User::factory()->schoolAdmin()->for($school)->create();
+        $accountant = User::factory()->accountant()->for($school)->create();
+        $admin->setImpersonating($accountant->id);
+
+        $response = $this->actingAs($accountant)->get('/teacher/impersonate/stop');
+
+        $response->assertRedirect('/accountant/dashboard');
     }
 
     public function test_schooladmin_usergroup_sees_admins_navigation_and_sidebar_under_accountant_prefix()

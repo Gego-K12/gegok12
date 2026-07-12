@@ -118,6 +118,8 @@ class ImpersonateController extends Controller
                 return redirect('/library/dashboard');
             } elseif ($user->usergroup_id == User::RECEPTIONIST_USERGROUP_ID) {
                 return redirect('/receptionist/dashboard');
+            } elseif ($user->usergroup_id == User::ACCOUNTANT_USERGROUP_ID) {
+                return redirect('/accountant/dashboard');
             }
             /*elseif ($user->usergroup_id == 1)
             {

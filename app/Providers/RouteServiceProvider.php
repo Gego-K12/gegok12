@@ -74,6 +74,7 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapPayrollRoutes();
         $this->mapParentRoutes();
         $this->mapStockRoutes();
+        $this->mapSiteAdminSettingRoutes();
     }
 
     /**
@@ -198,5 +199,12 @@ class RouteServiceProvider extends ServiceProvider
             ->middleware(['web', 'auth', 'stockkeeper'])
             ->namespace($this->stockNamespace)
             ->group(base_path('routes/stock.php'));
+    }
+
+    protected function mapSiteAdminSettingRoutes()
+    {
+        Route::prefix('siteadmin')
+            ->middleware(['web', 'auth', 'siteadmin'])
+            ->group(base_path('routes/siteadmin.php'));
     }
 }

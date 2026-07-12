@@ -1,4 +1,4 @@
-@extends('layouts.admin.settings-layout')
+@extends('layouts.siteadmin.layout')
 @section('content')
     <div class="relative">
         <livewire:admin.setting.city-detail  :id="$id" />

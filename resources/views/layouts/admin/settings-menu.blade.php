@@ -9,9 +9,8 @@ $coreMenu = [
     ['label' => 'Promotions', 'icon' => 'fa-solid fa-arrow-up-right-dots', 'route' => '/admin/promotion/create', 'match' => ['promotion'], 'hoverClass' => ''],
     ['label' => 'Leave Master', 'icon' => 'fa-solid fa-calendar-minus', 'route' => '/admin/leavetypes', 'match' => ['leavetypes', 'leavetype'], 'hoverClass' => ''],
     ['label' => 'SMS Templates', 'icon' => 'fa-solid fa-message', 'route' => '/admin/setting/smstemplates', 'segment' => 3, 'match' => ['smstemplates'], 'hoverClass' => ''],
-    ['label' => 'Countries', 'icon' => 'fa-solid fa-earth-americas', 'route' => '/admin/setting/countries', 'segment' => 3, 'match' => ['countries', 'country'], 'hoverClass' => ''],
-    ['label' => 'States', 'icon' => 'fa-solid fa-map', 'route' => '/admin/setting/states', 'segment' => 3, 'match' => ['states', 'state'], 'hoverClass' => ''],
-    ['label' => 'Cities', 'icon' => 'fa-solid fa-city', 'route' => '/admin/setting/cities', 'segment' => 3, 'match' => ['cities', 'city'], 'hoverClass' => ''],
+    // Countries/States/Cities moved to the siteadmin portal -- global
+    // master data, not school-scoped, school admins have no use for them.
     ['label' => 'General Settings', 'icon' => 'fa-solid fa-sliders', 'route' => '/admin/settings/generalsettings', 'segment' => 3, 'match' => ['generalsettings'], 'hoverClass' => ''],
     ['label' => 'SEO Details', 'icon' => 'fa-solid fa-magnifying-glass-chart', 'route' => '/admin/settings/seodetailsettings', 'segment' => 3, 'match' => ['seodetailsettings'], 'hoverClass' => ''],
     ['label' => 'Maintenance Mode', 'icon' => 'fa-solid fa-screwdriver-wrench', 'route' => '/admin/settings/maintenancesettings', 'segment' => 3, 'match' => ['maintenancesettings'], 'hoverClass' => ''],

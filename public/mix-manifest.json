@@ -1,6 +1,11 @@
 {
-    "/js/app.js": "/js/app.js?id=3114cff560c4b88b0d4518e951bf75b1",
-    "/js/manifest.js": "/js/manifest.js?id=daa0400a603aba473e8acaa14a8d66f9",
-    "/css/app.css": "/css/app.css?id=d3f35cc9385c9c2886b884835c5b54d9",
-    "/js/vendor.js": "/js/vendor.js?id=82916b0717676ca8d16f76c8cc228938"
+    "/js/app.js": "/js/app.js",
+    "/js/manifest.js": "/js/manifest.js",
+    "/css/app.css": "/css/app.css",
+    "/js/vendor.js": "/js/vendor.js",
+    "/vendor/fontawesome/css/all.min.css": "/vendor/fontawesome/css/all.min.css",
+    "/vendor/fontawesome/webfonts/fa-brands-400.woff2": "/vendor/fontawesome/webfonts/fa-brands-400.woff2",
+    "/vendor/fontawesome/webfonts/fa-regular-400.woff2": "/vendor/fontawesome/webfonts/fa-regular-400.woff2",
+    "/vendor/fontawesome/webfonts/fa-solid-900.woff2": "/vendor/fontawesome/webfonts/fa-solid-900.woff2",
+    "/vendor/fontawesome/webfonts/fa-v4compatibility.woff2": "/vendor/fontawesome/webfonts/fa-v4compatibility.woff2"
 }

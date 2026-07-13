@@ -26,6 +26,7 @@ class Group extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
+
     public function members()
     {
         return $this->hasMany(GroupMember::class, 'id', 'group_id');

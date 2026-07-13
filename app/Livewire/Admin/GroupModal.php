@@ -4,6 +4,7 @@ namespace App\Livewire\Admin;
 
 use Livewire\Component;
 
+
 /**
  * Class GroupModal
  *
@@ -45,6 +46,7 @@ class GroupModal extends Component
      * @param  int  $standardLink_id
      * @return void
      */
+
     public function mount($standardLink_id)
     {
         $this->standardLink_id = $standardLink_id;

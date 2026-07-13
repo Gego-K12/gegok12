@@ -79,6 +79,7 @@
             <div class="flex justify-between items-center my-4">
               <h2 class="font-semibold text-base text-gray-700 capitalize">Absent Staffs</h2>
             </div>
+
             <div class="relative mb-3">
               <input type="text" v-model="searchAbsent" placeholder="Search absent staff..." class="tw-form-control w-full pr-8">
               <button v-if="searchAbsent" type="button" @click="searchAbsent=''" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-base leading-none">&times;</button>
@@ -94,6 +95,7 @@
                   <div class="mx-2"> 
                     <p class="tw-form-label">{{ absent.user_name }}</p>
                   </div>
+
                 </div>
                 <div class="flex items-center">
                   <div class="mx-1">
@@ -123,6 +125,7 @@
               <h2 class="font-semibold text-base text-gray-700 capitalize">Approved Leaves
               <span class="text-xs">( For the selected date &amp; session )</span></h2>
             </div>
+
             <div class="relative mb-3">
               <input type="text" v-model="searchLeave" placeholder="Search leaves..." class="tw-form-control w-full pr-8">
               <button v-if="searchLeave" type="button" @click="searchLeave=''" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-base leading-none">&times;</button>

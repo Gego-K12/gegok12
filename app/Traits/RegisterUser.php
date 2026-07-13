@@ -210,7 +210,6 @@ trait RegisterUser
             $userprofile->aadhar_number = $data->aadhar_number;
 
             $userprofile->joining_date = date('Y-m-d', strtotime($data->joining_date));
-
             if (! is_null($data->EMIS_number)) {
                 $userprofile->EMIS_number = $data->EMIS_number;
             }

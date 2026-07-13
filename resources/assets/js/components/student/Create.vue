@@ -585,6 +585,7 @@ export default {
       formData.append('longitude', this.longitude);
 
       axios.post('/admin/student/add/validationUser',formData,{headers: {'Content-Type': 'multipart/form-data'}}).then(response => {
+
         $('#real-submit-btn').click(); 
       }).catch(error => {
         this.errors = error.response.data.errors;

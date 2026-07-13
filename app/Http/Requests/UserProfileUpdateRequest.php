@@ -113,6 +113,7 @@ class UserProfileUpdateRequest extends FormRequest
             'roll_number' => 'required|numeric',
             'id_card_number' => 'nullable|numeric',
             'mode_of_transport' => 'nullable',
+
             'board_registration_number' => 'nullable|numeric',
         ];
 

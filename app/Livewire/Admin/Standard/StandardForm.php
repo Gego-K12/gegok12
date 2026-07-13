@@ -50,6 +50,7 @@ class StandardForm extends Component
      * @param  int|null  $id
      * @return void
      */
+
     public function mount($id = null)
     {
         if ($id) {
@@ -81,6 +82,7 @@ class StandardForm extends Component
      *
      * @return \Illuminate\Http\RedirectResponse
      */
+
     public function save()
     {
         $this->validate([

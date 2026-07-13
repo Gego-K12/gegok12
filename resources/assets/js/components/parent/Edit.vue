@@ -321,6 +321,70 @@ export default {
 
     methods:
     {
+      initMap() {
+                const defaultLat = 9.9252007;
+                const defaultLng = 78.1197754;
+
+                const center = new google.maps.LatLng(defaultLat, defaultLng);
+
+                this.map = new google.maps.Map(
+                    document.getElementById("map_canvas"),
+                    {
+                        zoom: 15,
+                        center: center
+                    }
+                );
+
+                this.marker = new google.maps.Marker({
+                    position: center,
+                    map: this.map,
+                    draggable: true
+                });
+
+                this.latitude = defaultLat;
+                this.longitude = defaultLng;
+
+                this.geocoder = new google.maps.Geocoder();
+
+                google.maps.event.addListener(this.marker, 'mouseup', (event) => {
+                    this.latitude = event.latLng.lat();
+                    this.longitude = event.latLng.lng();
+                });
+
+                const autocomplete = new google.maps.places.Autocomplete(
+                    document.getElementById("official_address")
+                );
+
+                autocomplete.addListener("place_changed", () => {
+                    const place = autocomplete.getPlace();
+                    if (!place.geometry) return;
+
+                    const lat = place.geometry.location.lat();
+                    const lng = place.geometry.location.lng();
+                    this.updateLocation(lat, lng);
+                });
+            },
+
+            updateLocation(lat, lng) {
+                const latLng = new google.maps.LatLng(lat, lng);
+                this.latitude = lat;
+                this.longitude = lng;
+                this.map.setCenter(latLng);
+                this.marker.setPosition(latLng);
+            },
+
+            codeAddress() {
+                this.geocoder.geocode(
+                    { address: this.official_address },
+                    (results, status) => {
+                        if (status === "OK") {
+                            const lat = results[0].geometry.location.lat();
+                            const lng = results[0].geometry.location.lng();
+                            this.updateLocation(lat, lng);
+                        }
+                    }
+                );
+            },
       getData()
       {
         axios.get('/admin/parent/editlist/'+this.name+'?ref_name='+this.ref_name).then(response => {

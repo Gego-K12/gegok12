@@ -261,6 +261,7 @@ trait Dashboard
         $array['subject'] = $teachersubjects;
         $array['timetable'] = [];
         if (class_exists('Gegok12\Timetable\Models\Timetable')) {
+
             $timetables = \Gegok12\Timetable\Models\Timetable::where([['school_id', $school_id], ['academic_year_id', $academic_year->id], ['day', date('l')]])->whereIn('standardLink_id', $standardLinks)->get();
 
             foreach ($timetables as $key => $timetable) {

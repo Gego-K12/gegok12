@@ -540,6 +540,7 @@ export default {
       formData.append('address', this.address);
 
       axios.post('/admin/student/edit/validationUser/'+this.student_name,formData,{headers: {'Content-Type': 'multipart/form-data'}}).then(response => {
+
         $('#real-submit-btn').click(); 
       }).catch(error => {
         this.errors = error.response.data.errors;

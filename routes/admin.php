@@ -186,6 +186,7 @@ Route::get('/student/show/details/{name}', 'StudentDetailsController@showDetails
 Route::get('/student/show/relations/{name}', 'StudentDetailsController@showRelations');
 Route::get('/student/show/siblings/{name}', 'StudentDetailsController@showSiblings');
 Route::get('/student/show/siblingdetails/{name}', 'StudentDetailsController@showSiblingDetails');
+
 Route::get('/student/show/activity/{name}', 'StudentDetailsController@showActivity');
 Route::get('/student/show/discipline/{name}', 'StudentDetailsController@showDisciplines');
 Route::get('/student/show/attendance/{name}', 'StudentDetailsController@showAttendance');
@@ -410,6 +411,7 @@ Route::get('/homework/edit/{id}', 'Approval\HomeWorkController@edit');
 Route::post('/homework/edit/{id}', 'Approval\HomeWorkController@update');
 // delete
 Route::delete('/homework/delete/{id}', 'Approval\HomeWorkController@destroy');
+
 Route::get('/homework/viewers/{id}', 'Approval\HomeWorkController@view');
 
 // approve
@@ -452,7 +454,9 @@ Route::get('/notice/show/{id}', 'NoticeBoardController@show');
 Route::get('/notice/edit/{id}', 'NoticeBoardController@edit');
 Route::post('/notice/update/{id}', 'NoticeBoardController@update');
 // delete
+
 Route::delete('/notice/delete/{id}', 'NoticeBoardController@destroy');
+
 // backgroundImage
 Route::post('/notice/background/add', 'NoticeBoardController@addimage');
 
@@ -466,6 +470,7 @@ Route::post('/leavetype/add', 'LeaveTypesController@store');
 Route::get('/leavetype/edit/{id}', 'LeaveTypesController@edit');
 Route::post('/leavetype/edit/{id}', 'LeaveTypesController@update');
 // delete
+
 Route::delete('/leavetype/delete/{id}', 'LeaveTypesController@destroy');
 
 // event_gallery
@@ -478,7 +483,9 @@ Route::get('/magazines', 'BulletinsController@index');
 Route::get('/magazine/create', 'BulletinsController@create');
 Route::post('/magazine/create', 'BulletinsController@store');
 Route::get('/magazine/getDate', 'BulletinsController@getDate');
+
 Route::delete('/magazine/delete/{id}', 'BulletinsController@destroy');
+
 Route::get('/magazine/download/{id}', 'BulletinsController@downloadattachments');
 
 // reports
@@ -536,6 +543,7 @@ Route::post('/task/edit/{id}', 'TaskController@update');
 Route::post('/task/snooze/{id}', 'TaskController@snooze');
 
 // delete
+
 Route::delete('/task/{id}/delete', 'TaskController@destroy');
 
 // visitor-log
@@ -556,6 +564,7 @@ Route::get('/visitorlog/edit/{id}', 'VisitorLogController@edit');
 Route::post('/visitorlog/update/{id}', 'VisitorLogController@update');
 
 // delete
+
 Route::delete('/visitorlog/delete/{id}', 'VisitorLogController@destroy');
 
 // print
@@ -588,6 +597,7 @@ Route::post('/postalrecord/add', 'PostalRecordController@store');
 Route::get('/postalrecord/show/{id}', 'PostalRecordController@show');
 Route::get('/postalrecord/edit/{id}', 'PostalRecordController@edit');
 Route::post('/postalrecord/update/{id}', 'PostalRecordController@update');
+
 Route::delete('/postalrecord/delete/{id}', 'PostalRecordController@destroy');
 
 // page category
@@ -641,11 +651,13 @@ Route::post('/classwall/post/unsave/{post_id}', 'PostDetailController@unsave');
 Route::post('/classwall/post/add/comment/{post_id}', 'PostCommentsController@addComment');
 Route::get('/classwall/post/edit/commentList/{comment_id}', 'PostCommentsController@editCommentList');
 Route::post('/classwall/post/edit/comment/{comment_id}', 'PostCommentsController@editComment');
+
 Route::delete('/classwall/post/delete/comment/{comment_id}', 'PostCommentsController@destroy');
 
 Route::get('/classwall/post/replyComment/{post_comment_id}', 'PostReplyCommentsController@list');
 Route::post('/classwall/post/reply/add/comment/{post_comment_id}', 'PostReplyCommentsController@addComment');
 Route::post('/classwall/post/reply/edit/comment/{post_comment_id}', 'PostReplyCommentsController@editComment');
+
 Route::delete('/classwall/post/reply/delete/comment/{post_comment_id}', 'PostReplyCommentsController@destroy');
 
 Route::post('/classwall/post/comment/like/{comment_id}', 'PostCommentDetailsController@like');

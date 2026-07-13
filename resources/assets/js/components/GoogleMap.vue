@@ -77,11 +77,13 @@ export default {
   props: {
     address: String,
     latitude: Number,
+
     longitude: Number,
     fieldName: {
       type: String,
       default: 'address'
     }
+
   },
 
   emits: ['update:address', 'update:latitude', 'update:longitude'],

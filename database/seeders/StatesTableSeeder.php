@@ -23,6 +23,5 @@ class StatesTableSeeder extends Seeder
         } else {
             echo "SQL file not found!";
         }
-
     }
 }

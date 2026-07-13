@@ -176,7 +176,7 @@ class Detail extends Component
             $response = $this->guzzlePost($apiUrl, $create, true);
 
             if ($response && isset($response['success']) && $response['success'] &&
-    $response['status'] !== 'exists') {
+              $response['status'] !== 'exists') {
                 $payment = $response['data'];
                 $create['payment_id'] = $payment['id'];
 

@@ -406,6 +406,7 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="my-6">
                     <a href="#" dusk="submit-btn" class="btn btn-primary submit-btn" @click="submitForm()">Submit</a>
                     <a href="#" class="btn btn-reset reset-btn" @click="resetForm()">Reset</a>

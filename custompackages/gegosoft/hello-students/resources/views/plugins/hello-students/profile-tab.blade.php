@@ -1,0 +1,1 @@
+<p class="text-sm text-gray-600">Hello from the Hello Students plugin! (entityId: {{ $entityId }})</p>

@@ -44,6 +44,14 @@ trait MemberProcess
                 $users = StudentUser::BySchool($school_id)->ByRole($usergroup_id);
             }
 
+            $users = $users->with([
+                'userprofile',
+                'parents.userParent',
+                'teacherprofile',
+                'studentAcademicLatest.standardLink',
+                'librarycard',
+            ]);
+
             $alphabet = $request->alphabet ? $request->alphabet : '';
             if ($alphabet) {
                 $users = $users->ByFirstName($alphabet);
@@ -154,7 +162,12 @@ trait MemberProcess
                     'teacherlink' => function ($q) use ($academic_year) {
                         $q->where('academic_year_id', $academic_year->id);
                     },
+                    'teacherlink.standardLink',
+                    'teacherlink.subject',
                     'lastLogin',
+                    'userprofile',
+                    'latestTeacherProfile',
+                    'librarycard',
                 ])
                 ->whereHas('userprofile', function ($q) use ($request) {
                     if ($request->view == 'exit') {
@@ -246,7 +259,17 @@ trait MemberProcess
     public function StaffFilter($request, $school_id, $usergroup_id)
     {
         try {
-            $users = User::where('school_id', $school_id)->whereIn('usergroup_id', $usergroup_id)->with('lastLogin')->whereHas('userprofile', function ($q) use ($request) {
+            $users = User::where('school_id', $school_id)->whereIn('usergroup_id', $usergroup_id)
+                ->with([
+                    'lastLogin',
+                    'userprofile',
+                    'latestTeacherProfile',
+                    'librarycard',
+                    'standardLink',
+                    'teacherlink.standardLink',
+                    'teacherlink.subject',
+                ])
+                ->whereHas('userprofile', function ($q) use ($request) {
                 if ($request->view == 'exit') {
                     $q->where('status', 'exit');
                 } else {
@@ -494,6 +517,14 @@ trait MemberProcess
             } else {
                 $users = StudentUser::BySchool($school_id)->ByRole($usergroup_id);
             }
+
+            $users = $users->with([
+                'userprofile',
+                'parents.userParent',
+                'teacherprofile',
+                'studentAcademicLatest.standardLink',
+                'librarycard',
+            ]);
 
             $alphabet = $request->alphabet ? $request->alphabet : '';
             if ($alphabet) {

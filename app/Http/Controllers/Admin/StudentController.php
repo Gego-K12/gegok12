@@ -55,16 +55,10 @@ class StudentController extends Controller
      */
     public function find(Request $request)
     {
-        //
-        $school_id = Auth::user()->school_id;
-        $academic_year = SiteHelper::getAcademicYear($school_id);
-
-        $lowest_standard = Standard::where('school_id', $school_id)->orderBy('order')->first();
-
-        $standard = StandardLink::where([['school_id', $school_id], ['academic_year_id', $academic_year->id], ['standard_id', $lowest_standard->id]])->first();
-
+        // Default to names starting with A (all classes) so a bare request
+        // never loads the whole unpaginated student list.
         if (count((array) \Request::getQueryString()) == 0) {
-            $request['standard'] = $standard->id;
+            $request['alphabet'] = 'A';
         }
 
         return $this->MemberFilter($request, Auth::user()->school_id, 6, 'active');
@@ -77,28 +71,23 @@ class StudentController extends Controller
      */
     public function index()
     {
+        // Default view is all classes filtered to names starting with A --
+        // the list is unpaginated, so an unfiltered load is too heavy.
+        if (count((array) \Request::getQueryString()) == 0) {
+            return redirect(url()->current().'?alphabet=A');
+        }
+
         $school_id = Auth::user()->school_id;
-        $academic_year = SiteHelper::getAcademicYear($school_id);
         $count = StudentUser::ByRole(6)->where('school_id', $school_id)->where('deleted_at', null)->count();
         $alphabet = request('alphabet') ? request('alphabet') : '';
         $query = \Request::getQueryString();
         $standardLink = SiteHelper::getStandardLinkList($school_id);
 
-        $lowest_standard = Standard::where('school_id', $school_id)->orderBy('order')->first();
+        $birthday = request('date_of_birth') != null ? 'true' : false;
 
-        if (count((array) \Request::getQueryString()) == 0) {
-            $standard = StandardLink::where([['school_id', $school_id], ['academic_year_id', $academic_year->id], ['standard_id', $lowest_standard->id]])->first();
-        }
-        if (request('date_of_birth') != null) {
-            $birthday = 'true';
-        }
-        if (request('standard') != null) {
-            $selected_standard = request('standard');
-        } else {
-            $selected_standard = $standard->id;
-        }
+        $selected_standard = request('standard') != null ? request('standard') : '';
 
-        return view('/admin/member/index', ['alphabet' => $alphabet, 'query' => $query, 'count' => $count, 'standardLinks' => $standardLink, 'standard' => $standard->id, 'birthday' => $birthday, 'selected_standard' => $selected_standard]);
+        return view('/admin/member/index', ['alphabet' => $alphabet, 'query' => $query, 'count' => $count, 'standardLinks' => $standardLink, 'standard' => $selected_standard, 'birthday' => $birthday, 'selected_standard' => $selected_standard]);
     }
 
     /**
@@ -410,9 +399,8 @@ class StudentController extends Controller
         if (count(\Request::getQueryString()) == 0) {
             $standard = StandardLink::where([['school_id', $school_id], ['academic_year_id', $academic_year->id]])->first();
         }
-        if (request('date_of_birth') != null) {
-            $birthday = 'true';
-        }
+        $birthday = request('date_of_birth') != null ? 'true' : false;
+
         if (request('standard') != null) {
             $selected_standard = request('standard');
         } else {

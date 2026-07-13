@@ -15,16 +15,15 @@ class User extends JsonResource
      */
     public function toArray($request)
     {
-        $i = 0;
+        $parent_id = [];
         foreach ($this->parents as $parent) {
-            $parent_id[$i] = $parent->userParent->id;
-            $i++;
+            if ($parent->userParent) {
+                $parent_id[] = $parent->userParent->id;
+            }
         }
-        $pro_design = '';
-        if ($this->teacherprofile[0]['designation'] != null) {
 
-            $pro_design = ucwords(str_replace('_', ' ', $this->teacherprofile[0]['designation']));
-        }
+        $designation = optional($this->teacherprofile->first())->designation;
+        $pro_design = $designation != null ? ucwords(str_replace('_', ' ', $designation)) : '';
 
         return
         [
@@ -33,17 +32,17 @@ class User extends JsonResource
             'label' => $this->email,
             'mobile_no' => $this->mobile_no,
             'avatar' => optional($this->userprofile)->AvatarPath,
-            'firstname' => $this->userprofile->firstname.' '.$this->userprofile->lastname,
-            'lastname' => $this->userprofile->lastname,
+            'firstname' => optional($this->userprofile)->firstname.' '.optional($this->userprofile)->lastname,
+            'lastname' => optional($this->userprofile)->lastname,
             'fullname' => $this->FullName,
-            'class' => $this->studentAcademicLatest->standardLink->StandardSection,
-            'parent_id' => $parent_id == null ? [] : $parent_id,
-            'designation' => $this->teacherprofile[0]['designation'],
+            'class' => optional(optional($this->studentAcademicLatest)->standardLink)->StandardSection,
+            'parent_id' => $parent_id,
+            'designation' => $designation,
             'designation_display' => $pro_design,
-            'date_of_birth' => $this->userprofile->date_of_birth == null ? null : date('d M Y', strtotime($this->userprofile->date_of_birth)),
+            'date_of_birth' => optional($this->userprofile)->date_of_birth == null ? null : date('d M Y', strtotime($this->userprofile->date_of_birth)),
             'status' => $this->status,
-            'librarycard_number' => $this->librarycard->library_card_no,
-            'book_limit' => $this->librarycard->book_limit,
+            'librarycard_number' => optional($this->librarycard)->library_card_no,
+            'book_limit' => optional($this->librarycard)->book_limit,
         ];
     }
 }

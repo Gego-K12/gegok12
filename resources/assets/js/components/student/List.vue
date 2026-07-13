@@ -2,7 +2,7 @@
     <div>
         <Teleport to="#student_count">
             <div class="">
-                <h1 class="admin-h1 my-3">Students ( {{ Object.keys(this.users).length }} )</h1>
+                <h1 class="admin-h1 mb-3 font-bold font-exo">Students ( {{ Object.keys(this.users).length }} )</h1>
             </div>
         </Teleport>
         <div v-if="this.success!=null" class="alert alert-success" id="success-alert">{{this.success}}</div>
@@ -25,8 +25,6 @@
         </div>
 
         <div>
-            <memberdetails :url="this.url"></memberdetails>
-            <div id="memberdetail"></div>
             <div class="my-8">
                 <div class="w-full flex flex-wrap items-center justify-between mb-4">
                     <div class="flex items-center text-sm">
@@ -40,22 +38,13 @@
                             <input class="opacity-0 absolute w-full h-full cursor-pointer" type="checkbox" @click="selectNone($event)" v-model="noneSelected"><span>Select None</span>
                         </div>
                     </div> 
-                    <div class="relative flex items-center w-full lg:w-1/3 md:w-1/3 lg:justify-end mx-3 lg:mx-0 md:mx-0 my-2 lg:my-0 md:my-0" v-if="this.selectedUsersCount > 0">
-                        <a
-                            href="#"
-                            class="no-underline text-white px-4 my-3 mx-1 flex items-center custom-green py-1 justify-center"
-                            @click="showModal('tag')"
-                        >
-                            Add Tag
-                        </a>
-                        <a href="#" class="btn btn-submit blue-bg text-white px-3 py-1 text-sm font-medium rounded mx-1" @click="showModal('message')">Send Message</a>
-                       <a href="#" class="btn btn-submit blue-bg text-white px-3 py-1  text-sm font-medium rounded mx-1" @click="showModal('shift')">Shift</a>
-                       <a href="#" class="no-underline text-white  px-4 my-3 mx-1 flex items-center custom-green py-1 justify-center" @click="showModal('group')">Add Group</a>
-                        <a v-if="isFeeEnabled" href="#" class="no-underline text-white  px-4 my-3 mx-1 flex items-center custom-green py-1 justify-center" @click="showModal('fees')">
-                            <span class="mx-1 text-sm font-semibold">Add Fees Details</span>
-                            <svg class="w-3 h-3 fill-current text-white" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 409.6 409.6" style="enable-background:new 0 0 409.6 409.6;" xml:space="preserve"><g><g><path d="M392.533,187.733H221.867V17.067C221.867,7.641,214.226,0,204.8,0s-17.067,7.641-17.067,17.067v170.667H17.067 C7.641,187.733,0,195.374,0,204.8s7.641,17.067,17.067,17.067h170.667v170.667c0,9.426,7.641,17.067,17.067,17.067 s17.067-7.641,17.067-17.067V221.867h170.667c9.426,0,17.067-7.641,17.067-17.067S401.959,187.733,392.533,187.733z"/></g></g></svg>
-                        </a>
-                        <!-- <a href="#" class="btn btn-submit blue-bg text-white text-sm font-medium rounded " @click="buspass()">Bus Pass</a> -->
+                    <div class="relative flex flex-wrap items-center gap-2 w-full lg:w-auto lg:justify-end mx-3 lg:mx-0 md:mx-0 my-2 lg:my-0 md:my-0" v-if="this.selectedUsersCount > 0">
+                        <a href="#" class="bulk-action-btn bulk-action-btn--green" @click="showModal('tag')">Add Tag</a>
+                        <a href="#" class="bulk-action-btn bulk-action-btn--blue" @click="showModal('message')">Send Message</a>
+                        <a href="#" class="bulk-action-btn bulk-action-btn--blue" @click="showModal('shift')">Shift</a>
+                        <a href="#" class="bulk-action-btn bulk-action-btn--green" @click="showModal('group')">Add Group</a>
+                        <a v-if="isFeeEnabled" href="#" class="bulk-action-btn bulk-action-btn--green" @click="showModal('fees')">Add Fees Details</a>
+                        <!-- <a href="#" class="bulk-action-btn bulk-action-btn--blue" @click="buspass()">Bus Pass</a> -->
                     </div>
                 </div>
                 <div class="flex flex-wrap" v-if="Object.keys(this.users).length > 0">
@@ -67,14 +56,14 @@
                                 <label></label>
                             </div>
 
-                            <div class="flex p-2  w-full" v-bind:class="[user['status']=='active' ? 'active': 'bg-red-300' ]" :id="user['id']" @click="enableform(user['name'])">
+                            <a class="flex p-2  w-full no-underline" v-bind:class="[user['status']=='active' ? 'active': 'bg-red-300' ]" :id="user['id']" :href="url + '/admin/student/show/' + encodeURIComponent(user.name)">
                                 <img :src="user['avatar']" class="w-16 h-16">
                                 <div class="px-2">
                                     <h2 class="font-bold text-base text-gray-700">{{ user['fullname'] }}</h2>
-                                    <p>{{ user['class'] }}</p>
-                                    <p v-if="birthday == 'true'">{{ user['date_of_birth'] }}</p>
+                                    <p class="text-gray-700">{{ user['class'] }}</p>
+                                    <p v-if="birthday == 'true'" class="text-gray-700">{{ user['date_of_birth'] }}</p>
                                 </div>
-                            </div>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -90,64 +79,60 @@
 
         <div v-if="this.tab == 'message'" class="modal modal-mask">
             <div class="modal-wrapper px-4">
-                <div class="modal-container w-full  max-w-md px-8 mx-auto">
-                    <div class="modal-header flex justify-between items-center">
-                        <h2>Send Message</h2>
-                        <button id="close-button" class="modal-default-button text-2xl py-1"  @click="closeModal()">&times;</button>
+                <div class="modal-container gmodal w-full max-w-lg mx-auto">
+                    <div class="gmodal-head">
+                        <div class="gmodal-head-icon gmodal-head-icon--blue">
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </div>
+                        <div>
+                            <h2 class="gmodal-title">Send Message</h2>
+                            <p class="gmodal-subtitle">To the parents of {{ selectedUsersCount }} selected student(s)</p>
+                        </div>
+                        <button type="button" class="gmodal-close" @click="closeModal()">&times;</button>
                     </div>
-                    <div class="modal-body">
-                        <div class="flex items-center">
-                            <div class="w-full lg:w-1/4"> 
-                                <label for="subject" class="tw-form-label">Subject</label>
-                            </div>
-                            <div class="my-2 w-full lg:w-3/4">
-                                <input type="text" name="subject" v-model="subject" class="tw-form-control w-full" placeholder="Enter Subject">
-                                <span v-if="errors.subject" class="text-red-500 text-xs font-semibold">{{errors.subject[0]}}</span>
-                            </div>
+
+                    <div class="gmodal-body">
+                        <div class="gmodal-field">
+                            <label for="subject" class="gmodal-label">Subject</label>
+                            <input type="text" id="subject" name="subject" v-model="subject" class="tw-form-control w-full" placeholder="Enter subject">
+                            <span v-if="errors.subject"><p class="text-red-500 text-xs font-semibold my-1">{{errors.subject[0]}}</p></span>
+                        </div>
+
+                        <div class="gmodal-field">
+                            <label for="message" class="gmodal-label">Message</label>
+                            <textarea id="message" name="message" v-model="message" class="tw-form-control w-full" rows="6" placeholder="Type your message to the parents..."></textarea>
+                            <span v-if="errors.message"><p class="text-red-500 text-xs font-semibold my-1">{{errors.message[0]}}</p></span>
+                        </div>
+
+                        <label class="gmodal-check" :class="{ 'gmodal-check--on': send_later }">
+                            <input type="checkbox" name="send_later" v-model="send_later" @click="enableDate($event)">
+                            <span>
+                                <span class="gmodal-check-title">Send later</span>
+                                <span class="gmodal-check-desc">Schedule delivery for a specific date and time instead of sending now.</span>
+                            </span>
+                        </label>
+
+                        <div class="gmodal-field gmodal-field--inset" v-if="this.show == 'executed'">
+                            <label for="executed_at" class="gmodal-label">Deliver on</label>
+                            <VueDatePicker
+                              v-model="executed_at"
+                              format="dd-MM-yyyy HH:mm:ss"
+                              model-type="format"
+                              :enable-time-picker="true"
+                              :is-24="true"
+                              :auto-apply="true"
+                              input-class-name="w-full rounded"
+                            />
+                            <span v-if="errors.executed_at"><p class="text-red-500 text-xs font-semibold my-1">{{errors.executed_at[0]}}</p></span>
                         </div>
                     </div>
-                    <div class="modal-body">
-                        <div class="flex">
-                            <div class="w-full lg:w-1/4">
-                                <label for="message" class="tw-form-label">Message</label>
-                            </div>
-                            <div class="w-full lg:w-3/4">
-                                <textarea type="text" name="message" v-model="message" class="tw-form-control w-full" rows="10" placeholder="Enter Message"></textarea>
-                                <span v-if="errors.message" class="text-red-500 text-xs font-semibold">{{errors.message[0]}}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-body">
-                        <div class="flex items-center">
-                            <div class="w-6">
-                                <input type="checkbox" name="send_later" v-model="send_later" class="tw-form-control w-full" @click="enableDate($event)">
-                            </div>
-                            <div class="mx-1"> 
-                                <label for="subject" class="tw-form-label">Send Later</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-body" v-if="this.show == 'executed'">
-                        <div class="flex">
-                            <div class="w-full lg:w-1/4">
-                                <label for="executed_at" class="tw-form-label">Date Time</label>
-                            </div>
-                            <div class="w-full lg:w-3/4">
-                                <VueDatePicker
-                                  v-model="executed_at"
-                                  format="dd-MM-yyyy HH:mm:ss"
-                                  model-type="format"
-                                  :enable-time-picker="true"
-                                  :is-24="true"
-                                  :auto-apply="true"
-                                  input-class-name="w-full rounded"
-                                />
-                                <span v-if="errors.executed_at" class="text-red-500 text-xs font-semibold">{{errors.executed_at[0]}}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="my-6">
-                        <a href="#" class="btn btn-submit blue-bg text-white rounded px-3 py-1 mr-3 text-sm font-medium" @click="submit()">Send</a>
+
+                    <div class="gmodal-foot">
+                        <button type="button" class="gmodal-btn gmodal-btn--ghost" @click="closeModal()">Cancel</button>
+                        <button type="button" class="gmodal-btn gmodal-btn--primary" @click="submit()">
+                            <i class="fa-solid fa-paper-plane mr-2 text-xs"></i>
+                            {{ send_later ? 'Schedule Message' : 'Send Message' }}
+                        </button>
                     </div>
                 </div>
             </div>
@@ -156,28 +141,63 @@
 
          <div v-if="this.tab == 'shift'" class="modal modal-mask">
             <div class="modal-wrapper px-4">
-                <div class="modal-container w-full  max-w-md px-8 mx-auto">
-                    <div class="modal-header flex justify-between items-center">
-                        <h2>Shift Students</h2>
-                        <button id="close-button" class="modal-default-button text-2xl py-1"  @click="closeModal()">&times;</button>
+                <div class="modal-container gmodal w-full max-w-lg mx-auto">
+                    <div class="gmodal-head">
+                        <div class="gmodal-head-icon">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                        <div>
+                            <h2 class="gmodal-title">Shift Students</h2>
+                            <p class="gmodal-subtitle">Move {{ selectedUsersCount }} selected student(s) to another class</p>
+                        </div>
+                        <button type="button" class="gmodal-close" @click="closeModal()">&times;</button>
                     </div>
-                    <div class="modal-body">
-                        <div class="flex items-center">
-                            <div class="w-full lg:w-1/4"> 
-                                <label for="subject" class="tw-form-label">Select Standard</label>
-                            </div>
-                            <div class="my-2 w-full lg:w-3/4">
-                                 <select class="tw-form-control w-full" id="shift_std" v-model="shift_std" name="shift_std">
+
+                    <div class="gmodal-body">
+                        <div class="gmodal-alert">
+                            <i class="fa-solid fa-circle-info"></i>
+                            <span>This is a rarely used, critical action — records for the current academic year are rewritten immediately.</span>
+                        </div>
+
+                        <div class="gmodal-field">
+                            <label for="shift_std" class="gmodal-label">Move to class</label>
+                            <select class="tw-form-control w-full" id="shift_std" v-model="shift_std" name="shift_std">
                                 <option value="" disabled>Select Class</option>
                                 <option v-for="standard in standardLinks" v-bind:value="standard.id">{{ standard.standard_section }}</option>
                             </select>
-                            <span v-if="errors.shift_std"><p class="text-red-500 text-xs font-semibold">{{errors.shift_std[0]}}</p></span>
-                            </div>
+                            <span v-if="errors.shift_std"><p class="text-red-500 text-xs font-semibold my-1">{{errors.shift_std[0]}}</p></span>
                         </div>
+
+                        <p class="gmodal-label">Before you continue, acknowledge each point</p>
+
+                        <label class="gmodal-check" :class="{ 'gmodal-check--on': shiftAcks.scope }">
+                            <input type="checkbox" v-model="shiftAcks.scope">
+                            <span>
+                                <span class="gmodal-check-title">Selection verified</span>
+                                <span class="gmodal-check-desc">The shift applies to every selected student, not only the ones visible on this page.</span>
+                            </span>
+                        </label>
+                        <label class="gmodal-check" :class="{ 'gmodal-check--on': shiftAcks.records }">
+                            <input type="checkbox" v-model="shiftAcks.records">
+                            <span>
+                                <span class="gmodal-check-title">Records follow the class</span>
+                                <span class="gmodal-check-desc">Each student's class for the current academic year changes immediately — attendance, exams and fee records follow the new class.</span>
+                            </span>
+                        </label>
+                        <label class="gmodal-check" :class="{ 'gmodal-check--on': shiftAcks.irreversible }">
+                            <input type="checkbox" v-model="shiftAcks.irreversible">
+                            <span>
+                                <span class="gmodal-check-title">No undo</span>
+                                <span class="gmodal-check-desc">A wrong shift can only be corrected by manually shifting the students back.</span>
+                            </span>
+                        </label>
                     </div>
-                    
-                    <div class="my-6">
-                        <a href="#" class="btn btn-submit blue-bg text-white rounded px-3 py-1 mr-3 text-sm font-medium" @click="shiftstudents()">Shift</a>
+
+                    <div class="gmodal-foot">
+                        <button type="button" class="gmodal-btn gmodal-btn--ghost" @click="closeModal()">Cancel</button>
+                        <button type="button" class="gmodal-btn gmodal-btn--primary" :disabled="!shiftReady" @click="shiftstudents()">
+                            Shift {{ selectedUsersCount }} Student(s)
+                        </button>
                     </div>
                 </div>
             </div>
@@ -291,64 +311,41 @@
         </div>
         <div v-if="this.tab == 'group'" class="modal modal-mask">
     <div class="modal-wrapper px-4" @click.self="closeModal()">
-        <div class="modal-container w-full max-w-md mx-auto bg-white rounded-xl shadow-2xl overflow-hidden">
-            <!-- Header -->
-            <div class="modal-header flex justify-between items-center px-6 py-4 border-b border-gray-100 bg-gray-50">
-                <h2 class="text-lg font-semibold text-gray-800">Add Students To Group</h2>
-                <button
-                    class="modal-default-button text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-full w-8 h-8 flex items-center justify-center text-xl transition-colors"
-                    @click="closeModal()"
-                >
-                    &times;
-                </button>
+        <div class="modal-container gmodal w-full max-w-md mx-auto">
+            <div class="gmodal-head">
+                <div class="gmodal-head-icon gmodal-head-icon--green">
+                    <i class="fa-solid fa-layer-group"></i>
+                </div>
+                <div>
+                    <h2 class="gmodal-title">Add To Group</h2>
+                    <p class="gmodal-subtitle">Add {{ selectedUsersCount }} selected student(s) to a group</p>
+                </div>
+                <button type="button" class="gmodal-close" @click="closeModal()">&times;</button>
             </div>
 
-            <!-- Body -->
-            <div class="modal-body px-6 py-5">
-                <label class="block text-sm font-medium text-gray-700 mb-1.5">
-                    Select Group
-                </label>
-                <select
-                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-shadow"
-                    v-model="group_id"
-                >
-                    <option value="">Select Group</option>
-                    <option
-                        v-for="group in groups"
-                        :key="group.id"
-                        :value="group.id"
-                    >
-                        {{ group.group_name ? group.group_name.replace(/\b\w/g, char => char.toUpperCase()) : '' }}
-                    </option>
-                </select>
-
-                <span
-                    v-if="errors.group_id"
-                    class="text-red-500 text-xs font-medium mt-1.5 block"
-                >
-                    {{ errors.group_id[0] }}
-                </span>
-                <span
-                    v-if="errors.selectedUsers"
-                    class="text-red-500 text-xs font-medium block mt-2"
-                >
-                    {{ errors.selectedUsers[0] }}
-                </span>
+            <div class="gmodal-body">
+                <div class="gmodal-field">
+                    <label for="group_id" class="gmodal-label">Group</label>
+                    <select id="group_id" v-model="group_id" class="tw-form-control w-full">
+                        <option value="">&mdash; Choose a group &mdash;</option>
+                        <option
+                            v-for="group in groups"
+                            :key="group.id"
+                            :value="group.id"
+                        >
+                            {{ group.group_name ? group.group_name.replace(/\b\w/g, char => char.toUpperCase()) : '' }}
+                        </option>
+                    </select>
+                    <span v-if="errors.group_id"><p class="text-red-500 text-xs font-semibold my-1">{{ errors.group_id[0] }}</p></span>
+                    <span v-if="errors.selectedUsers"><p class="text-red-500 text-xs font-semibold my-1">{{ errors.selectedUsers[0] }}</p></span>
+                </div>
             </div>
 
-            <!-- Footer -->
-            <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
-                <button
-                    class="px-4 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
-                    @click="closeModal()"
-                >
-                    Cancel
-                </button>
-                <button
-                    class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition-colors"
-                    @click="submitGroup()"
-                >
-                    Update Group
+            <div class="gmodal-foot">
+                <button type="button" class="gmodal-btn gmodal-btn--ghost" @click="closeModal()">Cancel</button>
+                <button type="button" class="gmodal-btn gmodal-btn--primary" :disabled="!group_id" @click="submitGroup()">
+                    <i class="fa-solid fa-layer-group mr-2 text-xs"></i>
+                    Add To Group
                 </button>
             </div>
         </div>
@@ -356,123 +353,59 @@
 </div>
 <div v-if="this.tab == 'tag'" class="modal modal-mask">
     <div class="modal-wrapper px-4" @click.self="closeModal()">
-        <div class="modal-container w-full max-w-md mx-auto bg-white rounded-xl shadow-2xl overflow-hidden">
-
-            <!-- Header -->
-            <div class="modal-header flex justify-between items-center px-6 py-4 border-b border-gray-100 bg-gray-50">
-                <div class="flex items-center gap-2">
-                    <div class="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center">
-                        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-5 5a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"/>
-                        </svg>
-                    </div>
-                    <h2 class="text-lg font-semibold text-gray-800">Add Tag To Students</h2>
+        <div class="modal-container gmodal w-full max-w-md mx-auto">
+            <div class="gmodal-head">
+                <div class="gmodal-head-icon gmodal-head-icon--green">
+                    <i class="fa-solid fa-tag"></i>
                 </div>
-                <button
-                    class="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-200 hover:text-gray-600 transition-colors text-xl"
-                    @click="closeModal()"
-                >
-                    &times;
-                </button>
+                <div>
+                    <h2 class="gmodal-title">Add Tag</h2>
+                    <p class="gmodal-subtitle">Tag {{ selectedUsersCount }} selected student(s)</p>
+                </div>
+                <button type="button" class="gmodal-close" @click="closeModal()">&times;</button>
             </div>
 
-            <!-- Body -->
-            <div class="modal-body px-6 py-5 space-y-4">
-
-                <!-- Existing Tag Select -->
-                <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
-                        Select Existing Tag
-                    </label>
-                    <select
-                        v-model="tag_name"
-                        class="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition-all appearance-none"
-                        style="background-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 fill=%22none%22 viewBox=%220 0 20 20%22><path stroke=%22%236b7280%22 stroke-width=%221.5%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 d=%22M6 8l4 4 4-4%22/></svg>'); background-repeat: no-repeat; background-position: right 0.7rem center; background-size: 1.2em; padding-right: 2.5rem;"
-                    >
-                        <option value="">— Choose a tag —</option>
+            <div class="gmodal-body">
+                <div class="gmodal-field">
+                    <label class="gmodal-label">Existing tag</label>
+                    <select v-model="tag_name" class="tw-form-control w-full">
+                        <option value="">&mdash; Choose a tag &mdash;</option>
                         <option v-for="tag in tags" :key="tag.id" :value="tag.tag_name">
                             {{ tag.tag_name }}
                         </option>
                     </select>
                 </div>
 
-                <!-- Divider with OR -->
-                <div class="flex items-center gap-3">
-                    <div class="flex-1 h-px bg-gray-100"></div>
-                    <span class="text-xs font-medium text-gray-400">OR</span>
-                    <div class="flex-1 h-px bg-gray-100"></div>
-                </div>
+                <div class="gmodal-divider"><span>or</span></div>
 
-                <!-- Create New Tag Toggle -->
-                <div>
-                    <button
-                        type="button"
-                        @click="showNewTag = !showNewTag"
-                        class="w-full flex items-center justify-between text-xs font-semibold text-gray-600 px-3 py-2 rounded-lg border border-dashed border-gray-300 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600 transition-all"
-                    >
-                        <span class="flex items-center gap-1.5">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-                            </svg>
-                            Create a new tag
-                        </span>
-                        <svg
-                            class="w-4 h-4 transition-transform"
-                            :class="showNewTag ? 'rotate-180' : ''"
-                            fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
-                        >
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
-                        </svg>
-                    </button>
+                <button type="button" class="gmodal-toggle" :class="{ 'gmodal-toggle--open': showNewTag }" @click="showNewTag = !showNewTag">
+                    <span><i class="fa-solid fa-plus mr-2"></i>Create a new tag</span>
+                    <i class="fa-solid fa-chevron-down gmodal-toggle-chevron"></i>
+                </button>
 
-                    <transition name="slide-down">
-                        <div v-if="showNewTag" class="mt-2">
-                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
-                                Tag Name
-                            </label>
-                            <input
-                                type="text"
-                                v-model="new_tag_name"
-                                placeholder="e.g. Needs Extra Support"
-                                class="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 text-gray-700 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition-all"
-                            />
-                        </div>
-                    </transition>
-                </div>
+                <transition name="slide-down">
+                    <div v-if="showNewTag" class="gmodal-field gmodal-field--inset">
+                        <label class="gmodal-label">Tag name</label>
+                        <input
+                            type="text"
+                            v-model="new_tag_name"
+                            placeholder="e.g. Needs Extra Support"
+                            class="tw-form-control w-full"
+                        />
+                    </div>
+                </transition>
 
-                <!-- Validation errors -->
-                <span
-                    v-if="errors.tag_name"
-                    class="text-red-500 text-xs font-medium block"
-                >
-                    {{ errors.tag_name[0] }}
-                </span>
-                <span
-                    v-if="errors.selectedUsers"
-                    class="text-red-500 text-xs font-medium block"
-                >
-                    {{ errors.selectedUsers[0] }}
-                </span>
+                <span v-if="errors.tag_name"><p class="text-red-500 text-xs font-semibold my-1">{{ errors.tag_name[0] }}</p></span>
+                <span v-if="errors.selectedUsers"><p class="text-red-500 text-xs font-semibold my-1">{{ errors.selectedUsers[0] }}</p></span>
             </div>
 
-            <!-- Footer -->
-            <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
-                <button
-                    type="button"
-                    class="px-4 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
-                    @click="closeModal()"
-                >
-                    Cancel
-                </button>
-                <button
-                    type="button"
-                    class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition-colors"
-                    @click="submitTag()"
-                >
+            <div class="gmodal-foot">
+                <button type="button" class="gmodal-btn gmodal-btn--ghost" @click="closeModal()">Cancel</button>
+                <button type="button" class="gmodal-btn gmodal-btn--primary" :disabled="!tag_name && !new_tag_name.trim()" @click="submitTag()">
+                    <i class="fa-solid fa-tag mr-2 text-xs"></i>
                     Save Tag
                 </button>
             </div>
-
         </div>
     </div>
 </div>
@@ -481,7 +414,6 @@
 
 <script>
     import { bus } from "../../app";
-    import memberdetails from './Detail';
     import { VueDatePicker } from '@vuepic/vue-datepicker'
     import '@vuepic/vue-datepicker/dist/main.css'
 
@@ -490,7 +422,6 @@
 
         components:
         {
-            memberdetails,
             VueDatePicker,
         },
         data(){
@@ -522,6 +453,7 @@
                 checkedNames:[],
                 standardLinks:[],
                 shift_std:'',
+                shiftAcks: { scope: false, records: false, irreversible: false },
                 isFeeEnabled: window.AppConfig?.gfee_enabled ?? false,
                 groups: [],
                 group_id: '',
@@ -554,14 +486,22 @@
             filteredNames () 
             {
                 let users = this.users
-                if (this.selectedLetter) 
+                if (this.selectedLetter)
                 {
-                    users = users.filter((name) => {
-                        let firstLetter = name.charAt(0).toUpperCase()
+                    // users are objects from /admin/students/find, not name
+                    // strings -- calling charAt on the object throws and
+                    // freezes the whole component render.
+                    users = users.filter((user) => {
+                        let firstLetter = (user.firstname || '').charAt(0).toUpperCase()
                         return firstLetter === this.selectedLetter
                     })
                 }
                 return users
+            },
+
+            shiftReady ()
+            {
+                return this.shiftAcks.scope && this.shiftAcks.records && this.shiftAcks.irreversible
             }
         },
 
@@ -604,13 +544,6 @@
                 this.standardLink_id = standardLink_id;
             },
 
-            enableform(val)
-            {
-                this.success=null;
-                $('#show-detail').removeClass('hide-menu').addClass('block');
-                bus.emit("dataMemberName", val);
-            },
-            
             sortMembers(name)
             {
                 this.selectedLetter= name; 
@@ -714,9 +647,14 @@
                 }
                 if(this.selectedUsersCount > 0)
                 {
-                   
+
                     this.tab = value;
 
+                    if(value == 'shift')
+                    {
+                        // acknowledgments must be re-checked on every open
+                        this.shiftAcks = { scope: false, records: false, irreversible: false };
+                    }
                     if(value == 'group')
                     {
                         this.getGroups();
@@ -805,9 +743,13 @@
 
             shiftstudents()
             {
+                // Shifting rewrites academic records with no undo -- require
+                // every acknowledgment even if the disabled button is bypassed.
+                if (!this.shiftReady) { return; }
+
                 this.errors=[];
                 this.success=null;
-                
+
                 axios.post('/admin/student/shift',{
                   //selected:this.selected, 
                   selectedUsers:this.selectedUsers,
@@ -914,6 +856,7 @@
                 this.tag_name = '';
                 this.new_tag_name = '';
                 this.showNewTag = false;
+                this.shiftAcks = { scope: false, records: false, irreversible: false };
             },
 
             addNotify(e)
@@ -1004,6 +947,35 @@
 </script>
 
 <style scoped>
+  .bulk-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.375rem 0.9rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #fff;
+    border-radius: 0.375rem;
+    white-space: nowrap;
+    text-decoration: none;
+  }
+
+  .bulk-action-btn--green {
+    background-color: #00c982;
+  }
+
+  .bulk-action-btn--green:hover {
+    background-color: #00b374;
+  }
+
+  .bulk-action-btn--blue {
+    background-color: #3492e2;
+  }
+
+  .bulk-action-btn--blue:hover {
+    background-color: #2c7dc4;
+  }
+
   .modal-mask {
     position: fixed;
     z-index: 9998;
@@ -1120,5 +1092,269 @@
 .slide-down-leave-from {
   opacity: 1;
   max-height: 100px;
+}
+
+/* --- gmodal: header / body / footer modal layout (Shift Students) --- */
+/* Overrides .modal-container's fixed height + flat padding, so it must
+   stay below that rule in this style block. */
+.gmodal {
+    padding: 0;
+    height: auto;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.gmodal-head {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.gmodal-head-icon {
+    flex: none;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 9999px;
+    background: #fef3c7;
+    color: #b45309;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+}
+
+.gmodal-head-icon--blue {
+    background: #dbeafe;
+    color: #1d6fb8;
+}
+
+.gmodal-head-icon--green {
+    background: #d1fae5;
+    color: #047857;
+}
+
+.gmodal-title {
+    margin: 0;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1f2937;
+    line-height: 1.3;
+}
+
+.gmodal-subtitle {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+.gmodal-close {
+    margin-left: auto;
+    flex: none;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 9999px;
+    font-size: 1.25rem;
+    line-height: 1;
+    color: #6b7280;
+    background: transparent;
+}
+
+.gmodal-close:hover {
+    background: #f3f4f6;
+    color: #111827;
+}
+
+.gmodal-body {
+    padding: 1.25rem 1.5rem;
+    overflow-y: auto;
+}
+
+.gmodal-alert {
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-start;
+    background: #fffbeb;
+    border: 1px solid #fcd34d;
+    color: #92400e;
+    font-size: 0.8rem;
+    line-height: 1.45;
+    border-radius: 0.375rem;
+    padding: 0.625rem 0.75rem;
+    margin-bottom: 1.25rem;
+}
+
+.gmodal-alert i {
+    margin-top: 0.15rem;
+}
+
+.gmodal-field {
+    margin-bottom: 1.25rem;
+}
+
+.gmodal-field--inset {
+    margin: 0.5rem 0 0.25rem;
+    padding: 0.75rem;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.375rem;
+}
+
+.gmodal-divider {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 1rem 0;
+}
+
+.gmodal-divider::before,
+.gmodal-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #e5e7eb;
+}
+
+.gmodal-divider span {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #9ca3af;
+}
+
+.gmodal-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.55rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #4b5563;
+    background: #fff;
+    border: 1px dashed #d1d5db;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: border-color .15s ease, background-color .15s ease, color .15s ease;
+}
+
+.gmodal-toggle:hover {
+    border-color: #00c982;
+    background: #f0fdf7;
+    color: #047857;
+}
+
+.gmodal-toggle-chevron {
+    font-size: 0.7rem;
+    transition: transform .15s ease;
+}
+
+.gmodal-toggle--open .gmodal-toggle-chevron {
+    transform: rotate(180deg);
+}
+
+.gmodal-label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #6b7280;
+    margin: 0 0 0.5rem;
+}
+
+.gmodal-check {
+    display: flex;
+    gap: 0.625rem;
+    align-items: flex-start;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.375rem;
+    padding: 0.625rem 0.75rem;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    transition: border-color .15s ease, background-color .15s ease;
+}
+
+.gmodal-check:hover {
+    border-color: #9ca3af;
+}
+
+.gmodal-check--on {
+    border-color: #00c982;
+    background: #f0fdf7;
+}
+
+.gmodal-check input {
+    margin-top: 0.2rem;
+    flex: none;
+    width: 1rem;
+    height: 1rem;
+    accent-color: #00c982;
+}
+
+.gmodal-check-title {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.gmodal-check-desc {
+    display: block;
+    font-size: 0.75rem;
+    color: #6b7280;
+    line-height: 1.45;
+}
+
+.gmodal-foot {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    padding: 0.875rem 1.5rem;
+    background: #f9fafb;
+    border-top: 1px solid #e5e7eb;
+}
+
+.gmodal-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1.1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: 0.375rem;
+    transition: background-color .15s ease;
+}
+
+.gmodal-btn--ghost {
+    background: #fff;
+    color: #374151;
+    border: 1px solid #d1d5db;
+}
+
+.gmodal-btn--ghost:hover {
+    background: #f3f4f6;
+}
+
+.gmodal-btn--primary {
+    background: #3492e2;
+    color: #fff;
+    border: 1px solid transparent;
+}
+
+.gmodal-btn--primary:hover:not(:disabled) {
+    background: #2c7dc4;
+}
+
+.gmodal-btn--primary:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+    opacity: .7;
 }
 </style>

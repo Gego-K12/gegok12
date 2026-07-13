@@ -175,11 +175,13 @@
             {
                 let users = this.users
                 //console.log(users);
-                if (this.selectedLetter) 
+                if (this.selectedLetter)
                 {
-                    users = users.filter((name) => {
-                        let firstLetter = name.charAt(0).toUpperCase()
-                        return firstLetter === this.selectedLetter
+                    // users are objects, not name strings -- calling charAt
+                    // on the object throws and freezes the component render.
+                    users = users.filter((user) => {
+                        let name = typeof user === 'string' ? user : (user.firstname || user.name || '')
+                        return name.charAt(0).toUpperCase() === this.selectedLetter
                     })
                 }
                 return users

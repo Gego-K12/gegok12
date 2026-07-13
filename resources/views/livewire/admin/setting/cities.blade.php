@@ -6,7 +6,7 @@
                 {{ session('message') }}
             </div>
         @endif
-      <section class="section p-6">
+      <section class="section">
         <div class="w-full bg-white shadow-lg rounded-xl border overflow-hidden">
             <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
                 <h1 class="admin-h1">Cities</h1>

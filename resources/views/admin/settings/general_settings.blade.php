@@ -1,5 +1,5 @@
 <div class="container mx-auto">
-    <div class="max-w-5xl mx-auto my-6">
+    <div class="max-w-5xl mx-auto">
 
     <div class="bg-white shadow-lg rounded-xl border overflow-hidden">
 

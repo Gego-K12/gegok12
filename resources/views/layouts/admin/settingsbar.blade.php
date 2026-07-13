@@ -1,4 +1,4 @@
-<div class="w-full lg:w-40 md:w-40 settings-sidebar bg-red-800 self-stretch my-6">
+<div class="w-full lg:w-40 md:w-40 settings-sidebar bg-red-800 self-stretch">
 	<ul class="list-reset">
 		<li class="{{ Request::segment('3') == 'generalsettings' ? 'active' : '' }}"><a href="{{url('admin/settings/generalsettings/')}}" class="no-underline">General settings</a></li>
 		{{-- <li class="{{ Request::segment('3') == 'seodetailsettings' ? 'active' : '' }}"><a href="{{url('admin/settings/seodetailsettings/')}}" class="no-underline">SEO Details</a></li>

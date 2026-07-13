@@ -1,4 +1,4 @@
-  <div class="p-6">
+  <div>
 
     <div class="bg-white shadow-lg rounded-xl border overflow-hidden">
         <div class="flex items-center px-6 py-4 border-b bg-gray-50">

@@ -39,6 +39,12 @@ mix.js("resources/assets/js/app.js", "public/js")
     .extract()
     .sass("resources/assets/sass/app.scss", "public/css");
 
+// Font Awesome is linked directly from the layout <head> (not imported via
+// app.js) so icons render on first paint instead of popping in after the JS
+// bundle executes and injects the styles.
+mix.copy("node_modules/@fortawesome/fontawesome-free/css/all.min.css", "public/vendor/fontawesome/css/all.min.css")
+    .copyDirectory("node_modules/@fortawesome/fontawesome-free/webfonts", "public/vendor/fontawesome/webfonts");
+
 if (mix.inProduction()) {
     mix.version();
 } else {

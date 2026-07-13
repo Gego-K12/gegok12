@@ -30,13 +30,13 @@
         @include($portal['flashMessagePartial'])
     @endisset
 
-    @foreach(\App\Models\Plugin::withBeforeContentFor($portalKey)->get() as $__pluginBeforeContent)
+    @foreach(\App\Models\Plugin::cachedHook('withBeforeContentFor', $portalKey) as $__pluginBeforeContent)
         @includeIf($__pluginBeforeContent->beforeContentViewName($portalKey))
     @endforeach
 
     @yield('content')
 
-    @foreach(\App\Models\Plugin::withAfterContentFor($portalKey)->get() as $__pluginAfterContent)
+    @foreach(\App\Models\Plugin::cachedHook('withAfterContentFor', $portalKey) as $__pluginAfterContent)
         @includeIf($__pluginAfterContent->afterContentViewName($portalKey))
     @endforeach
 @endsection

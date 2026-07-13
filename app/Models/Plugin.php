@@ -9,6 +9,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * Class Plugin
@@ -64,6 +65,41 @@ class Plugin extends Model
     ];
 
     /**
+     * Any change to any plugin row (install, uninstall, status flip) bumps
+     * the hook-cache version, invalidating every cachedHook() entry at once.
+     */
+    protected static function booted(): void
+    {
+        $bump = function () {
+            Cache::forever(self::HOOK_CACHE_VERSION_KEY, self::hookCacheVersion() + 1);
+        };
+        static::saved($bump);
+        static::deleted($bump);
+    }
+
+    private const HOOK_CACHE_VERSION_KEY = 'plugin_hooks_version';
+
+    private static function hookCacheVersion(): int
+    {
+        return (int) Cache::rememberForever(self::HOOK_CACHE_VERSION_KEY, fn () => 1);
+    }
+
+    /**
+     * Cached wrapper around the per-portal hook scopes (withMenuFor,
+     * withToolsMenuFor, withBeforeContentFor, ...). The sidebar/layout
+     * blades run these on every request even though the result only
+     * changes when a plugin is (un)installed, so serve them from cache.
+     *
+     *     Plugin::cachedHook('withMenuFor', 'admin')
+     */
+    public static function cachedHook(string $scope, string $portal)
+    {
+        $key = sprintf('plugin_hook_%s_%s_v%d', $scope, $portal, self::hookCacheVersion());
+
+        return Cache::remember($key, env('CACHE_TIME'), fn () => static::query()->{$scope}($portal)->get());
+    }
+
+    /**
      * A plugin can target more than one portal at once — `portal` is stored
      * as a comma-separated list (e.g. "teacher,admin") rather than a single
      * value, so it can wire routes/menus into each portal independently.
@@ -100,7 +136,7 @@ class Plugin extends Model
      */
     public function scopeWithMenuFor($query, string $portal)
     {
-        return $this->filterByPortal($query, $portal)->where('status', 'installed')->where('has_menu', true);
+        return $this->filterByPortal($query, $portal)->where('status', 'installed')->where('has_menu', true)->orderBy('name');
     }
 
     /**

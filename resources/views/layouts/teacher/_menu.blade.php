@@ -48,7 +48,7 @@ $coreMenu = [
     {{-- Plugin menu hook: any installed plugin with has_menu=true and portal=teacher
          gets its resources/views/plugins/{slug}/menu.blade.php included here automatically,
          so new plugins never require editing this file. --}}
-    @foreach(\App\Models\Plugin::withMenuFor('teacher')->get() as $installedPlugin)
+    @foreach(\App\Models\Plugin::cachedHook('withMenuFor', 'teacher') as $installedPlugin)
         @includeIf($installedPlugin->menuViewName('teacher'))
     @endforeach
 </ul>

@@ -433,7 +433,7 @@
     {{-- Plugin dashboard-widget hook: any installed plugin with has_dashboard_widget=true
          and portal=teacher gets its resources/views/plugins/{slug}/dashboard-widget.blade.php
          included here automatically, so new plugins never require editing this file. --}}
-    @foreach(\App\Models\Plugin::withDashboardWidgetFor('teacher')->get() as $installedPlugin)
+    @foreach(\App\Models\Plugin::cachedHook('withDashboardWidgetFor', 'teacher') as $installedPlugin)
         @includeIf($installedPlugin->dashboardWidgetViewName('teacher'))
     @endforeach
 @endsection

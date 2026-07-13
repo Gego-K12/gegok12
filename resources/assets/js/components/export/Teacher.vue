@@ -15,9 +15,9 @@
     </ul>
   </div> -->
                <div class="">
-                    <a @click="customexport()" id="export-button" class="no-underline text-white px-4 my-3 mx-1 flex items-center custom-green py-1">
-                        <span class="mx-1 text-sm font-semibold">Export</span>
-                    </a> 
+                    <a @click="customexport()" id="export-button" class="no-underline flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <i class="fa-solid fa-file-export w-4 text-center mr-2 text-gray-500"></i> Export
+                    </a>
                 </div>
       	
         

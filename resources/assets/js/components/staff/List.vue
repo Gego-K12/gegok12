@@ -1,28 +1,29 @@
 <template>
   <div>
     <div v-if="this.success!=null" class="alert alert-success" id="success-alert">{{this.success}}</div>
-    <div class="my-4 filter-alphabet">
-      <ul class="list-reset flex" style="max-width: calc(100vw - 40px);overflow: auto;">
-        <li v-for="alphabet in alphabets">
-          <a href="#" id="filter" class="block font-bold p-2 bg-grey-light border border-grey mx-2 ni" v-bind:class="letter === alphabet?'active':'text-blue'" v-text="alphabet"  @click="sortMembers(alphabet)"> </a>
+    <div class="my-4 flex flex-wrap items-center justify-between staff-toolbar">
+      <ul class="list-reset flex staff-view-tabs">
+        <li :class="{'active': view === 'current'}">
+          <a href="#" @click.prevent="filterByView('current')">Current Staff</a>
         </li>
-        <li>
-          <a href="#" class="block font-bold p-2 bg-grey-light border border-grey mx-2 ni" @click="clearAll()">Clear All</a>
+        <li :class="{'active': view === 'exit'}">
+          <a href="#" @click.prevent="filterByView('exit')">Relieved Staff</a>
         </li>
       </ul>
-      <div class="my-4" v-if="!filteredNames.length">No names for this letter</div>
-      <div class="" v-if="filteredNames.length"></div>
+
+      <div class="flex items-center gap-2">
+        <select class="alphabet-select" v-model="selectedLetter" @change="sortMembers(selectedLetter)">
+          <option value="" disabled>A - Z</option>
+          <option v-for="alphabet in alphabets" :key="alphabet" :value="alphabet">{{ alphabet }}</option>
+        </select>
+        <a href="#" class="clear-btn" @click.prevent="clearAll()">Clear</a>
+      </div>
     </div>
-    <ul class="list-reset flex text-xs profile-tab flex-wrap">
-      <li class="px-2 mx-1 py-1" :class="{'active': view === 'current'}">
-        <a href="#" class="text-gray-700 font-medium" @click.prevent="filterByView('current')">Current Staff</a>
-      </li>
-      <li class="px-2 mx-1 py-1" :class="{'active': view === 'exit'}">
-        <a href="#" class="text-gray-700 font-medium" @click.prevent="filterByView('exit')">Relieved Staff</a>
-      </li>
-    </ul>
+    <div class="no-names-message" v-if="selectedLetter && !users.length">
+      <i class="fa-solid fa-circle-info"></i> No staff found for the letter "{{ selectedLetter }}".
+    </div>
     <div>
-      <div class="my-8">
+      <div class="my-8 overflow-x-auto staff-table-wrap">
         <vue-good-table
           :columns="tableColumns"
           :rows="users"
@@ -66,7 +67,7 @@
           alphabets: [
           'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
           ],
-          selectedLetter: undefined,
+          selectedLetter: this.letter || '',
           active: false,
           view: 'current',
           errors:[],
@@ -82,33 +83,20 @@
 
       computed:
       {
-        filteredNames ()
+        tableColumns()
         {
-          let users = this.users
-          if (this.selectedLetter)
+          var columns = [
+            { label: 'Name', field: 'fullname', width: '260px', filterOptions: { enabled: true, placeholder: 'Search name' } },
+            { label: 'Designation', field: 'designation_name', width: '200px', filterOptions: { enabled: true, placeholder: 'Search designation' } },
+            { label: 'Status', field: 'status', width: '150px' },
+            { label: 'Last Login', field: 'last_login_at', width: '200px', sortable: false },
+          ];
+          if (this.birthday == 'true')
           {
-            users = users.filter((name) => {
-            let firstLetter = name.charAt(0).toUpperCase()
-            return firstLetter === this.selectedLetter
-          })
-        }
-        return users
-      },
-
-      tableColumns()
-      {
-        var columns = [
-          { label: 'Name', field: 'fullname', filterOptions: { enabled: true, placeholder: 'Search name' } },
-          { label: 'Designation', field: 'designation_name', filterOptions: { enabled: true, placeholder: 'Search designation' } },
-          { label: 'Status', field: 'status' },
-          { label: 'Last Login', field: 'last_login_at', sortable: false },
-        ];
-        if (this.birthday == 'true')
-        {
-          columns.push({ label: 'Date of Birth', field: 'date_of_birth' });
-        }
-        return columns;
-      },
+            columns.push({ label: 'Date of Birth', field: 'date_of_birth', width: '180px' });
+          }
+          return columns;
+        },
     },
 
     components:
@@ -124,6 +112,8 @@
         var viewQuery = this.view == 'exit' ? '&view=exit' : '';
         axios.get('/admin/staffs/find?'+this.searchquery+viewQuery).then(response => {
           this.users = response.data.data;
+        }).catch(error => {
+          console.error('Failed to load staff list', error);
         });
       },
 
@@ -195,3 +185,70 @@
     }
   }
 </script>
+
+<style scoped>
+
+.staff-view-tabs {
+  gap: 0.5rem;
+}
+
+.staff-view-tabs li a {
+  display: inline-block;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #6b7280;
+  border-radius: 9999px;
+  text-decoration: none;
+}
+
+.staff-view-tabs li a:hover {
+  color: #374151;
+}
+
+.staff-view-tabs li.active a {
+  background-color: #e53e3e;
+  color: #fff;
+}
+
+.alphabet-select {
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  background-color: #fff;
+}
+
+.clear-btn {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #e53e3e;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.clear-btn:hover {
+  text-decoration: underline;
+}
+
+.staff-table-wrap :deep(table.vgt-table) {
+  min-width: 850px;
+  table-layout: fixed;
+}
+
+.no-names-message {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.75rem 0;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: #92400e;
+  background-color: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 0.375rem;
+}
+
+</style>

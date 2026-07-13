@@ -17,8 +17,9 @@
 
       <div class="">
                     <a @click="customexport()" id="export-button" class="no-underline text-white px-4 my-3 mx-1 flex items-center custom-green py-1">
+                        <i class="fa-solid fa-file-export w-4 text-center mr-2"></i>
                         <span class="mx-1 text-sm font-semibold">Export</span>
-                    </a> 
+                    </a>
                 </div>
         
          <div v-if="this.exporttab == 1" class="modal modal-mask">

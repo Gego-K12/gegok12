@@ -39,7 +39,7 @@ $coreMenuBottom = [
          here to match their original place between "Books" and "To Do List". --}}
     <li class="py-3 px-3 hover:font-semibold {{ (Request::segment('2') == 'booklending' && Request::segment(3) == 'index') ? 'active' : '' }}">
         <a href="{{ url('/library/booklending/index') }}" class="flex items-center">
-            <i class="fa-solid fa-book-arrow-right text-lg w-5 text-center"></i>
+            <i class="fa-solid fa-atlas text-lg w-5 text-center"></i>
             <span class="mx-3 whitespace-no-wrap">Books Lending</span>
         </a>
     </li>

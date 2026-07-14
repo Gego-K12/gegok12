@@ -539,7 +539,7 @@
                 this.users = response.data.data;
             });
             this.getUrl();
-            if(this.isFeeEnabled && this.tab=='fees')
+            if(this.tab=='fees')
             {
                 this.getFeeDetails();
             }

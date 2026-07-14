@@ -816,6 +816,21 @@ Route::get('setting/state/detail/{id}', function ($id) {
     return view('admin.setting.statedetail', compact('id'));
 })->name('admin.setting.states.detail');
 
+// Qualification
+Route::get('setting/qualifications', function () {
+    return view('admin.setting.qualifications');
+})->name('admin.setting.qualifications');
+
+Route::get('setting/qualification/create', function () {
+    $id = '';
+
+    return view('admin.setting.qualificationform', compact('id'));
+})->name('admin.setting.qualifications.create');
+
+Route::get('setting/qualification/update/{id}', function ($id) {
+    return view('admin.setting.qualificationform', compact('id'));
+})->name('admin.setting.qualifications.update');
+
 // sms
 Route::get('setting/smstemplates', function () {
     return view('admin.setting.smstemplates');

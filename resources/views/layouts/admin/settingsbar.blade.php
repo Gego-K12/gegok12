@@ -7,5 +7,6 @@
 		<li class="{{ in_array(Request::segment('3'), ['countries', 'country']) ? 'active' : '' }}"><a href="{{url('admin/setting/countries')}}" class="no-underline">Countries</a></li>
 		<li class="{{ in_array(Request::segment('3'), ['states', 'state']) ? 'active' : '' }}"><a href="{{url('admin/setting/states')}}" class="no-underline">States</a></li>
 		<li class="{{ in_array(Request::segment('3'), ['cities', 'city']) ? 'active' : '' }}"><a href="{{url('admin/setting/cities')}}" class="no-underline">Cities</a></li>
+		<li class="{{ in_array(Request::segment('3'), ['qualifications', 'qualification']) ? 'active' : '' }}"><a href="{{url('admin/setting/qualifications')}}" class="no-underline">Qualification</a></li>
 	</ul>
 </div>

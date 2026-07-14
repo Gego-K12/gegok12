@@ -2,8 +2,8 @@
 
 namespace App\Imports;
 
-use App\Models\QuizOption;
-use App\Models\QuizQuestion;
+use Gegok12\Quiz\Models\QuizQuestion;
+use Gegok12\Quiz\Models\QuizOption;
 use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;

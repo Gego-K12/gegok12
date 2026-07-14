@@ -5,7 +5,7 @@
                 <a href="#" class="text-gray-700 font-medium" @click="setProfileTab('1')">Notice Board</a>
             </li>
             
-            <li v-if="gtimetableEnabled" class="px-2 mx-1 lg:mx-2 md:mx-2 py-2 lg:py-3 md:py-2" v-bind:class="[{'active' : profile_tab === '2'}]">
+            <li class="px-2 mx-1 lg:mx-2 md:mx-2 py-2 lg:py-3 md:py-2" v-bind:class="[{'active' : profile_tab === '2'}]">
                 <a href="#" class="text-gray-700 font-medium" @click="setProfileTab('2')">Time Table</a>
             </li>
             <li class="px-2 mx-1 lg:mx-2 md:mx-2  py-2 lg:py-3 md:py-2" v-bind:class="[{'active' : profile_tab === '3'}]">

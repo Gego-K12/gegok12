@@ -88,13 +88,11 @@
           
            <div id="showdetail" class="hidden attendance-class-detail shadow rounded mx-2 absolute right-0 bg-white">
             <ul class="text-sm leading-loose">
-              @if(config('gtimetable.enabled', false))
               <li class="py-1">
                 @if(count($standardLink->timetable) == 0)
                   <a href="{{ url('/admin/timetable/add?standardLink_id='.$standardLink->id) }}" class="capitalize px-3 py-2 my-1 font-medium text-center">add timetable</a>
                 @endif
               </li>
-              @endif
               <li class="py-1">
                 <a href="{{ url('/admin/attendance/export/'.$standardLink->id) }}" class="capitalize px-3 py-2 my-1 font-medium text-center mr-1 lg:mr-0 md:mr-0">export attendance</a>
               </li>

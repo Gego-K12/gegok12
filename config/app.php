@@ -7,7 +7,6 @@ use App\Conference\ConferenceServiceProvider;
 use App\Providers\AppServiceProvider;
 use App\Providers\EventServiceProvider;
 use App\Providers\RouteServiceProvider;
-use App\Schoolplus\StudentServiceProvider;
 use Barryvdh\DomPDF\Facade;
 use Barryvdh\DomPDF\ServiceProvider;
 use Illuminate\Auth\AuthServiceProvider;
@@ -240,8 +239,6 @@ return [
         PurifyServiceProvider::class,
         // LaravelFCM\FCMServiceProvider::class,
 
-        // /
-        StudentServiceProvider::class,
         // Nova Theme
         // Gegosoft\NovaGego\ThemeServiceProvider::class,
         ConferenceServiceProvider::class,

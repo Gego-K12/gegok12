@@ -21,7 +21,6 @@ use App\Http\Resources\UserFees as UserFeesResource; // new
 use App\Http\Resources\UserRelation as UserRelationResource;
 use App\Http\Resources\UserSibling as UserSiblingResource;
 use App\Models\ActivityLog;
-// use App\Schoolplus\Student;
 use App\Models\Document;
 use App\Models\Fee;
 use App\Models\Mark;
@@ -30,7 +29,7 @@ use App\Models\StudentAcademic;
 use App\Models\StudentParentLink;
 use App\Models\TeacherLeaveApplication;
 use App\Models\User;
-use App\Schoolplus\StudentService;
+use App\Services\StudentService;
 use App\Traits\Common; // new
 use App\Traits\LogActivity;
 use Illuminate\Http\Response;
@@ -44,6 +43,8 @@ class StudentDetailsController extends Controller
     use Common;
     //
     use LogActivity;
+
+    public function __construct(protected StudentService $studentService) {}
 
     /**
      * Display the specified resource.
@@ -261,7 +262,7 @@ class StudentDetailsController extends Controller
         $studentId = $users->id;
         $examId = $users->marks[0]['exam_id'];
 
-        return Student::getStudentMark($studentId, $examId);
+        return $this->studentService->getStudentMark($studentId, $examId);
     }
 
     public function showAllMark($name)
@@ -270,7 +271,7 @@ class StudentDetailsController extends Controller
 
         $studentId = $users->id;
 
-        return Student::getAllMarks($studentId);
+        return $this->studentService->getAllMarks($studentId);
     }
 
     public function compareMarks($name)
@@ -286,10 +287,7 @@ class StudentDetailsController extends Controller
         $examIdOne = $exam[0];
         $examIdTwo = $exam[1];
 
-        // return Student::CompareMarks($studentId,$examIdOne,$examIdTwo,$standardId);
-        $studentService = new StudentService;
-
-        return $studentService->compareMarks($studentId, $examIdOne, $examIdTwo, $standardId);
+        return $this->studentService->compareMarks($studentId, $examIdOne, $examIdTwo, $standardId);
     }
 
     /**

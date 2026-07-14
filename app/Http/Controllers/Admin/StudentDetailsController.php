@@ -25,7 +25,7 @@ use App\Models\StudentParentLink;
 use App\Models\Subject;
 use App\Models\Teacherlink;
 use App\Models\User;
-use App\Schoolplus\StudentFacade as Student;
+use App\Services\StudentService;
 use App\Traits\Common;
 use App\Traits\LogActivity;
 use Exception;
@@ -54,6 +54,8 @@ class StudentDetailsController extends Controller
     use Common;
     //
     use LogActivity;
+
+    public function __construct(protected StudentService $studentService) {}
 
     /**
      * Show student basic details.
@@ -381,7 +383,7 @@ class StudentDetailsController extends Controller
         $studentId = $users->id;
         $examId = $users->marks[0]['exam_id'];
 
-        return Student::getStudentMark($studentId, $examId);
+        return $this->studentService->getStudentMark($studentId, $examId);
     }
 
     /**
@@ -396,7 +398,7 @@ class StudentDetailsController extends Controller
 
         $studentId = $users->id;
 
-        return Student::getAllMarks($studentId);
+        return $this->studentService->getAllMarks($studentId);
     }
 
     /**

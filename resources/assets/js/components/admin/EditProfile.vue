@@ -196,7 +196,7 @@ export default {
           address:'',
           city_id:'',
           state_id:'',
-          country_id:'7',
+          country_id:'100',
           pincode:'',
           countrylist:[],
           statelist:[],

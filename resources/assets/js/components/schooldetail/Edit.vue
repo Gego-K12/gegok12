@@ -289,7 +289,7 @@
                 school_logo_display:'',
                 landline_no:'',
                 about_us:'',
-                country_id:7,
+                country_id:100,
                 state_id:'',
                 city_id:'',
                 pincode:'',

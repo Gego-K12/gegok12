@@ -415,7 +415,7 @@ export default {
       section_name:'',
       city_id:'',
       state_id:'',
-      country_id:7,
+      country_id:100,
       pincode:'',
       birth_place:'',
       native_place:'',

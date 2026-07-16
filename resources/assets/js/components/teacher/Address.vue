@@ -105,7 +105,7 @@
 	      	user:[],
 	      	city_id:'',
 	      	state_id:'',
-	      	country_id:7,
+	      	country_id:100,
 	      	pincode:'',
 	      	countrylist:[],
 	      	statelist:[],
@@ -161,7 +161,7 @@
       {
           this.city_id='';
           this.state_id='';
-          this.country_id=7;
+          this.country_id=100;
       }, 
 
         previous(tab)

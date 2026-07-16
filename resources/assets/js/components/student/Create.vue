@@ -445,7 +445,7 @@ export default {
       standard:'',
       city_id:'',
       state_id:'',
-      country_id:7,
+      country_id:100,
       pincode:'',
       birth_place:'',
       native_place:'',
@@ -523,7 +523,7 @@ export default {
       this.standard='';
       this.city_id='';
       this.state_id='';
-      this.country_id=7;
+      this.country_id=100;
       this.pincode='';
       this.birth_place='';
       this.native_place='';

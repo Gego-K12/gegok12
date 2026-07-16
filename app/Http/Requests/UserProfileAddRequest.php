@@ -127,6 +127,15 @@ class UserProfileAddRequest extends FormRequest
             return true;
         });
 
+        Validator::extend('check_unique_registration_number', function ($attribute, $value, $parameters, $validator) {
+            $user = User::where('registration_number', request('registration_number'))->exists();
+            if ($user) {
+                return false;
+            }
+
+            return true;
+        });
+
         $rules =
         [
             //
@@ -148,7 +157,7 @@ class UserProfileAddRequest extends FormRequest
             'caste'                     => 'required',
             'avatar'                    => 'required|mimes:jpg,jpeg,png',
             'notes'                     => 'nullable|string|checknotes',
-            'registration_number'       => 'required|numeric',
+            'registration_number'       => 'required|numeric|check_unique_registration_number',
             'EMIS_number'               => 'nullable|numeric',
             'joining_date'              => 'required|date|check_joining_date',
             'standard'                  => 'required',
@@ -265,6 +274,7 @@ class UserProfileAddRequest extends FormRequest
 
             'registration_number.required'                      => 'Registration Number Is Required',
             'registration_number.numeric'                       => 'Registration Number Should Be Numeric',
+            'registration_number.check_unique_registration_number' => 'Registration Number Already Exists.Enter Different Registration Number',
 
             'EMIS_number.required'                              => 'EMIS Number Is Required',
             'EMIS_number.numeric'                               => 'EMIS Number Should Be Numeric',

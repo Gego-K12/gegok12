@@ -18,7 +18,7 @@ use Log;
 
 class StudentService
 {
-    public function getStudentMark($studentId, $examId)
+    public function getStudentMark(int|string $studentId, int|string $examId)
     {
         $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
 
@@ -35,7 +35,7 @@ class StudentService
         }
     }
 
-    public function getAllMarks($studentId)
+    public function getAllMarks(int|string $studentId)
     {
         $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
 
@@ -51,7 +51,12 @@ class StudentService
         }
     }
 
-    public function compareMarks($studentId, $examIdOne, $examIdTwo, $standardId): ?View
+    public function compareMarks(
+        int|string $studentId,
+        int|string $examIdOne,
+        int|string $examIdTwo,
+        int|string $standardId
+    ): ?View
     {
         try {
             $standard = StandardLink::where('id', $standardId)->first();

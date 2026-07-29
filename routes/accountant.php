@@ -86,6 +86,3 @@ Route::get('/notifications', 'NotificationController@index');
 Route::post('/notification/read', 'NotificationController@store');
 Route::get('/notification/showList', 'NotificationController@showList');
 
-if (file_exists(base_path('routes/gfee-accountant.php'))) {
-    require base_path('routes/gfee-accountant.php');
-}

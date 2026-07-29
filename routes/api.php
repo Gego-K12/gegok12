@@ -223,22 +223,3 @@ Route::get('/get/city/{id}','Api\UserprofileController@city');
 
 Route::get('/events/show/details/{id}','Api\EventsController@showdetails');
 
-if (file_exists(base_path('routes/gfee-api.php'))) {
-    require base_path('routes/gfee-api.php');
-}
-
-if (file_exists(base_path('routes/gvideoroom-api.php'))) {
-    require base_path('routes/gvideoroom-api.php');
-}
-
-if (file_exists(base_path('routes/gtimetable-api.php'))) {
-    require base_path('routes/gtimetable-api.php');
-}
-
-if (file_exists(base_path('routes/gtransport-api.php'))) {
-    require base_path('routes/gtransport-api.php');
-}
-
-if (file_exists(base_path('routes/gexam-api.php'))) {
-    require base_path('routes/gexam-api.php');
-}

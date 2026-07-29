@@ -151,13 +151,6 @@
             <div class="w-full lg:w-4/5 md:w-4/5 lg:mx-8 md:mx-8">
                 <div class="flex lg:items-center lg:justify-between flex-col lg:flex-row">
                     <h3 class="font-semibold text-3xl text-gray-700">{{ ucwords($user->FullName) }}</h3>
-                    @if(config('gexam.enabled', false))
-                    <div class="my-3 flex flex-wrap text-xs">
-                        <a href="{{url('/teacher/student/comparemark/'.$user->name)}}" class="capitalize text-white blue-bg rounded px-2 py-1 mr-2 font-medium my-1 lg:my-0 md:my-0" target="_blank">compare marks</a>
-
-                        <a href="{{url('/teacher/marks/show?ref_name='.$user->name.'&standard='.$user->studentAcademicLatest->standardLink_id)}}" class="capitalize text-white blue-bg rounded px-2 py-1 font-medium my-1 lg:my-0 md:my-0" target="_blank">View marks</a>
-                    </div>
-                    @endif
                 </div>
                 <div class="leading-relaxed">
                     <p class="text-lg text-gray-700 font-semibold">ID: {{ $user->id }}</p>
@@ -167,6 +160,8 @@
                    
                     <div id="profile"></div>
                 </div>
+
+                @livewire('admin.profile-extra-tabs', ['entityId' => $user->id, 'scope' => 'student'])
             </div>
         </div>
     </div>

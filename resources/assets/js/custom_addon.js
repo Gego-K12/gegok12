@@ -7,7 +7,6 @@ import { registerInventory } from './ginventory'
 import { registerTimetable } from './gtimetable'
 import { registerTransport } from './gtransport'
 import { registerWorkpermission } from './gworkpermission'
-import { registerHelloStudents } from './ghello-students'
 import { registerHelloteachers } from './ghelloteachers'
 import { registerShortTermCourses } from './gshort-term-courses'
 import { registerFees } from './gfees'
@@ -32,8 +31,6 @@ export default function registerCustomAddon(app) {
     registerTimetable(app)
 
     registerTransport(app)
-
-    registerHelloStudents(app)
 
     registerHelloteachers(app)
 

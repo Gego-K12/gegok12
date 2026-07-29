@@ -428,31 +428,3 @@ Route::get('/notice/list', 'NoticeBoardController@noticelist');
 // Group
 Route::get('groups/{standardLinkId}', 'GroupController@index');
 
-
-if (file_exists(base_path('routes/gworkpermission-teacher.php'))) {
-    require base_path('routes/gworkpermission-teacher.php');
-}
-
-if (file_exists(base_path('routes/gshort-term-courses-teacher.php'))) {
-    require base_path('routes/gshort-term-courses-teacher.php');
-}
-
-if (file_exists(base_path('routes/ghelloteachers-teacher.php'))) {
-    require base_path('routes/ghelloteachers-teacher.php');
-}
-
-if (file_exists(base_path('routes/gchat-teacher.php'))) {
-    require base_path('routes/gchat-teacher.php');
-}
-
-if (file_exists(base_path('routes/gquiz-teacher.php'))) {
-    require base_path('routes/gquiz-teacher.php');
-}
-
-if (file_exists(base_path('routes/gvideoroom-teacher.php'))) {
-    require base_path('routes/gvideoroom-teacher.php');
-}
-
-if (file_exists(base_path('routes/gexam-teacher.php'))) {
-    require base_path('routes/gexam-teacher.php');
-}

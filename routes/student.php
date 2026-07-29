@@ -135,22 +135,3 @@ Route::get('/feed/filter', 'FeedController@filter');
 Route::get('/notice/show/list', 'NoticeBoardController@list');
 Route::get('/notices', 'NoticeBoardController@index');
 
-if (file_exists(base_path('routes/gshort-term-courses-student.php'))) {
-    require base_path('routes/gshort-term-courses-student.php');
-}
-
-if (file_exists(base_path('routes/ghello-students-student.php'))) {
-    require base_path('routes/ghello-students-student.php');
-}
-
-if (file_exists(base_path('routes/gchat-student.php'))) {
-    require base_path('routes/gchat-student.php');
-}
-
-if (file_exists(base_path('routes/gquiz-student.php'))) {
-    require base_path('routes/gquiz-student.php');
-}
-
-if (file_exists(base_path('routes/gvideoroom-student.php'))) {
-    require base_path('routes/gvideoroom-student.php');
-}

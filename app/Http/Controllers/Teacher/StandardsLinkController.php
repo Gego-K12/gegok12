@@ -126,30 +126,15 @@ class StandardsLinkController extends Controller
         if (Gate::allows('standardlink', $standardLink)) {
             $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
 
-            if (class_exists('Gegok12\Timetable\Models\Timetable')) {// new
-
-                $timetable = \Gegok12\Timetable\Models\Timetable::where([
-                    ['school_id', Auth::user()->school_id],
-                    ['academic_year_id', $academic_year->id],
-                    ['standardLink_id', $id],
-                ])->get();
-            } else {                                           // new
-                $timetable = Timetable::where([
-                    ['school_id', Auth::user()->school_id],
-                    ['academic_year_id', $academic_year->id],
-                    ['standardLink_id', $id],
-                ])->get();
-            }
+            $timetable = Timetable::where([
+                ['school_id', Auth::user()->school_id],
+                ['academic_year_id', $academic_year->id],
+                ['standardLink_id', $id],
+            ])->get();
 
             $array['periodCount'] = count($timetable[0]['schedule']);
 
-            if (class_exists('Gegok12\Timetable\Http\Resources\Timetable')) { // new
-
-                $array['timetable'] = \Gegok12\Timetable\Http\Resources\Timetable::collection($timetable);
-            } else {                                                     // new
-
-                $array['timetable'] = TimetableResource::collection($timetable);
-            }
+            $array['timetable'] = TimetableResource::collection($timetable);
 
             return $array;
         } else {

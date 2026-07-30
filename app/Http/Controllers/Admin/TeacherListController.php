@@ -33,7 +33,22 @@ class TeacherListController extends Controller
     public function find(Request $request)
     {
         //
-        return $this->TeacherFilter($request, Auth::user()->school_id, 5);
+        $total = User::where('school_id', Auth::user()->school_id)->ByRole(5)
+            ->whereHas('userprofile', function ($q) use ($request) {
+                if ($request->view == 'exit') {
+                    $q->where('status', 'exit');
+                } else {
+                    $q->where('status', 'active')->orWhere('status', 'inactive');
+                }
+            })
+            ->count();
+
+        $data = $this->TeacherFilter($request, Auth::user()->school_id, 5);
+
+        return response()->json([
+            'data' => $data,
+            'total' => $total
+        ]);
     }
 
     /**

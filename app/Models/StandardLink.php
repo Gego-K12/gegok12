@@ -127,10 +127,12 @@ class StandardLink extends Model
      *
      * @return HasMany
      */
-    public function temp_timetable()
+
+    /* public function temp_timetable()
     {
         return $this->hasMany('\Gegok12\Timetable\Models\TempTimetable', 'standardLink_id', 'id');
     }
+    */
 
     /**
      * Get language subject assignments for this standard-section.
@@ -147,11 +149,12 @@ class StandardLink extends Model
      *
      * @return int
      */
+     /*
     public function getTimeTableCountAttribute()
     {
         return $this->hasMany('\Gegok12\Timetable\Models\TempTimetable', 'standardLink_id', 'id')->count();
 
-    }
+    } /*
 
     /*  public function temp_timetable_monday()
       {
@@ -238,9 +241,11 @@ class StandardLink extends Model
      *
      * @return HasMany
      */
+
+
     public function timetable()
     {
-        return $this->hasMany('\Gegok12\Timetable\Models\Timetable', 'standardLink_id', 'id');
+        return $this->hasMany('\App\Models\Timetable', 'standardLink_id', 'id');
     }
 
     /**

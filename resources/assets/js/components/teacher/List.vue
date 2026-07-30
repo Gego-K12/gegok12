@@ -22,6 +22,12 @@
     <div class="no-names-message" v-if="selectedLetter && !users.length">
       <i class="fa-solid fa-circle-info"></i> No staff found for the letter "{{ selectedLetter }}".
     </div>
+    <div v-if="selectedUsersCount > 0" class="bg-amber-50 border border-amber-200 rounded p-3 my-3 flex items-center justify-between">
+      <div>
+        <span class="text-sm text-amber-800">{{ selectedUsersCount }} of {{ totalTeacherCount }} teachers selected.</span>
+        <a v-if="selectedUsersCount < totalTeacherCount" href="#" @click.prevent="selectAllTeachers()" class="text-amber-600 font-semibold text-sm ml-2">Select all {{ totalTeacherCount }} teachers</a>
+      </div>
+    </div>
     <div>
       <div class="my-8 overflow-x-auto teacher-table-wrap">
         <vue-good-table
@@ -67,62 +73,59 @@
     </div>
     <div v-if="this.send == 1" class="modal modal-mask">
       <div class="modal-wrapper px-4">
-        <div class="modal-container w-full  max-w-md px-8 mx-auto">
-          <div class="modal-header flex justify-between items-center">
-            <h2>Send Message</h2>
-            <button id="close-button" class="modal-default-button text-2xl py-1"  @click="closeModal()">
-              &times;
+        <div class="modal-container w-full max-w-2xl px-8 mx-auto">
+          <div class="modal-header flex justify-between items-center mb-6">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+                <i class="fa-solid fa-paper-plane text-blue-600 text-lg"></i>
+              </div>
+              <div>
+                <h2 class="text-2xl font-bold text-gray-800">Send Message</h2>
+                <p class="text-sm text-gray-600">To {{ selectedUsersCount }} selected teacher(s)</p>
+              </div>
+            </div>
+            <button class="text-gray-400 hover:text-gray-600 text-3xl leading-none" @click="closeModal()">
+              ×
             </button>
+          </div>
 
-          </div>
-          <div class="modal-body">
-            <div class="flex flex-col lg:flex-row md:flex-row  lg:items-center">
-              <div class="w-full lg:w-1/4">
-                <label for="subject" class="tw-form-label">Subject</label>
-              </div>
-              <div class="my-2 w-full lg:w-3/4">
-                <input type="text" name="subject" v-model="subject" class="tw-form-control w-full">
-                <span v-if="errors.subject" class="text-red-500 text-xs font-semibold">{{errors.subject[0]}}</span>
-              </div>
+          <div class="space-y-6">
+            <div>
+              <label for="subject" class="block text-sm font-semibold text-gray-700 mb-2 uppercase">Subject</label>
+              <input type="text" name="subject" v-model="subject" placeholder="Enter subject" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" />
+              <span v-if="errors.subject" class="text-red-500 text-xs font-semibold mt-1 block">{{errors.subject[0]}}</span>
             </div>
-          </div>
-          <div class="modal-body">
-            <div class="flex flex-col lg:flex-row md:flex-row lg:items-center">
-              <div class="w-full lg:w-1/4">
 
-                <label for="message" class="tw-form-label">Message</label>
-              </div>
-              <div class="w-full lg:w-3/4">
-                <textarea type="text" name="message" v-model="message" class="tw-form-control w-full" rows="10"></textarea>
-                <span v-if="errors.message" class="text-red-500 text-xs font-semibold">{{errors.message[0]}}</span>
-              </div>
+            <div>
+              <label for="message" class="block text-sm font-semibold text-gray-700 mb-2 uppercase">Message</label>
+              <textarea name="message" v-model="message" placeholder="Type your message to the teachers..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" rows="8"></textarea>
+              <span v-if="errors.message" class="text-red-500 text-xs font-semibold mt-1 block">{{errors.message[0]}}</span>
             </div>
-          </div>
-          <div class="modal-body">
-            <div class="flex items-center">
-              <div class="w-6">
-                <input type="checkbox" name="send_later" v-model="send_later" class="tw-form-control w-full" @click="enableDate($event)">
-              </div>
-              <div class="mx-1">
-                <label for="subject" class="tw-form-label">Send Later</label>
-              </div>
 
+            <div class="border border-gray-200 rounded-lg p-4">
+              <label class="flex items-start gap-3 cursor-pointer">
+                <input type="checkbox" name="send_later" v-model="send_later" class="mt-1" @click="enableDate($event)">
+                <div>
+                  <span class="text-sm font-semibold text-gray-700">Send later</span>
+                  <p class="text-xs text-gray-600 mt-1">Schedule delivery for a specific date and time instead of sending now.</p>
+                </div>
+              </label>
             </div>
-          </div>
-          <div class="modal-body hidden" id="show_date">
-            <div class="flex">
-              <div class="w-full lg:w-1/4">
-                  <label for="executed_at" class="tw-form-label">Date Time</label>
-              </div>
-              <div class="w-full lg:w-3/4">
-                <VueDatePicker format="DD-MM-YYYY h:i:s" name="executed_at" v-model="executed_at" class="w-full rounded" id="executed_at">
-                </VueDatePicker>
-                <span v-if="errors.executed_at" class="text-red-500 text-xs font-semibold">{{errors.executed_at[0]}}</span>
-              </div>
+
+            <div class="hidden" id="show_date">
+              <label for="executed_at" class="block text-sm font-semibold text-gray-700 mb-2 uppercase">Date & Time</label>
+              <VueDatePicker format="DD-MM-YYYY h:i:s" name="executed_at" v-model="executed_at" class="w-full rounded" id="executed_at" />
+              <span v-if="errors.executed_at" class="text-red-500 text-xs font-semibold mt-1 block">{{errors.executed_at[0]}}</span>
             </div>
-          </div>
-          <div class="my-6">
-            <a href="#" class="btn btn-submit blue-bg text-white rounded px-3 py-1 mr-3 text-sm font-medium" @click="submit()">Send</a>
+
+            <div class="flex gap-3 pt-4">
+              <button class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition" @click="closeModal()">
+                Cancel
+              </button>
+              <button class="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition flex items-center gap-2" @click="submit()">
+                <i class="fa-solid fa-paper-plane"></i> Send Message
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -143,6 +146,8 @@
         return{
           users:[],
           user:'',
+          allTeachers:[],
+          totalTeacherCount: 0,
           alphabets: [
           'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
           ],
@@ -201,6 +206,7 @@
         var viewQuery = this.view == 'exit' ? '&view=exit' : '';
         axios.get('/admin/teachers/find?'+this.searchquery+viewQuery).then(response => {
           this.users = response.data.data;
+          this.totalTeacherCount = response.data.total || this.users.length;
         }).catch(error => {
           console.error('Failed to load teachers list', error);
         });
@@ -338,6 +344,18 @@
             $('#show_date').removeClass('block').addClass('hidden');
           }
         }
+      },
+
+      selectAllTeachers()
+      {
+        var viewQuery = this.view == 'exit' ? '&view=exit' : '';
+        axios.get('/admin/teachers/find?limit=all&'+this.searchquery+viewQuery).then(response => {
+          this.allTeachers = response.data.data || [];
+          this.selected = this.allTeachers.map(function (row) { return row.id; });
+          this.selectedUsersCount = this.selected.length;
+        }).catch(error => {
+          console.error('Failed to load all teachers', error);
+        });
       },
     }
   }

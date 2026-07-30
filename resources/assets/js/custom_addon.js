@@ -1,4 +1,5 @@
 import { registerAlumni } from './galumni'
+import { registerIncomeExpense } from './gincome-expense'
 import { registerCertificate } from './gcertificate'
 import { registerChat } from './gchat'
 import { registerQuiz } from './gquiz'
@@ -15,6 +16,8 @@ import { registerExam } from './gexam'
 // later you can import:
 
 export default function registerCustomAddon(app) {
+
+    registerIncomeExpense(app)
 
     registerAlumni(app)
 

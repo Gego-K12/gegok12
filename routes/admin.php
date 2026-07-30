@@ -686,8 +686,12 @@ Route::get('/staffs/find', 'StaffController@find');
 Route::get('/staffs', 'StaffController@index');
 Route::get('/staff/show/{name}', 'StaffController@show');
 Route::delete('/staff/delete/{name}', 'StaffController@destroy');
+// send message
+Route::post('/staff/sendMessageToAll', 'SendMessageController@storeStaff');
+// add
 Route::get('/staff/add', 'StaffController@create');
 Route::post('/staff/add', 'StaffController@store');
+// edit
 Route::get('/staff/edit/{name}', 'StaffController@edit');
 Route::post('/staff/edit/{name}', 'StaffController@update');
 
@@ -760,4 +764,3 @@ Route::get('setting/standard/create', function () {
 Route::get('setting/edit/standard/{id}', function ($id) {
     return view('admin.standard.edit_form',compact('id'));
 })->name('admin.setting.standards.update');
-

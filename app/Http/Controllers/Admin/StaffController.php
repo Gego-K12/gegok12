@@ -55,7 +55,23 @@ class StaffController extends Controller
             $groups[] = 12;
         }
 
-        return $this->StaffFilter($request, Auth::user()->school_id, $groups);
+        $total = User::where('school_id', Auth::user()->school_id)
+            ->whereIn('usergroup_id', $groups)
+            ->whereHas('userprofile', function ($q) use ($request) {
+                if ($request->view == 'exit') {
+                    $q->where('status', 'exit');
+                } else {
+                    $q->where('status', 'active')->orWhere('status', 'inactive');
+                }
+            })
+            ->count();
+
+        $data = $this->StaffFilter($request, Auth::user()->school_id, $groups);
+
+        return response()->json([
+            'data' => $data,
+            'total' => $total
+        ]);
     }
 
     /**

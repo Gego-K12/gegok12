@@ -10,7 +10,7 @@
         <title>{{ config('app.name', 'GegoK12') }}</title>
         <!-- Styles -->
 
-        <!-- <link href="{{ asset('css/app.css') }}" rel="stylesheet"> -->
+        <link href="{{ asset('css/app.css') }}" rel="stylesheet">
         <link rel="preload" href="{{ asset('vendor/fontawesome/webfonts/fa-solid-900.woff2') }}" as="font" type="font/woff2" crossorigin>
         <link href="{{ asset('vendor/fontawesome/css/all.min.css') }}" rel="stylesheet">
         <link href="{{ asset('css/custom.css') }}" rel="stylesheet">

@@ -138,6 +138,41 @@ class SendMessageController extends Controller
     }
 
     /**
+     * Send message specifically to staff.
+     *
+     * Prepares staff-specific message payload
+     * and dispatches SendMessageTeacherEvent.
+     *
+     * @return array
+     */
+    public function storeStaff(SendMailRequest $request)
+    {
+        //
+        try {
+            $data = [];
+            $data['selected'] = $request->selected;
+            $data['subject'] = $request->subject;
+            $data['message'] = $request->message;
+            $data['send_later'] = $request->send_later;
+            $data['executed_at'] = $request->executed_at;
+            $datas = (object) $data;
+
+            event(new SendMessageTeacherEvent(
+                $datas,
+                Auth::user()->school_id,
+                Auth::user()->email,
+                Auth::user()
+            ));
+
+            $res['message'] = trans('messages.message_success_msg');
+
+            return $res;
+        } catch (Exception $e) {
+            Log::info($e->getMessage());
+        }
+    }
+
+    /**
      * Shift selected students to another standard
      * or convert them to alumni if applicable.
      *

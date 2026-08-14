@@ -129,7 +129,7 @@
 
 <script>
     export default {
-    props:['url','standard','mode','date'],
+    props:['url','standard','mode','date','standardlist','studentlist','absentReasons'],
     data(){
       return{
         list:[],
@@ -312,7 +312,19 @@
     created()
     {
       this.dateValue = this.date || '';
-      this.getData();
+
+      // Use props if provided (from blade view), otherwise fetch from API
+      if (this.$props.standardlist && this.$props.standardlist.length > 0) {
+        this.standardlist = this.$props.standardlist;
+        this.studentlist = this.$props.studentlist || {};
+        this.absentReasonlist = this.$props.absentReasons || [];
+
+        if(this.standard != '') {
+          this.standardLink_id = this.standard;
+        }
+      } else {
+        this.getData();
+      }
     }
   }
 </script>

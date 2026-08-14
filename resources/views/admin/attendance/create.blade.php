@@ -12,6 +12,14 @@
         <span class="mx-3">Attendance</span>
     </h1>
     @include('partials.message')
-    <create-attendance url="{{ url('/') }}" standard="{{ $standard }}" mode="admin" date="{{ date('Y-m-d') }}"></create-attendance>  
+    <create-attendance
+        url="{{ url('/') }}"
+        standard="{{ $standard }}"
+        mode="admin"
+        date="{{ date('Y-m-d') }}"
+        :standardlist="{{ json_encode($standardlist ?? []) }}"
+        :studentlist="{{ json_encode($studentlist ?? []) }}"
+        :absent-reasons="{{ json_encode($absentReasonlist ?? []) }}"
+    ></create-attendance>  
 </div>
 @endsection

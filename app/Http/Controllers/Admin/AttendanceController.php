@@ -73,10 +73,26 @@ class AttendanceController extends Controller
      */
     public function create()
     {
-        //
+        $school_id = Auth::user()->school_id;
+        $academic_year = SiteHelper::getAcademicYear($school_id);
+
         $standard = \Request::get('standardLink_id') ? \Request::get('standardLink_id') : '';
 
-        return view('/admin/attendance/create', ['standard' => $standard]);
+        $standardlist = SiteHelper::getStandardLinkList($school_id);
+
+        $studentAcademic = StudentAcademic::with('user')->where([['school_id', $school_id], ['academic_year_id', $academic_year->id]])->whereHas('user', function ($q) {
+            $q->where([['status', 'active'], ['deleted_at', null]]);
+        })->get();
+
+        $studentlist = AttendanceStudentListResource::collection($studentAcademic)->groupBy('standardLink_id');
+        $absentReasonlist = AbsentReason::where('status', 1)->get();
+
+        return view('/admin/attendance/create', [
+            'standard' => $standard,
+            'standardlist' => $standardlist,
+            'studentlist' => $studentlist,
+            'absentReasonlist' => $absentReasonlist,
+        ]);
     }
 
     /**

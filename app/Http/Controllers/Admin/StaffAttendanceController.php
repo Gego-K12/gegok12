@@ -76,7 +76,7 @@ class StaffAttendanceController extends Controller
 
         $stafflistResource = TeacherlistResource::collection($staff);
         // Convert Resource collection to array for JSON encoding in blade view
-        $stafflist = $stafflistResource->toArray();
+        $stafflist = $stafflistResource->toArray(request());
 
         $absentReasonlist = AbsentReason::where('status', 1)->get();
 
@@ -106,7 +106,7 @@ class StaffAttendanceController extends Controller
 
         $stafflistResource = TeacherlistResource::collection($staff);
         // Convert Resource collection to array for JSON encoding in blade view
-        $stafflist = $stafflistResource->toArray();
+        $stafflist = $stafflistResource->toArray(request());
 
         $absentReasonlist = AbsentReason::where('status', 1)->get();
 

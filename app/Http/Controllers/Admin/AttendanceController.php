@@ -52,7 +52,7 @@ class AttendanceController extends Controller
 
         $standardlistResource = SiteHelper::getStandardLinkList($school_id);
         // Convert Resource collection to array for JSON encoding in blade view
-        $standardlist = $standardlistResource ? $standardlistResource->toArray() : [];
+        $standardlist = $standardlistResource ? $standardlistResource->toArray(request()) : [];
 
         $studentAcademic = StudentAcademic::with('user')->where([['school_id', $school_id], ['academic_year_id', $academic_year->id]])->whereHas('user', function ($q) {
             $q->where([['status', 'active'], ['deleted_at', null]]);
@@ -82,7 +82,7 @@ class AttendanceController extends Controller
 
         $standardlistResource = SiteHelper::getStandardLinkList($school_id);
         // Convert Resource collection to array for JSON encoding in blade view
-        $standardlist = $standardlistResource ? $standardlistResource->toArray() : [];
+        $standardlist = $standardlistResource ? $standardlistResource->toArray(request()) : [];
 
         $studentAcademic = StudentAcademic::with('user')->where([['school_id', $school_id], ['academic_year_id', $academic_year->id]])->whereHas('user', function ($q) {
             $q->where([['status', 'active'], ['deleted_at', null]]);

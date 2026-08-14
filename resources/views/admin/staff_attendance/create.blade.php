@@ -9,6 +9,12 @@
             <span class="mx-3">Staff Attendance</span>
         </h1>
         @include('partials.message')
-        <create-staff-attendance url="{{ url('/') }}" standard="{{ $standard }}" mode="admin"></create-staff-attendance>  
+        <create-staff-attendance
+            url="{{ url('/') }}"
+            standard="{{ $standard ?? '' }}"
+            mode="admin"
+            :stafflist="{{ json_encode($stafflist ?? []) }}"
+            :absent-reasons="{{ json_encode($absentReasonlist ?? []) }}"
+        ></create-staff-attendance>  
     </div>
 @endsection

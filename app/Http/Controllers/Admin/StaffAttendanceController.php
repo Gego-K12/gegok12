@@ -90,8 +90,24 @@ class StaffAttendanceController extends Controller
      */
     public function create()
     {
-        //
-        return view('/admin/staff_attendance/create');
+        $school_id = Auth::user()->school_id;
+        $academic_year = SiteHelper::getAcademicYear($school_id);
+
+        $staff = User::whereIn('usergroup_id', [5, 8, 10, 11, 12, 13])
+            ->where([
+                ['school_id', Auth::user()->school_id],
+                ['status', 'active'],
+            ])
+            ->get()
+            ->sortBy('userprofile.firstname');
+
+        $stafflist = TeacherlistResource::collection($staff);
+        $absentReasonlist = AbsentReason::where('status', 1)->get();
+
+        return view('/admin/staff_attendance/create', [
+            'stafflist' => $stafflist,
+            'absentReasonlist' => $absentReasonlist,
+        ]);
     }
 
     /**

@@ -150,7 +150,7 @@
 
 <script>
 	export default {
-    props:['url','standard','mode'],
+    props:['url','standard','mode','stafflist','absentReasons'],
     data(){
       return{
         list:[],
@@ -352,7 +352,13 @@
     },
     created()
     {
-      this.getData();
+      // Use props if provided (from blade view), otherwise fetch from API
+      if (this.$props.stafflist && this.$props.stafflist.length > 0) {
+        this.stafflist = this.$props.stafflist;
+        this.absentReasonlist = this.$props.absentReasons || [];
+      } else {
+        this.getData();
+      }
     }
   }
 </script>

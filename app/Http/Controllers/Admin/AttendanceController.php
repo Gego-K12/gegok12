@@ -41,34 +41,29 @@ class AttendanceController extends Controller
     use LogActivity;
 
     /**
-     * Show the form for creating a new resource.
+     * Show the student attendance list page.
      *
      * @return Response
      */
     public function list()
     {
-        //
-        $array = [];
         $school_id = Auth::user()->school_id;
-
         $academic_year = SiteHelper::getAcademicYear($school_id);
 
-        $standardLinklist = SiteHelper::getStandardLinkList($school_id);
+        $standardlist = SiteHelper::getStandardLinkList($school_id);
 
-        // $studentAcademic = StudentAcademic::with('user')->where([['school_id',$school_id],['academic_year_id',$academic_year->id]])->get();
         $studentAcademic = StudentAcademic::with('user')->where([['school_id', $school_id], ['academic_year_id', $academic_year->id]])->whereHas('user', function ($q) {
             $q->where([['status', 'active'], ['deleted_at', null]]);
         })->get();
 
         $studentlist = AttendanceStudentListResource::collection($studentAcademic)->groupBy('standardLink_id');
-
         $absentReasonlist = AbsentReason::where('status', 1)->get();
 
-        $array['standardlist'] = $standardLinklist;
-        $array['studentlist'] = $studentlist;
-        $array['absentReasonlist'] = $absentReasonlist;
-
-        return $array;
+        return view('/admin/attendance/list', [
+            'standardlist' => $standardlist,
+            'studentlist' => $studentlist,
+            'absentReasonlist' => $absentReasonlist,
+        ]);
     }
 
     /**

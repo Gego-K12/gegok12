@@ -54,18 +54,16 @@ class StaffAttendanceController extends Controller
     }
 
     /**
-     * Get staff list and absent reasons.
+     * Show the staff attendance list page.
      *
      * Returns active staff members for attendance
      * along with configured absent reasons.
      *
-     * @return array
+     * @return Response
      */
     public function list()
     {
-        $array = [];
         $school_id = Auth::user()->school_id;
-
         $academic_year = SiteHelper::getAcademicYear($school_id);
 
         $staff = User::whereIn('usergroup_id', [5, 8, 10, 11, 12, 13])
@@ -77,13 +75,12 @@ class StaffAttendanceController extends Controller
             ->sortBy('userprofile.firstname');
 
         $stafflist = TeacherlistResource::collection($staff);
-
         $absentReasonlist = AbsentReason::where('status', 1)->get();
 
-        $array['stafflist'] = $stafflist;
-        $array['absentReasonlist'] = $absentReasonlist;
-
-        return $array;
+        return view('/admin/staff_attendance/list', [
+            'stafflist' => $stafflist,
+            'absentReasonlist' => $absentReasonlist,
+        ]);
     }
 
     /**

@@ -54,18 +54,16 @@ class StaffAttendanceController extends Controller
     }
 
     /**
-     * Get staff list and absent reasons.
+     * Show the staff attendance list page.
      *
      * Returns active staff members for attendance
      * along with configured absent reasons.
      *
-     * @return array
+     * @return Response
      */
     public function list()
     {
-        $array = [];
         $school_id = Auth::user()->school_id;
-
         $academic_year = SiteHelper::getAcademicYear($school_id);
 
         $staff = User::whereIn('usergroup_id', [5, 8, 10, 11, 12, 13])
@@ -76,14 +74,16 @@ class StaffAttendanceController extends Controller
             ->get()
             ->sortBy('userprofile.firstname');
 
-        $stafflist = TeacherlistResource::collection($staff);
+        $stafflistResource = TeacherlistResource::collection($staff);
+        // Convert Resource collection to array for JSON encoding in blade view
+        $stafflist = $stafflistResource->toArray(request());
 
         $absentReasonlist = AbsentReason::where('status', 1)->get();
 
-        $array['stafflist'] = $stafflist;
-        $array['absentReasonlist'] = $absentReasonlist;
-
-        return $array;
+        return view('/admin/staff_attendance/list', [
+            'stafflist' => $stafflist,
+            'absentReasonlist' => $absentReasonlist,
+        ]);
     }
 
     /**
@@ -93,8 +93,27 @@ class StaffAttendanceController extends Controller
      */
     public function create()
     {
-        //
-        return view('/admin/staff_attendance/create');
+        $school_id = Auth::user()->school_id;
+        $academic_year = SiteHelper::getAcademicYear($school_id);
+
+        $staff = User::whereIn('usergroup_id', [5, 8, 10, 11, 12, 13])
+            ->where([
+                ['school_id', Auth::user()->school_id],
+                ['status', 'active'],
+            ])
+            ->get()
+            ->sortBy('userprofile.firstname');
+
+        $stafflistResource = TeacherlistResource::collection($staff);
+        // Convert Resource collection to array for JSON encoding in blade view
+        $stafflist = $stafflistResource->toArray(request());
+
+        $absentReasonlist = AbsentReason::where('status', 1)->get();
+
+        return view('/admin/staff_attendance/create', [
+            'stafflist' => $stafflist,
+            'absentReasonlist' => $absentReasonlist,
+        ]);
     }
 
     /**

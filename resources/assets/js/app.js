@@ -37,6 +37,15 @@ const appContainer = document.getElementById('app');
 const rootTemplate = appContainer ? appContainer.innerHTML : '<div></div>';
 const app = createApp({ template: rootTemplate });
 
+// Vue's runtime compiler strips HTML comments in production builds by default.
+// Livewire relies on HTML comment markers (inject_morph_markers) around @if/@foreach
+// blocks to locate where to morph in AJAX-updated content. Since Vue recompiles the
+// entire #app subtree (including Livewire components) as its own template on mount,
+// those markers get stripped before Livewire ever sees the DOM unless we force Vue
+// to keep them, which silently breaks Livewire's conditional-block updates (e.g.
+// modals gated by @if($showForm) never appear after a wire:click toggles it).
+app.config.compilerOptions.comments = true;
+
 const originalComponent = app.component.bind(app);
 
 app.component = (name, component) => {

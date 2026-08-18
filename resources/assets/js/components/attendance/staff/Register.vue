@@ -23,13 +23,33 @@
           </div>
 
           <template v-else>
-            <div class="flex flex-wrap gap-4 mb-4 text-sm">
-              <span class="font-semibold text-green-700">{{ summary.present }} Present</span>
-              <span class="font-semibold text-red-700">{{ summary.absent }} Absent</span>
+            <div class="flex flex-wrap items-center gap-4 mb-4 text-sm">
+              <button
+                type="button"
+                class="font-semibold text-green-700 hover:underline focus:outline-none"
+                :class="{ 'underline': filterStatus === 'present' }"
+                @click="toggleFilter('present')"
+              >{{ summary.present }} Present</button>
+              <button
+                type="button"
+                class="font-semibold text-red-700 hover:underline focus:outline-none"
+                :class="{ 'underline': filterStatus === 'absent' }"
+                @click="toggleFilter('absent')"
+              >{{ summary.absent }} Absent</button>
               <span v-if="summary.not_recorded" class="font-semibold text-gray-500">{{ summary.not_recorded }} Not Recorded</span>
+              <button
+                v-if="filterStatus"
+                type="button"
+                class="text-xs text-blue-600 hover:underline focus:outline-none"
+                @click="clearFilter"
+              >Clear filter</button>
             </div>
 
-            <div class="overflow-y-auto" style="max-height: 28rem;">
+            <div v-if="filterStatus && filteredStaff.length === 0" class="text-sm text-gray-500">
+              No {{ filterStatus }} staff found.
+            </div>
+
+            <div v-else class="overflow-y-auto" style="max-height: 28rem;">
               <table class="w-full text-sm">
                 <thead>
                   <tr class="border-b text-left text-gray-600">
@@ -39,7 +59,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="member in staff" :key="member.user_id" class="border-b">
+                  <tr v-for="member in filteredStaff" :key="member.user_id" class="border-b">
                     <td class="py-2 pr-2">
                       <p class="font-semibold">{{ member.name }}</p>
                       <p v-if="member.designation" class="text-xs text-gray-500">{{ member.designation }}</p>
@@ -82,6 +102,7 @@ export default {
       selectedDate: this.today,
       loading: false,
       staff: [],
+      filterStatus: null,
       summary: { present: 0, absent: 0, not_recorded: 0 },
       sessionsRecorded: { forenoon: false, afternoon: false },
       recordedDates: [],
@@ -90,6 +111,21 @@ export default {
     }
   },
   computed: {
+    filteredStaff() {
+      if (! this.filterStatus) {
+        return this.staff;
+      }
+
+      return this.staff.filter(member => {
+        const sessions = [member.sessions.forenoon, member.sessions.afternoon].filter(s => s !== null);
+
+        if (this.filterStatus === 'absent') {
+          return sessions.some(s => ! s.status);
+        }
+
+        return sessions.length > 0 && sessions.every(s => s.status);
+      });
+    },
     formattedSelectedDate() {
       return new Date(this.selectedDate + 'T00:00:00').toLocaleDateString('en-GB', {
         weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
@@ -151,7 +187,14 @@ export default {
       }
 
       this.selectedDate = info.dateStr;
+      this.filterStatus = null;
       this.fetchRegister();
+    },
+    toggleFilter(status) {
+      this.filterStatus = this.filterStatus === status ? null : status;
+    },
+    clearFilter() {
+      this.filterStatus = null;
     },
     fetchRegister() {
       this.loading = true;

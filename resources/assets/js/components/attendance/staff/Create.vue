@@ -8,7 +8,7 @@
         <div class="tw-form-group w-full lg:w-3/5">
           <div class="lg:mr-8 md:mr-8 flex flex-col lg:flex-row md:flex-row lg:items-center w-full">
             <div class="mb-2 w-full lg:w-1/4 md:w-1/3">
-              <label for="date" class="tw-form-label">Date<span class="text-red-500">*</span></label>
+              <label for="date" class="tw-form-label">Date <span class="text-red-500">*</span></label>
             </div>
             <div class="mb-2 w-full lg:w-3/4  md:w-2/3">
               <input type="date" name="date" v-model="date" class="tw-form-control w-full" id="date">
@@ -217,7 +217,7 @@
         this.presents = [];
         this.absents = [];
 
-        this.stafflist.forEach(staff => {
+        (this.stafflist || []).forEach(staff => {
           this.presents.push({
             present_id: staff.teacher_id,
             user_name: staff.teacher_name,
@@ -230,6 +230,12 @@
 
       fetchApprovedLeaves()
       {
+        if (!this.date || !this.session)
+        {
+          this.approvedLeaves = [];
+          return;
+        }
+
         axios.get('/'+this.mode+'/attendance/staff/approved-leaves/'+this.date+'/'+this.session).then(response => {
           this.approvedLeaves = response.data;
         });
@@ -325,12 +331,29 @@
           }
         }
       
-        axios.post('/'+this.mode+'/attendance/staff/add',formData,{headers: {'Content-Type': 'multipart/form-data'}}).then(response => {     
+        axios.post('/'+this.mode+'/attendance/staff/add',formData,{headers: {'Content-Type': 'multipart/form-data'}}).then(response => {
           this.success = response.data.success;
-          //this.resetForm();
+          this.clearFormAfterSubmit();
         }).catch(error => {
           this.errors = error.response.data.errors;
         });
+      },
+
+      clearFormAfterSubmit()
+      {
+        this.date = '';
+        this.session = '';
+        this.presents = [];
+        this.absents = [];
+        this.approvedLeaves = [];
+        this.searchStaff = '';
+        this.searchAbsent = '';
+        this.searchLeave = '';
+
+        $('#select').addClass('hidden').removeClass('block');
+        $('#select_student_btn').removeClass('hidden').addClass('block');
+        $('#btn_div').addClass('hidden').removeClass('block');
+        $('#save_btn').removeClass('hidden').addClass('block');
       },
 
       getData()

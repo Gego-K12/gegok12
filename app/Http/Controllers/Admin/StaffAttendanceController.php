@@ -72,13 +72,21 @@ class StaffAttendanceController extends Controller
                 ['status', 'active'],
             ])
             ->get()
-            ->sortBy('userprofile.firstname');
+            ->sortBy('userprofile.firstname')
+            ->values();
 
         $stafflistResource = TeacherlistResource::collection($staff);
         // Convert Resource collection to array for JSON encoding in blade view
         $stafflist = $stafflistResource->toArray(request());
 
         $absentReasonlist = AbsentReason::where('status', 1)->get();
+
+        if (request()->wantsJson()) {
+            return response()->json([
+                'stafflist' => $stafflist,
+                'absentReasonlist' => $absentReasonlist,
+            ]);
+        }
 
         return view('/admin/staff_attendance/list', [
             'stafflist' => $stafflist,
@@ -102,7 +110,8 @@ class StaffAttendanceController extends Controller
                 ['status', 'active'],
             ])
             ->get()
-            ->sortBy('userprofile.firstname');
+            ->sortBy('userprofile.firstname')
+            ->values();
 
         $stafflistResource = TeacherlistResource::collection($staff);
         // Convert Resource collection to array for JSON encoding in blade view

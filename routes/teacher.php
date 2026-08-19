@@ -225,6 +225,10 @@ Route::post('/attendance/add', 'AttendanceController@store');
 // export
 Route::get('/attendance/export/{standardLink_id}', 'AttendanceController@export');
 
+Route::get('/attendance/student/register/{standardLink_id}', 'AttendanceController@register');
+Route::get('/attendance/student/register/summary/{standardLink_id}/{month}', 'AttendanceController@registerMonthSummary');
+Route::get('/attendance/student/register/{standardLink_id}/{date}', 'AttendanceController@registerByDate');
+
 // without approval homework -- do not remove
 /*//homework
     //index

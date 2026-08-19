@@ -132,9 +132,9 @@ class StandardsLinkController extends Controller
                 ['standardLink_id', $id],
             ])->get();
 
-            $array['periodCount'] = count($timetable[0]['schedule']);
+            $array['periodCount'] = $timetable[0]['schedule'];
 
-            $array['timetable'] = TimetableResource::collection($timetable);
+            $array['timetable'] = '';
 
             return $array;
         } else {

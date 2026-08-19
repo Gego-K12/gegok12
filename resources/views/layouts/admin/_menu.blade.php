@@ -86,6 +86,12 @@ $coreMenu = [
             <span class="mx-3 whitespace-no-wrap">Staff Attendance Register</span>
           </a>
         </li>
+         <li class="py-3 px-3 hover:font-semibold {{Request::segment ('4') == 'register' ? 'active':''}}">
+          <a href="{{url('/admin/attendance/student/register')}}" class="flex items-center">
+            <svg class="w-5 h-5 fill-current text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
+            <span class="mx-3 whitespace-no-wrap">Student Attendance Register</span>
+          </a>
+        </li>
 
         <x-menu-item :item="['label' => 'Notice Board', 'icon' => 'fa-solid fa-bullhorn', 'route' => '/admin/notices', 'match' => ['notices', 'notice'], 'hoverClass' => 'hover:font-semibold']" />
         <x-menu-item :item="['label' => 'Home Works', 'icon' => 'fa-solid fa-book', 'route' => '/admin/homeworks', 'match' => ['homeworks', 'homework'], 'hoverClass' => 'hover:font-semibold']" />

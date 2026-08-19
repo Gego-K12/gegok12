@@ -682,6 +682,12 @@ Route::get('/teacher/attendances/show/{name}', 'StaffAttendanceController@getStu
 
 Route::get('/teacher/show/attendance/{name}', 'StaffAttendanceController@showAttendance');
 
+Route::get('/attendance/student/register', 'AttendanceController@register');
+
+Route::get('/attendance/student/register/summary/{standardLink_id}/{month}', 'AttendanceController@registerMonthSummary');
+
+Route::get('/attendance/student/register/{standardLink_id}/{date}', 'AttendanceController@registerByDate');
+
 Route::get('/staffs/find', 'StaffController@find');
 Route::get('/staffs', 'StaffController@index');
 Route::get('/staff/show/{name}', 'StaffController@show');

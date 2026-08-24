@@ -20,6 +20,7 @@ class TeacherLink extends JsonResource
             'standardLink_id'   =>  $this->standardLink_id,
             'subject_id'        =>  $this->subject_id,
             'subject_name'      =>  $this->subject->name,
+            'teacher_name'      =>  $this->teacher->fullname,
         ];
     }
 }

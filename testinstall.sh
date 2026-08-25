@@ -1,4 +1,4 @@
 #composer dump-autoload
-npm install
+#npm install
 php artisan migrate:fresh
 php artisan db:seed

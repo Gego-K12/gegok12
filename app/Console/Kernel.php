@@ -12,6 +12,8 @@ use App\Console\Commands\Addon\InstallQuizModule;
 use App\Console\Commands\Addon\InstallTimetableModule;
 use App\Console\Commands\Addon\InstallTransportModule;
 use App\Console\Commands\Addon\InstallVideoroomModule;
+use App\Console\Commands\Addon\InstallIncomeExpenseModule;
+use App\Console\Commands\Addon\InstallTransferCertificateModule;
 use App\Console\Commands\AddStandard;
 use App\Console\Commands\CheckAnniversary;
 use App\Console\Commands\CheckBirthday;
@@ -73,6 +75,8 @@ class Kernel extends ConsoleKernel
         InstallTimetableModule::class,
         InstallTransportModule::class,
         InstallVideoroomModule::class,
+        InstallIncomeExpenseModule::class,
+        InstallTransferCertificateModule::class,
 
         ProcessPluginInstalls::class,
     ];

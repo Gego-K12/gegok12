@@ -58,6 +58,7 @@
     <div id="add_homework"></div>
     <class-tab url="{{url('/')}}" id="{{ $standardLink->id }}" school_id="{{ $standardLink->school_id }}" mode="teacher" auth_id="{{ \Auth::id() }}"></class-tab>
     <div id="class"></div>
+    <div id="notes"></div>
   </div>
 </div>
 

@@ -32,6 +32,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
+
 class StandardsLinkController extends Controller
 {
     //
@@ -132,9 +133,11 @@ class StandardsLinkController extends Controller
                 ['standardLink_id', $id],
             ])->get();
 
-            $array['periodCount'] = $timetable[0]['schedule'];
+             $array['periodCount'] = count($timetable[0]['schedule']);
 
-            $array['timetable'] = '';
+            $array['timetable'] = TimetableResource::collection($timetable);
+
+            //$array['timetable'] = '';
 
             return $array;
         } else {

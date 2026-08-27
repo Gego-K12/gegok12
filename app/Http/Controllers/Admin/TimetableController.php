@@ -14,7 +14,7 @@ use Illuminate\Http\Request;
 use App\Models\Teacherlink;
 use App\Helpers\SiteHelper;
 use App\Traits\LogActivity;
-use Gegok12\Timetable\Models\Timetable;
+use App\Models\Timetable;
 use App\Traits\Common;
 use Exception;
 use Log;

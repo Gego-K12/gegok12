@@ -22,6 +22,7 @@
                         </td>
                         <td class="py-3 px-2" style="border-style: none;" v-for="(schedule,list) in timetable.schedule">
                             <p class="font-semibold text-xs">{{ schedule.subject_id }}</p>
+                            <p class="text-xs text-grey-darker" v-if="schedule.teacher_name">{{ schedule.teacher_name }}</p>
                             <p class="font-semibold text-xs">({{ schedule.start_time }} - {{ schedule.end_time }})</p>
                         </td>
                     </tr>

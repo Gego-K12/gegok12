@@ -11,7 +11,7 @@
                         <div class="mb-2 w-full lg:w-1/4">
                             <select class="tw-form-control w-full" id="standardLink_id" v-model="standardLink_id" name="standardLink_id">
                                 <option value="" disabled>Select Class</option>
-                                <option v-for="standard in standardLinklist" v-bind:value="standard.id">{{standard.standard_name}}-{{standard.section_name}}</option>
+                                <option v-for="standard in standardLinklist" v-bind:value="standard.id">{{standard.standard_name}}-{{standard.section_name}} </option>
                             </select>
                             <span v-if="errors.standardLink_id" class="text-red-500 text-xs font-semibold">{{errors.standardLink_id[0]}}</span>
                         </div>
@@ -62,19 +62,20 @@
                                             <tr class="border-b">
                                                 <th class="tw-form-label py-2">Period<span class="text-red-500">*</span></th>
                                                 <th class="tw-form-label py-2">Subject<span class="text-red-500">*</span></th>
+                                                <th class="tw-form-label py-2">Teacher</th>
                                                 <th class="tw-form-label py-2">Start Time<span class="text-red-500">*</span></th>
                                                 <th class="tw-form-label py-2">End Time<span class="text-red-500">*</span></th>
                                             </tr>
                                         </thead>
-              
-                                        <tr class="border-b" v-for="(list, key)  in input.array"> 
+
+                                        <tr class="border-b" v-for="(list, key)  in input.array">
                                             <td class="py-3 px-2">
                                                 <input type="text" name="period" v-model="list.period" class="tw-form-control" readonly>
                                                 <span v-if="errors['period'+index+key]" class="text-red-500 text-xs font-semibold">{{errors['period'+index+key][0]}}</span>
                                             </td>
 
                                             <td class="py-3 px-2">
-                                                <select class="tw-form-control" id="subject_id" v-model="list.subject_id" name="subject_id[]">
+                                                <select class="tw-form-control" id="subject_id" v-model="list.subject_id" name="subject_id[]" @change="setTeacherName(list)">
                                                     <option value="" disabled>Select Subject</option>
                                                     <option v-for="subject in teacherLinklist[standardLink_id]" v-bind:value="subject.subject_name">{{ subject.subject_name }}</option>
                                                 </select>
@@ -82,16 +83,42 @@
                                             </td>
 
                                             <td class="py-3 px-2">
-                                                <VueDatePicker format="HH:mm" model-type="format" :time-picker="true" :is-24="true" :auto-apply="true" input-class-name="w-full rounded" name="start_time[]" v-model="list.start_time" id="start_time" />
+                                                <input type="text" name="teacher_name" v-model="list.teacher_name" class="tw-form-control" readonly>
+                                                <span v-if="errors['teacher_name'+index+key]" class="text-red-500 text-xs font-semibold">{{errors['teacher_name'+index+key][0]}}</span>
+                                            </td>
+
+                                            <td class="py-3 px-2 time-cell">
+                                                <VueDatePicker
+                                                    v-model="list.start_time"
+                                                    time-picker
+                                                    :is-24="true"
+                                                    model-type="format"
+                                                    format="HH:mm"
+                                                    :auto-apply="true"
+                                                    input-class-name="date-input"
+                                                />
+
                                                 <span v-if="errors['start_time'+index+key]" class="text-red-500 text-xs font-semibold">{{errors['start_time'+index+key][0]}}</span>
                                             </td>
 
-                                            <td class="py-3 px-2">
-                                                <VueDatePicker format="HH:mm" model-type="format" :time-picker="true" :is-24="true" :auto-apply="true" input-class-name="w-full rounded" name="end_time[]" v-model="list.end_time" id="end_time" />
+                                            <td class="py-3 px-2 time-cell">
+                                                <VueDatePicker
+                                                    v-model="list.end_time"
+                                                    time-picker
+                                                    :is-24="true"
+                                                    model-type="format"
+                                                    format="HH:mm"
+                                                    :auto-apply="true"
+                                                    input-class-name="date-input"
+                                                />
                                                 <span v-if="errors['end_time'+index+key]" class="text-red-500 text-xs font-semibold">{{errors['end_time'+index+key][0]}}</span>
                                             </td>
                                         </tr>
                                     </table>
+                                </div>
+                                <div class="flex items-center mt-2" v-if="index < inputs.length - 1">
+                                    <input type="checkbox" v-model="input.sameAsTime" @change="applySameTime(input,index)" v-bind:id="'sameAsTime'+index" class="mr-2 cursor-pointer">
+                                    <label v-bind:for="'sameAsTime'+index" class="text-sm font-semibold text-purple-700 cursor-pointer">Same As Time</label>
                                 </div>
                             </div>
                         </div>
@@ -126,12 +153,14 @@
                 day:'',
                 period:'',
                 subject_id:'',
+                teacher_name:'',
                 start_time:'',
                 end_time:'',
                 inputs:[{
                     day:'',
                     period:'',
                     subject_id:'',
+                    teacher_name:'',
                     start_time:'',
                     end_time:'',
                 }],
@@ -157,9 +186,11 @@
                     this.inputs.push({
                         day:days[j].id,
                         day_name:days[j].name,
+                        sameAsTime:false,
                         array:[{
                             period:'',
                             subject_id:'',
+                            teacher_name:'',
                             start_time:'',
                             end_time:'',
                         }],
@@ -188,7 +219,7 @@
                             var input = this.inputs[key]['array'];
                             input.splice(i, 1);
                             input.push({
-                                period:i+1,subject_id:'',start_time:'',end_time:'',
+                                period:i+1,subject_id:'',teacher_name:'',start_time:'',end_time:'',
                             });
                         }
                     });
@@ -199,9 +230,36 @@
                 }
             },
 
-            deleteRow(index) 
+            deleteRow(index)
             {
                 this.inputs.splice(index,1);
+            },
+
+            applySameTime(sourceInput,index)
+            {
+                if(!sourceInput.sameAsTime)
+                {
+                    return;
+                }
+
+                for(var i=index+1 ; i<this.inputs.length ; i++)
+                {
+                    var targetArray = this.inputs[i]['array'];
+                    sourceInput.array.forEach(function(period,j){
+                        if(targetArray[j])
+                        {
+                            targetArray[j].start_time = period.start_time;
+                            targetArray[j].end_time   = period.end_time;
+                        }
+                    });
+                }
+            },
+
+            setTeacherName(list)
+            {
+                var subjects = this.teacherLinklist[this.standardLink_id];
+                var subject = subjects.find(function(subject){ return subject.subject_name == list.subject_id; });
+                list.teacher_name = subject ? subject.teacher_name : '';
             },
 
             submitForm()
@@ -239,10 +297,13 @@
                         if(typeof this.inputs[i]['array'][j]['subject_id'] !== "undefined")
                         {
                             formData.append('subject_id'+i+j,this.inputs[i]['array'][j]['subject_id']);
+
+                            formData.append('teacher_name'+i+j,this.inputs[i]['array'][j]['teacher_name']);
                         }
                         else
                         {
                             formData.append('subject_id'+i+j,'');
+                            formData.append('teacher_name'+i+j,'');
                         }
 
                         if(typeof this.inputs[i]['array'][j]['start_time'] !== "undefined")
@@ -303,3 +364,21 @@
         }
     }
 </script>
+
+<style scoped>
+    .time-cell {
+        min-width: 160px;
+    }
+
+    .time-cell :deep(.dp__main),
+    .time-cell :deep(.dp__input_wrap) {
+        width: 100%;
+    }
+
+    .time-cell :deep(.date-input) {
+        width: 100%;
+        min-width: 140px;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
+</style>

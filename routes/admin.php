@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\Admin\TimetableController;
 Route::get('/dashboard', 'DashboardController@index')->name('dashboard');
 Route::get('/dashboard/event', 'DashboardController@event');
 Route::get('/dashboard/structuralList', 'DashboardController@structuralList');
@@ -151,6 +151,16 @@ Route::delete('/discipline/delete/{id}', 'DisciplineController@destroy');
 Route::post('/discipline/updateStatus/{id}', 'DisciplineController@updateStatus');
 
 // Telephone Directory
+
+//timetable
+	//add
+	Route::get( '/timetable/list', [TimetableController::class,'list']);
+	Route::get( '/timetable/add', [TimetableController::class,'create']);
+	Route::post( '/timetable/add', [TimetableController::class,'store']);
+	//edit
+	Route::get( '/timetable/edit/list/{standardLink_id}', [TimetableController::class,'show']);
+	Route::get( '/timetable/edit/{standardLink_id}', [TimetableController::class,'edit']);
+	Route::post( '/timetable/edit/{standardLink_id}', [TimetableController::class,'update']);
 
 // index
 Route::get('/phonenumbers', 'TelephoneDirectoryController@index');

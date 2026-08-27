@@ -149,6 +149,9 @@ app.component('list-attendance', () => import('./components/attendance/List.vue'
 app.component('create-staff-attendance', () => import('./components/attendance/staff/Create.vue').then(m => m.default));
 app.component('list-staff-attendance', () => import('./components/attendance/staff/List.vue').then(m => m.default));
 app.component('staff-attendance-register', () => import('./components/attendance/staff/Register.vue').then(m => m.default));
+app.component('student-attendance-register', () => import('./components/attendance/Register.vue').then(m => m.default));
+app.component('admin-student-attendance-register', () => import('./components/attendance/Adminregister.vue').then(m => m.default));
+
 
 
 
@@ -284,6 +287,14 @@ app.component('view-birthday-teacher', () => import('./components/dashboard/View
 app.component('work-anniversary', () => import('./components/dashboard/WorkAnniversary.vue').then(m => m.default));
 app.component('view-work-anniversary', () => import('./components/dashboard/ViewWorkAnniversary.vue').then(m => m.default));
 app.component('dashboard-timetable-teacher', () => import('./components/dashboard/Timetable.vue').then(m => m.default));
+
+  app.component('create-timetable', () =>
+        import('./components/timetable/Create.vue')
+    );
+
+    app.component('edit-timetable', () =>
+        import('./components/timetable/Edit.vue')
+    );
 
 //Event
 app.component('create-event', () => import('./components/event/Create.vue').then(m => m.default));

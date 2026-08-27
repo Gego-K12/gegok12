@@ -47,33 +47,55 @@
                                             <tr class="border-b">
                                                 <th class="tw-form-label py-2">Period<span class="text-red-500">*</span></th>
                                                 <th class="tw-form-label py-2">Subject<span class="text-red-500">*</span></th>
+                                                <th class="tw-form-label py-2">Teacher</th>
                                                 <th class="tw-form-label py-2">Start Time<span class="text-red-500">*</span></th>
                                                 <th class="tw-form-label py-2">End Time<span class="text-red-500">*</span></th>
                                                 <th class="tw-form-label py-2"></th>
                                             </tr>
                                         </thead>
-              
-                                        <tr class="border-b" v-for="(list, key)  in input.array">  
+
+                                        <tr class="border-b" v-for="(list, key)  in input.array">
                                             <td class="py-3 px-2">
                                                 <input type="text" name="period" v-model="list.period" class="tw-form-control" readonly>
                                                 <span v-if="errors['period'+index+key]" class="text-red-500 text-xs font-semibold">{{errors['period'+index+key][0]}}</span>
                                             </td>
- 
+
                                             <td class="py-3 px-2">
-                                                <select class="tw-form-control" id="subject_id" v-model="list.subject_id" name="subject_id[]">
+                                                <select class="tw-form-control" id="subject_id" v-model="list.subject_id" name="subject_id[]" @change="setTeacherName(list)">
                                                     <option value="" disabled>Select Subject</option>
                                                     <option v-for="subject in teacherLinklist[id]" v-bind:value="subject.subject_name">{{ subject.subject_name }}</option>
                                                 </select>
                                                 <span v-if="errors['subject_id'+index+key]" class="text-red-500 text-xs font-semibold">{{errors['subject_id'+index+key][0]}}</span>
-                                            </td> 
-
-                                            <td class="py-3 px-2">
-                                                <VueDatePicker format="HH:mm" model-type="format" :time-picker="true" :is-24="true" :auto-apply="true" input-class-name="w-full rounded" name="start_time[]" v-model="list.start_time" id="start_time" />
-                                                <span v-if="errors['start_time'+index+key]" class="text-red-500 text-xs font-semibold">{{errors['start_time'+index+key][0]}}</span>
                                             </td>
 
                                             <td class="py-3 px-2">
-                                                <VueDatePicker format="HH:mm" model-type="format" :time-picker="true" :is-24="true" :auto-apply="true" input-class-name="w-full rounded" name="end_time[]" v-model="list.end_time" id="end_time" />
+                                                <input type="text" name="teacher_name" v-model="list.teacher_name" class="tw-form-control" readonly>
+                                                <span v-if="errors['teacher_name'+index+key]" class="text-red-500 text-xs font-semibold">{{errors['teacher_name'+index+key][0]}}</span>
+                                            </td>
+
+                                            <td class="py-3 px-2 time-cell">
+                                                <VueDatePicker
+                                                    v-model="list.start_time"
+                                                    time-picker
+                                                    :is-24="true"
+                                                    model-type="format"
+                                                    format="HH:mm"
+                                                    :auto-apply="true"
+                                                    input-class-name="tw-form-control"
+                                                />
+                                                <span v-if="errors['start_time'+index+key]" class="text-red-500 text-xs font-semibold">{{errors['start_time'+index+key][0]}}</span>
+                                            </td>
+
+                                            <td class="py-3 px-2 time-cell">
+                                                <VueDatePicker
+                                                    v-model="list.end_time"
+                                                    time-picker
+                                                    :is-24="true"
+                                                    model-type="format"
+                                                    format="HH:mm"
+                                                    :auto-apply="true"
+                                                    input-class-name="tw-form-control"
+                                                />
                                                 <span v-if="errors['end_time'+index+key]" class="text-red-500 text-xs font-semibold">{{errors['end_time'+index+key][0]}}</span>
                                             </td>
  
@@ -152,7 +174,7 @@
                             var input = [];
                             var input = this.inputs[key]['array'];
                             input.push({
-                                period:count+1,subject_id:'',start_time:'',end_time:'',
+                                period:count+1,subject_id:'',teacher_name:'',start_time:'',end_time:'',
                             });
                             this.periodCount1 = parseInt(count)+1;
                         }
@@ -177,9 +199,16 @@
                 this.inputs.splice(index,1);
             },
 
-            deleteCell(index,key) 
+            deleteCell(index,key)
             {
                 this.inputs[index]['array'].splice(key,1);
+            },
+
+            setTeacherName(list)
+            {
+                var subjects = this.teacherLinklist[this.id];
+                var subject = subjects.find(function(subject){ return subject.subject_name == list.subject_id; });
+                list.teacher_name = subject ? subject.teacher_name : '';
             },
 
             submitForm()
@@ -226,6 +255,15 @@
                             formData.append('subject_id'+i+j,'');
                         }
 
+                        if(typeof this.inputs[i]['array'][j]['teacher_name'] !== "undefined")
+                        {
+                            formData.append('teacher_name'+i+j,this.inputs[i]['array'][j]['teacher_name']);
+                        }
+                        else
+                        {
+                            formData.append('teacher_name'+i+j,'');
+                        }
+
                         if(typeof this.inputs[i]['array'][j]['start_time'] !== "undefined")
                         {
                             formData.append('start_time'+i+j,this.inputs[i]['array'][j]['start_time']);
@@ -264,13 +302,52 @@
                 });
             },
 
+            to24HourFormat(time)
+            {
+                if(!time)
+                {
+                    return '';
+                }
+
+                var parts = time.trim().split(' ');
+                var hoursMinutes = parts[0].split(':');
+                var hours = parseInt(hoursMinutes[0], 10);
+                var minutes = hoursMinutes[1];
+                var modifier = parts[1];
+
+                if(modifier)
+                {
+                    modifier = modifier.toUpperCase();
+                    if(modifier == 'PM' && hours !== 12)
+                    {
+                        hours += 12;
+                    }
+                    if(modifier == 'AM' && hours === 12)
+                    {
+                        hours = 0;
+                    }
+                }
+
+                return String(hours).padStart(2,'0')+':'+minutes;
+            },
+
             setData()
             {
                 if(Object.keys(this.list).length > 0)
-                {   
+                {
                     this.teacherLinklist  = this.list.teacherLinklist;
                     //this.standardLinklist = this.list.standardLinklist;
                     this.inputs           = this.list.timetable;
+
+                    this.inputs.forEach(input => {
+                        if(input.array)
+                        {
+                            input.array.forEach(list => {
+                                list.start_time = this.to24HourFormat(list.start_time);
+                                list.end_time   = this.to24HourFormat(list.end_time);
+                            });
+                        }
+                    });
                 }
             },
         },
@@ -282,3 +359,21 @@
         }
     }
 </script>
+
+<style scoped>
+    .time-cell {
+        min-width: 160px;
+    }
+
+    .time-cell :deep(.dp__main),
+    .time-cell :deep(.dp__input_wrap) {
+        width: 100%;
+    }
+
+    .time-cell :deep(.tw-form-control) {
+        width: 100%;
+        min-width: 140px;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
+</style>

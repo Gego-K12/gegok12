@@ -1,11 +1,22 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "gegok12/gegok12",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "Gegok12 - school management software built with the Laravel framework.",
     "keywords": [
-        "laravel",
-        "framework"
+        "school management system",
+        "school management software",
+        "school management system in php",
+        "school management system in laravel",
+        "educational erp",
+        "school erp",
+        "student management system",
+        "student attendance management system",
+        "student information system",
+        "school management system open source",
+        "school management system free",
+        "school management system github",
+        "school management system laravel"
     ],
     "license": "MIT",
     "require": {

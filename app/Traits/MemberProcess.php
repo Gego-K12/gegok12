@@ -359,14 +359,25 @@ trait MemberProcess
     public function ParentFilter($request, $school_id, $usergroup_id)
     {
         try {
-            $users = User::where('school_id', $school_id)->ByRole($usergroup_id)->whereHas('children', function ($q) {
-
-                $q->whereHas('userStudent', function ($q) {
-                    $q->where([['status', '!=', 'exit']]);
+            $users = User::where('school_id', $school_id)
+                ->ByRole($usergroup_id)
+                ->with([
+                    'userprofile',
+                    'children.userStudent.userprofile',
+                    'children.userStudent.studentAcademic' => function ($q) {
+                        $q->latest('id')->limit(1);
+                    },
+                    'children.userStudent.studentAcademic.standardLink.standard',
+                    'children.userStudent.studentAcademic.standardLink.section',
+                ])
+                ->whereHas('children', function ($q) {
+                    $q->whereHas('userStudent', function ($q) {
+                        $q->where([['status', '!=', 'exit']]);
+                    });
+                })
+                ->whereHas('userprofile', function ($q) {
+                    $q->where('status', 'active')->orWhere('status', 'inactive');
                 });
-            })->whereHas('userprofile', function ($q) {
-                $q->where('status', 'active')->orWhere('status', 'inactive');
-            });
 
             if (count((array) \Request::getQueryString()) > 0) {
                 $firstname = $request->firstname;

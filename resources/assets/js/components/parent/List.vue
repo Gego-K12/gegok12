@@ -6,12 +6,25 @@
                     <h1 class="admin-h1 my-3">Parents</h1>
                 </div>
 
-                <div class="relative flex items-center w-8/12 lg:w-1/4 md:w-1/4 justify-end">
-                    <div class="flex items-center w-full justify-end">
-                        <a :href="url+'/admin/parents'" class="btn btn-reset bg-gray-100 text-gray-700 border rounded px-3 py-1 ml-3 text-sm font-medium">
-                            <span class="mx-1 text-sm font-semibold">Reset</span>
-                        </a> 
+                <div class="relative flex items-center w-full lg:w-2/5 md:w-2/5 gap-3 justify-end">
+                    <!-- Filter by Class-Section Dropdown -->
+                    <div class="flex items-center gap-2">
+                        <label class="text-sm font-semibold text-gray-700">Filter by Class-Section:</label>
+                        <select
+                            v-model="selectedStandardLink"
+                            @change="onStandardLinkChange"
+                            class="px-4 py-2 border border-gray-300 rounded bg-white text-sm font-medium text-gray-700 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"
+                        >
+                            <option value="">✓ All Classes</option>
+                            <option v-for="link in standardLinklist" :key="link.id" :value="link.id">
+                                {{ link.standard_name }} - {{ link.section_name }}
+                            </option>
+                        </select>
                     </div>
+
+                    <a :href="url+'/admin/parents'" class="btn btn-reset bg-gray-100 text-gray-700 border rounded px-3 py-1 text-sm font-medium hover:bg-gray-200">
+                        <span class="mx-1 text-sm font-semibold">Reset</span>
+                    </a>
                 </div>
             </div>
         </Teleport>
@@ -23,13 +36,25 @@
                     </p>
                 </div>
                 <div v-if="props.column.field == 'fullname'" class="w-full flex justify-between">
-                    <a :href=props.row.showurl class="">{{ props.row.fullname }}
-                    <span  v-if="props.row.status != 'active'" class="bg-red-500 rounded px-1 text-xs text-white">InActive</span> 
+                    <a :href=props.row.showurl class="">
+                        <span v-if="props.row.prefix" class="font-semibold text-gray-700">{{ props.row.prefix }}</span>
+                        {{ props.row.fullname }}
+                        <span v-if="props.row.status != 'active'" class="bg-red-500 rounded px-1 text-xs text-white">InActive</span>
                     </a>
-
                 </div>
-                <div v-if="props.column.field == 'children.fullname'" class="w-full flex justify-between">
-                    <a :href=props.row.children.name class="">{{ props.row.children.fullname }}</a>
+                <div v-if="props.column.field == 'children.fullname'" class="w-full">
+                    <div v-if="props.row.children" class="flex flex-col">
+                        <a :href="props.row.children.name" class="font-semibold text-blue-600 hover:underline">
+                            {{ props.row.children.fullname }}
+                        </a>
+                        <span class="text-xs text-gray-600 mt-1">
+                            Roll Number: <span class="font-semibold">{{ props.row.children.roll_number }}</span>
+                        </span>
+                        <span class="text-xs text-gray-600">
+                            {{ props.row.children.standard }} - {{ props.row.children.section }}
+                        </span>
+                    </div>
+                    <div v-else class="text-gray-500 text-sm">No children</div>
                 </div>
                 <div v-if="props.column.field == 'mobile_no'" class="w-full flex justify-between">
                     <p>{{ props.row.mobile_no }}</p>
@@ -44,7 +69,7 @@
     import { VueGoodTable } from 'vue-good-table-next'
     import 'vue-good-table-next/dist/vue-good-table-next.css'
     export default {
-        props:['url' , 'searchquery'],
+        props:['url' , 'searchquery', 'standardlinklist'],
         components: {
             VueGoodTable,
         },
@@ -56,6 +81,7 @@
                 action:'',
                 id:'',
                 isLoading: false,
+                selectedStandardLink: '',
                 columns: [
                     {
                         label: 'Name',
@@ -106,18 +132,25 @@
         {
             getData()
             {
-                /*axios.get('/admin/parent/list?'+this.searchquery+'&page='+page).then(response => {
-                    this.rows = response.data.data;
-                    this.page_count = response.data.meta.last_page;
-                    this.totalRecords = response.data.meta.total;
-                    //console.log(this.rows)
-                });*/
-                axios.get('/admin/parent/list?'+'fullname='+this.fullname+'&student_name='+this.student_name+'&mobile_no='+this.mobile_no+'&page='+this.page).then(response => {
+                let url = '/admin/parent/list?'+'fullname='+this.fullname+'&student_name='+this.student_name+'&mobile_no='+this.mobile_no+'&page='+this.page;
+
+                // Add standard_link filter if selected
+                if (this.selectedStandardLink) {
+                    url += '&standardlink_id=' + this.selectedStandardLink;
+                }
+
+                axios.get(url).then(response => {
                     this.rows = response.data.data;
                     this.page_count = response.data.meta.last_page;
                     this.totalRecords = response.data.meta.total;
                     //console.log(this.rows)
                 });
+            },
+
+            onStandardLinkChange()
+            {
+                this.page = 1;
+                this.getData();
             },
 
             onColumnFilter(params) {

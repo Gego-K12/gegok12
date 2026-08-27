@@ -264,7 +264,10 @@
                 <dashboard-task url="{{ url('/') }}" mode="teacher"></dashboard-task>
             </div>
 
-            @if(config('gtimetable.enabled', false))
+
+
+            @if(config('gtimetable.enabled')=='true')
+
              <div class="w-full lg:w-1/2 md:w-1/2 my-3 lg:my-0 md:my-2 px-1">
                 <div class="bg-white custom-shadow px-3 py-2 border">
                     <div class="mx-2 py-1">

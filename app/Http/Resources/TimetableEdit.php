@@ -1,6 +1,6 @@
 <?php
 
-namespace Gegok12\Timetable\Http\Resources;
+namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 

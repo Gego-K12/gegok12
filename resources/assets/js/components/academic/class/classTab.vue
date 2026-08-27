@@ -4,6 +4,10 @@
             <li class="px-2 mx-1 lg:mx-2 md:mx-2 py-2 lg:py-3 md:py-2" v-bind:class="[{'active' : profile_tab === '1'}]">
                 <a href="#" class="text-gray-700 font-medium" @click="setProfileTab('1')">Notice Board</a>
             </li>
+
+             <li class="px-2 mx-1 lg:mx-2 md:mx-2 py-2 lg:py-3 md:py-2" v-bind:class="[{'active' : profile_tab === '6'}]">
+                <a href="#" class="text-gray-700 font-medium" @click="setProfileTab('6')">Attendance</a>
+            </li>
             
             <li v-if="gtimetableEnabled" class="px-2 mx-1 lg:mx-2 md:mx-2 py-2 lg:py-3 md:py-2" v-bind:class="[{'active' : profile_tab === '2'}]">
                 <a href="#" class="text-gray-700 font-medium" @click="setProfileTab('2')">Time Table</a>
@@ -17,9 +21,7 @@
             <li class="px-2 mx-1 lg:mx-2 md:mx-2 py-2 lg:py-3 md:py-2" v-bind:class="[{'active' : profile_tab === '5'}]">
                 <a href="#" class="text-gray-700 font-medium" @click="setProfileTab('5')">List Of Students</a>
             </li>
-            <li class="px-2 mx-1 lg:mx-2 md:mx-2 py-2 lg:py-3 md:py-2" v-bind:class="[{'active' : profile_tab === '6'}]">
-                <a href="#" class="text-gray-700 font-medium" @click="setProfileTab('6')">Attendance</a>
-            </li>
+           
             <li v-if="gexamEnabled" class="px-2 mx-1 lg:mx-2 md:mx-2 py-2 lg:py-3 md:py-2" v-bind:class="[{'active' : profile_tab === '7'}]">
                 <a href="#" class="text-gray-700 font-medium" @click="setProfileTab('7')">Upcoming Exams</a>
             </li>
@@ -49,15 +51,15 @@
             <div class="px-3 overflow-x-scroll lg:overflow-x-auto md:overflow-x-auto py-3" v-bind:class="[this.profile_tab==1?'block' :'hidden']">
                 <notice-board-list :url="this.url" :scope="this.id" :hidecolumns="true" :mode="this.mode"></notice-board-list>
             </div>
-            <timetable v-if="gtimetableEnabled" :url="this.url" :id="this.id" :mode="this.mode"></timetable>
+         
             <div class="px-3 overflow-x-scroll lg:overflow-x-auto md:overflow-x-auto py-3" v-bind:class="[this.profile_tab==3?'block' :'hidden']">
                 <home-work-list :url="this.url" :scope="this.id" :hidecolumns="true" :searchquery="null" :mode="this.mode"></home-work-list>
             </div>
+            <timetable v-if="gtimetableEnabled" :url="this.url" :id="this.id" :mode="this.mode"></timetable>
             <teachers :url="this.url" :id="this.id" :mode="this.mode"></teachers>
             <students :url="this.url" :id="this.id" :mode="this.mode"></students>
             <attendance :url="this.url" :id="this.id" :mode="this.mode"></attendance>
-            <upcomingExams v-if="gexamEnabled" :url="this.url" :id="this.id" :mode="this.mode"></upcomingExams>
-            <pastExams v-if="gexamEnabled" :url="this.url" :id="this.id" :mode="this.mode"></pastExams>
+            
             <events :url="this.url" :id="this.id" :mode="this.mode"></events>
             <fees v-if="gfeeEnabled" :url="this.url" :id="this.id" :mode="this.mode"></fees>
             <wallBoard :url="this.url" :id="this.id" :mode="this.mode" :auth_id="this.auth_id"></wallBoard>
@@ -114,11 +116,11 @@
 
         components: {
             NoticeList,
-            timetable,
+             timetable,
             HomeWorkList,
             teachers,
             students,
-            attendance,
+           attendance,
             upcomingExams,
             pastExams,
             events,

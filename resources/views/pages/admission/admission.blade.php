@@ -16,11 +16,9 @@
             </h1>
             @include('partials.message')
             <!-- multistep form -->
-            <form method="POST" action="" enctype="multipart/form-data" id="msform" class="w-full lg:w-1/2 mx-auto">
-                @csrf
-                <add-admission url="{{ url('/') }}" slug="{{ $slug }}"></add-admission>
-                <div id="add_admissionform"></div>
-            </form>
+            <div id="msform" class="w-full lg:w-1/2 mx-auto">
+                <livewire:admission.admission-form :slug="$slug" />
+            </div>
 
         @elseif($admission_open['meta_value']=="0")
             <h1 class="admin-h1 my-3 flex items-center">       

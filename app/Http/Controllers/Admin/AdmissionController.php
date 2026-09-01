@@ -49,6 +49,16 @@ class AdmissionController extends Controller
     }
 
     /**
+     * Show the admission settings page.
+     *
+     * @return Response
+     */
+    public function settings()
+    {
+        return view('/admin/admission/settings');
+    }
+
+    /**
      * Show the form for creating a new resource.
      *
      * @return Response

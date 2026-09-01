@@ -16,6 +16,7 @@ Route::get('/dashboard/task/count', 'DashboardController@listCount');
 // admission
 Route::get('/admissionlist', 'AdmissionController@admissionlist');
 Route::get('/admissions', 'AdmissionController@index');
+Route::get('/admission-settings', 'AdmissionController@settings');
 Route::get('/admission/show/{id}', 'AdmissionController@show');
 Route::get('/admission/edit/{id}', 'AdmissionController@edit');
 Route::post('/admission/update/{id}', 'AdmissionController@update');
@@ -189,8 +190,6 @@ Route::get('/students/blockedstudents', 'StudentController@blockedstudents');
 // add
 Route::get('/student/add', 'StudentController@create');
 Route::get('/student', 'StudentController@member');
-Route::post('/student/add/validationUser', 'StudentController@validationUser');
-Route::post('/student/add', 'StudentController@store');
 // show
 Route::get('/student/show/details/{name}', 'StudentDetailsController@showDetails');
 Route::get('/student/show/relations/{name}', 'StudentDetailsController@showRelations');
@@ -209,10 +208,7 @@ Route::get('/student/show/medicalHistory/{name}', 'StudentDetailsController@show
 Route::get('/student/add/medicalHistory/{name}', 'StudentDetailsController@createMedicalHistory');
 Route::post('/student/add/medicalHistory/{name}', 'StudentDetailsController@addMedicalHistory');
 // edit
-Route::get('/student/editStudent/{name}', 'StudentController@editStudent');
 Route::get('/student/edit/{name}', 'StudentController@edit');
-Route::post('/student/edit/validationUser/{name}', 'StudentController@editValidationUser');
-Route::post('/student/edit/{name}', 'StudentController@update');
 
 // delete
 Route::delete('/student/delete/{name}', 'StudentController@destroy');
@@ -735,6 +731,11 @@ Route::get('/staffs/id-card', 'StaffController@idcard');
 Route::get('/staffs/id-card-print', 'StaffController@printidcard');
 Route::get('/staffs/id-card/{name}', 'StaffController@showidcard');
 Route::get('/staffs/show-idcardprint/{name}', 'StaffController@showprintidcard');
+
+// Custom Fields
+Route::get('custom-fields', 'CustomFieldController@index');
+Route::get('custom-fields/create', 'CustomFieldController@create');
+Route::get('custom-fields/{id}/edit', 'CustomFieldController@edit');
 
 // Group
 Route::post('/group/store', 'GroupController@store');

@@ -126,8 +126,7 @@ class SchoolDetailsController extends Controller
 
             foreach ($request->request as $key => $value) {
                 $arrays = [
-                    'about_us', 'admission_open', 'admission_close_message',
-                    'admission_close_on', 'affiliation_no', 'affiliated_by',
+                    'about_us', 'affiliation_no', 'affiliated_by',
                     'board', 'date_of_establishment', 'landline_no',
                     'moto', 'school_logo', 'website',
                 ];
@@ -259,20 +258,13 @@ class SchoolDetailsController extends Controller
 
             foreach ($request->request as $key => $value) {
                 $arrays = [
-                    'about_us', 'admission_open', 'admission_close_message',
-                    'admission_close_on', 'affiliation_no', 'affiliated_by',
+                    'about_us', 'affiliation_no', 'affiliated_by',
                     'board', 'date_of_establishment', 'landline_no',
                     'moto', 'website',
                 ];
 
                 foreach ($arrays as $array) {
-                    if ($key == 'admission_open') {
-                        $details = SchoolDetail::where([['school_id', $school_id], ['meta_key', $key]])->first();
-                        if ($details) {
-                            $details->meta_value = ($value == 'true') ? 1 : 0;
-                            $details->save();
-                        }
-                    } elseif ($key == $array) {
+                    if ($key == $array) {
                         $details = SchoolDetail::where([['school_id', $school_id], ['meta_key', $key]])->first();
                         if ($details) {
                             $details->meta_value = $value;

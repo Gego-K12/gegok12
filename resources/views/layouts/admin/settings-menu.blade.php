@@ -3,6 +3,7 @@ $coreMenu = [
     ['label' => 'School Details', 'icon' => 'fa-solid fa-school', 'route' => '/admin/schooldetails', 'match' => ['schooldetails'], 'hoverClass' => ''],
     ['label' => 'Academic Years', 'icon' => 'fa-solid fa-graduation-cap', 'route' => '/admin/academics', 'match' => ['academics', 'academic'], 'hoverClass' => ''],
     ['label' => 'Admissions', 'icon' => 'fa-solid fa-file-signature', 'route' => '/admin/admissions', 'match' => ['admissions', 'admission'], 'hoverClass' => ''],
+    ['label' => 'Admission Settings', 'icon' => 'fa-solid fa-toggle-on', 'route' => '/admin/admission-settings', 'match' => ['admission-settings'], 'hoverClass' => ''],
     ['label' => 'Holidays List', 'icon' => 'fa-solid fa-umbrella-beach', 'route' => '/admin/holidays', 'match' => ['holidays', 'holiday'], 'hoverClass' => ''],
     ['label' => 'Exam Rules', 'icon' => 'fa-solid fa-scale-balanced', 'route' => '/admin/examrules', 'match' => ['examrules'], 'hoverClass' => '', 'visible' => ['config' => 'gexam.enabled']],
     ['label' => 'Exam Grade', 'icon' => 'fa-solid fa-ranking-star', 'route' => '/admin/exam/grade', 'segment' => 3, 'match' => ['grade'], 'hoverClass' => '', 'visible' => ['config' => 'gexam.enabled']],
@@ -15,6 +16,7 @@ $coreMenu = [
     ['label' => 'SEO Details', 'icon' => 'fa-solid fa-magnifying-glass-chart', 'route' => '/admin/settings/seodetailsettings', 'segment' => 3, 'match' => ['seodetailsettings'], 'hoverClass' => ''],
     ['label' => 'Maintenance Mode', 'icon' => 'fa-solid fa-screwdriver-wrench', 'route' => '/admin/settings/maintenancesettings', 'segment' => 3, 'match' => ['maintenancesettings'], 'hoverClass' => ''],
     ['label' => 'Standards', 'icon' => 'fa-solid fa-list-ol', 'route' => '/admin/settings/standards', 'segment' => 3, 'match' => ['standards'], 'hoverClass' => ''],
+    ['label' => 'Custom Fields', 'icon' => 'fa-solid fa-list-check', 'route' => '/admin/custom-fields', 'match' => ['custom-fields'], 'hoverClass' => ''],
 ];
 @endphp
 <div class="w-full h-full lg:w-48 md:w-48 bg-red-800 text-white">

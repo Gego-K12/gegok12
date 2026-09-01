@@ -165,7 +165,7 @@
         /*buttons*/
         #msform .action-button {
             width: 80px;
-            background: #c53030;
+            background: #3492e2;
             /*font-weight: bold;*/
             color: white;
             border: 0 none;
@@ -175,7 +175,7 @@
         }
 
         #msform .action-button:hover, #msform .action-button:focus {
-            box-shadow: 0 0 0 2px white, 0 0 0 3px #c53030;
+            box-shadow: 0 0 0 2px white, 0 0 0 3px #3492e2;
         }
 
         /*headings*/
@@ -220,7 +220,7 @@
             display: block;
             font-size: 10px;
             color: #333;
-            background: #feb2b2;
+            background: #bfdbfe;
             border-radius: 3px;
             margin: 0 auto 5px auto;
         }
@@ -230,7 +230,7 @@
             content: '';
             width: 100%;
             height: 2px;
-            background: #fed7d7;
+            background: #dbeafe;
             position: absolute;
             left: -50%;
             top: 9px;
@@ -239,13 +239,13 @@
 
         #progressbar li:first-child:after {
             /*connector not needed before the first step*/
-            content: none; 
+            content: none;
         }
 
-        /*marking active/completed steps green*/
-        /*The number of the step and the connector before it = green*/
+        /*marking active/completed steps blue*/
+        /*The number of the step and the connector before it = blue*/
         #progressbar li.active:before,  #progressbar li.active:after{
-            background: #e53e3e;
+            background: #3492e2;
             color: white;
         }
 

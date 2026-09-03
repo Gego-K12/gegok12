@@ -64,12 +64,6 @@ app.component('demo-tab', () => import('./components/demo/Tab.vue').then(m => m.
 //admission
 app.component('admission-list', () => import('./components/admission/List.vue').then(m => m.default));
 app.component('edit-admission-form', () => import('./components/admission/Edit.vue').then(m => m.default));
-app.component('add-admission', () => import('./components/admission/AdmissionTab.vue').then(m => m.default));
-app.component('select-standard', () => import('./components/admission/SelectStandard.vue').then(m => m.default));
-app.component('student-detail', () => import('./components/admission/StudentDetail.vue').then(m => m.default));
-app.component('academic-detail', () => import('./components/admission/AcademicDetail.vue').then(m => m.default));
-app.component('parent-detail', () => import('./components/admission/ParentDetail.vue').then(m => m.default));
-app.component('personal-detail', () => import('./components/admission/PersonalDetail.vue').then(m => m.default));
 
 
 
@@ -103,8 +97,6 @@ app.component('edit-schooldetail', () => import('./components/schooldetail/Edit.
 app.component('member-list', () => import('./components/student/List.vue').then(m => m.default));
 app.component('profile-tab', () => import('./components/student/profile/ProfileTab.vue').then(m => m.default));
 app.component('search-filter', () => import('./components/student/Filter.vue').then(m => m.default));
-app.component('create-member', () => import('./components/student/Create.vue').then(m => m.default));
-app.component('edit-member', () => import('./components/student/Edit.vue').then(m => m.default));
 app.component('create-medical-history', () => import('./components/student/CreateMedicalHistory.vue').then(m => m.default));
 
 app.component('change-password-student', () => import('./components/student/ChangePassword.vue').then(m => m.default));
@@ -119,8 +111,6 @@ app.component('create-bulletin', () => import('./components/bulletin/Create.vue'
 //parent
 app.component('parent-list', () => import('./components/parent/List.vue').then(m => m.default));
 app.component('parent-search-filter', () => import('./components/parent/Filter.vue').then(m => m.default));
-app.component('create-parent', () => import('./components/parent/Create.vue').then(m => m.default));
-app.component('edit-parent', () => import('./components/parent/Edit.vue').then(m => m.default));
 app.component('profile-tab-parent', () => import('./components/parent/profile/ProfileTab.vue').then(m => m.default));
 
 //teacher
@@ -297,8 +287,6 @@ app.component('dashboard-timetable-teacher', () => import('./components/dashboar
     );
 
 //Event
-app.component('create-event', () => import('./components/event/Create.vue').then(m => m.default));
-app.component('edit-event', () => import('./components/event/Edit.vue').then(m => m.default));
 app.component('show-event', () => import('./components/event/show.vue').then(m => m.default));
 app.component('event-popup', () => import('./components/event/Popup.vue').then(m => m.default));
 app.component('event-tab', () => import('./components/event/details/EventTab.vue').then(m => m.default));

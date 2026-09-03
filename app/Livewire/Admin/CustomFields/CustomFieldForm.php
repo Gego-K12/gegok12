@@ -39,6 +39,8 @@ class CustomFieldForm extends Component
         'staff' => 'Staff',
         'parent' => 'Parent',
         'admission' => 'Admission',
+        'event' => 'Event'
+
     ];
 
     public array $fieldTypes = [
@@ -71,7 +73,7 @@ class CustomFieldForm extends Component
         $this->validationPattern = $field->validation_pattern;
         $this->field_type = $field->field_type;
         $this->status = $field->status;
-        $this->options = $field->options->map(fn ($option) => [
+        $this->options = $field->options->map(fn($option) => [
             'option_label' => $option->option_label,
             'option_value' => $option->option_value,
         ])->values()->all();
@@ -129,11 +131,11 @@ class CustomFieldForm extends Component
 
         while (
             CustomField::where('school_id', $schoolId)
-                ->where('field_name', $fieldName)
-                ->when($this->field_id, fn ($query) => $query->where('id', '!=', $this->field_id))
-                ->exists()
+            ->where('field_name', $fieldName)
+            ->when($this->field_id, fn($query) => $query->where('id', '!=', $this->field_id))
+            ->exists()
         ) {
-            $fieldName = $baseFieldName.'_'.(++$suffix);
+            $fieldName = $baseFieldName . '_' . (++$suffix);
         }
 
         $field = CustomField::updateOrCreate(

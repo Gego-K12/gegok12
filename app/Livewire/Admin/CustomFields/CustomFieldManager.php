@@ -24,6 +24,7 @@ class CustomFieldManager extends Component
         'staff' => 'Staff',
         'parent' => 'Parent',
         'admission' => 'Admission',
+        'event' => 'Event',
     ];
 
     public array $fieldTypes = [
@@ -54,11 +55,11 @@ class CustomFieldManager extends Component
         $schoolId = Auth::user()->school_id;
 
         $fieldsQuery = CustomField::where('school_id', $schoolId)
-            ->with(['entityConfigs' => fn ($query) => $query->where('is_enabled', true)])
+            ->with(['entityConfigs' => fn($query) => $query->where('is_enabled', true)])
             ->orderBy('id', 'desc');
 
         if ($this->search) {
-            $fieldsQuery = $fieldsQuery->where('label', 'like', '%'.$this->search.'%');
+            $fieldsQuery = $fieldsQuery->where('label', 'like', '%' . $this->search . '%');
         }
 
         $fields = $fieldsQuery->paginate(10);

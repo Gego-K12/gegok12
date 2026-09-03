@@ -669,6 +669,131 @@ trait RegisterUser
     }
 
     /**
+     * Update an existing teacher's profile and qualification records.
+     *
+     * @param  object  $data  Request payload with updated fields
+     * @param  int  $school_id  School identifier
+     * @param  AcademicYear  $academic_year  Academic year model
+     * @param  int  $user_id  Teacher user identifier
+     * @param  string  $path  Avatar path if replaced
+     * @return Userprofile Updated profile
+     */
+    public function UpdateTeacher($data, $school_id, $academic_year, $user_id, $path)
+    {
+        \DB::beginTransaction();
+        try {
+            $userprofile = Userprofile::where('user_id', $user_id)->first();
+
+            $userprofile->firstname = $data->firstname;
+            if (! is_null($data->lastname)) {
+                $userprofile->lastname = $data->lastname;
+            }
+
+            $userprofile->gender = $data->gender;
+            $userprofile->date_of_birth = date('Y-m-d', strtotime($data->date_of_birth));
+            $userprofile->blood_group = $data->blood_group;
+            $userprofile->address = $data->address;
+            $userprofile->city_id = $data->city_id;
+            $userprofile->state_id = $data->state_id;
+            $userprofile->country_id = $data->country_id;
+            $userprofile->pincode = $data->pincode;
+            $userprofile->aadhar_number = $data->aadhar_number;
+            $userprofile->joining_date = date('Y-m-d', strtotime($data->joining_date));
+
+            if (! is_null($data->notes)) {
+                $userprofile->notes = $data->notes;
+            }
+
+            if ($path != '') {
+                $userprofile->avatar = $path;
+            }
+
+            $userprofile->marital_status = $data->marital_status;
+
+            $userprofile->save();
+
+            $teacherprofiles = TeacherProfile::where([['school_id', $school_id], ['user_id', $user_id]])->get();
+            foreach ($teacherprofiles as $profile) {
+                $profile->delete();
+            }
+
+            if ($data->qualification_id == null) {
+                $teacherprofile = new TeacherProfile;
+
+                $teacherprofile->school_id = $school_id;
+                $teacherprofile->academic_year_id = $academic_year->id;
+                $teacherprofile->user_id = $user_id;
+                $teacherprofile->qualification_id = $data->qualification_id;
+                $teacherprofile->ug_degree = $data->ug_degree;
+                $teacherprofile->pg_degree = $data->pg_degree;
+                $teacherprofile->specialization = $data->specialization;
+                $teacherprofile->designation = $data->designation;
+                $teacherprofile->sub_designation = $data->sub_designation;
+                $teacherprofile->employee_id = $data->employee_id;
+                $teacherprofile->job_type = $data->job_type;
+                $teacherprofile->interested_in = $data->interested_in;
+                $teacherprofile->reporting_to = $data->reporting_to;
+                $teacherprofile->status = 1;
+
+                $teacherprofile->save();
+            } else {
+                foreach ($data->qualification_id as $qualification) {
+                    $teacherprofile = new TeacherProfile;
+
+                    $teacherprofile->school_id = $school_id;
+                    $teacherprofile->academic_year_id = $academic_year->id;
+                    $teacherprofile->user_id = $user_id;
+                    $teacherprofile->qualification_id = $qualification;
+                    if ($teacherprofile->qualification_id == 1) {
+                        $teacherprofile->sub_qualification = $data->sub_qualification;
+                    }
+                    $teacherprofile->ug_degree = $data->ug_degree;
+                    $teacherprofile->pg_degree = $data->pg_degree;
+                    $teacherprofile->specialization = $data->specialization;
+                    $teacherprofile->designation = $data->designation;
+                    $teacherprofile->sub_designation = $data->sub_designation;
+                    $teacherprofile->employee_id = $data->employee_id;
+                    $teacherprofile->job_type = $data->job_type;
+                    $teacherprofile->interested_in = $data->interested_in;
+                    $teacherprofile->reporting_to = $data->reporting_to;
+                    $teacherprofile->status = 1;
+
+                    $teacherprofile->save();
+                }
+            }
+
+            $user = User::where('id', $user_id)->first();
+            $user->roles()->detach();
+
+            if ($data->designation == 'principal') {
+                $user->addRole('principal');
+            }
+
+            if ($data->designation == 'transport_coordinator') {
+                $user->addRole('transport_coordinator');
+            }
+
+            if ($data->designation == 'driver') {
+                $user->addRole('transport_driver');
+            }
+
+            if (($data->designation == 'principal') || ($data->designation == 'vice_principal') || ($data->designation == 'head_of_the_department')) {
+                $user->addRole('leave_checker');
+                $user->addRole('class_coordinator');
+            } else {
+                $user->addRole('leave_applier');
+            }
+
+            \DB::commit();
+
+            return $userprofile;
+        } catch (Exception $e) {
+            \DB::rollBack();
+            Log::info($e->getMessage());
+        }
+    }
+
+    /**
      * Create or update a mark entry for a student exam.
      *
      * @param  object  $data  Payload with mark details and associations

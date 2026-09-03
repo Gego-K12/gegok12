@@ -96,11 +96,11 @@ class EventsController extends Controller
 
             return $eventData;
         });
-        $events = json_encode($events);
 
         $standard = $request->standardLink_id;
+        $standardlist = SiteHelper::getStandardLinkList($school_id);
 
-        return view('admin.events.index', ['events' => $events, 'count' => $count, 'subscription' => $subscription, 'standard' => $standard]);
+        return view('admin.events.index', ['events' => $events, 'count' => $count, 'subscription' => $subscription, 'standard' => $standard, 'standardlist' => $standardlist]);
     }
 
     /**

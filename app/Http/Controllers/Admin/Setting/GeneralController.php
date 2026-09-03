@@ -45,6 +45,7 @@ class GeneralController extends Controller
         try {
             $this->updatesettings('sitetitle', $request->sitetitle);
             $this->updatesettings('sitename', $request->sitename);
+            $this->updatesettings('income_account', $request->income_account);
             $this->updatesettings(
                 'assignment_status',
                 $request->has('assignment_status') ? 1 : 0

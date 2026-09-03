@@ -104,6 +104,19 @@ class AdmissionController extends Controller
     }
 
     /**
+     * Display the full details of a single admission application.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function view($id)
+    {
+        $admission = Admission::where('school_id', Auth::user()->school_id)->where('id', $id)->firstOrFail();
+
+        return view('/admin/admission/view', ['admission' => $admission]);
+    }
+
+    /**
      * Show the form for editing the specified resource.
      *
      * @param  int  $id

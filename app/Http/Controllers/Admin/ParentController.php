@@ -9,15 +9,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Helpers\SiteHelper;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\ParentAddRequest;
-use App\Http\Requests\ParentUpdateRequest;
 use App\Http\Resources\ActivityLog as ActivityLogResource;
 use App\Http\Resources\Children as ChildrenResource;
 use App\Http\Resources\Feedback as FeedbackResource;
 use App\Http\Resources\User as UserResource;
 use App\Models\ActivityLog;
 use App\Models\Feedback;
-use App\Models\StudentAcademic;
 use App\Models\StudentParentLink;
 use App\Models\Subscription;
 use App\Models\User;
@@ -26,7 +23,6 @@ use App\Models\Users\ParentUser;
 use App\Traits\Common;
 use App\Traits\LogActivity;
 use App\Traits\MemberProcess;
-use App\Traits\RegisterUser;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -34,7 +30,6 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
-use Log;
 
 /**
  * Class ParentController
@@ -48,7 +43,6 @@ class ParentController extends Controller
     use Common;
     use LogActivity;
     use MemberProcess;
-    use RegisterUser;
 
     /**
      * Get filtered list of parents.
@@ -108,8 +102,9 @@ class ParentController extends Controller
 
         $array['qualificationlist'] = SiteHelper::getQualifications();
         $array['standardLinklist'] = SiteHelper::getStandardLinkList(Auth::user()->school_id);
+        $array['parent'] = [];
 
-        if ($request->standardLink_id != null) {
+        if ($request->filled('standardLink_id')) {
             $parent = ParentUser::where('school_id', Auth::user()->school_id)
                 ->ByRole(7)
                 ->ByStandardLinkParentList($request->standardLink_id)
@@ -119,53 +114,6 @@ class ParentController extends Controller
         }
 
         return $array;
-    }
-
-    /**
-     * Validate parent creation request.
-     *
-     * @return void
-     */
-    public function validationParent(ParentAddRequest $request)
-    {
-        //
-    }
-
-    /**
-     * Store a newly created parent.
-     *
-     * @return mixed
-     */
-    public function store(ParentAddRequest $request)
-    {
-        //
-        try {
-            $school_id = Auth::user()->school_id;
-            $student_id = '';
-
-            $user = $this->CreateParent($student_id, $request, $school_id, 7);
-
-            $ip = $this->getRequestIP();
-            $this->doActivityLog(
-                $user,
-                Auth::user(),
-                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT']],
-                LOGNAME_ADD_PARENT,
-                trans('messages.add_success_msg', ['module' => 'Parent'])
-            );
-
-            if ($request->parent == 'add') {
-                \Session::put('successmessage', trans('messages.add_success_msg', ['module' => 'Parent']));
-
-                return redirect()->back();
-            } else {
-                $res['success'] = trans('messages.add_success_msg', ['module' => 'Parent']);
-
-                return $res;
-            }
-        } catch (Exception $e) {
-            Log::info($e->getMessage());
-        }
     }
 
     /**
@@ -238,71 +186,6 @@ class ParentController extends Controller
     }
 
     /**
-     * Get parent data for edit form.
-     *
-     * @param  string  $name
-     * @return array
-     */
-    public function editList($name)
-    {
-        //
-        $user = ParentUser::where('name', $name)->first();
-        $userprofile = Userprofile::where('user_id', $user->id)->first();
-        $parentprofile = $user->getParentDetails();
-
-        $array = [];
-
-        $array['firstname'] = $userprofile->firstname;
-        $array['lastname'] = $userprofile->lastname;
-        $array['alternate_no'] = $userprofile->alternate_no ?? '';
-        $array['profession'] = $parentprofile['profession'] ?? '';
-        $array['sub_occupation'] = $parentprofile['sub_occupation'] ?? '';
-        $array['designation'] = $parentprofile['designation'] ?? '';
-        $array['organization_name'] = $parentprofile['organization_name'] ?? '';
-        $array['official_address'] = $parentprofile['official_address'] ?? '';
-        $array['annual_income'] = $parentprofile['annual_income'] ?? '';
-        $array['relation'] = $parentprofile['relation'] ?? '';
-        $array['qualification_id'] = $parentprofile['qualification_id'] ?? '';
-        $array['qualification_name'] = $parentprofile['qualification_name'] ?? '';
-        $array['qualificationlist'] = SiteHelper::getQualifications();
-        $array['standardLinklist'] = SiteHelper::getStandardLinkList(Auth::user()->school_id);
-
-        $ref_name = Request('ref_name') ? Request('ref_name') : '';
-
-        if ($ref_name != '') {
-            $student = User::where('name', $ref_name)->first();
-        } else {
-            $link = StudentParentLink::where('parent_id', $user->id)->orderByDesc('id')->first();
-            $student = $link != null ? User::where('id', $link->student_id)->first() : null;
-        }
-
-        $array['siblings'] = '';
-        $array['siblings_count'] = '';
-        $array['sibling_details'] = [];
-
-        if ($student != null) {
-            $academic = StudentAcademic::where('user_id', $student->id)->orderByDesc('id')->first();
-
-            if (($academic != null) && ($academic->siblings == 'yes') && ($academic->sibling_details != null)) {
-                $array['siblings'] = $academic->siblings;
-                $array['siblings_count'] = $academic->siblings_count;
-
-                foreach ($academic->sibling_details as $i => $sibling) {
-                    $array['sibling_details'][$i]['sibling_relation'] = $sibling['sibling_relation'];
-                    $array['sibling_details'][$i]['sibling_name'] = $sibling['sibling_name'];
-                    $array['sibling_details'][$i]['sibling_date_of_birth'] =date('Y-m-d', strtotime($sibling['sibling_date_of_birth'][0]));
-                    $array['sibling_details'][$i]['sibling_standard'] = $sibling['sibling_standard'];
-                }
-            } elseif ($academic != null) {
-                $array['siblings'] = $academic->siblings ?? '';
-                $array['siblings_count'] = $academic->siblings_count ?? '';
-            }
-        }
-
-        return $array;
-    }
-
-    /**
      * Show parent edit form.
      *
      * @param  string  $name
@@ -311,59 +194,12 @@ class ParentController extends Controller
     public function edit($name)
     {
         //
-        $ref_name = Request('ref_name') ? Request('ref_name') : '';
         $user = ParentUser::where('name', $name)->first();
-        $userprofile = Userprofile::where('user_id', $user->id)->first();
-        $parentprofile = $user->getParentDetails();
 
-        return view('/admin/parent/edit', [
-            'ref_name' => $ref_name,
-            'user' => $user,
-            'userprofile' => $userprofile,
-            'parentprofile' => $parentprofile,
-        ]);
-    }
-
-    /**
-     * Validate parent update request.
-     *
-     * @param  string  $name
-     * @return void
-     */
-    public function editValidationUser(ParentUpdateRequest $request, $name)
-    {
-        //
-    }
-
-    /**
-     * Update parent details.
-     *
-     * @param  string  $name
-     * @return RedirectResponse
-     */
-    public function update(ParentUpdateRequest $request, $name)
-    {
-        //
-        try {
-            $user = ParentUser::where('name', $name)->first();
-            $school_id = Auth::user()->school_id;
-
-            $userprofile = $this->UpdateParent('', $request, $school_id, $user->id);
-
-            $ip = $this->getRequestIP();
-            $this->doActivityLog(
-                $userprofile,
-                Auth::user(),
-                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT']],
-                LOGNAME_EDIT_PARENT,
-                trans('messages.update_success_msg', ['module' => 'Parent'])
-            );
-
-            \Session::put('successmessage', trans('messages.update_success_msg', ['module' => 'Parent']));
-
-            return redirect()->back();
-        } catch (Exception $e) {
-            Log::info($e->getMessage());
+        if (Gate::allows('member', $user)) {
+            return view('/admin/parent/edit', ['user' => $user]);
+        } else {
+            abort(403);
         }
     }
 

@@ -9,21 +9,17 @@ namespace App\Http\Controllers\Admin;
 
 use App\Helpers\SiteHelper;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\UserProfileAddRequest;
-use App\Http\Requests\UserProfileUpdateRequest;
 use App\Models\Group;
 use App\Models\Standard;
 use App\Models\StandardLink;
 use App\Models\StudentAcademic;
 use App\Models\StudentParentLink;
 use App\Models\Subscription;
-use App\Models\User;
 use App\Models\Userprofile;
 use App\Models\Users\StudentUser;
 use App\Traits\Common;
 use App\Traits\LogActivity;
 use App\Traits\MemberProcess;
-use App\Traits\RegisterUser;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -43,7 +39,6 @@ class StudentController extends Controller
     use Common;
     use LogActivity;
     use MemberProcess;
-    use RegisterUser;
 
     /**
      * Filter and fetch students list.
@@ -105,29 +100,12 @@ class StudentController extends Controller
     }
 
     /**
-     * Load supporting data for student creation.
+     * Load standard/transport/blood-group/caste dropdown data used by the
+     * student list filter (see resources/assets/js/components/student/Filter.vue
+     * and librarycard/Filter.vue) — unrelated to the Add/Edit Student forms.
      *
      * @return array
      */
-    // public function member()
-    // {
-    //   $academic_year  = SiteHelper::getAcademicYear(Auth::user()->school_id);
-
-    //   $array = [];
-
-    //   $array['academic_year_id']  =   $academic_year->id;
-    //   $array['countrylist']       =   SiteHelper::getCountries();
-    //   $array['statelist']         =   SiteHelper::getStates();
-    //   $array['citylist']          =   SiteHelper::getCities();
-    //   $array['standardLinklist']  =   SiteHelper::getStandardLinkList(Auth::user()->school_id);
-    //   $array['blood_groups']      =   SiteHelper::getBloodGroups();
-    //   $array['castelist']         =   SiteHelper::getCasteList();
-    //   $array['transportlist']     =   SiteHelper::getTransportList();
-    //   $array['date_of_birth']     =   date('Y-m-d',strtotime('-4 years',strtotime(date('Y'))));
-    //   $array['joining_date']      =   date('Y-m-d');
-
-    //   return $array;
-    // }
     public function member()
     {
         $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
@@ -149,119 +127,12 @@ class StudentController extends Controller
         $array['countrylist'] = SiteHelper::getCountries();
         $array['statelist'] = SiteHelper::getStates();
         $array['citylist'] = SiteHelper::getCities();
-
-        // updated
         $array['standardLinklist'] = $standardlinks;
-
         $array['blood_groups'] = SiteHelper::getBloodGroups();
         $array['castelist'] = SiteHelper::getCasteList();
         $array['transportlist'] = SiteHelper::getTransportList();
-        $array['date_of_birth'] = date('Y-m-d', strtotime('-4 years', strtotime(date('Y'))));
+        $array['date_of_birth'] = date('Y-m-d', strtotime('-4 years'));
         $array['joining_date'] = date('Y-m-d');
-
-        return $array;
-    }
-
-    /**
-     * Validate student creation request.
-     *
-     * @return void
-     */
-    public function validationUser(UserProfileAddRequest $request)
-    {
-        //
-    }
-
-    /**
-     * Store newly created student.
-     *
-     * @return Response
-     */
-    public function store(Request $request)
-    {
-        //
-        try {
-            $school_id = Auth::user()->school_id;
-
-            $academic_year = SiteHelper::getAcademicYear($school_id);
-
-            $file = $request->file('avatar');
-            if ($file) {
-                $folder = Auth::user()->school->slug.'/student/avatar';
-                $path = $this->uploadFile($folder, $file);
-            } else {
-                $path = '';
-            }
-
-            $user = $this->CreateUser($request, $school_id, $academic_year->id, $path, 6);
-            $mes = trans('messages.add_success_msg', ['module' => 'Student']);
-
-            $ip = $this->getRequestIP();
-            $this->doActivityLog(
-                $user,
-                Auth::user(),
-                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT']],
-                LOGNAME_ADD_STUDENT,
-                $mes
-            );
-
-            return redirect()->back()->with('successmessage', $mes);
-        } catch (Exception $e) {
-        }
-    }
-
-    /**
-     * Fetch student data for edit API.
-     *
-     * @param  string  $name
-     * @return array
-     */
-    public function editStudent($name)
-    {
-        //
-        $user = StudentUser::where('name', $name)->first();
-        $userprofile = Userprofile::where('user_id', $user->id)->first();
-        $studentAcademic = $user->studentAcademicLatest;
-
-        $array = [];
-
-        $array['firstname'] = $userprofile->firstname;
-        $array['lastname'] = $userprofile->lastname;
-        $array['date_of_birth'] = date('Y-m-d', strtotime($userprofile->date_of_birth));
-        $array['gender'] = $userprofile->gender;
-        $array['blood_group'] = $userprofile->blood_group;
-        $array['aadhar_number'] = $userprofile->aadhar_number == null ? '' : $userprofile->aadhar_number;
-        $array['city_id'] = $userprofile->city_id;
-        $array['state_id'] = $userprofile->state_id;
-        $array['country_id'] = $userprofile->country_id;
-        $array['pincode'] = $userprofile->pincode == null ? '' : $userprofile->pincode;
-        $array['birth_place'] = $userprofile->birth_place;
-        $array['native_place'] = $userprofile->native_place;
-        $array['mother_tongue'] = $userprofile->mother_tongue;
-        $array['caste'] = $userprofile->caste;
-        $array['sub_caste'] = $userprofile->sub_caste;
-        $array['avatar'] = $userprofile->AvatarPath;
-        $array['notes'] = $userprofile->notes;
-        $array['registration_number'] = $user->registration_number == null ? $userprofile->registration_number : $user->registration_number;
-        $array['EMIS_number'] = $userprofile->EMIS_number == null ? '' : $userprofile->EMIS_number;
-        $array['joining_date'] = $userprofile->joining_date == null ? '' : date('Y-m-d', strtotime($userprofile->joining_date));
-
-        $array['standardLink_id'] = $studentAcademic->standardLink_id;
-        $array['roll_number'] = $studentAcademic->roll_number == null ? '' : $studentAcademic->roll_number;
-        $array['id_card_number'] = $studentAcademic->id_card_number == null ? '' : $studentAcademic->id_card_number;
-        $array['board_registration_number'] = $studentAcademic->board_registration_number == null ? '' : $studentAcademic->board_registration_number;
-        $array['mode_of_transport'] = $studentAcademic->mode_of_transport;
-        $array['driver_name'] = $studentAcademic->transport_details['driver_name'];
-        $array['driver_contact_number'] = $studentAcademic->transport_details['driver_contact_number'];
-
-        $array['countrylist'] = SiteHelper::getCountries();
-        $array['statelist'] = SiteHelper::getStates();
-        $array['citylist'] = SiteHelper::getCities();
-        $array['standardLinklist'] = SiteHelper::getStandardLinkList(Auth::user()->school_id);
-        $array['blood_groups'] = SiteHelper::getBloodGroups();
-        $array['castelist'] = SiteHelper::getCasteList();
-        $array['transportlist'] = SiteHelper::getTransportList();
-        $array['today'] = date('Y-m-d');
 
         return $array;
     }
@@ -276,67 +147,11 @@ class StudentController extends Controller
     {
         //
         $user = StudentUser::where('name', $name)->first();
-        $userprofile = Userprofile::where('user_id', $user->id)->first();
+
         if (Gate::allows('member', $user)) {
-            return view('/admin/member/edit', ['user' => $user, 'userprofile' => $userprofile]);
+            return view('/admin/member/edit', ['user' => $user]);
         } else {
             abort(403);
-        }
-    }
-
-    /**
-     * Validate student update request.
-     *
-     * @param  string  $name
-     * @return void
-     */
-    public function editValidationUser(UserProfileUpdateRequest $request, $name)
-    {
-        //
-    }
-
-    /**
-     * Update student details.
-     *
-     * @param  string  $name
-     * @return Response
-     */
-    public function update(Request $request, $name)
-    {
-        //
-        try {
-            $user = StudentUser::where('name', $name)->first();
-
-            $userprofile = Userprofile::where('user_id', $user->id)->first();
-
-            $school_id = Auth::user()->school_id;
-
-            $academic_year = SiteHelper::getAcademicYear($school_id);
-
-            if ($request->hasFile('avatar')) {
-                $file = $request->file('avatar');
-                $folder = Auth::user()->school->slug.'/member/avatar';
-                $path = $this->uploadFile($folder, $file);
-            } else {
-                $path = $userprofile->avatar;
-            }
-
-            $userprofile = $this->UpdateUser($request, $school_id, $academic_year->id, $user->id, $path);
-
-            $message = trans('messages.update_success_msg', ['module' => 'Student']);
-
-            $ip = $this->getRequestIP();
-            $this->doActivityLog(
-                $userprofile,
-                Auth::user(),
-                ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT']],
-                LOGNAME_EDIT_STUDENT,
-                $message
-            );
-            \Session::put('successmessage', $message);
-
-            return redirect()->back();
-        } catch (Exception $e) {
         }
     }
 

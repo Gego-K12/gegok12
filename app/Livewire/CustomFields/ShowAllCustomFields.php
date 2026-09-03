@@ -19,11 +19,14 @@ class ShowAllCustomFields extends Component
 
     public Collection $fields;
 
-    public function mount(string $entityType, int $entityId, int $schoolId)
+    public bool $bare = false;
+
+    public function mount(string $entityType, int $entityId, int $schoolId, bool $bare = false)
     {
         $this->entityType = $entityType;
         $this->entityId = $entityId;
         $this->schoolId = $schoolId;
+        $this->bare = $bare;
 
         $this->fields = CustomFieldHelper::getFieldsForEntity($entityType, $schoolId);
     }

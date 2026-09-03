@@ -6,6 +6,7 @@
 
 namespace App\Traits;
 
+use App\Helpers\CustomFieldHelper;
 use App\Models\ParentProfile;
 use App\Models\StudentAcademic;
 use App\Models\StudentParentLink;
@@ -150,6 +151,37 @@ trait AdmissionUser
             $academic->medication_problems = $data->medical_details;
 
             $academic->save();
+
+            if (! empty($data->custom_fields)) {
+                // The admission form's "Additional Info" step collects
+                // fields configured for the 'admission' entity type, which
+                // includes admission-only fields (e.g. Mother/Father Aadhaar
+                // number) that describe the parents, not the student. Only
+                // fields ALSO configured for 'student' become part of the
+                // new student's own custom field values.
+                $customFieldValues = json_decode($data->custom_fields, true) ?? [];
+                $studentFieldsById = CustomFieldHelper::getFieldsForEntity('student', $data->school_id)->keyBy('id');
+
+                foreach ($customFieldValues as $customFieldId => $value) {
+                    $field = $studentFieldsById->get($customFieldId);
+
+                    if (! $field) {
+                        continue;
+                    }
+
+                    $isFile = $field->field_type === 'file';
+
+                    CustomFieldHelper::setValue(
+                        (int) $customFieldId,
+                        'student',
+                        $user->id,
+                        $data->school_id,
+                        $isFile ? null : $value,
+                        $isFile ? $value : null
+                    );
+                }
+            }
+
             if (config('gfee.enabled', false)) {
 
                 if ($data->payment_status == 'paid') {
@@ -233,7 +265,7 @@ trait AdmissionUser
             $parent->designation = $data->father_designation;
             $parent->organization_name = $data->father_organisation;
             // $parent->official_address   =   $data->official_address;
-            $parent->relation = 'Father';
+            $parent->relation = 'father';
             $parent->annual_income = $data->father_income;
 
             $parent->save();
@@ -311,7 +343,7 @@ trait AdmissionUser
             $parent->designation = $data->mother_designation;
             $parent->organization_name = $data->mother_organisation;
             // $parent->official_address   =   $data->official_address;
-            $parent->relation = 'Mother';
+            $parent->relation = 'mother';
             $parent->annual_income = $data->mother_income;
 
             $parent->save();

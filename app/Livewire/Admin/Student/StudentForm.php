@@ -132,6 +132,17 @@ class StudentForm extends Component
         $this->transportList = SiteHelper::getTransportList();
         $this->customFields = CustomFieldHelper::getFieldsForEntity('student', $schoolId);
 
+        // Livewire only binds a checkbox input as part of an array when the
+        // underlying model is already an array -- with no stored value to
+        // seed from (unlike edit mode below), a checkbox field with just one
+        // option would otherwise bind as a plain boolean and fail the
+        // 'array' validation rule.
+        foreach ($this->customFields as $field) {
+            if ($field->field_type === 'checkbox') {
+                $this->custom_fields[$field->id] = [];
+            }
+        }
+
         if (! $name) {
             $this->date_of_birth = date('Y-m-d', strtotime('-4 years'));
             $this->joining_date = date('Y-m-d');
@@ -192,7 +203,14 @@ class StudentForm extends Component
             }
 
             $value = $stored?->value;
-            $this->custom_fields[$field->id] = ($field->field_type === 'checkbox' && $value) ? explode(',', $value) : $value;
+
+            if ($field->field_type === 'checkbox') {
+                $this->custom_fields[$field->id] = $value ? explode(',', $value) : [];
+
+                continue;
+            }
+
+            $this->custom_fields[$field->id] = $value;
         }
     }
 
@@ -526,6 +544,11 @@ class StudentForm extends Component
         // moment it was selected and recorded its path here.
         $path = $this->avatarPath ?? '';
 
+        // MySQL only exempts NULL (not '') from the users_email_unique
+        // constraint -- a second student left without an email would
+        // otherwise collide with the first empty-email user and crash.
+        $this->email = $this->email !== '' ? $this->email : null;
+
         if ($this->isEdit()) {
             $userprofile = $this->UpdateUser($this, $schoolId, $academicYear->id, $this->userId, $path);
 
@@ -581,7 +604,7 @@ class StudentForm extends Component
                 continue;
             }
 
-            if ($value === null || $value === '') {
+            if ($value === null || $value === '' || $value === []) {
                 continue;
             }
 

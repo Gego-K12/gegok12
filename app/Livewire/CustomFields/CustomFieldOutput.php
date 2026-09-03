@@ -21,11 +21,14 @@ class CustomFieldOutput extends Component
 
     public array $selectedOptionLabels = [];
 
-    public function mount(int $customFieldId, string $entityType, int $entityId)
+    public bool $bare = false;
+
+    public function mount(int $customFieldId, string $entityType, int $entityId, bool $bare = false)
     {
         $this->customField = CustomField::with('options')->findOrFail($customFieldId);
         $this->entityType = $entityType;
         $this->entityId = $entityId;
+        $this->bare = $bare;
 
         $this->fieldValue = CustomFieldValue::where('custom_field_id', $customFieldId)
             ->where('entity_type', $entityType)

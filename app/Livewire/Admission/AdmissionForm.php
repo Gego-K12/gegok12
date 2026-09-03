@@ -5,6 +5,7 @@
 
 namespace App\Livewire\Admission;
 
+use App\Helpers\CustomFieldHelper;
 use App\Helpers\SiteHelper;
 use App\Models\Admission;
 use App\Models\School;
@@ -226,6 +227,11 @@ class AdmissionForm extends Component
 
     public string $driver_mobile_number = '';
 
+    // Step 6: Additional Info
+    public $customFields;
+
+    public array $custom_fields = [];
+
     public bool $submitted = false;
 
     public ?string $submitError = null;
@@ -243,6 +249,20 @@ class AdmissionForm extends Component
         $this->bloodGroupList = SiteHelper::getBloodGroups();
         $this->qualificationList = json_decode(json_encode(SiteHelper::getQualifications()), true) ?? [];
         $this->transportList = SiteHelper::getTransportList();
+
+        $this->customFields = CustomFieldHelper::getFieldsForEntity('admission', $school->id);
+
+       // dd($this->customFields);
+
+        // Livewire only binds a checkbox input as part of an array when the
+        // underlying model is already an array -- a checkbox field with just
+        // one option would otherwise bind as a plain boolean and fail the
+        // 'array' validation rule (see the same fix in StudentForm).
+        foreach ($this->customFields as $field) {
+            if ($field->field_type === 'checkbox') {
+                $this->custom_fields[$field->id] = [];
+            }
+        }
     }
 
     protected function rules(): array
@@ -262,7 +282,7 @@ class AdmissionForm extends Component
                 'father_income' => 'required|numeric|regex:/^[0-9]{1,9}$/',
                 'father_mobile_no' => 'required|numeric|digits:10',
                 'father_email' => 'required|email',
-                'father_aadhar_number' => 'required|numeric|digits:12',
+                //'father_aadhar_number' => 'required|numeric|digits:12',
                 'father_avatar' => 'nullable|image|max:2048',
 
                 'mother_name' => 'required|regex:/^[A-Za-z\s]+$/',
@@ -273,7 +293,7 @@ class AdmissionForm extends Component
                 'mother_income' => 'required|numeric|regex:/^[0-9]{1,9}$/',
                 'mother_mobile_no' => 'nullable|numeric|digits:10',
                 'mother_email' => 'nullable|email',
-                'mother_aadhar_number' => 'required|numeric|digits:12',
+                //'mother_aadhar_number' => 'required|numeric|digits:12',
                 'mother_avatar' => 'nullable|image|max:2048',
 
                 'emergency_contact_1' => 'required|numeric|digits:10',
@@ -282,6 +302,7 @@ class AdmissionForm extends Component
                 'relation_with_student_2' => 'required|regex:/^[A-Za-z\s]+$/',
             ],
             5 => $this->personalRules(),
+            6 => CustomFieldHelper::validationRules('admission', $this->schoolId),
             default => [],
         };
     }
@@ -297,11 +318,11 @@ class AdmissionForm extends Component
             'avatar' => 'nullable|image|max:2048',
             'birth_place' => 'required|regex:/^[A-Za-z\s]+$/',
             'nationality' => 'required|regex:/^[A-Za-z\s]+$/',
-            'religion' => 'required|regex:/^[A-Za-z\s]+$/',
-            'community' => 'required|regex:/^[A-Za-z\s]+$/',
+           // 'religion' => 'required|regex:/^[A-Za-z\s]+$/',
+            //'community' => 'required|regex:/^[A-Za-z\s]+$/',
             'mother_tongue' => 'required|regex:/^[A-Za-z\s]+$/',
             'identification_marks' => 'required|regex:/^[A-Za-z\s]+$/',
-            'aadhar_number' => 'required|digits:12',
+            //'aadhar_number' => 'required|digits:12',
             'blood_group' => 'required',
             'school_last_studied' => 'nullable|regex:/^[A-Za-z\s]+$/',
             'reason_for_leaving' => 'nullable|regex:/^[A-Za-z\s]+$/',
@@ -325,8 +346,8 @@ class AdmissionForm extends Component
             'maths' => 'nullable|numeric|max:100',
             'science' => 'nullable|numeric|max:100',
             'social' => 'nullable|numeric|max:100',
-            'board_of_education' => 'required',
-            'choice_of_language' => 'required',
+            //'board_of_education' => 'required',
+            //'choice_of_language' => 'required',
             'group_selection' => 'nullable',
         ];
 
@@ -406,7 +427,7 @@ class AdmissionForm extends Component
             'science.max' => 'Enter Valid Science Marks Cannot Be Greater Than 100',
             'social.numeric' => 'Enter Valid Social Marks',
             'social.max' => 'Enter Valid Social Marks Cannot Be Greater Than 100',
-            'board_of_education.required' => 'Board of Study Is Required',
+            //'board_of_education.required' => 'Board of Study Is Required',
             'choice_of_language.required' => 'Choice of Language Is Required',
             'group_selection.required' => 'Group Selection Is Required',
             'board_registration_number.required' => 'Board Registration Number Is Required',
@@ -429,9 +450,9 @@ class AdmissionForm extends Component
             'father_mobile_no.digits' => 'Mobile Number Should Be Of 10 Digits',
             'father_email.required' => 'Email Is Required',
             'father_email.email' => 'Enter Valid Email',
-            'father_aadhar_number.required' => 'Aadhaar Number Is Required',
-            'father_aadhar_number.numeric' => 'Enter Valid Aadhaar Number',
-            'father_aadhar_number.digits' => 'Aadhaar Number Should Be Of 12 Digits',
+            //'father_aadhar_number.required' => 'Aadhaar Number Is Required',
+            //'father_aadhar_number.numeric' => 'Enter Valid Aadhaar Number',
+            //'father_aadhar_number.digits' => 'Aadhaar Number Should Be Of 12 Digits',
             'father_avatar.image' => 'Photo Must Be An Image',
             'father_avatar.max' => 'Photo Must Not Be Larger Than 2MB',
 
@@ -450,9 +471,9 @@ class AdmissionForm extends Component
             'mother_mobile_no.numeric' => 'Enter Valid Mobile Number',
             'mother_mobile_no.digits' => 'Mobile Number Should Be Of 10 Digits',
             'mother_email.email' => 'Enter Valid Email',
-            'mother_aadhar_number.required' => 'Aadhaar Number Is Required',
-            'mother_aadhar_number.numeric' => 'Enter Valid Aadhaar Number',
-            'mother_aadhar_number.digits' => 'Aadhaar Number Should Be Of 12 Digits',
+            //'mother_aadhar_number.required' => 'Aadhaar Number Is Required',
+            //'mother_aadhar_number.numeric' => 'Enter Valid Aadhaar Number',
+            //'mother_aadhar_number.digits' => 'Aadhaar Number Should Be Of 12 Digits',
             'mother_avatar.image' => 'Photo Must Be An Image',
             'mother_avatar.max' => 'Photo Must Not Be Larger Than 2MB',
 
@@ -476,6 +497,11 @@ class AdmissionForm extends Component
             'driver_mobile_number.numeric' => 'Enter Valid Mobile Number',
             'driver_mobile_number.digits' => 'Mobile Number Should Be 10 Digits',
         ];
+    }
+
+    protected function validationAttributes(): array
+    {
+        return CustomFieldHelper::validationAttributes('admission', $this->schoolId);
     }
 
     public function nextStep()
@@ -503,6 +529,7 @@ class AdmissionForm extends Component
         $bloodGroupList = $this->bloodGroupList;
         $qualificationList = $this->qualificationList;
         $transportList = $this->transportList;
+        $customFields = $this->customFields;
 
         $this->reset();
 
@@ -512,7 +539,14 @@ class AdmissionForm extends Component
         $this->bloodGroupList = $bloodGroupList;
         $this->qualificationList = $qualificationList;
         $this->transportList = $transportList;
+        $this->customFields = $customFields;
         $this->currentStep = 1;
+
+        foreach ($this->customFields as $field) {
+            if ($field->field_type === 'checkbox') {
+                $this->custom_fields[$field->id] = [];
+            }
+        }
     }
 
     public function submit()
@@ -541,11 +575,11 @@ class AdmissionForm extends Component
             $admission->weight = $this->weight;
             $admission->birth_place = $this->birth_place;
             $admission->nationality = $this->nationality;
-            $admission->religion = $this->religion;
-            $admission->community = $this->community;
+            //$admission->religion = $this->religion;
+           // $admission->community = $this->community;
             $admission->mother_tongue = $this->mother_tongue;
             $admission->identification_marks = $this->identification_marks;
-            $admission->aadhar_number = $this->aadhar_number;
+           // $admission->aadhar_number = $this->aadhar_number;
             $admission->blood_group = $this->blood_group;
             $admission->school_last_studied = $this->school_last_studied;
             $admission->reason_for_leaving = $this->reason_for_leaving;
@@ -562,8 +596,8 @@ class AdmissionForm extends Component
                 'social' => $this->social,
             ]);
 
-            $admission->board_of_education = $this->board_of_education;
-            $admission->choice_of_language = $this->choice_of_language;
+            //$admission->board_of_education = $this->board_of_education;
+            //$admission->choice_of_language = $this->choice_of_language;
             $admission->group_selection = $this->group_selection;
             $admission->board_registration_number = $this->board_registration_number;
 
@@ -615,6 +649,28 @@ class AdmissionForm extends Component
 
             $admission->application_status = 'Draft';
             $admission->application_no = 'APP-FORM-' . date('YmdHis');
+
+            $customFieldValues = [];
+
+            foreach ($this->customFields as $field) {
+                $value = $this->custom_fields[$field->id] ?? null;
+
+                if ($field->field_type === 'file') {
+                    if ($value instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
+                        $customFieldValues[$field->id] = $this->uploadFile($school->id . '/custom-fields', $value);
+                    }
+
+                    continue;
+                }
+
+                if ($value === null || $value === '' || $value === []) {
+                    continue;
+                }
+
+                $customFieldValues[$field->id] = is_array($value) ? implode(',', $value) : $value;
+            }
+
+            $admission->custom_fields = json_encode($customFieldValues);
 
             $admission->save();
 

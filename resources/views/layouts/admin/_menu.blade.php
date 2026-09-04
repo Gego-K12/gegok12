@@ -142,7 +142,7 @@ $coreMenu = [
          Settings, Standards). --}}
     <x-menu-item :item="[
         'label' => 'Settings', 'icon' => 'fa-solid fa-gear', 'route' => '/admin/settings',
-        'match' => ['schooldetails', 'academics', 'academic', 'promotion', 'leavetypes', 'leavetype', 'examrules', 'holidays', 'holiday', 'admissions', 'admission', 'setting', 'settings'],
+        'match' => ['schooldetails', 'academics', 'academic', 'promotion', 'leavetypes', 'leavetype', 'examrules', 'holidays', 'holiday', 'admissions', 'admission', 'admission-payment-codes', 'setting', 'settings'],
         'hoverClass' => '',
     ]" />
 </ul>

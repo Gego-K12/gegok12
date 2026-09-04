@@ -46,4 +46,9 @@ return [
         'key' => env('GOOGLE_MAPS_API_KEY'),
     ],
 
+    'razorpay' => [
+        'key' => env('RAZORPAY_KEY'),
+        'secret' => env('RAZORPAY_SECRET'),
+    ],
+
 ];

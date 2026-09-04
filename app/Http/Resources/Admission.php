@@ -18,9 +18,11 @@ class Admission extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'standard_id' => $this->standard->present()->integerToRoman($this->standard->name),
+            'standard_id' => strtoupper(optional($this->standard)->name ?? ''),
             'application_no' => $this->application_no,
             'application_status' => $this->application_status,
+            'payment_mode' => $this->payment_mode,
+            'application_payment_status' => $this->application_payment_status,
         ];
     }
 }

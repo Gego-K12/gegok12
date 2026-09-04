@@ -57,6 +57,18 @@
                 @error('closeOn') <span class="text-red-500 text-xs font-semibold">{{ $message }}</span> @enderror
             </div>
         </div>
+
+        <div class="tw-form-group w-full lg:w-1/3">
+            <div class="lg:mr-8 md:mr-8">
+                <div class="mb-2">
+                    <label class="tw-form-label">Application Fee Amount</label>
+                </div>
+                <div class="w-full lg:w-3/4 my-2">
+                    <input type="number" step="0.01" min="0" wire:model="feeAmount" class="tw-form-control w-full" placeholder="e.g. 500">
+                </div>
+                @error('feeAmount') <span class="text-red-500 text-xs font-semibold">{{ $message }}</span> @enderror
+            </div>
+        </div>
     </div>
 
     <div class="py-3">

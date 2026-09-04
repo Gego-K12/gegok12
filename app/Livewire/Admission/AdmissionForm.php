@@ -8,12 +8,15 @@ namespace App\Livewire\Admission;
 use App\Helpers\CustomFieldHelper;
 use App\Helpers\SiteHelper;
 use App\Models\Admission;
+use App\Models\AdmissionPaymentCode;
 use App\Models\School;
+use App\Models\SchoolDetail;
 use App\Models\Standard;
 use App\Models\User;
 use App\Traits\Common;
 use App\Traits\LogActivity;
 use Exception;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -29,6 +32,23 @@ class AdmissionForm extends Component
     public int $schoolId;
 
     public int $currentStep = 1;
+
+    // Step 7: Payment
+    public string $paymentMode = '';
+
+    public string $paymentCode = '';
+
+    public string $applicationFeeAmount = '0';
+
+    public ?string $razorpayKey = null;
+
+    public bool $onlinePaymentSuccessful = false;
+
+    public ?string $razorpayPaymentId = null;
+
+    public ?string $razorpayOrderId = null;
+
+    public ?string $onlinePaymentError = null;
 
     public array $standardlist = [];
 
@@ -252,7 +272,15 @@ class AdmissionForm extends Component
 
         $this->customFields = CustomFieldHelper::getFieldsForEntity('admission', $school->id);
 
-       // dd($this->customFields);
+        $this->applicationFeeAmount = (string) (SchoolDetail::where('school_id', $school->id)
+            ->where('meta_key', 'admission_fee_amount')
+            ->value('meta_value') ?: '0');
+
+        //dd($this->applicationFeeAmount);
+
+        $this->razorpayKey = config('services.razorpay.key');
+
+        // dd($this->customFields);
 
         // Livewire only binds a checkbox input as part of an array when the
         // underlying model is already an array -- a checkbox field with just
@@ -303,6 +331,10 @@ class AdmissionForm extends Component
             ],
             5 => $this->personalRules(),
             6 => CustomFieldHelper::validationRules('admission', $this->schoolId),
+            7 => [
+                'paymentMode' => ['required', 'in:online,offline'],
+                'paymentCode' => ['nullable', 'string', 'max:50'],
+            ],
             default => [],
         };
     }
@@ -318,7 +350,7 @@ class AdmissionForm extends Component
             'avatar' => 'nullable|image|max:2048',
             'birth_place' => 'required|regex:/^[A-Za-z\s]+$/',
             'nationality' => 'required|regex:/^[A-Za-z\s]+$/',
-           // 'religion' => 'required|regex:/^[A-Za-z\s]+$/',
+            // 'religion' => 'required|regex:/^[A-Za-z\s]+$/',
             //'community' => 'required|regex:/^[A-Za-z\s]+$/',
             'mother_tongue' => 'required|regex:/^[A-Za-z\s]+$/',
             'identification_marks' => 'required|regex:/^[A-Za-z\s]+$/',
@@ -516,6 +548,64 @@ class AdmissionForm extends Component
         $this->currentStep--;
     }
 
+    public function createRazorpayOrder()
+    {
+        $this->onlinePaymentError = null;
+
+        if (! config('services.razorpay.key') || ! config('services.razorpay.secret')) {
+            $this->onlinePaymentError = 'Online payment is not configured yet. Please choose the offline option.';
+
+            return;
+        }
+
+        $amountInPaise = (int) round(((float) $this->applicationFeeAmount) * 100);
+
+        $response = Http::withBasicAuth(config('services.razorpay.key'), config('services.razorpay.secret'))
+            ->post('https://api.razorpay.com/v1/orders', [
+                'amount' => $amountInPaise,
+                'currency' => 'INR',
+                'receipt' => 'admission_' . $this->schoolId . '_' . time(),
+            ]);
+
+        if (! $response->successful()) {
+            $this->onlinePaymentError = 'Unable to initiate payment right now. Please try again.';
+
+            return;
+        }
+
+        $this->razorpayOrderId = $response->json('id');
+
+        $this->dispatch(
+            'open-razorpay-checkout',
+            key: $this->razorpayKey,
+            orderId: $this->razorpayOrderId,
+            amount: $amountInPaise,
+            name: 'Admission Application Fee'
+        );
+    }
+
+    public function verifyOnlinePayment($paymentId, $orderId, $signature)
+    {
+        $expectedSignature = hash_hmac('sha256', $orderId . '|' . $paymentId, (string) config('services.razorpay.secret'));
+
+        if (! hash_equals($expectedSignature, (string) $signature)) {
+            $this->onlinePaymentError = 'Payment verification failed. Please try again.';
+            $this->onlinePaymentSuccessful = false;
+
+            return;
+        }
+
+        $this->onlinePaymentSuccessful = true;
+        $this->razorpayPaymentId = $paymentId;
+        $this->onlinePaymentError = null;
+    }
+
+    public function onlinePaymentFailed()
+    {
+        $this->onlinePaymentSuccessful = false;
+        $this->onlinePaymentError = 'Payment was not completed. You can still submit and pay later.';
+    }
+
     public function toggleGroupSelection(string $value)
     {
         $this->group_selection = $this->group_selection === $value ? '' : $value;
@@ -553,6 +643,34 @@ class AdmissionForm extends Component
     {
         $this->validate($this->rules());
 
+        $paymentCode = null;
+        $applicationPaymentStatus = 'pending';
+
+        if ($this->paymentMode === 'offline') {
+            if ($this->paymentCode !== '') {
+                $paymentCode = AdmissionPaymentCode::where('school_id', $this->schoolId)
+                    ->where('code', strtoupper($this->paymentCode))
+                    ->where('status', 'unused')
+                    ->first();
+
+                if (! $paymentCode) {
+                    $this->addError('paymentCode', 'Invalid or already used payment code');
+
+                    return;
+                }
+
+                $applicationPaymentStatus = 'paid';
+            }
+        } else {
+            $applicationPaymentStatus = $this->onlinePaymentSuccessful ? 'paid' : 'pending';
+        }
+
+        $amountPaid = null;
+
+        if ($applicationPaymentStatus === 'paid') {
+            $amountPaid = $this->paymentMode === 'online' ? $this->applicationFeeAmount : $paymentCode->amount;
+        }
+
         $school = School::findOrFail($this->schoolId);
         $academicYear = SiteHelper::getAcademicYear($school->id);
         $admin = User::where('school_id', $school->id)->ByRole(3)->first();
@@ -576,10 +694,10 @@ class AdmissionForm extends Component
             $admission->birth_place = $this->birth_place;
             $admission->nationality = $this->nationality;
             //$admission->religion = $this->religion;
-           // $admission->community = $this->community;
+            // $admission->community = $this->community;
             $admission->mother_tongue = $this->mother_tongue;
             $admission->identification_marks = $this->identification_marks;
-           // $admission->aadhar_number = $this->aadhar_number;
+            // $admission->aadhar_number = $this->aadhar_number;
             $admission->blood_group = $this->blood_group;
             $admission->school_last_studied = $this->school_last_studied;
             $admission->reason_for_leaving = $this->reason_for_leaving;
@@ -626,7 +744,7 @@ class AdmissionForm extends Component
             $admission->mother_organisation = $this->mother_organisation;
             $admission->mother_income = $this->mother_income;
             $admission->mother_mobile_no = $this->mother_mobile_no;
-            $admission->mother_email = $this->mother_email;
+            $admission->mother_email = $this->mother_email !== '' ? $this->mother_email : null;
             $admission->mother_aadhar_number = $this->mother_aadhar_number;
 
             $admission->emergency_contact_1 = $this->emergency_contact_1;
@@ -648,6 +766,10 @@ class AdmissionForm extends Component
             }
 
             $admission->application_status = 'Draft';
+            $admission->application_payment_status = $applicationPaymentStatus;
+            $admission->payment_mode = $this->paymentMode === 'online' ? 'razorpay' : 'application_code';
+            $admission->razorpay_transaction_id = $this->paymentMode === 'online' ? $this->razorpayPaymentId : null;
+            $admission->amount_paid = $amountPaid;
             $admission->application_no = 'APP-FORM-' . date('YmdHis');
 
             $customFieldValues = [];
@@ -674,6 +796,15 @@ class AdmissionForm extends Component
 
             $admission->save();
 
+            if ($paymentCode) {
+                $paymentCode->update([
+                    'status' => 'used',
+                    'entity_type' => 'admission',
+                    'entity_id' => $admission->id,
+                    'used_at' => now(),
+                ]);
+            }
+
             $message = trans('messages.add_success_msg', ['module' => 'Admission Form']);
 
             $this->doActivityLog(
@@ -695,6 +826,13 @@ class AdmissionForm extends Component
 
     public function render()
     {
+
+        //dd("GG");
+        // $this->applicationFeeAmount = (string) (SchoolDetail::where('school_id', 1)
+        //     ->where('meta_key', 'admission_fee_amount')
+        //     ->value('meta_value') ?: '0');
+
+        // dd($this->applicationFeeAmount);
         return view('livewire.admission.admission-form');
     }
 }

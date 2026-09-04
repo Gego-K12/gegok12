@@ -20,6 +20,8 @@ class AdmissionSettings extends Component
 
     public string $schoolSlug = '';
 
+    public $feeAmount = '';
+
     public function mount()
     {
         $schoolId = Auth::user()->school_id;
@@ -31,6 +33,8 @@ class AdmissionSettings extends Component
 
         $closeOn = $this->metaValue($schoolId, 'admission_close_on');
         $this->closeOn = $this->toDatetimeLocal($closeOn);
+
+        $this->feeAmount = (string) ($this->metaValue($schoolId, 'admission_fee_amount') ?: '');
     }
 
     protected function toDatetimeLocal(?string $value): ?string
@@ -57,6 +61,7 @@ class AdmissionSettings extends Component
             'admissionOpen' => 'boolean',
             'closeMessage' => 'nullable|string|max:1000',
             'closeOn' => 'nullable|date',
+            'feeAmount' => 'nullable|numeric|min:0',
         ];
     }
 
@@ -79,6 +84,11 @@ class AdmissionSettings extends Component
         SchoolDetail::updateOrCreate(
             ['school_id' => $schoolId, 'meta_key' => 'admission_close_on'],
             ['meta_value' => $this->closeOn ? Carbon::parse($this->closeOn)->format('Y-m-d H:i:s') : null]
+        );
+
+        SchoolDetail::updateOrCreate(
+            ['school_id' => $schoolId, 'meta_key' => 'admission_fee_amount'],
+            ['meta_value' => $this->feeAmount !== '' ? $this->feeAmount : null]
         );
 
         session()->flash('admission-settings-success', 'Admission settings updated successfully.');

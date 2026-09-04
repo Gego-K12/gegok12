@@ -18,9 +18,12 @@ Route::get('/admissionlist', 'AdmissionController@admissionlist');
 Route::get('/admissions', 'AdmissionController@index');
 Route::get('/admission-settings', 'AdmissionController@settings');
 Route::get('/admission/show/{id}', 'AdmissionController@show');
+Route::get('/admission/view/{id}', 'AdmissionController@view');
 Route::get('/admission/edit/{id}', 'AdmissionController@edit');
 Route::post('/admission/update/{id}', 'AdmissionController@update');
 Route::delete('/admission/delete/{id}', 'AdmissionController@destroy');
+Route::get('/admission-payment-codes', 'AdmissionPaymentCodeController@index');
+Route::get('/admission-payment-codes/create', 'AdmissionPaymentCodeController@create');
 
 // navigation drop-down
 Route::get('/list/academicyear', 'NavigationController@list');
@@ -233,19 +236,14 @@ Route::get('/parents', 'ParentController@index');
 Route::delete('/parent/delete/{name}', 'ParentController@destroy');
 // add
 Route::get('/parent/get', 'ParentController@addList');
-Route::post('/parent/add/validationParent', 'ParentController@validationParent');
 Route::get('/parent/add', 'ParentController@create');
-Route::post('/parent/add', 'ParentController@store');
 // show
 Route::get('/parent/show/{name}', 'ParentController@show');
 Route::get('/parent/show/children/{name}', 'ParentController@showChildren');
 Route::get('/parent/show/activity/{name}', 'ParentController@showActivityLog');
 Route::get('/parent/show/feedback/{name}', 'ParentController@showFeedbacks');
 // edit
-Route::get('/parent/editlist/{name}', 'ParentController@editList');
-Route::post('/parent/edit/validationUser/{name}', 'ParentController@editValidationUser');
 Route::get('/parent/edit/{name}', 'ParentController@edit');
-Route::post('/parent/edit/{name}', 'ParentController@update');
 
 // teacher
 // index

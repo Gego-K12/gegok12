@@ -120,5 +120,17 @@ class SettingsTableSeeder extends Seeder
 
         ]);
 
+         DB::table('settings')->insert([
+            'key' => 'income_account',
+            'name' => 'Set Income Account',
+            'description' => 'Income Account',
+            'value' =>1,
+            'field' => '{"name":"value","label":"Income Account" ,"type":"radio", "options":{"1":"Active", "0":"Inactive"}}',
+            'active' => 1,
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
+
+        ]);
+
     }
 }

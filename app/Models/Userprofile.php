@@ -71,11 +71,14 @@ class Userprofile extends Model
     use SoftDeletes;
 
     /**
-     * The attributes that should be mutated to dates.
+     * The attributes that should be cast.
      *
      * @var array
      */
-    protected $dates = ['date_of_birth', 'joining_date', 'deleted_at'];
+    protected $casts = [
+        'date_of_birth' => 'date',
+        'joining_date' => 'date',
+    ];
 
     /**
      * The table associated with the model.

@@ -4,6 +4,7 @@ $coreMenu = [
     ['label' => 'Academic Years', 'icon' => 'fa-solid fa-graduation-cap', 'route' => '/admin/academics', 'match' => ['academics', 'academic'], 'hoverClass' => ''],
     ['label' => 'Admissions', 'icon' => 'fa-solid fa-file-signature', 'route' => '/admin/admissions', 'match' => ['admissions', 'admission'], 'hoverClass' => ''],
     ['label' => 'Admission Settings', 'icon' => 'fa-solid fa-toggle-on', 'route' => '/admin/admission-settings', 'match' => ['admission-settings'], 'hoverClass' => ''],
+    ['label' => 'Payment Codes', 'icon' => 'fa-solid fa-ticket', 'route' => '/admin/admission-payment-codes', 'match' => ['admission-payment-codes'], 'hoverClass' => ''],
     ['label' => 'Holidays List', 'icon' => 'fa-solid fa-umbrella-beach', 'route' => '/admin/holidays', 'match' => ['holidays', 'holiday'], 'hoverClass' => ''],
     ['label' => 'Exam Rules', 'icon' => 'fa-solid fa-scale-balanced', 'route' => '/admin/examrules', 'match' => ['examrules'], 'hoverClass' => '', 'visible' => ['config' => 'gexam.enabled']],
     ['label' => 'Exam Grade', 'icon' => 'fa-solid fa-ranking-star', 'route' => '/admin/exam/grade', 'segment' => 3, 'match' => ['grade'], 'hoverClass' => '', 'visible' => ['config' => 'gexam.enabled']],

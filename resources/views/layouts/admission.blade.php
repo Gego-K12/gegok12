@@ -207,7 +207,7 @@
             /*  color: white;*/
             text-transform: uppercase;
             font-size: 9px;
-            width: 20%;
+            width: calc(100% / 7);
             float: left;
             position: relative;
         }

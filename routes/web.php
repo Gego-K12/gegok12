@@ -52,17 +52,14 @@ Route::get('/cache-clear', function () {
     Artisan::call('cache:clear');
 });
 
-Route::get('/{slug}/standardlist', 'AdmissionController@list');
 Route::get('/{slug}/admission-form', 'AdmissionController@create');
-Route::post('/{slug}/admission-form', 'AdmissionController@store');
-
-Route::post('/{slug}/admission-form/validationAvatar', 'AdmissionController@validationAvatar');
-Route::post('/{slug}/admission-form/validationFatherAvatar', 'AdmissionController@validationFatherAvatar');
-Route::post('/{slug}/admission-form/validationMotherAvatar', 'AdmissionController@validationMotherAvatar');
-Route::post('/{slug}/admission-form/validationStandard', 'AdmissionController@validationStandard');
-Route::post('/{slug}/admission-form/validationStudentDetail', 'AdmissionController@validationStudentDetail');
-Route::post('/{slug}/admission-form/validationAcademicDetail', 'AdmissionController@validationAcademicDetail');
-Route::post('/{slug}/admission-form/validationParentDetail', 'AdmissionController@validationParentDetail');
-Route::post('/{slug}/admission-form/validationPersonalDetail', 'AdmissionController@validationPersonalDetail');
 
 
+
+if (file_exists(base_path('routes/gfee.php'))) {
+    require base_path('routes/gfee.php');
+}
+
+// if (file_exists(base_path('routes/gtimetable.php'))) {
+//     require base_path('routes/gtimetable.php');
+// }

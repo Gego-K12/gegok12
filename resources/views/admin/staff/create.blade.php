@@ -10,11 +10,7 @@
     </h1>
     @include('partials.message')
     @if($count < $subscription->plan->no_of_members)
-        <form method="POST" action="" enctype="multipart/form-data">
-            @csrf
-            <add-tab-teacher url="{{ url('/') }}" staff="non_teaching" teacher_name=null type="add"></add-tab-teacher>
-            <div id="add_teacherprofile"></div>
-        </form>
+        @livewire('admin.staff.staff-form')
     @else
         <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
             <p class="font-semibold">Staff limit reached</p>

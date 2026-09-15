@@ -10,12 +10,8 @@
         </h1>
       </div>
       @include('partials.message')
-      <form method="POST" action="{{url('/admin/teacher/edit/'.$user->name)}}" enctype="multipart/form-data">
-        @csrf
 
-          <add-tab-teacher url="{{ url('/') }}" staff="teaching" teacher_name="{{ $user->name }}" type="edit"></add-tab-teacher>
-          <div id="edit_teacherprofile"></div>
-        </form>
+      @livewire('admin.teacher.teacher-form', ['name' => $user->name])
       </div>
 @endsection
 

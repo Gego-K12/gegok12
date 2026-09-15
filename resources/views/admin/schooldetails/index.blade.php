@@ -21,27 +21,16 @@
                         <p class="font-bold text-xl text-black capitalize flex items-center w-full lg:w-1/2">{{ $school->name }}</p>
                     </li>
                     @foreach($details as $key => $value)
+                        @continue(in_array($key, ['admission_open', 'admission_close_message', 'admission_close_on']))
                         <li class="flex pb-2 flex-col lg:flex-row py-3">
-                            @if($key == 'admission_open')
-                                <p class="font-bold text-base text-gray-800 capitalize w-full lg:w-1/4">Admission Open Status</p>
-                            @else
-                                <p class="font-bold text-base text-gray-800 capitalize w-full lg:w-1/4">{{ str_replace('_' , ' ' , ucwords($key)) }}</p>
-                            @endif
+                            <p class="font-bold text-base text-gray-800 capitalize w-full lg:w-1/4">{{ str_replace('_' , ' ' , ucwords($key)) }}</p>
                             <p class="font-medium text-sm text-black capitalize flex items-center w-full lg:w-1/2">
-                                @if($key == 'admission_open')
-                                    @if( $value->meta_value == '0' )
-                                        <p class="text-white px-4 mx-1 bg-red-500 rounded">Closed</p>
-                                    @else
-                                        <p class="text-white px-4 mx-1 custom-green rounded">Open</p>
-                                        <a href="{{ url('/'.Auth::user()->school->slug.'/admission-form') }}" class="text-white px-4 mx-1 blue-bg rounded">View</a>
-                                    @endif
-                                @elseif($key != 'school_logo')
+                                @if($key != 'school_logo')
                                     @if( ($value->meta_value != null) && ($value->meta_value != '-') )
                                         {{ $value->meta_value }}
                                     @else
                                         NULL
                                     @endif
-
                                 @else
                                     @if( ($value->meta_value != null) && ($value->meta_value != '-') )
                                         <img src="{{ $value->LogoPath }}" class="img-responsive w-32">

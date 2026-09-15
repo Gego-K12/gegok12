@@ -141,6 +141,12 @@
 
         @livewire('admin.profile-extra-tabs', ['entityId' => $user->id, 'scope' => 'staff'])
 
+        @livewire('custom-fields.show-all-custom-fields', [
+            'entityType' => 'staff',
+            'entityId' => $user->id,
+            'schoolId' => $user->school_id,
+        ])
+
         {{-- Deactivate confirmation modal --}}
         <div id="deactivate-confirm-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 px-4">
             <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6">

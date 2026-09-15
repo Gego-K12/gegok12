@@ -147,6 +147,30 @@
         </label>
     </div>
 
+     
+     <div class="border-t pt-4">
+
+        <div class="font-medium text-gray-800">
+                    Income Account Setting
+       </div>
+        <div class="flex items-center">
+    @php
+
+    $accounts=Gegok12\IncomeExpense\Models\IncomeExpenseAccount::whereIn('usable_for',['income','both'])->get();
+
+        //dd($accountss);
+
+     @endphp
+            <select name="income_account" class="mr-3 h-7 w-1/3">
+                <option value="">Set Account</option>
+                @foreach($accounts as $account)
+                  <option value="{{$account->id}}" {{ config('settings.income_account') == $account->id ? 'selected' : '' }}>{{$account->name}}</option>
+                @endforeach
+            </select>
+            
+        </div>
+    </div>
+
 </div>
 
                 <!-- Submit Button -->

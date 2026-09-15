@@ -276,12 +276,12 @@
                         type="text"
                         x-ref="addressInput"
                         x-model="localAddress"
-                        @change="$wire.set('official_address', localAddress)"
+                        x-on:change="$wire.set('official_address', localAddress)"
                         placeholder="Enter a location"
                         class="tw-form-control w-full pr-10">
                     <button
                         type="button"
-                        @click="codeAddress()"
+                        x-on:click="codeAddress()"
                         class="absolute right-0 inset-y-0 flex items-center justify-center w-10 text-gray-400 hover:text-gray-600"
                         style="background: transparent; border: none; cursor: pointer;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

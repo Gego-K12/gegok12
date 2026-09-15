@@ -5,6 +5,8 @@
         <li @class(['active' => $currentStep === 3])><a href="#" class="text-gray-700 font-medium">Academic Detail</a></li>
         <li @class(['active' => $currentStep === 4])><a href="#" class="text-gray-700 font-medium">Parent Detail</a></li>
         <li @class(['active' => $currentStep === 5])><a href="#" class="text-gray-700 font-medium">Personal Detail</a></li>
+        <li @class(['active' => $currentStep === 6])><a href="#" class="text-gray-700 font-medium">Additional Info</a></li>
+        <li @class(['active' => $currentStep === 7])><a href="#" class="text-gray-700 font-medium">Payment</a></li>
     </ul>
 
     @if ($submitted)
@@ -136,20 +138,20 @@
                         </div>
                         @error('nationality') <span class="text-red-500 text-xs font-semibold">{{ $message }}</span> @enderror
                     </div>
-                    <div class="my-1 w-full lg:w-1/3 lg:mr-2">
+                    {{--<div class="my-1 w-full lg:w-1/3 lg:mr-2">
                         <label class="tw-form-label">Religion</label>
                         <input type="text" wire:model="religion" placeholder="Religion" class="tw-form-control w-full my-1 py-2">
                         @error('religion') <span class="text-red-500 text-xs font-semibold">{{ $message }}</span> @enderror
-                    </div>
+                    </div>--}}
                 </div>
 
                 <div class="flex flex-col lg:flex-row">
-                    <div class="my-1 w-full lg:w-1/2 lg:mr-2">
+                    {{--<div class="my-1 w-full lg:w-1/2 lg:mr-2">
                         <label class="tw-form-label">Community</label>
                         <input type="text" wire:model="community" placeholder="Community" class="tw-form-control w-full my-1 py-2">
                         <p class="text-xs mb-0">(BC / BCM / FC / MBC / OBC / Others / SC / SCA / ST )</p>
                         @error('community') <span class="text-red-500 text-xs font-semibold">{{ $message }}</span> @enderror
-                    </div>
+                    </div>--}}
                     <div class="my-1 w-full lg:w-1/2 lg:mr-2">
                         <label class="tw-form-label">Mother tongue</label>
                         <input type="text" wire:model="mother_tongue" placeholder="Mother tongue" class="tw-form-control w-full my-1 py-2">
@@ -164,11 +166,12 @@
                 </div>
 
                 <div class="flex flex-col lg:flex-row">
-                    <div class="my-1 w-full lg:w-1/2 lg:mr-2">
+
+                    {{--<div class="my-1 w-full lg:w-1/2 lg:mr-2">
                         <label class="tw-form-label">Aadhaar Number</label>
                         <input type="text" wire:model="aadhar_number" placeholder="Aadhar Number" class="tw-form-control w-full my-1 py-2">
                         @error('aadhar_number') <span class="text-red-500 text-xs font-semibold">{{ $message }}</span> @enderror
-                    </div>
+                    </div>--}}
                     <div class="w-full lg:w-1/2 lg:mr-2 my-1">
                         <label class="tw-form-label">Blood Group</label>
                         <select wire:model="blood_group" class="tw-form-control w-full my-1 py-2">
@@ -276,7 +279,7 @@
                     </div>
                 </div>
 
-                <div class="w-full my-1">
+                {{--<div class="w-full my-1">
                     <h6 class="text-sm font-bold mb-3">Board of Study<span class="text-red-500">*</span></h6>
                     <ul class="list-reset leading-loose flex items-center flex-wrap">
                         @foreach ($boardList as $board)
@@ -287,9 +290,9 @@
                         @endforeach
                     </ul>
                     @error('board_of_education') <span class="text-red-500 text-xs font-semibold">{{ $message }}</span> @enderror
-                </div>
+                </div>--}}
 
-                <div class="w-full my-1">
+                {{--<div class="w-full my-1">
                     <h6 class="text-sm font-bold mb-3">Choice of Language<span class="text-red-500">*</span></h6>
                     <ul class="list-reset leading-loose flex items-center flex-wrap">
                         @foreach ($languageList as $language)
@@ -300,7 +303,7 @@
                         @endforeach
                     </ul>
                     @error('choice_of_language') <span class="text-red-500 text-xs font-semibold">{{ $message }}</span> @enderror
-                </div>
+                </div>--}}
 
                 <div class="my-1">
                     <h6 class="text-sm font-bold mb-3">Group Selection<span class="text-red-500 whitespace-no-wrap">*Only For Class X , XI , XII</span></h6>
@@ -415,13 +418,13 @@
                         </div>
                         @error('father_email') <span class="text-red-500 text-xs font-semibold">{{ $message }}</span> @enderror
                     </div>
-                    <div class="w-full lg:w-1/3 lg:mr-2">
+                    {{--<div class="w-full lg:w-1/3 lg:mr-2">
                         <div class="my-1">
                             <label class="tw-form-label">Aadhaar ID</label>
                             <input type="text" wire:model="father_aadhar_number" placeholder="Aadhar Number" class="tw-form-control w-full my-1 py-2">
                         </div>
                         @error('father_aadhar_number') <span class="text-red-500 text-xs font-semibold">{{ $message }}</span> @enderror
-                    </div>
+                    </div>--}}
                 </div>
 
                 <h2 class="text-lg my-2">Mother's Detail</h2>
@@ -510,13 +513,13 @@
                         </div>
                         @error('mother_email') <span class="text-red-500 text-xs font-semibold">{{ $message }}</span> @enderror
                     </div>
-                    <div class="w-full lg:w-1/3 lg:mr-2">
+                    {{--<div class="w-full lg:w-1/3 lg:mr-2">
                         <div class="my-1">
                             <label class="tw-form-label">Aadhaar ID</label>
                             <input type="text" wire:model="mother_aadhar_number" placeholder="Aadhar Number" class="tw-form-control w-full my-1 py-2">
                         </div>
                         @error('mother_aadhar_number') <span class="text-red-500 text-xs font-semibold">{{ $message }}</span> @enderror
-                    </div>
+                    </div>--}}
                 </div>
 
                 <h2 class="text-lg my-2">Emergency Contact<span class="text-red-500">*</span></h2>
@@ -646,9 +649,93 @@
 
                 <div class="my-6">
                     <a href="#" class="btn-primary submit-btn blue-bg text-sm text-white px-2 py-1 rounded mx-1" wire:click="previousStep">Previous</a>
+                    <a href="#" class="btn-primary submit-btn blue-bg text-sm text-white px-2 py-1 rounded mx-1" wire:click="nextStep">Next</a>
+                </div>
+            </fieldset>
+        </div>
+
+        {{-- Step 6: Additional Info --}}
+        <div @class(['bg-white', 'shadow', 'px-4', 'py-3', 'hidden' => $currentStep !== 6])>
+            <fieldset class="shadow">
+                <h2 class="text-lg my-2">Additional Info</h2>
+
+                @foreach ($customFields as $field)
+                    @include('livewire.admin.student.partials.custom-field', ['field' => $field])
+                @endforeach
+
+                <div class="my-6">
+                    <a href="#" class="btn-primary submit-btn blue-bg text-sm text-white px-2 py-1 rounded mx-1" wire:click="previousStep">Previous</a>
+                    <a href="#" class="btn-primary submit-btn blue-bg text-sm text-white px-2 py-1 rounded mx-1" wire:click="nextStep">Next</a>
+                </div>
+            </fieldset>
+        </div>
+
+        {{-- Step 7: Payment --}}
+        <div @class(['bg-white', 'shadow', 'px-4', 'py-3', 'hidden' => $currentStep !== 7])>
+            <fieldset class="shadow">
+                <h2 class="text-lg my-2">Payment</h2>
+
+                <p class="text-sm text-gray-700 mb-3">Application Fee: <span class="font-bold">&#8377;{{ number_format((float) $applicationFeeAmount, 2) }}</span></p>
+
+                <div class="w-full my-2">
+                    <label class="mx-3"><input type="radio" wire:model.live="paymentMode" value="offline"> Offline (Payment Code)</label>
+                    <label class="mx-3"><input type="radio" wire:model.live="paymentMode" value="online"> Online (Pay Now)</label>
+                    @error('paymentMode') <span class="text-red-500 text-xs font-semibold block">{{ $message }}</span> @enderror
+                </div>
+
+                @if ($paymentMode === 'offline')
+                    <div class="w-full lg:w-1/2 lg:mr-2">
+                        <label class="tw-form-label"><h6 class="text-sm font-bold mb-3">Have a payment code? (optional)</h6></label>
+                        <input type="text" wire:model="paymentCode" placeholder="Payment Code" class="tw-form-control w-full my-1 py-2">
+                        @error('paymentCode') <span class="text-red-500 text-xs font-semibold">{{ $message }}</span> @enderror
+                        <p class="text-xs text-gray-500 mt-1">Without a code your application will be submitted with payment marked as pending.</p>
+                    </div>
+                @endif
+
+                @if ($paymentMode === 'online')
+                    <div class="w-full lg:w-1/2 lg:mr-2" x-data x-on:open-razorpay-checkout.window="openRazorpayCheckout($event.detail, $wire)">
+                        @if ($onlinePaymentSuccessful)
+                            <p class="text-green-600 text-sm font-semibold">Payment successful. You can now submit your application.</p>
+                        @else
+                            <a href="#" class="btn-primary submit-btn blue-bg text-sm text-white px-3 py-2 rounded" wire:click.prevent="createRazorpayOrder">Pay &#8377;{{ number_format((float) $applicationFeeAmount, 2) }} Now</a>
+                        @endif
+                        @if ($onlinePaymentError)
+                            <p class="text-red-500 text-xs font-semibold mt-2">{{ $onlinePaymentError }}</p>
+                        @endif
+                    </div>
+                @endif
+
+                <div class="my-6">
+                    <a href="#" class="btn-primary submit-btn blue-bg text-sm text-white px-2 py-1 rounded mx-1" wire:click="previousStep">Previous</a>
                     <a href="#" class="btn-primary submit-btn blue-bg text-sm text-white px-2 py-1 rounded mx-1" wire:click="submit" wire:loading.attr="disabled" wire:target="submit">Submit</a>
                 </div>
             </fieldset>
         </div>
     @endif
 </div>
+
+@push('scripts')
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    function openRazorpayCheckout(detail, wire) {
+        var options = {
+            key: detail.key,
+            order_id: detail.orderId,
+            amount: detail.amount,
+            currency: 'INR',
+            name: detail.name,
+            handler: function (response) {
+                wire.verifyOnlinePayment(response.razorpay_payment_id, response.razorpay_order_id, response.razorpay_signature);
+            },
+            modal: {
+                ondismiss: function () {
+                    wire.onlinePaymentFailed();
+                }
+            }
+        };
+        var rzp = new Razorpay(options);
+        rzp.on('payment.failed', function () { wire.onlinePaymentFailed(); });
+        rzp.open();
+    }
+</script>
+@endpush

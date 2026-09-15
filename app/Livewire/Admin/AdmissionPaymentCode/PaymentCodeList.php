@@ -71,11 +71,17 @@ class PaymentCodeList extends Component
         $codes = $codesQuery->paginate(15);
 
         $admissionIds = $codes->where('entity_type', 'admission')->pluck('entity_id')->filter()->all();
-        $admissionNames = Admission::whereIn('id', $admissionIds)->pluck('name', 'id');
+        $admissionDetails = Admission::with('standard')
+            ->whereIn('id', $admissionIds)
+            ->get()
+            ->mapWithKeys(fn($admission) => [
+                $admission->id => ucwords(trim($admission->name . ' ' . $admission->lastname))
+                    . (optional($admission->standard)->name ? ' - ' . strtoupper($admission->standard->name) : ''),
+            ]);
 
         return view('livewire.admin.admission-payment-code.payment-code-list', [
             'codes' => $codes,
-            'admissionNames' => $admissionNames,
+            'admissionNames' => $admissionDetails,
         ]);
     }
 }

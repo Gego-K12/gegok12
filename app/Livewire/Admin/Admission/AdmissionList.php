@@ -8,6 +8,7 @@ namespace App\Livewire\Admin\Admission;
 use App\Helpers\SiteHelper;
 use App\Models\Admission;
 use App\Models\AdmissionPaymentCode;
+use App\Models\Standard;
 use App\Traits\Common;
 use App\Traits\LogActivity;
 use Illuminate\Support\Facades\Auth;
@@ -33,6 +34,10 @@ class AdmissionList extends Component
 
     public string $modeFilter = '';
 
+    public string $classFilter = '';
+
+    public string $applicationStatusFilter = '';
+
     public function updatingFromDate(): void
     {
         $this->resetPage();
@@ -53,9 +58,19 @@ class AdmissionList extends Component
         $this->resetPage();
     }
 
+    public function updatingClassFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingApplicationStatusFilter(): void
+    {
+        $this->resetPage();
+    }
+
     public function resetFilters(): void
     {
-        $this->reset('fromDate', 'toDate', 'statusFilter', 'modeFilter');
+        $this->reset('fromDate', 'toDate', 'statusFilter', 'modeFilter', 'classFilter', 'applicationStatusFilter');
         $this->resetPage();
     }
 
@@ -142,17 +157,8 @@ class AdmissionList extends Component
         session()->flash('success', $message);
     }
 
-    protected function baseQuery()
+    protected function applyFilters($query)
     {
-        $schoolId = Auth::user()->school_id;
-        $academicYear = SiteHelper::getAcademicYear($schoolId);
-
-        $query = Admission::where('school_id', $schoolId)
-            ->where('academic_year_id', $academicYear->id)
-            ->where(function ($query) {
-                $query->where('application_status', 'Draft')->orWhere('application_status', 'Pending');
-            });
-
         if ($this->fromDate) {
             $query->whereDate('created_at', '>=', $this->fromDate);
         }
@@ -169,23 +175,67 @@ class AdmissionList extends Component
             $query->where('payment_mode', $this->modeFilter);
         }
 
+        if ($this->classFilter) {
+            $query->where('standard_id', $this->classFilter);
+        }
+
         return $query;
+    }
+
+    /**
+     * Lists every application status (Draft, Pending, Rejected, Approved); narrowed
+     * to one status only when applicationStatusFilter is set.
+     */
+    protected function baseQuery()
+    {
+        $query = $this->overviewQuery();
+
+        if ($this->applicationStatusFilter) {
+            $query->where('application_status', $this->applicationStatusFilter);
+        }
+
+        return $query;
+    }
+
+    /**
+     * Same scope as baseQuery() but ignores applicationStatusFilter, so the overview
+     * stat cards can always report a full breakdown across every application status.
+     */
+    protected function overviewQuery()
+    {
+        $schoolId = Auth::user()->school_id;
+        $academicYear = SiteHelper::getAcademicYear($schoolId);
+
+        $query = Admission::where('school_id', $schoolId)
+            ->where('academic_year_id', $academicYear->id);
+
+        return $this->applyFilters($query);
     }
 
     public function render()
     {
         $admissions = $this->baseQuery()->orderByDesc('id')->paginate(10);
 
-        $paidQuery = $this->baseQuery()->where('application_payment_status', 'paid');
+        $totalApplications = $this->overviewQuery()->count();
+        $draftCount = $this->overviewQuery()->where('application_status', 'Draft')->count();
+        $approvedCount = $this->overviewQuery()->where('application_status', 'Approved')->count();
+
+        $paidQuery = $this->overviewQuery()->where('application_payment_status', 'paid');
 
         $applicationCodeTotal = (clone $paidQuery)->where('payment_mode', 'application_code')->sum('amount_paid');
         $razorpayTotal = (clone $paidQuery)->where('payment_mode', 'razorpay')->sum('amount_paid');
+
+        $standards = Standard::where('school_id', Auth::user()->school_id)->active()->orderBy('order')->get();
 
         return view('livewire.admin.admission.admission-list', [
             'admissions' => $admissions,
             'applicationCodeTotal' => $applicationCodeTotal,
             'razorpayTotal' => $razorpayTotal,
             'totalFees' => $applicationCodeTotal + $razorpayTotal,
+            'totalApplications' => $totalApplications,
+            'draftCount' => $draftCount,
+            'approvedCount' => $approvedCount,
+            'standards' => $standards,
         ]);
     }
 }

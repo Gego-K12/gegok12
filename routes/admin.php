@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\TimetableController;
+
 Route::get('/dashboard', 'DashboardController@index')->name('dashboard');
 Route::get('/dashboard/event', 'DashboardController@event');
 Route::get('/dashboard/structuralList', 'DashboardController@structuralList');
@@ -16,6 +17,7 @@ Route::get('/dashboard/task/count', 'DashboardController@listCount');
 // admission
 Route::get('/admissionlist', 'AdmissionController@admissionlist');
 Route::get('/admissions', 'AdmissionController@index');
+Route::get('/admission/export', 'AdmissionController@export');
 Route::get('/admission-settings', 'AdmissionController@settings');
 Route::get('/admission/show/{id}', 'AdmissionController@show');
 Route::get('/admission/view/{id}', 'AdmissionController@view');
@@ -157,14 +159,14 @@ Route::post('/discipline/updateStatus/{id}', 'DisciplineController@updateStatus'
 // Telephone Directory
 
 //timetable
-	//add
-	Route::get( '/timetable/list', [TimetableController::class,'list']);
-	Route::get( '/timetable/add', [TimetableController::class,'create']);
-	Route::post( '/timetable/add', [TimetableController::class,'store']);
-	//edit
-	Route::get( '/timetable/edit/list/{standardLink_id}', [TimetableController::class,'show']);
-	Route::get( '/timetable/edit/{standardLink_id}', [TimetableController::class,'edit']);
-	Route::post( '/timetable/edit/{standardLink_id}', [TimetableController::class,'update']);
+//add
+Route::get('/timetable/list', [TimetableController::class, 'list']);
+Route::get('/timetable/add', [TimetableController::class, 'create']);
+Route::post('/timetable/add', [TimetableController::class, 'store']);
+//edit
+Route::get('/timetable/edit/list/{standardLink_id}', [TimetableController::class, 'show']);
+Route::get('/timetable/edit/{standardLink_id}', [TimetableController::class, 'edit']);
+Route::post('/timetable/edit/{standardLink_id}', [TimetableController::class, 'update']);
 
 // index
 Route::get('/phonenumbers', 'TelephoneDirectoryController@index');
@@ -241,7 +243,7 @@ Route::get('/parent/add', 'ParentController@create');
 Route::get('/parent/show/{name}', 'ParentController@show');
 Route::get('/parent/show/children/{name}', 'ParentController@showChildren');
 Route::get('/parent/show/activity/{name}', 'ParentController@showActivityLog');
-Route::get('/parent/show/feedback/{name}', 'ParentController@showFeedbacks');
+Route::get('/parent/show/feedback/{naadmission/editme}', 'ParentController@showFeedbacks');
 // edit
 Route::get('/parent/edit/{name}', 'ParentController@edit');
 
@@ -777,5 +779,5 @@ Route::get('setting/standard/create', function () {
 })->name('admin.setting.standards.create');
 
 Route::get('setting/edit/standard/{id}', function ($id) {
-    return view('admin.standard.edit_form',compact('id'));
+    return view('admin.standard.edit_form', compact('id'));
 })->name('admin.setting.standards.update');

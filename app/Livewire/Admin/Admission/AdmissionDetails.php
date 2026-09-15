@@ -9,6 +9,7 @@ namespace App\Livewire\Admin\Admission;
 
 use App\Helpers\CustomFieldHelper;
 use App\Models\Admission;
+use App\Models\AdmissionPaymentCode;
 use App\Models\Qualification;
 use App\Models\Section;
 use Illuminate\Support\Facades\Auth;
@@ -43,6 +44,8 @@ class AdmissionDetails extends Component
 
     public ?string $feeGroupName = null;
 
+    public ?string $paymentCodeUsed = null;
+
     public function mount(int $admissionId)
     {
         $this->admission = Admission::findOrFail($admissionId);
@@ -67,6 +70,12 @@ class AdmissionDetails extends Component
 
         if ($this->admission->fee_group_id && class_exists('Gegok12\Fee\Models\FeeGroup')) {
             $this->feeGroupName = \Gegok12\Fee\Models\FeeGroup::find($this->admission->fee_group_id)?->name;
+        }
+
+        if ($this->admission->payment_mode === 'application_code') {
+            $this->paymentCodeUsed = AdmissionPaymentCode::where('entity_type', 'admission')
+                ->where('entity_id', $this->admission->id)
+                ->value('code');
         }
 
         $customFieldRaw = json_decode($this->admission->custom_fields ?? '', true) ?? [];

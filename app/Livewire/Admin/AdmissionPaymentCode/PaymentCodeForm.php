@@ -9,6 +9,7 @@ use App\Models\AdmissionPaymentCode;
 use Auth;
 use Illuminate\Support\Str;
 use Livewire\Component;
+use App\Models\SchoolDetail;
 
 class PaymentCodeForm extends Component
 {
@@ -22,6 +23,20 @@ class PaymentCodeForm extends Component
             'quantity' => 'required|integer|min:1|max:500',
             'amount' => 'required|numeric|min:0.01',
         ];
+    }
+
+    public function mount()
+    {
+        $schoolId = Auth::user()->school_id;
+
+
+        // $this->feeAmount = (string) ($this->metaValue($schoolId, 'admission_fee_amount') ?: '');
+
+        $this->amount = ($this->metaValue($schoolId, 'admission_fee_amount') ?: '');
+    }
+    protected function metaValue($schoolId, $key)
+    {
+        return SchoolDetail::where('school_id', $schoolId)->where('meta_key', $key)->value('meta_value');
     }
 
     public function save()

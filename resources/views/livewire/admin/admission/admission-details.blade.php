@@ -13,15 +13,38 @@
     </div>
 
     @php
-        $row = function ($label, $value) {
-            return '<li class="flex py-1"><span class="text-gray-700 font-medium mx-2 w-1/3">'.$label.' :</span><p class="w-2/3">'.($value !== null && $value !== '' ? e($value) : '--').'</p></li>';
-        };
+    $row = function ($label, $value) {
+    return '<li class="flex py-1"><span class="text-gray-700 font-medium mx-2 w-1/3">'.$label.' :</span>
+        <p class="w-2/3">'.($value !== null && $value !== '' ? e($value) : '--').'</p>
+    </li>';
+    };
     @endphp
 
     {{-- Standard Detail --}}
     <h2 class="text-sm font-bold text-gray-700 uppercase mt-4 mb-2">Standard Detail</h2>
     <ul class="list-reset text-xs leading-loose">
         {!! $row('Class Applied For', strtoupper(optional($admission->standard)->name ?? '') ?: null) !!}
+    </ul>
+
+    {{-- Payment Details --}}
+    <h2 class="text-sm font-bold text-gray-700 uppercase mt-4 mb-2">Payment Details</h2>
+    <ul class="list-reset text-xs leading-loose">
+        <li class="flex py-1 items-center">
+            <span class="text-gray-700 font-medium mx-2 w-1/3">Payment Status :</span>
+            <p class="w-2/3">
+                <span class="inline-block px-2 py-0.5 rounded text-xs font-semibold {{ $admission->application_payment_status === 'paid' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700' }}">
+                    {{ ucfirst($admission->application_payment_status ?: 'pending') }}
+                </span>
+            </p>
+        </li>
+        {!! $row('Payment Mode', $admission->payment_mode === 'razorpay' ? 'Razorpay' : ($admission->payment_mode === 'application_code' ? 'Application Code' : null)) !!}
+        {!! $row('Amount Paid', $admission->amount_paid !== null ? '₹'.number_format($admission->amount_paid, 2) : null) !!}
+        @if($admission->payment_mode === 'application_code')
+        {!! $row('Payment Code Used', $paymentCodeUsed) !!}
+        @endif
+        @if($admission->payment_mode === 'razorpay')
+        {!! $row('Razorpay Transaction ID', $admission->razorpay_transaction_id) !!}
+        @endif
     </ul>
 
     {{-- Student Detail --}}
@@ -36,8 +59,8 @@
                 {!! $row('Height', $admission->height) !!}
                 {!! $row('Weight', $admission->weight) !!}
                 {!! $row('Birth Place', ucfirst($admission->birth_place)) !!}
-                {!! $row('Nationality',  ucfirst($admission->nationality)) !!}
-                {!! $row('Mother Tongue',  ucfirst($admission->mother_tongue)) !!}
+                {!! $row('Nationality', ucfirst($admission->nationality)) !!}
+                {!! $row('Mother Tongue', ucfirst($admission->mother_tongue)) !!}
                 {!! $row('Identification Marks', $admission->identification_marks) !!}
                 {!! $row('Blood Group', strtoupper($admission->blood_group)) !!}
                 {!! $row('School Last Studied', ucfirst($admission->school_last_studied)) !!}
@@ -46,13 +69,13 @@
                 {!! $row('Address: Communication', ucfirst($admission->address_for_communication)) !!}
                 {!! $row('Sibling Studying Here', ucfirst($admission->siblings ?? '')) !!}
                 @if($admission->siblings === 'yes')
-                    {!! $row('Sibling Details', $admission->siblings_details) !!}
+                {!! $row('Sibling Details', $admission->siblings_details) !!}
                 @endif
             </ul>
         </div>
         <div class="w-full lg:w-1/4">
             @if($admission->avatar)
-                <img src="{{ Storage::url($admission->avatar) }}" style="width: 150px;height: 150px;object-fit: cover;" class="my-2">
+            <img src="{{ Storage::url($admission->avatar) }}" style="width: 150px;height: 150px;object-fit: cover;" class="my-2">
             @endif
         </div>
     </div>
@@ -86,7 +109,7 @@
         </div>
         <div class="w-full lg:w-1/4">
             @if($admission->father_avatar)
-                <img src="{{ Storage::url($admission->father_avatar) }}" style="width: 150px;height: 150px;object-fit: cover;" class="my-2">
+            <img src="{{ Storage::url($admission->father_avatar) }}" style="width: 150px;height: 150px;object-fit: cover;" class="my-2">
             @endif
         </div>
     </div>
@@ -107,7 +130,7 @@
         </div>
         <div class="w-full lg:w-1/4">
             @if($admission->mother_avatar)
-                <img src="{{ Storage::url($admission->mother_avatar) }}" style="width: 150px;height: 150px;object-fit: cover;" class="my-2">
+            <img src="{{ Storage::url($admission->mother_avatar) }}" style="width: 150px;height: 150px;object-fit: cover;" class="my-2">
             @endif
         </div>
     </div>
@@ -125,51 +148,51 @@
     <ul class="list-reset text-xs leading-loose">
         {!! $row('Medical History', ucfirst($admission->medical_history ?? '')) !!}
         @if($admission->medical_history === 'yes' && count($medicalDetails))
-            {!! $row('Medical Details', implode(', ', $medicalDetails)) !!}
+        {!! $row('Medical Details', implode(', ', $medicalDetails)) !!}
         @endif
         {!! $row('Extra Curricular Activities', ucfirst($admission->extra_curricular_activities ?? '')) !!}
         @if($admission->extra_curricular_activities === 'yes' && count($activities))
-            {!! $row('Activities', implode(', ', $activities)) !!}
+        {!! $row('Activities', implode(', ', $activities)) !!}
         @endif
         {!! $row('Mode of Transport', ucfirst($admission->mode_of_transport ?? '')) !!}
         @if($transportDetails)
-            {!! $row("Driver's Name", $transportDetails['driver_name'] ?? null) !!}
-            {!! $row("Driver's Phone Number", $transportDetails['driver_mobile_number'] ?? null) !!}
+        {!! $row("Driver's Name", $transportDetails['driver_name'] ?? null) !!}
+        {!! $row("Driver's Phone Number", $transportDetails['driver_mobile_number'] ?? null) !!}
         @endif
     </ul>
 
     {{-- Additional Info --}}
     @if(count($customFieldValues))
-        <h2 class="text-sm font-bold text-gray-700 uppercase mt-4 mb-2">Additional Info</h2>
-        <ul class="list-reset text-xs leading-loose">
-            @foreach($customFieldValues as $field)
-                <li class="flex py-1">
-                    <span class="text-gray-700 font-medium mx-2 w-1/3">{{ $field['label'] }} :</span>
-                    <p class="w-2/3">
-                        @if($field['is_file'] && $field['value'])
-                            <a href="{{ Storage::url($field['value']) }}" target="_blank" class="text-blue-600 underline">View file</a>
-                        @else
-                            {{ $field['value'] ?: '--' }}
-                        @endif
-                    </p>
-                </li>
-            @endforeach
-        </ul>
+    <h2 class="text-sm font-bold text-gray-700 uppercase mt-4 mb-2">Additional Info</h2>
+    <ul class="list-reset text-xs leading-loose">
+        @foreach($customFieldValues as $field)
+        <li class="flex py-1">
+            <span class="text-gray-700 font-medium mx-2 w-1/3">{{ $field['label'] }} :</span>
+            <p class="w-2/3">
+                @if($field['is_file'] && $field['value'])
+                <a href="{{ Storage::url($field['value']) }}" target="_blank" class="text-blue-600 underline">View file</a>
+                @else
+                {{ $field['value'] ?: '--' }}
+                @endif
+            </p>
+        </li>
+        @endforeach
+    </ul>
     @endif
 
     {{-- Approval details, once decided --}}
     @if(in_array($admission->application_status, ['Approved', 'Rejected']))
-        <h2 class="text-sm font-bold text-gray-700 uppercase mt-4 mb-2">Decision</h2>
-        <ul class="list-reset text-xs leading-loose">
-            @if($sectionName)
-                {!! $row('Section', $sectionName) !!}
-            @endif
-            @if($feeGroupName)
-                {!! $row('Fee Group', $feeGroupName) !!}
-            @endif
-            @if($admission->payment_status)
-                {!! $row('Payment Status', ucfirst($admission->payment_status)) !!}
-            @endif
-        </ul>
+    <h2 class="text-sm font-bold text-gray-700 uppercase mt-4 mb-2">Decision</h2>
+    <ul class="list-reset text-xs leading-loose">
+        @if($sectionName)
+        {!! $row('Section', $sectionName) !!}
+        @endif
+        @if($feeGroupName)
+        {!! $row('Fee Group', $feeGroupName) !!}
+        @endif
+        @if($admission->payment_status)
+        {!! $row('Payment Status', ucfirst($admission->payment_status)) !!}
+        @endif
+    </ul>
     @endif
 </div>

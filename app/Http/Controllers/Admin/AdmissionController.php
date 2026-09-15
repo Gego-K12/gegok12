@@ -8,6 +8,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Events\AdmissionApprovalEvent;
+use App\Exports\AdmissionExport;
 use App\Helpers\SiteHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admission\AdmissionFormRequest;
@@ -24,6 +25,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Log;
+use Maatwebsite\Excel\Facades\Excel;
 
 /**
  * Class AdmissionController
@@ -56,6 +58,22 @@ class AdmissionController extends Controller
     public function settings()
     {
         return view('/admin/admission/settings');
+    }
+
+    /**
+     * Export the admin admission list to an Excel file, honoring the same
+     * filters applied on the admission-list Livewire page.
+     *
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
+     */
+    public function export(Request $request)
+    {
+        $schoolId = Auth::user()->school_id;
+        $academicYear = SiteHelper::getAcademicYear($schoolId);
+
+        $filters = $request->only(['from_date', 'to_date', 'status', 'mode', 'standard_id', 'application_status']);
+
+        return Excel::download(new AdmissionExport($schoolId, $academicYear->id, $filters), 'admissions.xlsx');
     }
 
     /**

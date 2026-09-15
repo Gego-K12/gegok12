@@ -8,7 +8,7 @@
 
         <div class="mb-4">
             <label class="tw-form-label text-sm font-bold">Amount (per code)</label>
-            <input type="number" step="0.01" min="0.01" wire:model="amount" class="tw-form-control w-full my-1 py-2">
+            <input type="number" step="0.01" min="0.01" wire:model="amount" readonly class="tw-form-control w-full my-1 py-2">
             @error('amount') <span class="text-red-500 text-xs font-semibold">{{ $message }}</span> @enderror
         </div>
 

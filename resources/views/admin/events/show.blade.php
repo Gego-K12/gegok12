@@ -17,9 +17,6 @@
                 </div>
             </div>
 
-            <input type="hidden" name="event_id" value="{{ $event->id }}" id="event_id">
-
-            
             <div class="w-full lg:w-4/5 md:w-4/5 lg:mx-6 md:mx-6 relative">
                 <div>
                     <h3 class="font-semibold text-3xl text-gray-700">{{ $event->title }}</h3>
@@ -115,22 +112,19 @@
             </form>
             </div>
 
-            <div class="bg-white shadow my-5">
-                <event-tab url="{{ url('/') }}" id="{{ $event->id }}" event_id="{{ $event->event_id }}" entity_id="{{ $event->id }}" entity_name="event" school_id="{{ $event->school_id }}"></event-tab>
-                <div id="events"></div>
-            </div>
+            @livewire('admin.events.event-details', ['eventId' => $event->id])
 
             @livewire('admin.profile-extra-tabs', ['entityId' => $event->id, 'scope' => 'event'])
         @endif
     </div>
-    <edit-event url="{{ url('/') }}"></edit-event>
+    @livewire('admin.events.event-form', ['eventId' => $event->id])
 @endsection
 
 @push('scripts')
     <script>
         function editevent()
         {
-            $('#edit-event-modal').click();
+            Livewire.dispatch('openEditEvent');
         }
     </script>
 @endpush

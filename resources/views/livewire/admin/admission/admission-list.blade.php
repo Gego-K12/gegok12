@@ -9,18 +9,75 @@
         </div>
     </div>
 
-    <div class="flex flex-wrap gap-3 my-3">
-        <div class="bg-white shadow px-4 py-3 flex-1 min-w-[180px]">
-            <p class="text-xs text-gray-500">Total Application Fees</p>
-            <p class="text-lg font-bold text-gray-800">&#8377;{{ number_format($totalFees, 2) }}</p>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 my-3">
+        <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 text-sm font-medium">Total Applications</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-2">{{ $totalApplications }}</p>
+                </div>
+                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-clipboard-list text-blue-600 text-lg"></i>
+                </div>
+            </div>
         </div>
-        <div class="bg-white shadow px-4 py-3 flex-1 min-w-[180px]">
-            <p class="text-xs text-gray-500">Payment Code</p>
-            <p class="text-lg font-bold text-gray-800">&#8377;{{ number_format($applicationCodeTotal, 2) }}</p>
+        <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 text-sm font-medium">Draft</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-2">{{ $draftCount }}</p>
+                </div>
+                <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-file-signature text-yellow-600 text-lg"></i>
+                </div>
+            </div>
         </div>
-        <div class="bg-white shadow px-4 py-3 flex-1 min-w-[180px]">
-            <p class="text-xs text-gray-500">Razorpay</p>
-            <p class="text-lg font-bold text-gray-800">&#8377;{{ number_format($razorpayTotal, 2) }}</p>
+        <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 text-sm font-medium">Approved</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-2">{{ $approvedCount }}</p>
+                </div>
+                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-check-circle text-green-600 text-lg"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 my-3">
+        <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 text-sm font-medium">Total Application Fees</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-2">&#8377;{{ number_format($totalFees, 2) }}</p>
+                </div>
+                <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-wallet text-indigo-600 text-lg"></i>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 text-sm font-medium">Payment Code</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-2">&#8377;{{ number_format($applicationCodeTotal, 2) }}</p>
+                </div>
+                <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-key text-purple-600 text-lg"></i>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 text-sm font-medium">Razorpay</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-2">&#8377;{{ number_format($razorpayTotal, 2) }}</p>
+                </div>
+                <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-credit-card text-orange-600 text-lg"></i>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -33,6 +90,16 @@
             <div>
                 <label class="tw-form-label text-xs">To Date</label>
                 <input type="date" wire:model.live="toDate" class="tw-form-control">
+            </div>
+            <div>
+                <label class="tw-form-label text-xs">Application Status</label>
+                <select wire:model.live="applicationStatusFilter" class="tw-form-control">
+                    <option value="">All</option>
+                    <option value="Draft">Draft</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Rejected">Rejected</option>
+                    <option value="Approved">Approved</option>
+                </select>
             </div>
             <div>
                 <label class="tw-form-label text-xs">Payment Status</label>
@@ -51,7 +118,24 @@
                 </select>
             </div>
             <div>
+                <label class="tw-form-label text-xs">Class</label>
+                <select wire:model.live="classFilter" class="tw-form-control">
+                    <option value="">All</option>
+                    @foreach ($standards as $standard)
+                        <option value="{{ $standard->id }}">{{ strtoupper($standard->name) }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
                 <button type="button" wire:click="resetFilters" class="text-sm border bg-gray-100 text-grey-darkest py-2 px-4">Reset</button>
+            </div>
+            <div>
+                <a
+                    href="{{ url('/admin/admission/export') }}?{{ http_build_query(['from_date' => $fromDate, 'to_date' => $toDate, 'status' => $statusFilter, 'mode' => $modeFilter, 'standard_id' => $classFilter, 'application_status' => $applicationStatusFilter]) }}"
+                    class="inline-block text-sm border bg-green-600 hover:bg-green-700 text-white py-2 px-4"
+                >
+                    Export
+                </a>
             </div>
         </div>
     </div>

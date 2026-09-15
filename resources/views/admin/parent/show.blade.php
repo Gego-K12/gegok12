@@ -97,9 +97,15 @@
             <div class="w-full lg:w-4/5 md:w-4/5 lg:mx-8 md:mx-8">
                 <div class="bg-white shadow my-5">
                     <profile-tab-parent url="{{ url('/') }}" entity_id="{{ $user->id }}" school_id="{{ $user->school_id }}" name="{{ $user->name }}"></profile-tab-parent>
-                   
+
                     <div id="parent-profile"></div>
                 </div>
+
+                @livewire('custom-fields.show-all-custom-fields', [
+                    'entityType' => 'parent',
+                    'entityId' => $user->id,
+                    'schoolId' => $user->school_id,
+                ])
             </div>
         </div>
     </div>

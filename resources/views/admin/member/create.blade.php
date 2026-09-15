@@ -10,14 +10,7 @@
     </h1>
     @include('partials.message')
     @if($count < $subscription->plan->no_of_members)
-        <form method="POST" action="" enctype="multipart/form-data">
-            @csrf
-
-            <create-member url="{{url('/')}}"></create-member>
-            <div id="address-section"></div>
-            <div id="submit-btn"></div>
-            
-        </form>
+        @livewire('admin.student.student-form')
     @else
         <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
             <p class="font-semibold">Student limit reached</p>

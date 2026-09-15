@@ -9,13 +9,8 @@
         <span class="mx-3">Add Parent</span>
     </h1>
     @include('partials.message')
-        
-    <form method="POST" action="" enctype="multipart/form-data">
-        @csrf
 
-        <create-parent url="{{url('/')}}" ref_name="{{ $ref_name }}"></create-parent>
-
-    </form>
+    @livewire('admin.parent.parent-form')
 </div>
 
 @endsection

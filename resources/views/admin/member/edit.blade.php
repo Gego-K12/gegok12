@@ -10,11 +10,8 @@
         <span class="mx-3">Edit Student</span>
       </h1>
       @include('partials.message')
-      <form method="POST" action="{{url('/admin/student/edit/'.$user->name)}}" enctype="multipart/form-data">
-        @csrf
-          <edit-member url="{{ url('/') }}" student_name="{{ $user->name }}"></edit-member>
-          <div id="submit-btn"></div>
-        </form>
+
+      @livewire('admin.student.student-form', ['name' => $user->name])
       </div>
 @endsection
 

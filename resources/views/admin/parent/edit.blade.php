@@ -12,10 +12,8 @@
     </div>
     <div class="bg-white shadow px-3 py-2">
     @include('partials.message')
-    <form method="POST" action="{{url('/admin/parent/edit/'.$user->name)}}" enctype="multipart/form-data">
-        @csrf
-        <edit-parent url="{{ url('/') }}" name="{{ $user->name }}" ref_name="{{ $ref_name }}"></edit-parent>
-      </form>
+
+    @livewire('admin.parent.parent-form', ['name' => $user->name])
       </div>
     </div>
 @endsection

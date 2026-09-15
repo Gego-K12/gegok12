@@ -131,7 +131,7 @@ trait AuthenticatesUsers
          * @return bool True if user exists
          */
         Validator::extend('checkusers', function ($attribute, $value, $parameters, $validator) {
-            $users = User::where('email', request('email'))->with('userprofile')->first();
+            $users = User::orWhere('email', request('email'))->orWhere('registration_number', request('email'))->with('userprofile')->first();
 
             return $users != null;
         }, 'Invalid Credentials');
@@ -150,7 +150,8 @@ trait AuthenticatesUsers
          * @return bool True if user is active
          */
         Validator::extend('checkactive', function ($attribute, $value, $parameters, $validator) {
-            $users = User::where('email', request('email'))->with('userprofile')->first();
+
+            $users = User::orWhere('email', request('email'))->orWhere('registration_number', request('email'))->with('userprofile')->first();
 
             if (! $users) {
                 return false;
@@ -175,7 +176,7 @@ trait AuthenticatesUsers
          * @return bool True if user status is not 'exit'
          */
         Validator::extend('checkexit', function ($attribute, $value, $parameters, $validator) {
-            $users = User::where('email', request('email'))->with('userprofile')->first();
+            $users = User::orWhere('email', request('email'))->orWhere('registration_number', request('email'))->with('userprofile')->first();
 
             if (! $users) {
                 return false;
@@ -202,7 +203,8 @@ trait AuthenticatesUsers
     protected function attemptLogin(Request $request)
     {
         return $this->guard()->attempt(
-            $this->credentials($request), $request->filled('remember')
+            $this->credentials($request),
+            $request->filled('remember')
         );
     }
 
@@ -228,7 +230,7 @@ trait AuthenticatesUsers
         $this->clearLoginAttempts($request);
 
         return $this->authenticated($request, $this->guard()->user())
-                ?: redirect()->intended($this->redirectPath());
+            ?: redirect()->intended($this->redirectPath());
     }
 
     /**

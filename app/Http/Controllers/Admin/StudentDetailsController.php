@@ -41,6 +41,7 @@ use Log;
 use PDF;
 use Redirect;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use App\Models\Attendance;
 
 /**
  * Class StudentDetailsController
@@ -561,5 +562,79 @@ class StudentDetailsController extends Controller
 
         return $pdf->stream('buspass.pdf', ['Attachment' => 0]);
 
+    }
+
+    /**
+     * Generate a PDF of the student's profile details.
+     *
+     * @param string $name Student name
+     * @return \Illuminate\Http\Response
+     */
+    public function showPdf($name)
+    {
+
+        //dd("hh");
+
+        //
+        $user = User::with(['userprofile', 'studentAcademicLatest.standardLink.standard', 'librarycard', 'parents.userParent'])->where('name', $name)->first();
+
+        if (!Gate::allows('member', $user)) {
+            abort(403);
+        }
+
+        $avatarData = null;
+
+        if (optional($user->userprofile)->avatar != null) {
+            try {
+                $avatarPath = \Storage::path($user->userprofile->avatar);
+
+                if (file_exists($avatarPath)) {
+                    $extension  = pathinfo($avatarPath, PATHINFO_EXTENSION);
+                    $avatarData = 'data:image/' . $extension . ';base64,' . base64_encode(file_get_contents($avatarPath));
+                }
+            } catch (Exception $e) {
+                Log::info($e->getMessage());
+            }
+        }
+
+        $school_id     = $user->school_id;
+        $academic_year = SiteHelper::getAcademicYear($school_id);
+
+        $attendanceRecords     = Attendance::where([['user_id',$user->id],['academic_year_id',$academic_year->id]])->get();
+        $attendanceTotal       = $attendanceRecords->count();
+        $attendancePresent     = $attendanceRecords->where('status',1)->count();
+        $attendanceAbsent      = $attendanceRecords->where('status',0)->count();
+        $attendancePercentage  = $attendanceTotal > 0 ? round(($attendancePresent / $attendanceTotal) * 100, 2) : 0;
+
+        $feeDetails = [];
+
+        if(config('gfee.enabled', false) && class_exists('Gegok12\Fee\Models\Fee') && class_exists('Gegok12\Fee\Models\FeePayment'))
+        {
+            $fees = \Gegok12\Fee\Models\Fee::where([['school_id',$school_id],['academic_year_id',$academic_year->id]])
+                        ->where(function($query) use ($user)
+                        {
+                            $query->where('standardLink_id', optional($user->studentAcademicLatest)->standardLink_id)
+                                  ->orWhereNull('standardLink_id');
+                        })
+                        ->orderBy('start_date','DESC')
+                        ->get();
+
+            foreach($fees as $fee)
+            {
+                $payment = \Gegok12\Fee\Models\FeePayment::where([['fee_id',$fee->id],['user_id',$user->id]])->first();
+
+                $feeDetails[] = [
+                    'name'    => $fee->name,
+                    'term'    => $fee->term,
+                    'amount'  => optional($payment)->paid_amount != null ? $payment->paid_amount : $fee->amount,
+                    'status'  => optional($payment)->status == 1 ? 'Paid' : 'Unpaid',
+                    'paid_on' => optional($payment)->paid_on != null ? date('d-m-Y',strtotime($payment->paid_on)) : '--',
+                ];
+            }
+        }
+
+        $pdf = PDF::loadView('admin/member/pdf', compact('user', 'avatarData', 'attendanceTotal', 'attendancePresent', 'attendanceAbsent', 'attendancePercentage', 'feeDetails'));
+
+        return $pdf->stream($user->name . '-profile.pdf', ['Attachment' => 0]);
     }
 }

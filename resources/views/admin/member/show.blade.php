@@ -332,6 +332,16 @@
                             <span class="hover:font-semibold hidden lg:block md:block">Bus Pass<span>
                         </a>
                     </div>
+                     <div class="py-4 mr-5">
+                            <a href="{{ url('/admin/student/show/pdf/'.$user->name) }}" target="_blank" class="text-xs">
+                                <div class="bg-gray-200 rounded-full w-8 h-8 lg:w-10 md:h-10 md:w-10 md:h-10 flex items-center justify-center mx-auto hover:bg-gray-100">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 lg:w-5 lg:h-5 md:w-5 md:h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                              </div>
+                            <span class="hover:font-semibold hidden lg:block md:block">Download PDF<span>
+                          </a>
+                            </div>
                     <div onclick="showsidebar('student-profile-menu')" class="bg-white rounded-full w-6 h-6 ml-auto flex items-center justify-center cursor-pointer">
                         <svg id="Capa_1" enable-background="new 0 0 515.555 515.555" height="512" viewBox="0 0 515.555 515.555" width="512" xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 fill-current text-gray-600">
                             <path d="m303.347 18.875c25.167 25.167 25.167 65.971 0 91.138s-65.971 25.167-91.138 0-25.167-65.971 0-91.138c25.166-25.167 65.97-25.167 91.138 0"></path>

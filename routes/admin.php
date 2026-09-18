@@ -212,6 +212,7 @@ Route::get('/student/show/fees/{name}', 'StudentDetailsController@showFees');
 Route::get('/student/show/medicalHistory/{name}', 'StudentDetailsController@showMedicalHistory');
 Route::get('/student/add/medicalHistory/{name}', 'StudentDetailsController@createMedicalHistory');
 Route::post('/student/add/medicalHistory/{name}', 'StudentDetailsController@addMedicalHistory');
+Route::get( '/student/show/pdf/{name}', 'StudentDetailsController@showPdf' );
 // edit
 Route::get('/student/edit/{name}', 'StudentController@edit');
 

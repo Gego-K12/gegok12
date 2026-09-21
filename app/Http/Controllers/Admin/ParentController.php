@@ -62,10 +62,7 @@ class ParentController extends Controller
      */
     public function index()
     {
-        //
-        $query = \Request::getQueryString();
-
-        return view('/admin/parent/index', ['query' => $query]);
+        return view('/admin/parent/index');
     }
 
     /**

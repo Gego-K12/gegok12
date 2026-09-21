@@ -58,15 +58,7 @@ class TeacherListController extends Controller
      */
     public function index()
     {
-        //
-        $count = User::ByRole(5)->where('school_id', Auth::user()->school_id)->count();
-        $alphabet = request('alphabet') ? request('alphabet') : '';
-        $query = \Request::getQueryString();
-        if (request('date_of_birth') != null) {
-            $birthday = 'true';
-        }
-
-        return view('/admin/teacher/index', ['alphabet' => $alphabet, 'query' => $query, 'birthday' => $birthday, 'count' => $count]);
+        return view('/admin/teacher/index');
     }
 
     public function destroy($name)

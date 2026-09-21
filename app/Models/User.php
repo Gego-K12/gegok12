@@ -671,6 +671,51 @@ class User extends Authenticatable implements HasMedia
     }
 
     /**
+     * Scope to filter users by qualification. Also relied on by StaffFilter()
+     * (App\Traits\MemberProcess), which queries this base class directly.
+     *
+     * @param  Builder  $query
+     * @param  int  $qualification
+     * @return Builder
+     */
+    public function scopeByQualification($query, $qualification)
+    {
+        return $query->wherehas('teacherprofile', function ($query) use ($qualification) {
+            $query->where('qualification_id', '=', $qualification);
+        });
+    }
+
+    /**
+     * Scope to filter users by designation. Also relied on by StaffFilter()
+     * (App\Traits\MemberProcess), which queries this base class directly.
+     *
+     * @param  Builder  $query
+     * @param  string  $designation
+     * @return Builder
+     */
+    public function scopeByDesignation($query, $designation)
+    {
+        return $query->wherehas('teacherprofile', function ($query) use ($designation) {
+            $query->where('designation', 'LIKE', $designation);
+        });
+    }
+
+    /**
+     * Scope to filter users by job type. Also relied on by StaffFilter()
+     * (App\Traits\MemberProcess), which queries this base class directly.
+     *
+     * @param  Builder  $query
+     * @param  string  $job_type
+     * @return Builder
+     */
+    public function scopeByJobType($query, $job_type)
+    {
+        return $query->wherehas('teacherprofile', function ($query) use ($job_type) {
+            $query->where('job_type', $job_type);
+        });
+    }
+
+    /**
      * Scope to filter parents by first name.
      *
      * @param  Builder  $query

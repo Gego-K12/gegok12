@@ -115,6 +115,9 @@ public/uploads/reports/*
 composer.lock
 public/demo-school
 custompackages/gegok12/*
+.claude
+.phpunit.cache
+.poc3
 
 # Plugin views get physically published (vendor:publish) into this
 # directory at install time - excluded for the same reason as

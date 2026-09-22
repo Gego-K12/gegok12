@@ -126,7 +126,9 @@ class CountryForm extends Component
             $this->alert('success', 'Country created successfully');
         }
 
-        return redirect(url('/admin/setting/countries'));
+        return redirect()->route('admin.setting.countries');
+
+        //return redirect(url('/siteadmin/setting/countries'));
     }
 
     /**

@@ -142,7 +142,7 @@ class CityForm extends Component
             $this->alert('success', 'City updated successfully');
         }
 
-        return redirect(url('/admin/setting/cities'));
+        return redirect()->route('admin.setting.cities');
     }
 
     /**

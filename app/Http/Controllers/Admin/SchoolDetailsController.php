@@ -42,6 +42,7 @@ class SchoolDetailsController extends Controller
     public function index()
     {
         $details = SchoolDetail::where('school_id', Auth::user()->school_id)->get()->keyby('meta_key');
+        // dd($details);
 
         $school = School::where('id', Auth::user()->school_id)->first();
 

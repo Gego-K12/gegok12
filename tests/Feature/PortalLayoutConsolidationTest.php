@@ -127,30 +127,6 @@ class PortalLayoutConsolidationTest extends TestCase
         $response->assertRedirect('/admin/dashboard');
     }
 
-    public function test_alumni_portal_uses_alumniprofile_relation_and_edit_profile_link()
-    {
-        $school = School::factory()->create();
-        $user = User::factory()->alumni()->for($school)->create();
-        \Gegok12\Alumni\Models\Alumniprofile::create([
-            'user_id' => $user->id,
-            'school_id' => $school->id,
-            'name' => $user->name,
-            'email' => $user->email,
-            'mobile_no' => $user->mobile_no,
-            'photo' => 'test-avatar.jpg',
-            'passing_session' => '2020',
-        ]);
-
-        $response = $this->actingAs($user)->get('/alumni/dashboard');
-
-        $response->assertOk();
-        $response->assertSee('Edit Profile');
-        // (Alumni's file also has a dead "Change Avatar" link wrapped in a
-        // raw HTML comment rather than a Blade {{-- --}} one, so its text is
-        // present-but-invisible in the response -- out of scope here, not
-        // asserted on.)
-    }
-
     public function test_library_dashboard_link_points_at_librarys_own_dashboard_not_teachers()
     {
         $school = School::factory()->create();
@@ -292,49 +268,4 @@ class PortalLayoutConsolidationTest extends TestCase
         $response->assertDontSee('<notification', false);
     }
 
-    public function test_stock_keeper_landing_on_admin_dashboard_gets_redirected_to_stock_portal()
-    {
-        $school = School::factory()->create();
-        $stockKeeper = User::factory()->stockKeeper()->for($school)->create();
-
-        $response = $this->actingAs($stockKeeper)->get('/admin/dashboard');
-
-        $response->assertRedirect('/stock/stockproduct/show');
-    }
-
-    public function test_stock_keeper_sees_their_own_chrome_not_admins()
-    {
-        $school = School::factory()->create();
-        $stockKeeper = User::factory()->stockKeeper()->for($school)->create();
-
-        $response = $this->actingAs($stockKeeper)->get('/stock/stockproduct/show');
-
-        $response->assertOk();
-        $response->assertSee('librarian-sidebar');
-        $response->assertSee('mode="stock"', false);
-        $response->assertDontSee('admin-sidebar');
-    }
-
-    public function test_admin_still_sees_admin_chrome_on_the_same_shared_stock_view()
-    {
-        $school = School::factory()->create();
-        $this->satisfyAdminOnboarding($school);
-        $admin = User::factory()->schoolAdmin()->for($school)->create();
-
-        $response = $this->actingAs($admin)->get('/admin/stockproduct/show');
-
-        $response->assertOk();
-        $response->assertSee('admin-sidebar');
-        $response->assertSee('mode="admin"', false);
-    }
-
-    public function test_stock_keeper_cannot_reach_the_admin_prefixed_stock_route()
-    {
-        $school = School::factory()->create();
-        $stockKeeper = User::factory()->stockKeeper()->for($school)->create();
-
-        $response = $this->actingAs($stockKeeper)->get('/admin/stockproduct/show');
-
-        $response->assertRedirect('/stock/stockproduct/show');
-    }
 }

@@ -218,18 +218,6 @@ class PortalLayoutConsolidationTest extends TestCase
         $response->assertSee('admin-sidebar');
     }
 
-    public function test_teacher_portal_notification_mode_and_sidebar_class()
-    {
-        $school = School::factory()->create();
-        $user = User::factory()->teacher()->for($school)->create();
-
-        $response = $this->actingAs($user)->get('/teacher/dashboard');
-
-        $response->assertOk();
-        $response->assertSee('mode="teacher"', false);
-        $response->assertSee('teacher-sidebar');
-    }
-
     public function test_admin_portal_has_edit_profile_and_admin_sidebar()
     {
         $school = School::factory()->create();

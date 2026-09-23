@@ -7,11 +7,8 @@
 namespace App\Traits;
 
 use Exception;
-use FCM;
-use LaravelFCM\Message\DownstreamResponse;
-use LaravelFCM\Message\OptionsBuilder;
-use LaravelFCM\Message\PayloadDataBuilder;
-use LaravelFCM\Message\PayloadNotificationBuilder;
+use Kreait\Firebase\Messaging\CloudMessage;
+use Kreait\Firebase\Messaging\Notification;
 use Log;
 
 trait SendPushNotification
@@ -21,36 +18,43 @@ trait SendPushNotification
      *
      * @param  array  $array  Payload containing at least 'type' and 'message'
      * @param  array|string  $usertoken  Single token or array of device tokens
-     * @return DownstreamResponse|null Response object or null on failure
+     * @return bool Success status
      */
     public function sendNotification($array, $usertoken)
     {
         try {
+            $messaging = app('firebase.messaging');
 
-            config(['fcm.http.server_key' => env('FCM_SERVER_KEY')]);
-            config(['fcm.http.sender_id' => env('FCM_SENDER_ID')]);
-            $optionBuilder = new OptionsBuilder;
-            $optionBuilder->setTimeToLive(60 * 20);
-            $notificationBuilder = new PayloadNotificationBuilder($array['type']);
-            $notificationBuilder->setBody($array['message'])
-                ->setTitle($array['type'])
-                ->setSound('default');
-            $dataBuilder = new PayloadDataBuilder;
-            $dataBuilder->addData(['message' => $array['message'], 'type' => $array['type']]);
-            $option = $optionBuilder->build();
-            $notification = $notificationBuilder->build();
-            $data = $dataBuilder->build();
-            $token = $usertoken;
-            $downstreamResponse = FCM::sendTo($token, $option, $notification, $data);
-            $downstreamResponse->numberSuccess();
-            $downstreamResponse->numberFailure();
-            if ($downstreamResponse->numberSuccess()) {
-                return $downstreamResponse;
+            $notification = Notification::create()
+                ->withTitle($array['type'])
+                ->withBody($array['message']);
+
+            $message = CloudMessage::fromArray([
+                'notification' => [
+                    'title' => $array['type'],
+                    'body' => $array['message'],
+                ],
+                'data' => [
+                    'message' => $array['message'],
+                    'type' => $array['type'],
+                ],
+                'webpush' => [
+                    'fcmOptions' => [
+                        'link' => url('/'),
+                    ],
+                ],
+            ]);
+
+            if (is_array($usertoken)) {
+                $messaging->sendMulticast($message, $usertoken);
             } else {
-                return $downstreamResponse;
+                $messaging->send($message->withToken($usertoken));
             }
+
+            return true;
         } catch (Exception $e) {
-            Log::info($e->getMessage());
+            Log::error('FCM notification send error: ' . $e->getMessage());
+            return false;
         }
     }
 
@@ -59,35 +63,39 @@ trait SendPushNotification
      *
      * @param  array  $array  Payload containing at least 'type' and 'message'
      * @param  array|string  $usertoken  Single token or array of device tokens
-     * @return DownstreamResponse|null Response object or null on failure
+     * @return bool Success status
      */
     public function sendTeacherNotification($array, $usertoken)
     {
         try {
-            config(['fcm.http.server_key' => env('FCM_TEACHER_SERVER_KEY')]);
-            config(['fcm.http.sender_id' => env('FCM_TEACHER_SENDER_ID')]);
-            $optionBuilder = new OptionsBuilder;
-            $optionBuilder->setTimeToLive(60 * 20);
-            $notificationBuilder = new PayloadNotificationBuilder($array['type']);
-            $notificationBuilder->setBody($array['message'])
-                ->setTitle($array['type'])
-                ->setSound('default');
-            $dataBuilder = new PayloadDataBuilder;
-            $dataBuilder->addData(['message' => $array['message'], 'type' => $array['type']]);
-            $option = $optionBuilder->build();
-            $notification = $notificationBuilder->build();
-            $data = $dataBuilder->build();
-            $token = $usertoken;
-            $downstreamResponse = FCM::sendTo($token, $option, $notification, $data);
-            $downstreamResponse->numberSuccess();
-            $downstreamResponse->numberFailure();
-            if ($downstreamResponse->numberSuccess()) {
-                return $downstreamResponse;
+            $messaging = app('firebase.messaging');
+
+            $message = CloudMessage::fromArray([
+                'notification' => [
+                    'title' => $array['type'],
+                    'body' => $array['message'],
+                ],
+                'data' => [
+                    'message' => $array['message'],
+                    'type' => $array['type'],
+                ],
+                'webpush' => [
+                    'fcmOptions' => [
+                        'link' => url('/'),
+                    ],
+                ],
+            ]);
+
+            if (is_array($usertoken)) {
+                $messaging->sendMulticast($message, $usertoken);
             } else {
-                return $downstreamResponse;
+                $messaging->send($message->withToken($usertoken));
             }
+
+            return true;
         } catch (Exception $e) {
-            Log::info($e->getMessage());
+            Log::error('FCM teacher notification send error: ' . $e->getMessage());
+            return false;
         }
     }
 }

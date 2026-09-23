@@ -67,6 +67,6 @@ class DatabaseSeeder extends Seeder
         $this->call(NoticeBoardSeeder::class); // test
         $this->call(PayrollSeeder::class); // test
         $this->call(TagSeeder::class);
-        $this->call(IncomeExpenseSeeder::class);
+        //$this->call(IncomeExpenseSeeder::class);
     }
 }

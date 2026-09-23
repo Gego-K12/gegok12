@@ -21,7 +21,7 @@
                         <p class="font-bold text-xl text-black capitalize flex items-center w-full lg:w-1/2">{{ $school->name }}</p>
                     </li>
                     @foreach($details as $key => $value)
-                        @continue(in_array($key, ['admission_open', 'admission_close_message', 'admission_close_on']))
+                        @continue(in_array($key, ['admission_open', 'admission_close_message', 'admission_close_on', 'admission_fee_amount']))
                         <li class="flex pb-2 flex-col lg:flex-row py-3">
                             <p class="font-bold text-base text-gray-800 capitalize w-full lg:w-1/4">{{ str_replace('_' , ' ' , ucwords($key)) }}</p>
                             <p class="font-medium text-sm text-black capitalize flex items-center w-full lg:w-1/2">

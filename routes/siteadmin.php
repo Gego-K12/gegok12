@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 // City
 Route::get('setting/cities', function () {
     return view('admin.setting.cities');
-})->name('superadmin.setting.cities');
+})->name('admin.setting.cities');
 
 Route::get('setting/city/create', function () {
     return view('admin.setting.cityform');

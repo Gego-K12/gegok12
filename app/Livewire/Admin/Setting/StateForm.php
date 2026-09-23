@@ -108,7 +108,7 @@ class StateForm extends Component
             $this->alert('success', 'State created successfully');
         }
 
-        return redirect(url('/admin/setting/states'));
+        return redirect()->route('admin.setting.states');
     }
 
     /**

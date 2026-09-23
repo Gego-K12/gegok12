@@ -62,17 +62,7 @@ class ParentController extends Controller
      */
     public function index()
     {
-        //
-        $query = \Request::getQueryString();
-        $school_id = Auth::user()->school_id;
-
-        // Get all standard-section combinations for filter dropdown
-        $standardLinklist = SiteHelper::getStandardLinkList($school_id);
-
-        return view('/admin/parent/index', [
-            'query' => $query,
-            'standardLinklist' => $standardLinklist,
-        ]);
+        return view('/admin/parent/index');
     }
 
     /**

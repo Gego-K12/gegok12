@@ -84,30 +84,7 @@ class StaffController extends Controller
      */
     public function index()
     {
-        //
-        $query = User::where('school_id', Auth::user()->school_id);
-
-        $groups = [8, 10, 11, 13];
-
-        if (config('ginventory.enabled', false)) {
-            $groups[] = 12;
-        }
-
-        $count = $query->whereIn('usergroup_id', $groups)->count();
-
-        $alphabet = request('alphabet') ? request('alphabet') : 'A';
-        $query = \Request::getQueryString();
-
-        if (request('date_of_birth') != null) {
-            $birthday = 'true';
-        }
-
-        return view('/admin/staff/index', [
-            'alphabet' => $alphabet,
-            'query' => $query,
-            'birthday' => $birthday,
-            'count' => $count,
-        ]);
+        return view('/admin/staff/index');
     }
 
     /**

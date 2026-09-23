@@ -1,7 +1,9 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * custom_field_entity_config.entity_type was left as
@@ -18,7 +20,9 @@ return new class extends Migration
 {
     public function up(): void
     {
-        DB::statement("ALTER TABLE custom_field_entity_config MODIFY entity_type ENUM('student','teacher','staff','parent','admission','event') NOT NULL");
+        Schema::table('custom_field_entity_config', function (Blueprint $table) {
+            $table->enum('entity_type', ['student', 'teacher', 'staff', 'parent', 'admission', 'event'])->change();
+        });
 
         // Recover the row(s) that were already silently corrupted to '' by
         // the enum mismatch -- 'event' is the only entity type missing from
@@ -30,6 +34,8 @@ return new class extends Migration
 
     public function down(): void
     {
-        DB::statement("ALTER TABLE custom_field_entity_config MODIFY entity_type ENUM('student','teacher','staff','parent','admission') NOT NULL");
+        Schema::table('custom_field_entity_config', function (Blueprint $table) {
+            $table->enum('entity_type', ['student', 'teacher', 'staff', 'parent', 'admission'])->change();
+        });
     }
 };

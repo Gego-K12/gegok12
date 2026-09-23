@@ -1,7 +1,8 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * The custom_field_values migration's ENUM list already included 'event'
@@ -19,11 +20,15 @@ return new class extends Migration
 {
     public function up(): void
     {
-        DB::statement("ALTER TABLE custom_field_values MODIFY entity_type ENUM('student','teacher','staff','parent','admission','event')");
+        Schema::table('custom_field_values', function (Blueprint $table) {
+            $table->enum('entity_type', ['student', 'teacher', 'staff', 'parent', 'admission', 'event'])->change();
+        });
     }
 
     public function down(): void
     {
-        DB::statement("ALTER TABLE custom_field_values MODIFY entity_type ENUM('student','teacher','staff','parent','admission')");
+        Schema::table('custom_field_values', function (Blueprint $table) {
+            $table->enum('entity_type', ['student', 'teacher', 'staff', 'parent', 'admission'])->change();
+        });
     }
 };

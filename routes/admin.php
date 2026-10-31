@@ -772,10 +772,10 @@ Route::get('groups', 'GroupController@showlist');
 Route::get('groups/{standardLinkId}', 'GroupController@index');
 Route::get('/grouplist', 'GroupController@list');
 Route::post('/groups/add-members', 'GroupController@addMembers');
+Route::patch('/group/{id}', 'GroupController@update');
+Route::delete('/group/{id}', 'GroupController@destroy');
 
-Route::get('/group/{id}/members', function ($id) {
-    return view('admin.groups.member-list',compact('id'));
-});
+Route::get('/group/{id}/members', 'GroupController@members');
 
 //student tag
 Route::get('/student-tags', 'StudentTagController@index');
@@ -876,4 +876,3 @@ Route::get('/purchase/addon/histories', function () {
 	Route::get('setting/edit/standard/{id}', function ($id) {
 		return view('admin.standard.edit_form',compact('id'));
 	})->name('admin.setting.standards.update');
-

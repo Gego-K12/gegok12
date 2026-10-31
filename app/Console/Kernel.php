@@ -13,6 +13,7 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
+            \App\Console\Commands\PrepareAcademyDemo::class,
         //
 
         //Test
@@ -116,3 +117,4 @@ class Kernel extends ConsoleKernel
         require base_path('routes/console.php');
     }
 }
+

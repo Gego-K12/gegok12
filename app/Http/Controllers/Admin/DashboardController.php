@@ -52,9 +52,7 @@ class DashboardController extends Controller
     public function index(Request $request) 
     {
 
-        \Artisan::call('cache:clear');
-        \Artisan::call('view:clear');
-        \Artisan::call('config:clear');
+        // Cache invalidation belongs to writes/deployment, never a dashboard GET.
         
         $admin_id  =   Auth::id();
         $school_id =   Auth::user()->school_id;

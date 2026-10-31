@@ -1,0 +1,2 @@
+<p class="my-2">Recorded group lessons: <strong>{{ $summary->present_count ?? 0 }}</strong> present · <strong>{{ $summary->absent_count ?? 0 }}</strong> absent · {{ $summary->excused_count ?? 0 }} excused</p>
+<p class="my-2">Homework: <strong>{{ $summary->homework_done ?? 0 }}</strong> done · <strong>{{ $summary->homework_missing ?? 0 }}</strong> missing · {{ $summary->homework_pending ?? 0 }} awaiting review</p>

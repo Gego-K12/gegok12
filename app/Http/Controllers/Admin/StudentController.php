@@ -62,11 +62,10 @@ class StudentController extends Controller
         $school_id = Auth::user()->school_id;
         $academic_year = SiteHelper::getAcademicYear($school_id);
 
-        $lowest_standard = Standard::where('school_id',$school_id)->orderBy('order')->first();
+        $standard = StandardLink::where('school_id', $school_id)->where('academic_year_id', $academic_year->id)
+            ->orderBy('standard_id')->orderBy('section_id')->first();
 
-        $standard = StandardLink::where([['school_id',$school_id],['academic_year_id',$academic_year->id],['standard_id',$lowest_standard->id]])->first();
-
-        if(count((array)\Request::getQueryString()) == 0)
+        if(count((array)\Request::getQueryString()) == 0 && $standard)
         {
             $request['standard'] = $standard->id;
         }
@@ -81,32 +80,19 @@ class StudentController extends Controller
     public function index()
     {
         $school_id = Auth::user()->school_id;
-        $academic_year = SiteHelper::getAcademicYear($school_id);
-        $count    = StudentUser::ByRole(6)->where('school_id',$school_id)->where('deleted_at',NULL)->//count();dd($count);
-        $alphabet = request('alphabet')?request('alphabet'):'';
-        $query    = \Request::getQueryString();
-        $standardLink = SiteHelper::getStandardLinkList($school_id);
-
-        $lowest_standard = Standard::where('school_id',$school_id)->orderBy('order')->first();
-
-        if(count((array)\Request::getQueryString()) == 0)
-        {
-            $standard = StandardLink::where([['school_id',$school_id],['academic_year_id',$academic_year->id],['standard_id',$lowest_standard->id]])->first();
-        }
-        if(request('date_of_birth') != null)
-        {
-            $birthday = 'true';
-        }
-        if(request('standard') != null)
-        {
-            $selected_standard = request('standard');
-        }
-        else
-        {
-            $selected_standard = $standard->id;
-        }
-
-        return view('/admin/member/index',[ 'alphabet' => $alphabet , 'query' => $query , 'count' => $count , 'standardLinks' => $standardLink , 'standard' => $standard->id , 'birthday' => $birthday , 'selected_standard' => $selected_standard ]);
+        $standardLinks = collect(SiteHelper::getStandardLinkList($school_id));
+        $requested = request('standard');
+        $default = $standardLinks->first();
+        $selected = $requested ? $standardLinks->firstWhere('id', (int) $requested) : $default;
+        abort_if($requested && !$selected, 404);
+        $id = $selected ? $selected['id'] : null;
+        return view('/admin/member/index', [
+            'alphabet' => request('alphabet', ''), 'query' => \Request::getQueryString(),
+            'count' => StudentUser::ByRole(6)->where('school_id', $school_id)->count(),
+            'standardLinks' => $standardLinks, 'standard' => $id,
+            'birthday' => request()->filled('date_of_birth') ? 'true' : 'false',
+            'selected_standard' => $id,
+        ]);
     }
 
     /**
@@ -151,15 +137,13 @@ class StudentController extends Controller
     {
         $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
 
-        $standardlinks = collect(
-            SiteHelper::getStandardLinkList(Auth::user()->school_id)
-        )->map(function ($item) {
-
-            $item['groups'] = Group::where('standardLink_id', $item['id'])
-                ->select('id', 'group_name')
-                ->get();
-
-            return $item;
+        $links = collect(SiteHelper::getStandardLinkList(Auth::user()->school_id));
+        $groups = Group::forAcademy((int) Auth::user()->school_id)->whereIn('standardLink_id', $links->pluck('id'))
+            ->get(['id', 'group_name', 'standardLink_id'])->groupBy('standardLink_id');
+        $standardlinks = $links->map(function ($item) use ($groups) {
+            return array_merge($item instanceof \Illuminate\Http\Resources\Json\JsonResource ? $item->resolve() : $item->toArray(), [
+                'groups' => $groups->get($item['id'], collect()),
+            ]);
         });
 
         $array = [];

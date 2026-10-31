@@ -55,7 +55,7 @@ trait Dashboard
                               });
 
         $array['parentCount']    =  Cache::remember('parentCount_'.$school_id, env('CACHE_TIME'), function () use ($school_id)                          {
-                                  return User::BySchool($school_id)->ByRole(7)->whereHas('children', function($q) use ($search){
+                                  return User::BySchool($school_id)->ByRole(7)->whereHas('children', function($q){
     
                 $q->whereHas('userStudent', function($q) 
                 {
@@ -68,7 +68,8 @@ trait Dashboard
                                   return User::where([['status','!=','exit']])->BySchool($school_id)->ByRole(5)->count();
                                 });
 
-        $array['nonteachingCount']   = User::where([['status','!=','exit']])->where('school_id',$school_id)->whereIn('usergroup_id',[8,10,11,12,13])->count();
+        $array['nonteachingCount'] = config('academy_backend.enabled') ? 0
+            : User::where('status', '!=', 'exit')->where('school_id', $school_id)->whereIn('usergroup_id', [8,10,11,12,13])->count();
 
 
         $array['maleCount']      = Cache::remember('maleCount_'.$school_id, env('CACHE_TIME'), function () use ($school_id)                          {
@@ -123,7 +124,7 @@ trait Dashboard
          $array['events']=$events->orderBy('id','DESC')->take(5)->get();
 
         $array['products'] =[];
-        if (class_exists('Gegok12\Exam\Models\Inventory\Product')) {
+        if (!config('academy_backend.enabled') && class_exists('Gegok12\Exam\Models\Inventory\Product')) {
             $array['products']    = \Gegok12\Inventory\Models\Product::where('school_id',$school_id)->where('product_type','sellable')->orderBy('created_at','DESC')->take(5)->get();
         } 
 
@@ -131,7 +132,7 @@ trait Dashboard
 
         // $array['nonteachingCount']   = User::where('school_id',$school_id)->Where('usergroup_id',13)->count();
                 $array['upcomingExam'] =[];
-      if (class_exists('Gegok12\Exam\Models\ExamSchedule')) {
+      if (!config('academy_backend.enabled') && class_exists('Gegok12\Exam\Models\ExamSchedule')) {
         $array['upcomingExam']   = \Gegok12\Exam\Models\ExamSchedule::with('exam')->whereHas('exam',function($query) use($academic_year)
                               { 
                                 $query->where('academic_year_id',$academic_year->id);
@@ -197,13 +198,21 @@ trait Dashboard
         $array = [];
 
         $academic_year      =   SiteHelper::getAcademicYear($school_id);
-        $total              =   Attendance::where('user_id',$user_id->id)->count();
-        $present            =   Attendance::where([['user_id',$user_id->id],['status',1]])->count();
-        $absent             =   Attendance::where([['user_id',$user_id->id],['status',0]])->count();
+        $attendance = Attendance::where('school_id', $school_id)->where('user_id', $user_id->id)
+            ->where('academic_year_id', $academic_year->id)
+            ->selectRaw('COUNT(*) AS total, SUM(CASE WHEN status = 1 THEN 1 ELSE 0 END) AS present, SUM(CASE WHEN status = 0 THEN 1 ELSE 0 END) AS absent')->first();
+        $total = (int) $attendance->total;
+        $present = (int) $attendance->present;
+        $absent = (int) $attendance->absent;
+        $array['presentPercentage'] = 0;
+        $array['absentPercentage'] = 0;
+        $array['marks'] = collect();
+        $array['presentSessions'] = $present;
+        $array['absentSessions'] = $absent;
 
         $date=date('Y-m-d H:i:s');
         
-        if(class_exists('Gegok12\Exam\Models\Mark'))
+        if(!config('academy_backend.enabled') && class_exists('Gegok12\Exam\Models\Mark'))
         {
 
             $marks              =   \Gegok12\Exam\Models\Mark::where([['school_id',$school_id],['academic_year_id',$academic_year->id],['user_id',$user_id->id]]);
@@ -243,11 +252,15 @@ trait Dashboard
         }
         $array['presentDay']        = $present/2;
         $array['absentDay']         = $absent/2;
-        $array['noticeboard']       = NoticeBoard::where([['school_id',$school_id],['academic_year_id',$academic_year->id],['type','!=','teacher']])->orWhere('standardLink_id',$standardLink_id)->orderBy('created_at','DESC')->take(5)->get();
+        $array['noticeboard'] = NoticeBoard::where('school_id', $school_id)->where('academic_year_id', $academic_year->id)
+            ->where(function ($query) use ($standardLink_id) {
+                $query->where(function ($general) { $general->where('type', '!=', 'teacher')->whereNull('standardLink_id'); });
+                if ($standardLink_id) { $query->orWhere('standardLink_id', $standardLink_id); }
+            })->orderByDesc('created_at')->take(5)->get();
         $array['upcomingeventCount']  = Events::where([['school_id',$school_id],['standard_id',$standardLink_id],['end_date','>',$date],['category','!=','holidays']])->count();
         $array['upcomingholidayCount']  = Events::where([['school_id',$school_id],['end_date','>=',$date],['category','=','holidays']])->count();
 
-        if(class_exists('Gegok12\Exam\Models\Mark'))
+        if(!config('academy_backend.enabled') && class_exists('Gegok12\Exam\Models\Mark'))
         {
             $array['marks']             = $marks->take(5)->get();
         }
@@ -267,16 +280,20 @@ trait Dashboard
     {
         $array = [];
 
-        $teacher = TeacherUser::find($teacher_id);
-        $user = TeacherUser::with('teacherlink')->where('id',$teacher_id)->get();
-        $academic_year  = SiteHelper::getAcademicYear($school_id);
-        $teacherlinks   = $teacher->teacherlinkCurrentAcademicYear;
+        $academic_year = SiteHelper::getAcademicYear($school_id);
+        $teacher = TeacherUser::without(['members', 'children', 'parents'])->where('school_id', $school_id)
+            ->findOrFail($teacher_id);
+        $teacherlinks = $teacher->teacherlink()
+            ->where('academic_year_id', $academic_year->id)
+            ->without('teacher')
+            ->with(['subject', 'standardLink'])
+            ->get();
 
         $teachersubjects = [];
         foreach ($teacherlinks as $teacherlink) 
         {
-            $teachersubjects[$teacherlink->id]['subject']   = $teacherlink->subject->name;
-            $teachersubjects[$teacherlink->id]['class']     = $teacherlink->standardLink->StandardSection;
+            $teachersubjects[$teacherlink->id]['subject']   = $teacherlink->subject?->name ?? 'English';
+            $teachersubjects[$teacherlink->id]['class']     = $teacherlink->standardLink?->StandardSection ?? 'Archived group';
         }
         $standardLinks = $teacherlinks->pluck('standardLink_id')->toArray();
 
@@ -313,7 +330,7 @@ trait Dashboard
 
         $array['noticeboard']   = NoticeBoard::where([['school_id',$school_id],['academic_year_id',$academic_year->id],['type','!=','class']])->orderBy('created_at','DESC')->take(5)->get();
         $array['upcomingExam']=[];
-         if (class_exists('Gegok12\Exam\Models\ExamSchedule')) {
+         if (!config('academy_backend.enabled') && class_exists('Gegok12\Exam\Models\ExamSchedule')) {
         $array['upcomingExam']  = \Gegok12\Exam\Models\ExamSchedule::with('exam','subject')->whereIn('standard_id',$standardLinks)->whereHas('exam',function($query) use($academic_year)
         { 
             $query->where('academic_year_id',$academic_year->id);

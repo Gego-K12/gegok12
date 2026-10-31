@@ -1,0 +1,29 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ..:/var/www
+    command: php -S 0.0.0.0:8000 -t public
+    environment:
+      PHP_CLI_SERVER_WORKERS: "4"
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: academy_trial
+      MYSQL_USER: academy
+      MYSQL_PASSWORD: trial_only_password
+      MYSQL_ROOT_PASSWORD: trial_only_root_password
+    volumes:
+      - trial_mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+volumes:
+  trial_mysql:

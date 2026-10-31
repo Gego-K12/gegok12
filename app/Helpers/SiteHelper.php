@@ -71,7 +71,11 @@ class SiteHelper
     // }
    public static function getAcademicYear($school_id)
     {
-        $academic_year_id = Cache::get('academic_year');
+        if (config('academy_backend.enabled')) {
+            return app(\App\Services\AcademyContext::class)->period((int) $school_id);
+        }
+        $academic_year_id = app()->bound('session')
+            ? session()->get('academic_year.'.$school_id) : null;
 
         $schoolCacheKey = "academic_year_for_school_{$school_id}_{$academic_year_id}";
 
@@ -230,14 +234,22 @@ class SiteHelper
     public static function getStandardLinkList($school_id)
     {
         $academic_year = SiteHelper::getAcademicYear($school_id);
-        $standardLinkCacheKey = 'standardLink' . $school_id;
-        return Cache::remember($standardLinkCacheKey, env('CACHE_TIME'), function () use ($school_id, $academic_year) {
+        $actor = auth()->user();
+        if (config('academy_backend.enabled') && $actor && (int) $actor->usergroup_id === 5) {
+            // Assignment lists must not use the administrator's shared cache entry.
+            return StandardLinkResource::collection(StandardLink::with(['standard', 'section', 'teacher'])->orderBy('id')->get());
+        }
+        $standardLinkCacheKey = 'standardLink'.$school_id.':'.$academic_year->id;
+        return Cache::remember($standardLinkCacheKey, 300, function () use ($school_id, $academic_year) {
             $standards = Standard::where('school_id', $school_id)->active()->orderBy('order')->pluck('id')->toArray();
             if (count($standards) > 0) {
-                $standard = implode(' ,', $standards);
-                $standardLink = StandardLink::where([['school_id', $school_id], ['academic_year_id', $academic_year->id]])->orderByRaw('FIELD(standard_id,' . $standard . ')')->orderBy('section_id')->groupBy(['standard_id', 'section_id'])->get();
+                $standardLink = StandardLink::select('standards_link.*')
+                    ->join('standards', 'standards.id', '=', 'standards_link.standard_id')
+                    ->where('standards_link.school_id', $school_id)->where('academic_year_id', $academic_year->id)
+                    ->whereIn('standard_id', $standards)->orderBy('standards.order')->orderBy('section_id')->get();
                 return StandardLinkResource::collection($standardLink);
             }
+            return collect();
         });
     }
     /**

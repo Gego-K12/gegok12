@@ -30,7 +30,8 @@ class GroupController extends Controller
     }
     public function index($standardLinkId)
     {
-        $groups = Group::where('standardLink_id', $standardLinkId)
+        abort_unless(app(\App\Services\AcademyAssignments::class)->allows(auth()->user(), (int) $standardLinkId), 403);
+        $groups = Group::forAcademy((int) auth()->user()->school_id)->where('standardLink_id', $standardLinkId)
             ->latest()
             ->get();
 
@@ -42,8 +43,7 @@ class GroupController extends Controller
     }
     public function list()
     {
-        $groups = Group::get();
-        dd($groups);
+        $groups = Group::forAcademy((int) auth()->user()->school_id)->whereIn('standardLink_id', app(\App\Services\AcademyAssignments::class)->classIds(auth()->user()))->get();
 
         return response()->json([
             'data'    => GroupResource::collection($groups)
@@ -72,3 +72,4 @@ class GroupController extends Controller
         ]);
     }
 }
+

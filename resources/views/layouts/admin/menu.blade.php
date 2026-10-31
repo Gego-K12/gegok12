@@ -1,3 +1,6 @@
+@if(config('academy_backend.enabled'))
+    @include('academy.menu')
+@else
 <ul class="list-reset text-sm">
     <li class="py-3 px-3  {{Request::segment ('2') == 'dashboard' ? 'active':''}}"> <!-- hover:bg-red-900 -->
         <a href="{{url('admin/dashboard')}}" class="flex items-center">
@@ -1259,3 +1262,5 @@ fill="#fff" stroke="none">
     @endif
 
 </ul>
+
+@endif

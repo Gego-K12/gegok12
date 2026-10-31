@@ -1,0 +1,25 @@
+{
+  "name": "GegoK12 academy trial",
+  "dockerComposeFile": "compose.yml",
+  "service": "app",
+  "workspaceFolder": "/var/www",
+  "shutdownAction": "stopCompose",
+  "remoteUser": "root",
+  "forwardPorts": [
+    8000
+  ],
+  "portsAttributes": {
+    "8000": {
+      "label": "Academy trial — open /installer/",
+      "onAutoForward": "notify"
+    }
+  },
+  "postCreateCommand": "mkdir -p storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs bootstrap/cache",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "xdebug.php-debug"
+      ]
+    }
+  }
+}

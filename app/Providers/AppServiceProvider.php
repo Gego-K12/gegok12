@@ -89,6 +89,12 @@ class AppServiceProvider extends ServiceProvider {
             }
         });
 
+        foreach ([\App\Models\StandardLink::class => 'id', \App\Models\StudentAcademic::class => 'standardLink_id',
+            \App\Models\Homework::class => 'standardLink_id', \App\Models\Assignment::class => 'standardLink_id',
+            \App\Models\Teacherlink::class => 'standardLink_id'] as $model => $column) {
+            $model::addGlobalScope(new \App\Models\Scopes\AcademyTeacherScope($column));
+        }
+
         Events::observe( EventObserver::class );
         Bulletin::observe( BulletinObserver::class );
         Homework::observe( HomeworkObserver::class );
@@ -99,6 +105,12 @@ class AppServiceProvider extends ServiceProvider {
 
 
         StandardLink::observe(StandardLinkObserver::class);
+        $forgetGroups = function ($link) {
+            \Illuminate\Support\Facades\Cache::forget('standardLink'.$link->school_id.':'.$link->academic_year_id);
+        };
+        StandardLink::saved($forgetGroups);
+        StandardLink::deleted($forgetGroups);
+        StandardLink::restored($forgetGroups);
         User::observe(UserObserver::class);
         Task::observe(TaskObserver::class);
         AcademicYear::observe(AcademicYearObserver::class); //new
@@ -117,12 +129,9 @@ class AppServiceProvider extends ServiceProvider {
             return;
         }
 
-        if ( !\App::runningInConsole() && count( Schema::getColumnListing( 'settings' ) ) ) {
-
-            $settings = Setting::all();
-
-            foreach ( $settings as $key => $setting ) {
-                Config::set( 'settings.'.$setting->key, $setting->value );
+        if (!\App::runningInConsole()) {
+            foreach (app(\App\Services\ApplicationSettings::class)->values() as $key => $value) {
+                Config::set('settings.'.$key, $value);
             }
         }
 
@@ -135,6 +144,6 @@ class AppServiceProvider extends ServiceProvider {
     * @return void
     */
     public function register() {
-
+        $this->app->scoped(\App\Services\AcademyContext::class);
     }
 }

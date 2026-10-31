@@ -17,6 +17,10 @@ class MustBePrivilege
      */
     public function handle($request, Closure $next)
     {
+        if (config('academy_backend.enabled')) {
+            app(\App\Services\AcademyContext::class)->prepare((int) $request->user()->school_id);
+            return $next($request);
+        }
         $academic_year = SiteHelper::getAcademicYear(\Auth::user()->school_id);
         if($academic_year != null)
         {

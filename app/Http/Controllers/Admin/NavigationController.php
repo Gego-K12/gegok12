@@ -36,9 +36,9 @@ class NavigationController extends Controller
     {
         $school_id = Auth::user()->school_id;
 
-        $academic_year = AcademicYear::where('school_id', $school_id)
-            ->orderBy('name', 'ASC')
-            ->get();
+        $academic_year = config('academy_backend.enabled')
+            ? collect([SiteHelper::getAcademicYear($school_id)])
+            : AcademicYear::where('school_id', $school_id)->orderBy('name', 'ASC')->get();
 
         $current_year = SiteHelper::getAcademicYear($school_id);
 
@@ -61,15 +61,13 @@ class NavigationController extends Controller
      */
     public function index(Request $request)
     {
-        $academic_year_id = $request->academic_year_id;
+        $school = (int) Auth::user()->school_id;
+        $request->validate(['academic_year_id' => ['required', 'integer',
+            \Illuminate\Validation\Rule::exists('academic_years', 'id')->where('school_id', $school)->whereNull('deleted_at')]]);
+        if (!config('academy_backend.enabled')) {
+            $request->session()->put('academic_year.'.$school, (int) $request->academic_year_id);
+        }
+        return response()->json(['current_year' => SiteHelper::getAcademicYear($school)]);
 
-        Cache::forget('academic_year');
-        Cache::forget("academic_year_for_school_" . Auth::user()->school_id);
-
-        Cache::remember("academic_year", env('CACHE_TIME'), function () use ($academic_year_id) {
-            return $academic_year_id;
-        });
-
-        $current_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
     }
 }

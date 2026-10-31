@@ -1,0 +1,72 @@
+name: Academy backend checks
+on:
+  pull_request:
+  push:
+    branches: ['fix/academy-backend', 'feature/academy-student-journey', 'feature/academy-group-lessons', 'feature/academy-teacher-workspace']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        database: [sqlite, mysql]
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_DATABASE: academy_test
+          MYSQL_ROOT_PASSWORD: ci_only_password
+          MYSQL_ROOT_HOST: '%'
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -pci_only_password"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
+    timeout-minutes: 20
+    env:
+      APP_ENV: testing
+      DB_CONNECTION: ${{ matrix.database }}
+      DB_DATABASE: ${{ matrix.database == 'mysql' && 'academy_test' || ':memory:' }}
+      DB_HOST: 127.0.0.1
+      DB_PORT: '3306'
+      DB_USERNAME: root
+      DB_PASSWORD: ci_only_password
+      ACADEMY_TEST_DATABASE: ${{ matrix.database }}
+      SESSION_DRIVER: array
+      CACHE_DRIVER: array
+      MAIL_MAILER: log
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_sqlite, pdo_mysql, mbstring, curl, fileinfo, gd, bcmath, xml, zip, intl
+          tools: composer:v2
+          coverage: none
+      - name: Verify original frontend assets are untouched
+        run: git diff --exit-code 9a35872dd0a2942f7b0ffafaf35a37c9476f2465 HEAD -- public resources/js resources/css resources/sass
+      - name: Lint backend
+        run: |
+          git diff --name-only --diff-filter=ACMR 95b17a73cad638d5db367937f9350d338a899e73 HEAD -- '*.php' | while IFS= read -r file; do php -l "$file" || exit 1; done
+      - name: Install dependencies
+        run: |
+          cp .env.example .env
+          composer install --prefer-dist --no-interaction --no-progress
+          php artisan key:generate
+      - name: Check preview updater syntax
+        run: |
+          bash -n scripts/preview-academy.sh
+          python3 tests/scripts/test_preview_academy.py
+      - name: Compile academy Blade templates
+        run: |
+          php artisan view:cache
+      - name: Test academy backend
+        run: php artisan test --filter=AcademyBackendTest
+

@@ -47,6 +47,9 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+      \Illuminate\Support\Facades\Auth::provider('academy-eloquent', function ($app, array $config) {
+          return new \App\Auth\AcademyUserProvider($app['hash'], $config['model']);
+      });
       $this->registerPolicies();
       
       Gate::define('event', function ($user, $event) {
@@ -54,7 +57,11 @@ class AuthServiceProvider extends ServiceProvider
       });
 
       Gate::define('member', function ($user, $member) {
-        return $user->school_id == $member->school_id;
+        if (!$member || (int) $user->school_id !== (int) $member->school_id) { return false; }
+        if (config('academy_backend.enabled') && (int) $user->usergroup_id === 5 && (int) $member->usergroup_id === 6) {
+            return app(\App\Services\LearningAccess::class)->students($user)->where('users.id', $member->id)->exists();
+        }
+        return true;
       });
 
       Gate::define('academic', function ($user, $academic) {
@@ -110,7 +117,9 @@ class AuthServiceProvider extends ServiceProvider
       });
 
       Gate::define('standardlink', function ($user, $standardlink) {
-        return $user->school_id == $standardlink->school_id;
+        if (!$standardlink || (int) $user->school_id !== (int) $standardlink->school_id) { return false; }
+        return !config('academy_backend.enabled') || (int) $user->usergroup_id !== 5
+            || app(\App\Services\AcademyAssignments::class)->allows($user, (int) $standardlink->id);
       });
 
       Gate::define('standard', function ($user, $standard) {
@@ -165,3 +174,4 @@ class AuthServiceProvider extends ServiceProvider
       });
     }
 }
+

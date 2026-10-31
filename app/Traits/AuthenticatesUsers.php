@@ -65,81 +65,22 @@ trait AuthenticatesUsers
      */
     protected function validateLogin(Request $request)
     {
-        /**
-         * Validator: checkschool
-         * Ensures the user's school is active (status = 1).
-         * SuperAdmins (usergroup_id == 1) bypass school checks.
-         *
-         * @param string $attribute The attribute being validated
-         * @param string $value The value being validated
-         * @param array $parameters Additional parameters
-         * @param \Illuminate\Validation\Validator $validator The validator instance
-         * @return bool True if school is active or user is superadmin
-         */
-        Validator::extend('checkschool', function ($attribute, $value, $parameters, $validator) {
-            $users = User::orWhere('email', request('email'))
-                ->orWhere('mobile_no', request('email'))
-                ->orWhere('name', request('email'))
-                ->orWhere('registration_number', request('email'))
-                ->first();
-
-            if ($users->usergroup_id == 1) {
-                return TRUE;
-            }
-
-            $school = School::IsActive($users->school_id)->exists();
-            return $school == TRUE;
-        }, 'Invalid Credentials. You are not in this school');
-
-        /**
-         * Validator: checkusers
-         * Validates that the user exists in the system.
-         *
-         * @param string $attribute The attribute being validated
-         * @param string $value The value being validated
-         * @param array $parameters Additional parameters
-         * @param \Illuminate\Validation\Validator $validator The validator instance
-         * @return bool True if user exists
-         */
-        Validator::extend('checkusers', function ($attribute, $value, $parameters, $validator) {
-            $users = User::where('email', request('email'))->with('userprofile')->first();
-            return $users != null;
-        }, 'Invalid Credentials');
-
-        /**
-         * Validator: checkactive
-         * Validates that the user's profile status is not 'inactive' (suspended).
-         *
-         * @param string $attribute The attribute being validated
-         * @param string $value The value being validated
-         * @param array $parameters Additional parameters
-         * @param \Illuminate\Validation\Validator $validator The validator instance
-         * @return bool True if user is active
-         */
-        Validator::extend('checkactive', function ($attribute, $value, $parameters, $validator) {
-            $users = User::where('email', request('email'))->with('userprofile')->first();
-            return $users->userprofile->status != 'inactive';
-        }, 'You are suspended by site admin');
-
-        /**
-         * Validator: checkexit
-         * Validates that the user's profile status is not 'exit' (no longer works in school).
-         *
-         * @param string $attribute The attribute being validated
-         * @param string $value The value being validated
-         * @param array $parameters Additional parameters
-         * @param \Illuminate\Validation\Validator $validator The validator instance
-         * @return bool True if user status is not 'exit'
-         */
-        Validator::extend('checkexit', function ($attribute, $value, $parameters, $validator) {
-            $users = User::where('email', request('email'))->with('userprofile')->first();
-            return $users->userprofile->status != 'exit';
-        }, 'You have exited this school');
-
-        $this->validate($request, [
-            $this->username() => 'required|string|checkactive|checkexit',
-            'password' => 'bail|required|string|checkschool',
-        ]);
+        $request->validate(['email' => ['required', 'string', 'max:255'], 'password' => ['required', 'string']]);
+        $field = $this->username();
+        $user = User::without(['members', 'children', 'parents'])->with('userprofile')
+            ->where($field, $request->input($field))->first();
+        $active = $user && $user->status === 'active' && $user->userprofile
+            && $user->userprofile->status === 'active';
+        if ($active && config('academy_backend.test_only')) { $active = in_array($user->email, config('academy_backend.demo_emails'), true); }
+        if ($active && config('academy_backend.enabled')) {
+            $active = in_array((int) $user->usergroup_id, [1, 3, 5, 6, 7], true);
+        }
+        if ($active && (int) $user->usergroup_id !== 1) {
+            $active = School::IsActive($user->school_id)->exists();
+        }
+        if (!$active) {
+            throw ValidationException::withMessages(['email' => trans('auth.failed')]);
+        }
     }
 
     /**

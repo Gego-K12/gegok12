@@ -124,6 +124,8 @@ trait MemberProcess
                     $users = $users->ByStatus($status);
                 }
             }
+            $users = $users->without(['members', 'children'])->with(['parents', 'studentAcademicLatest.standardLink']);
+            if (!config('academy_backend.enabled')) { $users->with(['teacherprofile', 'librarycard']); }
             $users = $users->get()->sortBy('userprofile.firstname');
             $users = UserResource::collection($users);
             return $users;
@@ -210,6 +212,8 @@ trait MemberProcess
                     $users = $users->ByJopType($job_type);
                 }
             }
+            $users = $users->without(['members', 'children', 'parents'])->with('teacherprofile');
+            if (!config('academy_backend.enabled')) { $users->with(['teacherprofile.qualification', 'librarycard']); }
             $users = $users->get();
             $users = TeacherResource::collection($users);
             return $users;
@@ -316,7 +320,7 @@ trait MemberProcess
     public function ParentFilter($request, $school_id, $usergroup_id)
     {
         try {
-            $users = User::where('school_id', $school_id)->ByRole($usergroup_id)->whereHas('children', function ($q) use ($search) {
+            $users = User::where('school_id', $school_id)->ByRole($usergroup_id)->whereHas('children', function ($q) {
 
                 $q->whereHas('userStudent', function ($q) {
                     $q->where([['status', '!=', 'exit']]);

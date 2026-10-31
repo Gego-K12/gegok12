@@ -25,6 +25,12 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Setting extends Model
 {
+    protected static function booted(): void
+    {
+        static::saved(fn () => app(\App\Services\ApplicationSettings::class)->forget());
+        static::deleted(fn () => app(\App\Services\ApplicationSettings::class)->forget());
+    }
+
     //
     /**
      * The table associated with the model.

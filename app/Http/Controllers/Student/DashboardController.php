@@ -29,7 +29,8 @@ class DashboardController extends Controller
         $school_id          =   Auth::user()->school_id;
         $student_id         =   Auth::id();
         $student            =   User::where('id',$student_id)->first();
-        $standardLink_id    =   $student->studentAcademicLatest->standardLink_id;
+        $standardLink_id = $student->studentAcademicLatest?->standardLink_id;
+        $exam_date = null;
         
         if($request->exam_date != null)
         {

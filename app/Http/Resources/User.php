@@ -15,17 +15,11 @@ class User extends JsonResource
     */
     public function toArray($request)
     {
-        $i = 0;
-        foreach($this->parents as $parent)
-        {
-            $parent_id[$i] = $parent->userParent->id;
-            $i++;
-        }
-         $pro_design='';
-        if($this->teacherprofile[0]['designation']!=null){
-
-            $pro_design=ucwords(str_replace('_', ' ', $this->teacherprofile[0]['designation']));
-        }
+        $parent_id = $this->parents->pluck('parent_id')->all();
+        $designation = config('academy_backend.enabled') && (int) $this->usergroup_id === 6
+            ? null : $this->teacherprofile->first()?->designation;
+        $pro_design = $designation ? ucwords(str_replace('_', ' ', $designation)) : '';
+        $library = config('academy_backend.enabled') ? null : $this->librarycard;
         return 
         [
             'id'                    =>  $this->id,
@@ -33,17 +27,17 @@ class User extends JsonResource
             'label'                 =>  $this->email,
             'mobile_no'             =>  $this->mobile_no,
             'avatar'                =>  optional($this->userprofile)->AvatarPath,
-            'firstname'             =>  $this->userprofile->firstname.' '.$this->userprofile->lastname,
-            'lastname'              =>  $this->userprofile->lastname,
+            'firstname'             =>  trim(($this->userprofile?->firstname ?? '').' '.($this->userprofile?->lastname ?? '')),
+            'lastname'              =>  $this->userprofile?->lastname,
             'fullname'              =>  $this->FullName,
-            'class'                 =>  $this->studentAcademicLatest->standardLink->StandardSection,
+            'class'                 =>  $this->studentAcademicLatest?->standardLink?->StandardSection,
             'parent_id'             =>  $parent_id == null ? []:$parent_id,
-            'designation'           =>  $this->teacherprofile[0]['designation'],
+            'designation'           =>  $designation,
             'designation_display'   => $pro_design,
-            'date_of_birth'         =>  $this->userprofile->date_of_birth == null ? null:date('d M Y',strtotime($this->userprofile->date_of_birth)),
+            'date_of_birth'         =>  $this->userprofile?->date_of_birth == null ? null:date('d M Y',strtotime($this->userprofile->date_of_birth)),
             'status'                =>  $this->status,
-            'librarycard_number'        => $this->librarycard->library_card_no,
-            'book_limit' => $this->librarycard->book_limit,
+            'librarycard_number'        => $library?->library_card_no,
+            'book_limit' => $library?->book_limit,
         ];
     }
 }

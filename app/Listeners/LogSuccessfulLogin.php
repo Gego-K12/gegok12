@@ -39,12 +39,13 @@ class LogSuccessfulLogin implements ShouldQueue
         $this->doActivityLog(
             $event->user,
             $event->user,
-            ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT'] ],
+            ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown client'],
             LOGNAME_LOGIN,
             'Logged In'
         );
         
-        if(env('MAIL_STATUS') == 'on')
+        if(env('MAIL_STATUS') == 'on'
+            && (!config('academy_backend.enabled') || config('academy_backend.login_email_notifications')))
         {
             if($event->user->email != null)
             {

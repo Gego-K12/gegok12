@@ -19,6 +19,7 @@ class MustBeTeacher
     {
         if (\Auth::user()->isTeacher())
         {
+            app(\App\Services\TeacherLearningGuard::class)->check($request, \Auth::user());
             return $next($request);
         }
 
@@ -45,3 +46,4 @@ class MustBeTeacher
         abort(404);
     }
 }
+

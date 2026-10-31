@@ -571,7 +571,7 @@ class User extends Authenticatable implements HasMedia
      */
     public function studentAcademicLatest()
     {
-        return $this->hasOne('App\Models\StudentAcademic','user_id','id')->orderByDesc('id')->limit(1);
+        return $this->hasOne('App\Models\StudentAcademic', 'user_id', 'id')->latestOfMany();
     }
 
     /**
@@ -1025,8 +1025,15 @@ class User extends Authenticatable implements HasMedia
      */
     public function teacherlinkCurrentAcademicYear()
     {
+        $relation = $this->hasMany('\App\Models\Teacherlink', 'teacher_id', 'id');
+        if (config('academy_backend.enabled')) {
+            return $relation->where('academic_year_id', function ($query) {
+                $query->select('id')->from('academic_years')->whereColumn('academic_years.school_id', 'class_teacher_links.school_id')
+                    ->where('status', 1)->whereNull('deleted_at')->orderByDesc('id')->limit(1);
+            });
+        }
         $academic_year = SiteHelper::getAcademicYear($this->school_id);
-        return $this->hasMany('\App\Models\Teacherlink','teacher_id','id')->where('academic_year_id',$academic_year->id);
+        return $relation->where('academic_year_id', $academic_year->id);
     }
 
     /**

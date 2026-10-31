@@ -14,7 +14,15 @@ class Teacher extends JsonResource
      */
     public function toArray($request)
     {
-        $details = $this->getTeacherDetails();
+        if (config('academy_backend.enabled')) {
+            $profile = $this->teacherprofile->first();
+            $details = ['designation' => $profile?->designation,
+                'designation_name' => $profile?->designation ? str_replace('_', ' ', ucwords($profile->designation)) : '',
+                'sub_designation' => $profile?->sub_designation];
+        } else {
+            $details = $this->getTeacherDetails();
+        }
+        $library = config('academy_backend.enabled') ? null : $this->librarycard;
         return 
         [
             //
@@ -29,8 +37,8 @@ class Teacher extends JsonResource
             'sub_designation'   =>  $details['sub_designation'],
             'date_of_birth'     =>  date('d M Y',strtotime($this->userprofile->date_of_birth)),
             'status'            =>  $this->status,
-            'librarycard_number'        => $this->librarycard->library_card_no,
-            'book_limit' => $this->librarycard->book_limit,
+            'librarycard_number'        => $library?->library_card_no,
+            'book_limit' => $library?->book_limit,
         ];
     }
 }
